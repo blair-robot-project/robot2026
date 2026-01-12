@@ -1,11 +1,10 @@
 package frc.team449.subsystems.drive
 
-import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
-import com.ctre.phoenix6.swerve.SwerveRequest.ApplyRobotSpeeds
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.DriverStation
@@ -15,9 +14,7 @@ import org.littletonrobotics.junction.Logger
 class DriveSubsystem(
     val io: DriveIO
 ) : SubsystemBase() {
-    val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
-
-    private val stopRequest: ApplyRobotSpeeds = ApplyRobotSpeeds().withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
+    private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -26,6 +23,16 @@ class DriveSubsystem(
     }
 
     fun setControl(request: SwerveRequest) { io.setControl(request) }
+
+    fun resetOdometry(pose: Pose2d) { io.resetOdometry(pose) }
+
+    fun getPose(): Pose2d {
+        return inputs.Pose
+    }
+
+    fun getRobotRelativeSpeeds(): ChassisSpeeds {
+        return inputs.Speeds
+    }
 
     fun seedFieldCentric() {
         if (io is DriveIOHardware) {
@@ -45,8 +52,6 @@ class DriveSubsystem(
             )
         }
     }
-
-    fun resetOdometry(pose: Pose2d) { io.resetOdometry(pose) }
 
     fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
