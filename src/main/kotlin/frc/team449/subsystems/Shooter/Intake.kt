@@ -1,4 +1,4 @@
-package frc.team449.subsystems.shooter
+package frc.team449.subsystems.intake
 
 import au.grapplerobotics.LaserCan
 import au.grapplerobotics.interfaces.LaserCanInterface
@@ -15,7 +15,7 @@ import frc.team449.subsystems.superstructure.intake.IntakeConstants.config
 import frc.team449.system.motor.KrakenDogLog
 import kotlin.math.abs
 
-class Shooter(
+class Intake(
     private val topMotor: TalonFX,
     private val rightMotor: TalonFX,
     private val leftMotor: TalonFX,
