@@ -1,11 +1,21 @@
 package frc.team449
 
+import choreo.auto.AutoChooser
 import com.ctre.phoenix6.SignalLogger
+import com.pathplanner.lib.auto.AutoBuilder
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
+import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers
+import frc.team449.auto.bLineRoutines
+import frc.team449.auto.choreoRoutines
+import frc.team449.auto.pathRoutines
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -16,6 +26,15 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
+
+
+    val routines = choreoRoutines(this)
+    val autoChooser = AutoChooser()
+    val pathPlannerRoutines = pathRoutines(this)
+    val bLineRoutines = bLineRoutines(this)
+
+
+
     init {
         println("Initializing Robot!")
 
@@ -56,6 +75,12 @@ class Robot : LoggedRobot() {
     override fun robotInit() {
         bindings.setDefaultCommands()
         bindings.bindControls()
+
+      routines.addOptions(autoChooser)
+        SmartDashboard.putData("Auto Chooser", autoChooser)
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler())
+
+
     }
 
     override fun robotPeriodic() {
