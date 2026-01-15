@@ -31,6 +31,7 @@ class Intake(
             rightSensor,
             middleSensor,
         )
+
     private fun setVoltage(
         vararg motors: TalonFX,
         voltage: Double,
