@@ -31,3 +31,11 @@ class Intake(
             rightSensor,
             middleSensor,
         )
+    private fun setVoltage(
+        vararg motors: TalonFX,
+        voltage: Double,
+    ): Command =
+        runOnce {
+            motors.forEach { it.setVoltage(voltage) }
+        }
+}
