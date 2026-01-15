@@ -10,6 +10,7 @@ package frc.team449.subsystems.indexer
 object IndexerConstants {
     //motor definitions that are currently placeholders
     const val INDEXER_ID = 1
+    const val INDEXER_DETECTION_THRESHOLD = 30
     //const val INDEXER_ID_2 = 2
     //add more indexers as needed
 }

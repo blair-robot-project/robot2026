@@ -4,11 +4,10 @@ import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.subsystems.indexer.IndexerConstants
-/*
 import au.grapplerobotics.interfaces.LaserCanInterface
 import au.grapplerobotics.LaserCan
 import au.grapplerobotics.simulation.MockLaserCan
-*/
+
 
 /**
  * @file Indexer.kt
@@ -19,32 +18,63 @@ import au.grapplerobotics.simulation.MockLaserCan
 
 class Indexer (
     val indexer: TalonFX, // kraken x60
-    //lasercan def
-    //private val conveyorSensor: LaserCanInterface,
+    private val indexSensor: LaserCanInterface,
+
 ): SubsystemBase() {
-    private fun setVoltage(
-        vararg motors: TalonFX,
-        voltage: Double,
-    ): Command =
-        runOnce {
-            motors.forEach { it.setVoltage(voltage) }
-        }
-}
-    /*
-    more lasercan def
+    private val sensors =
+        listOf(
+            indexSensor
+        )
     private var allSensorsConfigured = true
     private var lasercanConfigured = listOf<Boolean>()
-    */
 
-
-    /*
-    init{
-        try{
-            initiation stuff
+    init {
+        try {
+            indexSensor.setTimingBudget(LaserCanInterface.TimingBudget.TIMING_BUDGET_20MS)
+            for (sensor in sensors) {
+                if (sensor != sensors) {
+                    sensor.setTimingBudget(LaserCanInterface.TimingBudget.TIMING_BUDGET_33MS)
+                }
+                sensor.setRegionOfInterest(LaserCanInterface.RegionOfInterest(8, 8, 4, 4))
+                sensor.setRangingMode(LaserCanInterface.RangingMode.SHORT)
+                lasercanConfigured.plus(true)
+            }
+        } catch (_: Exception) {
+            lasercanConfigured.plus(false)
+            allSensorsConfigured = false
         }
     }
-     */
-//resets position of indexer
-fun resetPos() {
-    indexer.setPosition(0.0)
+
+    //sets voltage of motor
+    private fun setVoltage(voltage: Double){
+        indexer.setVoltage(voltage)
+    }
+
+    //stops motor
+    fun stop(): Command=runOnce{
+        indexer.setVoltage(0.0)
+    }
+
+    //reset pos of indexer
+    fun resetPos() {
+        indexer.setPosition(0.0)
+    }
+
+    //lasercan detected info
+    private fun laserCanDetected(laserCan: LaserCanInterface): Boolean {
+        val measurement = laserCan.measurement
+        return measurement != null && (
+                measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT &&
+                        measurement.distance_mm <= IndexerConstants.INDEXER_DETECTION_THRESHOLD
+
+                )
+    }
+
+    //t/f function to see if the ball is detected
+    fun ballDetected(): Boolean = laserCanDetected(indexSensor)
+    fun ballNotDetected(): Boolean = !ballDetected()
+
+
+    fun runDetect(volt:Double): Command=runOnce{
+        setVoltage(volt)}.onlyIf { ballNotDetected() }.andThen(stop())
 }
