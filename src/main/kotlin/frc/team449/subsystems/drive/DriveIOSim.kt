@@ -2,6 +2,7 @@ package frc.team449.subsystems.drive
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.configs.TalonFXSConfiguration
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants
 import com.ctre.phoenix6.swerve.SwerveModuleConstants
 import edu.wpi.first.math.geometry.Pose2d
@@ -22,7 +23,7 @@ import java.util.function.Consumer
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
 ) : DriveIOHardware(
     driveConstants,
     sanitizeConstantsForSim(moduleConstants)
@@ -96,8 +97,8 @@ class DriveIOSim(
 
             simModule.useSteerMotorController(
                 SimulatedMotorController { mechPos, mechVel, encPos, encVel ->
-                    realModule.encoder.simState.setRawPosition(mechPos)
-                    realModule.encoder.simState.setVelocity(mechVel)
+                    realModule.steerMotor.simState.setPulseWidthPosition(mechPos)
+                    realModule.steerMotor.simState.setPulseWidthVelocity(mechVel)
 
                     realModule.steerMotor.simState.setRawRotorPosition(encPos)
                     realModule.steerMotor.simState.setRotorVelocity(encVel)
@@ -120,8 +121,8 @@ class DriveIOSim(
 
     companion object {
         private fun sanitizeConstantsForSim(
-            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
-        ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>> {
+            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+        ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>> {
             // create a new array to hold the modified constants
             return originalConstants.map { module ->
                 // create a modified copy of the module constant

@@ -44,6 +44,8 @@ class Robot : LoggedRobot() {
 
         SignalLogger.enableAutoLogging(false)
         Logger.start()
+
+        print(Constants.CURRENT_MODE)
     }
 
     private val robotContainer = RobotContainer

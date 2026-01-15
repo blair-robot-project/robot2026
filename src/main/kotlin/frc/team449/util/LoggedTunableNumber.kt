@@ -19,8 +19,7 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
     private val lastHasChangedValues: MutableMap<Int, Double> = HashMap()
 
     /**
-     * Create a new LoggedTunableNumber with the default value
-     *
+     * Create a new LoggedTunableNumber with the default value.
      * @param dashboardKey Key on dashboard
      * @param defaultValue Default value
      */
@@ -30,7 +29,6 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
 
     /**
      * Set the default value of the number. The default value can only be set once.
-     *
      * @param defaultValue The default value
      */
     fun initDefault(defaultValue: Double) {
@@ -45,7 +43,6 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
 
     /**
      * Get the current value, from dashboard if available and in tuning mode.
-     *
      * @return The current value
      */
     fun get(): Double {
@@ -57,8 +54,7 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
     }
 
     /**
-     * Checks whether the number has changed since our last check
-     *
+     * Checks whether the number has changed since our last check.
      * @param id Unique identifier for the caller to avoid conflicts when shared between multiple
      * objects. Recommended approach is to pass the result of "hashCode()"
      * @return True if the number has changed since the last time this method was called, false
@@ -83,8 +79,7 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
         private const val TABLE_KEY = "/Tuning"
 
         /**
-         * Runs action if any of the tunableNumbers have changed
-         *
+         * Runs action if any of the tunableNumbers have changed.
          * @param id Unique identifier for the caller to avoid conflicts when shared between multiple *
          * objects. Recommended approach is to pass the result of "hashCode()"
          * @param action Callback to run when any of the tunable numbers have changed. Access tunable

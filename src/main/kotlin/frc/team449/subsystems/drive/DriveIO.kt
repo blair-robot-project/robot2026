@@ -23,6 +23,7 @@ interface DriveIO {
             this.FailedDaqs = stateIn.FailedDaqs
             this.ModuleStates = stateIn.ModuleStates
             this.ModuleTargets = stateIn.ModuleTargets
+            this.ModulePositions = stateIn.ModulePositions
             this.Speeds = stateIn.Speeds
             this.OdometryPeriod = stateIn.OdometryPeriod
         }
