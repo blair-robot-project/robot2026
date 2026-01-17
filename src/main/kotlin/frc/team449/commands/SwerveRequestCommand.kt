@@ -1,14 +1,23 @@
 package frc.team449.commands
 
+import com.ctre.phoenix6.SignalLogger
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
+import edu.wpi.first.units.Units.Second
+import edu.wpi.first.units.Units.Volts
+import edu.wpi.first.units.measure.Voltage
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
+import java.util.function.Consumer
 import java.util.function.DoubleSupplier
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sign
+
 
 class SwerveRequestCommand(
     private val drive: DriveSubsystem,
@@ -49,6 +58,8 @@ class SwerveRequestCommand(
         strafe = abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) * Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
         turn = abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
 
+
+        println()
         drive.setControl(
             driveNoHeading
                 .withVelocityX(throttle)
@@ -60,4 +71,6 @@ class SwerveRequestCommand(
     override fun isFinished(): Boolean {
         return false
     }
+
+
 }
