@@ -53,8 +53,6 @@ open class choreoRoutines(
     }
 
 
-
-
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("test", this::testing)
         autoChooser.addRoutine("taxi", this::forward)

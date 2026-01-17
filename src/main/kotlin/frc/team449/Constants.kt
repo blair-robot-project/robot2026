@@ -1,6 +1,8 @@
 package frc.team449
 
+import com.pathplanner.lib.config.RobotConfig
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
@@ -49,6 +51,14 @@ object Constants {
 
         const val WHEEL_FRICTION_COEFFICIENT = 1.2
     }
+
+
+
+    object AutoConstants {
+        val config: RobotConfig = RobotConfig.fromGUISettings()
+
+    }
+
 
     object PowerConstants
 }
