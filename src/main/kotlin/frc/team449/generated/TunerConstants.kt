@@ -66,7 +66,7 @@ object TunerConstants {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    val kCANBus: CANBus = CANBus("", "./logs/example.hoot")
+    val kCANBus: CANBus = CANBus("")
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
@@ -76,6 +76,7 @@ object TunerConstants {
     // This may need to be tuned to your individual robot
     private const val kCoupleRatio = 3.5714285714285716
 
+    // L2
     private const val kDriveGearRatio = 6.746031746031747
     private const val kSteerGearRatio = 21.428571428571427
     private val kWheelRadius: Distance = Units.Inches.of(1.935)

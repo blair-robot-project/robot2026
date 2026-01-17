@@ -1,12 +1,11 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.PrintCommand
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
     val robotContainer: RobotContainer
 ) {
-
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
 
@@ -22,10 +21,28 @@ class Bindings(
     }
 
     fun bindControls() {
-        driveController
+        opController
             .x()
             .onTrue(
-                PrintCommand("X Button Pressed!")
+                robotContainer.drive.sysIdRoutineTranslation.quasistatic(SysIdRoutine.Direction.kForward)
+            )
+
+        opController
+            .y()
+            .onTrue(
+                robotContainer.drive.sysIdRoutineTranslation.quasistatic(SysIdRoutine.Direction.kReverse)
+            )
+
+        opController
+            .a()
+            .onTrue(
+                robotContainer.drive.sysIdRoutineTranslation.dynamic(SysIdRoutine.Direction.kForward)
+            )
+
+        opController
+            .b()
+            .onTrue(
+                robotContainer.drive.sysIdRoutineTranslation.dynamic(SysIdRoutine.Direction.kReverse)
             )
     }
 }

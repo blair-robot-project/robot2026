@@ -63,8 +63,9 @@ open class DriveIOHardware(
             accelY
         )
 
-        this.odometryThread.setThreadPriority(99)
+        pigeon2.optimizeBusUtilization()
 
+        this.odometryThread.setThreadPriority(99)
         registerTelemetry(telemetryConsumer)
     }
 
@@ -107,7 +108,7 @@ open class DriveIOHardware(
 
     override fun logModules(driveState: SwerveDriveState) {
         val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
-        if (driveState.ModuleStates == null) return
+        if (driveState.ModuleStates == null || driveState.ModulePositions == null) return
         for (i in 0 until modules.count()) {
             Logger.recordOutput(
                 moduleNames[i] + "/Steering Angle",
@@ -125,10 +126,6 @@ open class DriveIOHardware(
                 moduleNames[i] + "/Target Drive Velocity",
                 driveState.ModuleTargets[i].speedMetersPerSecond
             )
-        }
-
-        if (driveState.ModulePositions == null) return
-        for (i in 0 until modules.count()) {
             Logger.recordOutput(
                 moduleNames[i] + "/Drive Position",
                 driveState.ModulePositions[i].distanceMeters

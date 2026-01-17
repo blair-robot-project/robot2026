@@ -15,6 +15,7 @@ object Constants {
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
     const val TUNING_MODE: Boolean = false
+    const val CHARACTERIZATION_MODE: Boolean = false
 
     const val PDH_CAN_ID = 1
 
