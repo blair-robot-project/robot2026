@@ -24,9 +24,6 @@ class Bindings(
             )
     }
 
-
-
-
     fun bindControls() {
         driveController
             .x()
@@ -34,15 +31,9 @@ class Bindings(
                 PrintCommand("X Button Pressed!")
             )
 
-        charController.povUp().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        charController.povDown().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        charController.povLeft().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        charController.povRight().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-
-
-
-
+        charController.povUp().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward))
+        charController.povDown().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse))
+        charController.povLeft().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward))
+        charController.povRight().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse))
     }
 }
-
-

@@ -70,21 +70,17 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-
-
     /* Swerve requests to apply during SysId characterization */
     private val m_translationCharacterization = SwerveRequest.SysIdSwerveTranslation()
     private val m_steerCharacterization = SwerveRequest.SysIdSwerveSteerGains()
     private val m_rotationCharacterization = SwerveRequest.SysIdSwerveRotation()
 
-
-
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private val m_sysIdRoutineTranslation = SysIdRoutine(
         SysIdRoutine.Config(
-            null,  // Use default ramp rate (1 V/s)
-            Volts.of(4.0),  // Reduce dynamic step voltage to 4 V to prevent brownout
-            null,  // Use default timeout (10 s)
+            null, // Use default ramp rate (1 V/s)
+            Volts.of(4.0), // Reduce dynamic step voltage to 4 V to prevent brownout
+            null, // Use default timeout (10 s)
             // Log state with SignalLogger class
             Consumer<SysIdRoutineLog.State> { state: SysIdRoutineLog.State ->
                 SignalLogger.writeString(
@@ -103,9 +99,9 @@ class DriveSubsystem(
     /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
     private val m_sysIdRoutineSteer = SysIdRoutine(
         SysIdRoutine.Config(
-            null,  // Use default ramp rate (1 V/s)
-            Volts.of(7.0),  // Use dynamic voltage of 7 V
-            null,  // Use default timeout (10 s)
+            null, // Use default ramp rate (1 V/s)
+            Volts.of(7.0), // Use dynamic voltage of 7 V
+            null, // Use default timeout (10 s)
             // Log state with SignalLogger class
             Consumer<SysIdRoutineLog.State> { state: SysIdRoutineLog.State ->
                 SignalLogger.writeString(
@@ -128,9 +124,9 @@ class DriveSubsystem(
      */
     private val m_sysIdRoutineRotation = SysIdRoutine(
         SysIdRoutine.Config( /* This is in radians per second², but SysId only supports "volts per second" */
-            Volts.of(Math.PI / 6).per(Second),  /* This is in radians per second, but SysId only supports "volts" */
+            Volts.of(Math.PI / 6).per(Second), /* This is in radians per second, but SysId only supports "volts" */
             Volts.of(Math.PI),
-            null,  // Use default timeout (10 s)
+            null, // Use default timeout (10 s)
             // Log state with SignalLogger class
             Consumer<SysIdRoutineLog.State> { state: SysIdRoutineLog.State ->
                 SignalLogger.writeString(
@@ -174,4 +170,5 @@ class DriveSubsystem(
      */
     fun sysIdDynamic(direction: SysIdRoutine.Direction?): Command {
         return m_sysIdRoutineToApply.dynamic(direction)
-    }}
+    }
+}

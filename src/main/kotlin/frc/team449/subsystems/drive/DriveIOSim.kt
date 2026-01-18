@@ -97,8 +97,8 @@ class DriveIOSim(
 
             simModule.useSteerMotorController(
                 SimulatedMotorController { mechPos, mechVel, encPos, encVel ->
-                    realModule.encoder.simState.setRawPosition(mechPos)
-                    realModule.encoder.simState.setVelocity(mechVel)
+                    realModule.steerMotor.simState.setPulseWidthPosition(mechPos)
+                    realModule.steerMotor.simState.setPulseWidthVelocity(mechVel)
 
                     realModule.steerMotor.simState.setRawRotorPosition(encPos)
                     realModule.steerMotor.simState.setRotorVelocity(encVel)

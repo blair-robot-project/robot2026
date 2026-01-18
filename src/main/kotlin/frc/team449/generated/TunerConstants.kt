@@ -25,6 +25,7 @@ object TunerConstants {
         .withKI(0.0).withKD(0.5)
         .withKS(0.1).withKV(2.62).withKA(0.0)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
+
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     private
@@ -37,6 +38,7 @@ object TunerConstants {
     private
     val kSteerClosedLoopOutput: SwerveModuleConstants.ClosedLoopOutputType =
         SwerveModuleConstants.ClosedLoopOutputType.Voltage
+
     // The closed-loop output type to use for the drive motors;
     // This affects the PID/FF gains for the drive motors
     private
@@ -46,6 +48,7 @@ object TunerConstants {
     // The type of motor used for the drive motor
     private
     val kDriveMotorType: DriveMotorArrangement = DriveMotorArrangement.TalonFX_Integrated
+
     // The type of motor used for the drive motor
     private
     val kSteerMotorType: SteerMotorArrangement = SteerMotorArrangement.TalonFXS_NEO_JST
@@ -81,7 +84,7 @@ object TunerConstants {
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
 
-    val kCANBus: CANBus = CANBus("", "./logs/example.hoot")
+    val kCANBus: CANBus = CANBus("")
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
@@ -113,25 +116,17 @@ object TunerConstants {
     val kSteerInertia: MomentOfInertia = Units.KilogramSquareMeters.of(0.01)
     private
     val kDriveInertia: MomentOfInertia = Units.KilogramSquareMeters.of(0.01)
+
     // Simulated voltage necessary to overcome friction
     private
     val kSteerFrictionVoltage: Voltage = Units.Volts.of(0.2)
     private
     val kDriveFrictionVoltage: Voltage = Units.Volts.of(0.2)
 
-
-
-
-
-
-
-
-
     val DrivetrainConstants: SwerveDrivetrainConstants = SwerveDrivetrainConstants()
         .withCANBusName(kCANBus.name)
         .withPigeon2Id(kPigeonId)
         .withPigeon2Configs(pigeonConfigs)
-
 
     private
     val ConstantCreator: SwerveModuleConstantsFactory<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration> =
@@ -164,7 +159,7 @@ object TunerConstants {
     private
     const val kFrontLeftEncoderId: Int = 8
     private
-    val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-139.83 )
+    val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-139.83)
     private
     const val kFrontLeftSteerMotorInverted: Boolean = true
     private
@@ -231,10 +226,6 @@ object TunerConstants {
     val kBackRightXPos: Distance = Units.Inches.of(-10.875)
     private
     val kBackRightYPos: Distance = Units.Inches.of(-10.875)
-
-
-
-
 
     val FrontLeft: SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration> = ConstantCreator.createModuleConstants(
         kFrontLeftSteerMotorId,
