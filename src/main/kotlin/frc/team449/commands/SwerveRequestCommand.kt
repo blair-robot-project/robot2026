@@ -59,7 +59,6 @@ class SwerveRequestCommand(
         turn = abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
 
 
-        println()
         drive.setControl(
             driveNoHeading
                 .withVelocityX(throttle)

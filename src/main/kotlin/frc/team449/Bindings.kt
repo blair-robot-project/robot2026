@@ -19,7 +19,7 @@ class Bindings(
             SwerveRequestCommand(
                 robotContainer.drive,
                 { -robotContainer.driveController.leftY },
-                { -robotContainer.driveController.leftX },
+                { robotContainer.driveController.leftX },
                 { -robotContainer.driveController.rightX }
             )
     }
