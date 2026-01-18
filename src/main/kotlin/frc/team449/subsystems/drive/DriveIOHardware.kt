@@ -4,8 +4,10 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.configs.TalonFXSConfiguration
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.hardware.TalonFXS
 import com.ctre.phoenix6.swerve.SwerveDrivetrain
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants
 import com.ctre.phoenix6.swerve.SwerveModuleConstants
@@ -23,10 +25,10 @@ import java.util.function.Consumer
 
 open class DriveIOHardware(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
-) : SwerveDrivetrain<TalonFX, TalonFX, CANcoder>(
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+) : SwerveDrivetrain<TalonFX, TalonFXS, CANcoder>(
     ::TalonFX,
-    ::TalonFX,
+    ::TalonFXS,
     ::CANcoder,
     driveConstants,
     100.0,
