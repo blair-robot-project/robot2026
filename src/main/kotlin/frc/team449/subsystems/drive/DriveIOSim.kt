@@ -29,12 +29,12 @@ class DriveIOSim(
     sanitizeConstantsForSim(moduleConstants)
 ) {
 
-    val simTelemetryConsumer: Consumer<SwerveDriveState> = Consumer { swerveDriveState: SwerveDriveState ->
+    private val simTelemetryConsumer: Consumer<SwerveDriveState> = Consumer { swerveDriveState: SwerveDriveState ->
         swerveDriveState.Pose = mapleSimDrive.simulatedDriveTrainPose
         telemetryConsumer.accept(swerveDriveState)
     }
 
-    val simulationConfig: DriveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+    private val simulationConfig: DriveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
         .withRobotMass(Kilograms.of(Constants.ROBOT_MASS_KG))
         .withBumperSize(Inches.of(Constants.ROBOT_LENGTH_INCHES), Inches.of(Constants.ROBOT_WIDTH_INCHES))
         .withGyro(COTS.ofPigeon2())
@@ -52,11 +52,12 @@ class DriveIOSim(
                 Volts.of(moduleConstants[0].SteerFrictionVoltage),
                 Meters.of(moduleConstants[0].WheelRadius),
                 KilogramSquareMeters.of(moduleConstants[0].SteerInertia),
-                1.2
+                Constants.DriveConstants.WHEEL_COF,
             )
         )
 
-    val mapleSimDrive = SwerveDriveSimulation(simulationConfig, Pose2d(3.0, 3.0, Rotation2d()))
+    private val startingPose = Pose2d(3.0, 3.0, Rotation2d())
+    val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier = Notifier {
         SimulatedArena.getInstance().simulationPeriodic()
@@ -64,7 +65,7 @@ class DriveIOSim(
         pigeon2.simState.setRawYaw(mapleSimDrive.simulatedDriveTrainPose.rotation.measure)
         pigeon2.simState.setAngularVelocityZ(
             RadiansPerSecond.of(
-                mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
+                mapleSimDrive.driveTrainSimulatedChassisSpeedsRobotRelative
                     .omegaRadiansPerSecond
             )
         )
@@ -77,7 +78,7 @@ class DriveIOSim(
         simNotifier.startPeriodic(SIM_LOOP_TIME)
     }
 
-    fun initializeSimulation() {
+    private fun initializeSimulation() {
         SimulatedArena.overrideSimulationTimings(Seconds.of(SIM_LOOP_TIME), 1)
         SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive)
 

@@ -9,7 +9,6 @@ class Bindings(
     val robotContainer: RobotContainer
 ) {
 
-    val charController = robotContainer.charController
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
 
@@ -31,9 +30,9 @@ class Bindings(
                 PrintCommand("X Button Pressed!")
             )
 
-        charController.povUp().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward))
-        charController.povDown().whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse))
-        charController.povLeft().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward))
-        charController.povRight().whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kForward))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kReverse))
     }
 }

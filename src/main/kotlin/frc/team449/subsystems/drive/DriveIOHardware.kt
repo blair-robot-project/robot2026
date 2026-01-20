@@ -111,7 +111,7 @@ open class DriveIOHardware(
         for (i in 0 until modules.count()) {
             Logger.recordOutput(
                 moduleNames[i] + "/Absolute Encoder Angle",
-                getModule(i).encoder.absolutePosition.valueAsDouble * 360
+                getModule(i).steerMotor.rawPulseWidthPosition.valueAsDouble * 360
             )
             Logger.recordOutput(
                 moduleNames[i] + "/Steering Angle",
