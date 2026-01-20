@@ -19,8 +19,6 @@ class Robot : LoggedRobot() {
     init {
         println("Initializing Robot!")
 
-        // CanBridge.runTCP()
-
         HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Kotlin)
         DriverStation.silenceJoystickConnectionWarning(true)
 
@@ -47,15 +45,14 @@ class Robot : LoggedRobot() {
     }
 
     private val robotContainer = RobotContainer
-    private val bindings = Bindings(robotContainer)
 
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
     }
 
     override fun robotInit() {
-        bindings.setDefaultCommands()
-        bindings.bindControls()
+        robotContainer.bindings.setDefaultCommands()
+        robotContainer.bindings.bindControls()
     }
 
     override fun robotPeriodic() {
@@ -76,8 +73,7 @@ class Robot : LoggedRobot() {
 
     override fun teleopInit() {}
 
-    override fun teleopPeriodic() {
-    }
+    override fun teleopPeriodic() {}
 
     override fun disabledInit() {}
 

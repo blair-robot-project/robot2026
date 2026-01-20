@@ -11,9 +11,8 @@ import frc.team449.subsystems.drive.DriveSubsystem
 
 object RobotContainer {
     // driver/op controllers
-    val charController: CommandXboxController = CommandXboxController(0)
-    val driveController: CommandXboxController = CommandXboxController(1)
-    val opController: CommandXboxController = CommandXboxController(2)
+    val driveController: CommandXboxController = CommandXboxController(0)
+    val opController: CommandXboxController = CommandXboxController(1)
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
 
@@ -30,4 +29,6 @@ object RobotContainer {
             Mode.REPLAY -> object : DriveIO {}
         }
     )
+
+    val bindings = Bindings(this)
 }
