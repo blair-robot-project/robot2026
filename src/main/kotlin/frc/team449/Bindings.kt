@@ -1,6 +1,8 @@
 package frc.team449
 
 import edu.wpi.first.wpilibj2.command.PrintCommand
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
+import frc.team449.RobotContainer.drive
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
@@ -17,7 +19,7 @@ class Bindings(
                 robotContainer.drive,
                 { -robotContainer.driveController.leftY },
                 { -robotContainer.driveController.leftX },
-                { -robotContainer.driveController.rightX }
+                { robotContainer.driveController.rightX }
             )
     }
 
@@ -27,5 +29,10 @@ class Bindings(
             .onTrue(
                 PrintCommand("X Button Pressed!")
             )
+
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kForward))
+        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kReverse))
     }
 }

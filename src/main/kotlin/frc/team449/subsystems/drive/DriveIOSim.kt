@@ -2,6 +2,7 @@ package frc.team449.subsystems.drive
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.configs.TalonFXSConfiguration
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants
 import com.ctre.phoenix6.swerve.SwerveModuleConstants
 import edu.wpi.first.math.geometry.Pose2d
@@ -22,18 +23,18 @@ import java.util.function.Consumer
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
 ) : DriveIOHardware(
     driveConstants,
     sanitizeConstantsForSim(moduleConstants)
 ) {
 
-    val simTelemetryConsumer: Consumer<SwerveDriveState> = Consumer { swerveDriveState: SwerveDriveState ->
+    private val simTelemetryConsumer: Consumer<SwerveDriveState> = Consumer { swerveDriveState: SwerveDriveState ->
         swerveDriveState.Pose = mapleSimDrive.simulatedDriveTrainPose
         telemetryConsumer.accept(swerveDriveState)
     }
 
-    val simulationConfig: DriveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+    private val simulationConfig: DriveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
         .withRobotMass(Kilograms.of(Constants.ROBOT_MASS_KG))
         .withBumperSize(Inches.of(Constants.ROBOT_LENGTH_INCHES), Inches.of(Constants.ROBOT_WIDTH_INCHES))
         .withGyro(COTS.ofPigeon2())
@@ -51,11 +52,12 @@ class DriveIOSim(
                 Volts.of(moduleConstants[0].SteerFrictionVoltage),
                 Meters.of(moduleConstants[0].WheelRadius),
                 KilogramSquareMeters.of(moduleConstants[0].SteerInertia),
-                1.2
+                Constants.DriveConstants.WHEEL_COF,
             )
         )
 
-    val mapleSimDrive = SwerveDriveSimulation(simulationConfig, Pose2d(3.0, 3.0, Rotation2d()))
+    private val startingPose = Pose2d(3.0, 3.0, Rotation2d())
+    val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier = Notifier {
         SimulatedArena.getInstance().simulationPeriodic()
@@ -63,7 +65,7 @@ class DriveIOSim(
         pigeon2.simState.setRawYaw(mapleSimDrive.simulatedDriveTrainPose.rotation.measure)
         pigeon2.simState.setAngularVelocityZ(
             RadiansPerSecond.of(
-                mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative()
+                mapleSimDrive.driveTrainSimulatedChassisSpeedsRobotRelative
                     .omegaRadiansPerSecond
             )
         )
@@ -76,7 +78,7 @@ class DriveIOSim(
         simNotifier.startPeriodic(SIM_LOOP_TIME)
     }
 
-    fun initializeSimulation() {
+    private fun initializeSimulation() {
         SimulatedArena.overrideSimulationTimings(Seconds.of(SIM_LOOP_TIME), 1)
         SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive)
 
@@ -96,8 +98,8 @@ class DriveIOSim(
 
             simModule.useSteerMotorController(
                 SimulatedMotorController { mechPos, mechVel, encPos, encVel ->
-                    realModule.encoder.simState.setRawPosition(mechPos)
-                    realModule.encoder.simState.setVelocity(mechVel)
+                    realModule.steerMotor.simState.setPulseWidthPosition(mechPos)
+                    realModule.steerMotor.simState.setPulseWidthVelocity(mechVel)
 
                     realModule.steerMotor.simState.setRawRotorPosition(encPos)
                     realModule.steerMotor.simState.setRotorVelocity(encVel)
@@ -120,8 +122,8 @@ class DriveIOSim(
 
     companion object {
         private fun sanitizeConstantsForSim(
-            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
-        ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>> {
+            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+        ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>> {
             // create a new array to hold the modified constants
             return originalConstants.map { module ->
                 // create a modified copy of the module constant

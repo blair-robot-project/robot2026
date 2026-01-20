@@ -29,4 +29,6 @@ object RobotContainer {
             Mode.REPLAY -> object : DriveIO {}
         }
     )
+
+    val bindings = Bindings(this)
 }
