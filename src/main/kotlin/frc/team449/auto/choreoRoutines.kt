@@ -41,7 +41,7 @@ open class choreoRoutines(
 
 
     fun forward(): AutoRoutine {
-        val taxi: AutoRoutine = autoFactory.newRoutine(" Taxi")
+        val taxi: AutoRoutine = autoFactory.newRoutine("taxi")
         val path: AutoTrajectory = taxi.trajectory("forward")
         taxi.active().onTrue(
             Commands.sequence(
@@ -52,12 +52,26 @@ open class choreoRoutines(
         return taxi
     }
 
+    fun neutral(): AutoRoutine {
+        val neutral: AutoRoutine = autoFactory.newRoutine("neutral")
+        val path: AutoTrajectory = neutral.trajectory("sample")
+        neutral.active().onTrue(
+            Commands.sequence(
+                path.resetOdometry(),
+                path.cmd()
+            )
+        )
+        return neutral
+    }
+
 
 
 
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("test", this::testing)
         autoChooser.addRoutine("taxi", this::forward)
+        autoChooser.addRoutine("do nothing", this::doNothing)
+        autoChooser.addRoutine("neutral", this::neutral)
     }
 
 }

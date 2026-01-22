@@ -2,10 +2,6 @@ package frc.team449.subsystems.drive
 
 import choreo.trajectory.SwerveSample
 import com.ctre.phoenix6.swerve.SwerveRequest
-import com.pathplanner.lib.auto.AutoBuilder
-import com.pathplanner.lib.config.PIDConstants
-import com.pathplanner.lib.config.RobotConfig
-import com.pathplanner.lib.controllers.PPHolonomicDriveController
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.controller.PIDController
@@ -59,7 +55,6 @@ class DriveSubsystem(
 
     var desiredAngle = 0.0
     var desiredOmega = 0.0
-    val config: RobotConfig = RobotConfig.fromGUISettings()
 
     init {
         headingController.enableContinuousInput(-Math.PI, Math.PI)
