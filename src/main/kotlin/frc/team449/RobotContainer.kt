@@ -16,19 +16,28 @@ object RobotContainer {
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
 
-    val drive: DriveSubsystem = DriveSubsystem(
-        when (Constants.CURRENT_MODE) {
-            Mode.REAL -> DriveIOHardware(
-                TunerConstants.DrivetrainConstants,
-                arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
-            )
-            Mode.SIM -> DriveIOSim(
-                TunerConstants.DrivetrainConstants,
-                arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
-            )
-            Mode.REPLAY -> object : DriveIO {}
-        }
-    )
+    val drive: DriveSubsystem =
+        DriveSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> {
+                    DriveIOHardware(
+                        TunerConstants.DrivetrainConstants,
+                        arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight),
+                    )
+                }
+
+                Mode.SIM -> {
+                    DriveIOSim(
+                        TunerConstants.DrivetrainConstants,
+                        arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight),
+                    )
+                }
+
+                Mode.REPLAY -> {
+                    object : DriveIO {}
+                }
+            },
+        )
 
     val bindings = Bindings(this)
 }

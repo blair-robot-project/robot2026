@@ -1,8 +1,8 @@
 package frc.team449
 
+import com.pathplanner.lib.config.RobotConfig
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import com.pathplanner.lib.config.RobotConfig
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.units.Units
@@ -14,7 +14,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY
+        REPLAY,
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -41,8 +41,6 @@ object Constants {
         const val WHEEL_COF = 1.4
     }
 
-
-
     object FieldConstants {
         // CHS uses AndyMark Rebuilt Field
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
@@ -62,13 +60,9 @@ object Constants {
         // vision constants
     }
 
-
-
     object AutoConstants {
         val config: RobotConfig = RobotConfig.fromGUISettings()
-
     }
-
 
     object LEDConstants {
         // led constants
