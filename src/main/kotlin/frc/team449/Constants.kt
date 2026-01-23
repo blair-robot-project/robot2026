@@ -3,10 +3,6 @@ package frc.team449
 import com.pathplanner.lib.config.RobotConfig
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.units.Units
-import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
 
@@ -14,7 +10,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY,
+        REPLAY
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM

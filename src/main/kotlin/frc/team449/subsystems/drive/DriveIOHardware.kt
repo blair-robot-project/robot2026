@@ -25,15 +25,15 @@ import java.util.function.Consumer
 
 open class DriveIOHardware(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
 ) : SwerveDrivetrain<TalonFX, TalonFXS, CANcoder>(
-        ::TalonFX,
-        ::TalonFXS,
-        ::CANcoder,
-        driveConstants,
-        100.0,
-        *moduleConstants,
-    ),
+    ::TalonFX,
+    ::TalonFXS,
+    ::CANcoder,
+    driveConstants,
+    100.0,
+    *moduleConstants,
+),
     DriveIO {
     var telemetryCache: AtomicReference<SwerveDriveState> = AtomicReference()
 
@@ -95,7 +95,7 @@ open class DriveIOHardware(
     override fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>,
+        visionMeasurementStdDevs: Matrix<N3, N1>
     ) {
         super<SwerveDrivetrain>.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
