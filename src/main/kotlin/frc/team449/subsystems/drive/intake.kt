@@ -3,16 +3,17 @@ package frc.team449.subsystems.drive
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import edu.wpi.first.wpilibj.motorcontrol.Talon
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import org.littletonrobotics.junction.AutoLog
+import org.littletonrobotics.junction.Logger
 
-class Intake(): SubsystemBase(){
+class Intake : SubsystemBase() {
     private val motor: TalonFX = TalonFX(25)
     private val config: TalonFXConfiguration
 
@@ -37,8 +38,22 @@ class Intake(): SubsystemBase(){
         motor.configurator.apply(config)
     }
 
-    fun runIntake(): Command = InstantCommand({ motor.setVoltage(5.0) },this)
+    val request =
+        VelocityVoltage(50.0)
+            .withFeedForward(3.0)
+            .withSlot(0)
 
+    fun runIntake(): Command =
+        InstantCommand({
+            motor.setControl(request)
 
-    fun stop(): Command = InstantCommand({ motor.stopMotor()},this)
+//            Logger.recordOutput("motor velocity ", motor.velocity.value)
+//            Logger.recordOutput("target velocity ", request.Velocity)
+//            Logger.recordOutput("motor voltage ", motor.motorVoltage.valueAsDouble)
+//            Logger.recordOutput("motor current ", motor.supplyCurrent.valueAsDouble)
+        }, this)
+
+    fun stop(): Command = InstantCommand({ motor.stopMotor() }, this)
+
+    fun run(): Command = InstantCommand({ motor.setVoltage(8.0) }, this)
 }
