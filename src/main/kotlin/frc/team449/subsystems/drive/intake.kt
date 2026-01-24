@@ -10,8 +10,9 @@ import edu.wpi.first.wpilibj.motorcontrol.Talon
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.SubsystemBase
 
-class Intake {
+class Intake(): SubsystemBase(){
     private val motor: TalonFX = TalonFX(25)
     private val config: TalonFXConfiguration
 
@@ -36,7 +37,8 @@ class Intake {
         motor.configurator.apply(config)
     }
 
-    fun runIntake(): Command = InstantCommand({ motor.setVoltage(5.0) })
+    fun runIntake(): Command = InstantCommand({ motor.setVoltage(5.0) },this)
 
-    fun stop(): Command = InstantCommand({ motor.stopMotor() })
+
+    fun stop(): Command = InstantCommand({ motor.stopMotor()},this)
 }

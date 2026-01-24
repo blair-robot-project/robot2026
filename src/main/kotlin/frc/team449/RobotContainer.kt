@@ -4,10 +4,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
 import frc.team449.generated.TunerConstants
-import frc.team449.subsystems.drive.DriveIO
-import frc.team449.subsystems.drive.DriveIOHardware
-import frc.team449.subsystems.drive.DriveIOSim
-import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.drive.*
 
 object RobotContainer {
     // driver/op controllers
@@ -16,6 +13,7 @@ object RobotContainer {
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
 
+    val intake = Intake()
     val drive: DriveSubsystem =
         DriveSubsystem(
             when (Constants.CURRENT_MODE) {
