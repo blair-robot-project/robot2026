@@ -13,7 +13,7 @@ import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
 
 class BLineRoutines(
-    robot: Robot
+    robot: Robot,
 ) {
     val autoFactory =
         AutoFactory(
@@ -54,7 +54,19 @@ class BLineRoutines(
         return routine
     }
 
+    fun zigzag(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("zigzag")), // 9.5
+                // use the event triggers on the path
+            ),
+        )
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 1 cycle (R)", this::oneCycleR)
+        autoChooser.addRoutine("B-Line full middle (R)", this::zigzag)
     }
 }
