@@ -14,7 +14,7 @@ class SwerveRequestCommand(
     private val drive: DriveSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
-    private val turnSupplier: DoubleSupplier
+    private val turnSupplier: DoubleSupplier,
 ) : Command() {
     private val driveNoHeading: SwerveRequest.FieldCentric =
         SwerveRequest

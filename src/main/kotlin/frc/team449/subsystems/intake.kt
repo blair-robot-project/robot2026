@@ -1,7 +1,8 @@
-package frc.team449.subsystems.drive
+package frc.team449.subsystems
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.TalonFX
@@ -30,10 +31,15 @@ class Intake : SubsystemBase() {
                 .withNeutralMode(NeutralModeValue.Brake)
                 .withInverted(InvertedValue.CounterClockwise_Positive)
 
+        val slot0Configs: Slot0Configs =
+            Slot0Configs()
+                .withKP(10.0)
+                .withKV(0.1)
         config =
             TalonFXConfiguration()
                 .withCurrentLimits(currentLimitConfigs)
                 .withMotorOutput(motorOutput)
+                .withSlot0(slot0Configs)
 
         motor.configurator.apply(config)
     }

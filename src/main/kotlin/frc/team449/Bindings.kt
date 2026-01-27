@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.RobotContainer.drive
 import frc.team449.RobotContainer.intake
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.subsystems.drive.Intake
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
