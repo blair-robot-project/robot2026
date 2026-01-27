@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import org.littletonrobotics.junction.Logger
+import java.util.function.Supplier
 
 class DriveSubsystem(
     val io: DriveIO
@@ -35,6 +36,8 @@ class DriveSubsystem(
     fun getPose(): Pose2d {
         return inputs.Pose
     }
+
+    val rotation: Supplier<Rotation2d> = Supplier { getPose().rotation }
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds {
         return inputs.Speeds
