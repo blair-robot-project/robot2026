@@ -24,7 +24,7 @@ import frc.team449.Robot
 import org.littletonrobotics.junction.Logger
 
 class DriveSubsystem(
-    val io: DriveIO,
+    val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
@@ -75,7 +75,7 @@ class DriveSubsystem(
 
     fun followTrajectory(
         robot: Robot,
-        sample: SwerveSample,
+        sample: SwerveSample
     ) {
         desiredAngle = MathUtil.angleModulus(sample.heading)
         desiredOmega = sample.omega
@@ -132,7 +132,7 @@ class DriveSubsystem(
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>,
+        visionMeasurementStdDevs: Matrix<N3, N1>
     ) {
         io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
@@ -198,13 +198,13 @@ class DriveSubsystem(
                 Volts.of(Math.PI),
                 null,
             ) // Use default timeout (10 s)
-                // Log state with SignalLogger class
-                { state: SysIdRoutineLog.State ->
-                    Logger.recordOutput(
-                        "SysIdRotation_State",
-                        state.toString(),
-                    )
-                },
+            // Log state with SignalLogger class
+            { state: SysIdRoutineLog.State ->
+                Logger.recordOutput(
+                    "SysIdRotation_State",
+                    state.toString(),
+                )
+            },
             Mechanism(
                 { output: Voltage ->
                     // output is actually radians per second, but SysId only supports "volts"

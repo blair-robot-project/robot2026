@@ -13,7 +13,7 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController

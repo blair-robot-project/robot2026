@@ -13,7 +13,7 @@ import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
 
 class BLineRoutines(
-    robot: Robot,
+    robot: Robot
 ) {
     val autoFactory =
         AutoFactory(

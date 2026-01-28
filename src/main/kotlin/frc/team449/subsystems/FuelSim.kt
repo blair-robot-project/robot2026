@@ -376,22 +376,7 @@ class FuelSim private constructor() {
      * @param ableToIntake Should a return a boolean whether the intake is active
      * @param intakeCallback Function to call when a fuel is intaked
      */
-    /**
-     * Registers an intake with the fuel simulator. This intake will always remove fuel from the field.
-     * @param xMin Minimum x position for the bounding box
-     * @param xMax Maximum x position for the bounding box
-     * @param yMin Minimum y position for the bounding box
-     * @param yMax Maximum y position for the bounding box
-     */
 
-    /**
-     * Registers an intake with the fuel simulator. This intake will remove fuel from the field based on the `ableToIntake` parameter.
-     * @param xMin Minimum x position for the bounding box
-     * @param xMax Maximum x position for the bounding box
-     * @param yMin Minimum y position for the bounding box
-     * @param yMax Maximum y position for the bounding box
-     * @param ableToIntake Should a return a boolean whether the intake is active
-     */
     @JvmOverloads
     fun registerIntake(
         xMin: Double,
@@ -570,9 +555,6 @@ class FuelSim private constructor() {
         private const val FRICTION = 0.31 // proportion of horizontal velocity to lose per second while on ground
 
         var instance: FuelSim = FuelSim()
-            /**
-             * Returns a singleton instance of frc.team449.FuelSim
-             */
             get() {
 
                 return field

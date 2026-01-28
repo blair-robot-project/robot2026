@@ -39,7 +39,7 @@ interface DriveIO {
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>,
+        visionMeasurementStdDevs: Matrix<N3, N1>
     ) {}
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}

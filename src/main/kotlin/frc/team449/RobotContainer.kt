@@ -14,8 +14,6 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
-import java.util.function.BooleanSupplier
-import java.util.function.Supplier
 
 object RobotContainer {
     // driver/op controllers

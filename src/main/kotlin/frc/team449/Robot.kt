@@ -14,7 +14,6 @@ import frc.team449.auto.BLineRoutines
 import frc.team449.auto.ChoreoRoutines
 import frc.team449.auto.PathRoutines
 import frc.team449.subsystems.FuelSim
-import org.ironmaple.simulation.SimulatedArena
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
