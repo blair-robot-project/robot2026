@@ -57,8 +57,21 @@ open class ChoreoRoutines(
         return taxi
     }
 
+    fun round(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine(" auto")
+        val path: AutoTrajectory = routine.trajectory("spiny")
+        routine.active().onTrue(
+            Commands.sequence(
+                path.resetOdometry(),
+                path.cmd(),
+            ),
+        )
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("taxi", this::forward)
+        autoChooser.addRoutine("!spin fuel test!", this::round)
         autoChooser.addRoutine("choreo 2 cycle (R)", this::twoCycle)
     }
 }

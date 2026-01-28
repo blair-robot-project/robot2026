@@ -13,7 +13,7 @@ import frc.team449.RobotContainer.configureFuelSim
 import frc.team449.auto.BLineRoutines
 import frc.team449.auto.ChoreoRoutines
 import frc.team449.auto.PathRoutines
-import frc.team449.util.FuelSim
+import frc.team449.subsystems.FuelSim
 import org.ironmaple.simulation.SimulatedArena
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
