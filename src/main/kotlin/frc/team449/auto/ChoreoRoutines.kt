@@ -10,7 +10,7 @@ import frc.team449.Robot
 import frc.team449.RobotContainer.drive
 
 open class ChoreoRoutines(
-    robot: Robot,
+    robot: Robot
 ) {
     val autoFactory =
         AutoFactory(
