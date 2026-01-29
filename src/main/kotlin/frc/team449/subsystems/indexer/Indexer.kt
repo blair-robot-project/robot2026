@@ -1,9 +1,9 @@
 package frc.team449.subsystems.indexer
+import frc.team449.Constants
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.wpilibj2.command.Command
-import frc.team449.subsystems.indexer.IndexerConstants
 import au.grapplerobotics.interfaces.LaserCanInterface
 import au.grapplerobotics.LaserCan
 import au.grapplerobotics.simulation.MockLaserCan
@@ -17,7 +17,9 @@ import au.grapplerobotics.simulation.MockLaserCan
 */
 
 class Indexer (
-    val indexer: TalonFX, // kraken x60
+    //define motor port in robotcontainer.kt
+    val indexer: TalonFX = TalonFX(Constants.IndexerConstants.INDEXER_ID), // kraken x60
+    val indexer2: TalonFX = TalonFX(Constants.IndexerConstants.INDEXER_ID_2), //kraken x60
     private val indexSensor: LaserCanInterface,
 
 ): SubsystemBase() {
@@ -46,17 +48,20 @@ class Indexer (
     }
 
     //sets voltage of motor
-    private fun setVoltage(voltage: Double){
+    private fun setVoltage(voltage: Double, voltage2: Double){
         indexer.setVoltage(voltage)
+        indexer2.setVoltage(voltage2)
     }
 
     //stops motor
     fun stop(): Command=runOnce{
         indexer.setVoltage(0.0)
+        indexer2.setVoltage(0.0)
     }
 
     //reset pos of indexer
     fun resetPos() {
+        indexer.setPosition(0.0)
         indexer.setPosition(0.0)
     }
 
@@ -65,7 +70,7 @@ class Indexer (
         val measurement = laserCan.measurement
         return measurement != null && (
                 measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT &&
-                        measurement.distance_mm <= IndexerConstants.INDEXER_DETECTION_THRESHOLD
+                        measurement.distance_mm <= Constants.IndexerConstants.INDEXER_DETECTION_THRESHOLD
 
                 )
     }
@@ -76,5 +81,5 @@ class Indexer (
 
 
     fun runDetect(volt:Double): Command=runOnce{
-        setVoltage(volt)}.onlyIf { ballNotDetected() }.andThen(stop())
+        setVoltage(volt, volt)}.onlyIf { ballNotDetected() }.andThen(stop())
 }
