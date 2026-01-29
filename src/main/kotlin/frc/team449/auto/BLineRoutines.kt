@@ -42,19 +42,7 @@ class BLineRoutines(
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
 
-    fun oneCycleR(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("intake")
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilder.build(Path("1")),
-                pathBuilder.build(Path("2")),
-                pathBuilder.build(Path("3")),
-            ),
-        )
-        return routine
-    }
-
-    fun zigzag(): AutoRoutine {
+    fun bump2cycle(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         routine.active().onTrue(
             Commands.sequence(
@@ -65,19 +53,7 @@ class BLineRoutines(
         return routine
     }
 
-    fun jp(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("intake")
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilder.build(Path("first_half")),
-            ),
-        )
-        return routine
-    }
-
     fun addOptions(autoChooser: AutoChooser) {
-        autoChooser.addRoutine("B-Line 1 cycle (R)", this::oneCycleR)
-        autoChooser.addRoutine("B-Line full middle (R)", this::zigzag)
-        autoChooser.addRoutine("Jp", this::jp)
+        autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
     }
 }

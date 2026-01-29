@@ -27,18 +27,6 @@ open class ChoreoRoutines(
         return nothing
     }
 
-    fun forward(): AutoRoutine {
-        val taxi: AutoRoutine = autoFactory.newRoutine(" Taxi")
-        val path: AutoTrajectory = taxi.trajectory("forward")
-        taxi.active().onTrue(
-            Commands.sequence(
-                path.resetOdometry(),
-                path.cmd(),
-            ),
-        )
-        return taxi
-    }
-
     fun twoCycle(): AutoRoutine {
         val taxi: AutoRoutine = autoFactory.newRoutine(" Taxi")
         val a: AutoTrajectory = taxi.trajectory("leftintake")
@@ -57,9 +45,9 @@ open class ChoreoRoutines(
         return taxi
     }
 
-    fun round(): AutoRoutine {
+    fun loop2Cycle(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine(" auto")
-        val path: AutoTrajectory = routine.trajectory("spiny")
+        val path: AutoTrajectory = routine.trajectory("loop")
         routine.active().onTrue(
             Commands.sequence(
                 path.resetOdometry(),
@@ -70,8 +58,7 @@ open class ChoreoRoutines(
     }
 
     fun addOptions(autoChooser: AutoChooser) {
-        autoChooser.addRoutine("taxi", this::forward)
-        autoChooser.addRoutine("!spin fuel test!", this::round)
+        autoChooser.addRoutine("choreo 2 cycle loop (R)", this::loop2Cycle)
         autoChooser.addRoutine("choreo 2 cycle (R)", this::twoCycle)
     }
 }
