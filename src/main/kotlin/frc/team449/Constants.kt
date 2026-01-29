@@ -63,5 +63,27 @@ object Constants {
         // led constants
     }
 
+    object IntakeConstants {
+        // config constants
+        const val PIVOT_MOTOR_ID = 41
+        const val PIVOT_MOTOR_ID2 = 42
+
+        const val ROLLER_MOTOR_ID = 43
+        const val ROLLER_MOTOR_ID2 = 44
+
+        const val PIVOT_STATOR_LIMIT = 80.0
+        const val PIVOT_SUPPLY_LIMIT = 40.0
+
+        const val ROLLER_STATOR_LIMIT = 80.0
+        const val ROLLER_SUPPLY_LIMIT = 40.0
+
+        const val ROLLER_KP = 5.0
+        const val ROLLER_KV = 0.12
+
+        // sim constants
+
+        // setpoint constants
+    }
+
     // other subsystem constants when applicable
 }

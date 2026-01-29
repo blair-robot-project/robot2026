@@ -1,12 +1,11 @@
 package frc.team449.subsystems.intake.roller
-import frc.team449.subsystems.intake.pivot.PivotIO.PivotIOInputs
 import org.littletonrobotics.junction.AutoLog
 
 interface RollerIO {
     @AutoLog
     open class RollerIOInputs {
         @JvmField
-        var velocity: Double = 0.0
+        var currentVelocity: Double = 0.0
 
         @JvmField
         var voltage: Double = 0.0
