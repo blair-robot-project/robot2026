@@ -65,8 +65,19 @@ class BLineRoutines(
         return routine
     }
 
+    fun jp(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("intake")
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("first_half")),
+            ),
+        )
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 1 cycle (R)", this::oneCycleR)
         autoChooser.addRoutine("B-Line full middle (R)", this::zigzag)
+        autoChooser.addRoutine("Jp", this::jp)
     }
 }

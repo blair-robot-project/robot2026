@@ -3,6 +3,8 @@ package frc.team449
 import com.pathplanner.lib.config.RobotConfig
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.units.Units.Inches
+import edu.wpi.first.units.measure.Distance
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
 
@@ -62,6 +64,16 @@ object Constants {
 
     object LEDConstants {
         // led constants
+    }
+
+    object Dimensions {
+        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
+        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
+        val FRAME_WIDTH: Distance = Inches.of(27.0) // left to right (y-axis)
+        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
+
+        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
+        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
     }
 
     // other subsystem constants when applicable

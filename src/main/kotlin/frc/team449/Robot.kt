@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers
+import frc.team449.RobotContainer.configureFuelSim
 import frc.team449.auto.BLineRoutines
 import frc.team449.auto.ChoreoRoutines
 import frc.team449.auto.PathRoutines
+import frc.team449.subsystems.FuelSim
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -90,7 +92,10 @@ class Robot : LoggedRobot() {
 
     override fun teleopPeriodic() {}
 
-    override fun disabledInit() {}
+    override fun disabledInit() {
+        FuelSim.instance.clearFuel()
+        FuelSim.instance.spawnStartingFuel()
+    }
 
     override fun disabledPeriodic() {}
 
@@ -98,7 +103,11 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        configureFuelSim()
+    }
 
-    override fun simulationPeriodic() {}
+    override fun simulationPeriodic() {
+        FuelSim.instance.updateSim()
+    }
 }
