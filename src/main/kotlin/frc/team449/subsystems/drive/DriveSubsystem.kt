@@ -33,11 +33,7 @@ class DriveSubsystem(
 
     fun resetOdometry(pose: Pose2d) { io.resetOdometry(pose) }
 
-    fun getPose(): Pose2d {
-        return inputs.Pose
-    }
-
-    val rotation: Supplier<Rotation2d> = Supplier { getPose().rotation }
+    val rotation: Supplier<Rotation2d> = Supplier { inputs.Pose.rotation }
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds {
         return inputs.Speeds
@@ -62,9 +58,21 @@ class DriveSubsystem(
         }
     }
 
-    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {
-        io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
+    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d?, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3?, N1?>?) {
+        if (visionRobotPoseMeters != null && visionMeasurementStdDevs != null) {
+            io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
+        }
     }
+
+//    fun addVisionMeasurement(
+//        visionRobotPoseMeters: Pose2d?,
+//        timestampSeconds: Double,
+//        visionMeasurementStdDevs: Matrix<N3?, N1?>?
+//    ) {
+//        poseEstimator.addVisionMeasurement(
+//            visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs
+//        )
+//    }
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
