@@ -8,10 +8,8 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.vision.Vision
-import frc.team449.subsystems.vision.VisionConstants
-import frc.team449.subsystems.vision.VisionIOLimelight
-import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
+import frc.team449.subsystems.vision.*
+
 
 object RobotContainer {
     // driver/op controllers
@@ -47,7 +45,10 @@ object RobotContainer {
                     VisionIOPhotonVisionSim("camera1", VisionConstants.robotToCamera0, drive.pose),
                     VisionIOPhotonVisionSim("camera2", VisionConstants.robotToCamera1, drive.pose),
                 )
-            Mode.REPLAY -> TODO()
+            Mode.REPLAY -> Vision(
+                drive::addVisionMeasurement,
+                object : VisionIO {},
+                object : VisionIO {}).also { vision = it };
         }
 
     val bindings = Bindings(this)
