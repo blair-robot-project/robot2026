@@ -53,7 +53,31 @@ class BLineRoutines(
         return routine
     }
 
+    fun trench2cycle(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("trench_1")), // 9.5
+                // use the event triggers on the path
+            ),
+        )
+        return routine
+    }
+
+    fun trench_chute(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("trench_2")), // 9.5
+                // use the event triggers on the path
+            ),
+        )
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
+        autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
+        autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trench_chute)
     }
 }
