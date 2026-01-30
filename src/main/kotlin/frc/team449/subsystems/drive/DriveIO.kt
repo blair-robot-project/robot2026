@@ -1,6 +1,6 @@
 package frc.team449.subsystems.drive
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState
+import com.ctre.phoenix6.swerve.SwerveDrivetrain
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
@@ -10,14 +10,14 @@ import org.littletonrobotics.junction.AutoLog
 
 interface DriveIO {
     @AutoLog
-    open class DriveIOInputs : SwerveDriveState() {
+    open class DriveIOInputs : SwerveDrivetrain.SwerveDriveState() {
         @JvmField var gyroAngle: Double = 0.0
 
         init {
             this.Pose = Pose2d()
         }
 
-        fun fromSwerveDriveState(stateIn: SwerveDriveState) {
+        fun fromSwerveDriveState(stateIn: SwerveDrivetrain.SwerveDriveState) {
             this.Pose = stateIn.Pose
             this.SuccessfulDaqs = stateIn.SuccessfulDaqs
             this.FailedDaqs = stateIn.FailedDaqs
@@ -30,13 +30,17 @@ interface DriveIO {
 
     fun updateInputs(inputs: DriveIOInputs) {}
 
-    fun logModules(driveState: SwerveDriveState) {}
+    fun logModules(driveState: SwerveDrivetrain.SwerveDriveState) {}
 
     fun resetOdometry(pose: Pose2d) {}
 
     fun setControl(request: SwerveRequest) {}
 
-    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {}
+    fun addVisionMeasurement(
+        visionRobotPoseMeters: Pose2d,
+        timestampSeconds: Double,
+        visionMeasurementStdDevs: Matrix<N3, N1>
+    ) {}
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}
 }

@@ -4,8 +4,10 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.configs.TalonFXSConfiguration
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.hardware.TalonFXS
 import com.ctre.phoenix6.swerve.SwerveDrivetrain
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants
 import com.ctre.phoenix6.swerve.SwerveModuleConstants
@@ -23,23 +25,22 @@ import java.util.function.Consumer
 
 open class DriveIOHardware(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
-) : SwerveDrivetrain<TalonFX, TalonFX, CANcoder>(
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+) : SwerveDrivetrain<TalonFX, TalonFXS, CANcoder>(
     ::TalonFX,
-    ::TalonFX,
+    ::TalonFXS,
     ::CANcoder,
     driveConstants,
     100.0,
-    *moduleConstants
+    *moduleConstants,
 ),
     DriveIO {
-
     var telemetryCache: AtomicReference<SwerveDriveState> = AtomicReference()
 
-    var telemetryConsumer: Consumer<SwerveDriveState> = Consumer {
-            swerveDriveState: SwerveDriveState ->
-        telemetryCache.set(swerveDriveState.clone())
-    }
+    var telemetryConsumer: Consumer<SwerveDriveState> =
+        Consumer { swerveDriveState: SwerveDriveState ->
+            telemetryCache.set(swerveDriveState.clone())
+        }
 
     val angularPitchVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityYWorld
     val angularRollVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityXWorld
@@ -58,7 +59,7 @@ open class DriveIOHardware(
             roll,
             pitch,
             accelX,
-            accelY
+            accelY,
         )
 
         this.odometryThread.setThreadPriority(99)
@@ -79,7 +80,7 @@ open class DriveIOHardware(
             pitch,
             roll,
             accelX,
-            accelY
+            accelY,
         )
     }
 
@@ -109,23 +110,23 @@ open class DriveIOHardware(
         for (i in 0 until modules.count()) {
             Logger.recordOutput(
                 moduleNames[i] + "/Absolute Encoder Angle",
-                getModule(i).encoder.absolutePosition.valueAsDouble * 360
+                getModule(i).steerMotor.rawPulseWidthPosition.valueAsDouble * 360,
             )
             Logger.recordOutput(
                 moduleNames[i] + "/Steering Angle",
-                driveState.ModuleStates[i].angle
+                driveState.ModuleStates[i].angle,
             )
             Logger.recordOutput(
                 moduleNames[i] + "/Target Steering Angle",
-                driveState.ModuleTargets[i].angle
+                driveState.ModuleTargets[i].angle,
             )
             Logger.recordOutput(
                 moduleNames[i] + "/Drive Velocity",
-                driveState.ModuleStates[i].speedMetersPerSecond
+                driveState.ModuleStates[i].speedMetersPerSecond,
             )
             Logger.recordOutput(
                 moduleNames[i] + "/Target Drive Velocity",
-                driveState.ModuleTargets[i].speedMetersPerSecond
+                driveState.ModuleTargets[i].speedMetersPerSecond,
             )
         }
     }

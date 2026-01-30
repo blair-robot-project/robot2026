@@ -6,13 +6,14 @@ import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
-import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers
-import frc.team449.auto.choreoRoutines
+import frc.team449.RobotContainer.configureFuelSim
+import frc.team449.auto.BLineRoutines
+import frc.team449.auto.ChoreoRoutines
+import frc.team449.auto.PathRoutines
+import frc.team449.subsystems.FuelSim
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -23,17 +24,13 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-
-
-    val routines = choreoRoutines(this)
+    val choreoRoutines = ChoreoRoutines(this)
     val autoChooser = AutoChooser()
-
-
+    val pathPlannerRoutines = PathRoutines(this)
+    val bLineRoutines = BLineRoutines(this)
 
     init {
         println("Initializing Robot!")
-
-        // CanBridge.runTCP()
 
         HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Kotlin)
         DriverStation.silenceJoystickConnectionWarning(true)
@@ -61,27 +58,24 @@ class Robot : LoggedRobot() {
     }
 
     private val robotContainer = RobotContainer
-    private val bindings = Bindings(robotContainer)
 
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
     }
 
     override fun robotInit() {
-        bindings.setDefaultCommands()
-        bindings.bindControls()
+        robotContainer.bindings.setDefaultCommands()
+        robotContainer.bindings.bindControls()
 
-      routines.addOptions(autoChooser)
+        choreoRoutines.addOptions(autoChooser)
+        bLineRoutines.addOptions(autoChooser)
         SmartDashboard.putData("Auto Chooser", autoChooser)
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler())
-
-
     }
 
     override fun robotPeriodic() {
         // high priority (real-time) thread for loop timing
         Threads.setCurrentThreadPriority(true, 99)
-
         CommandScheduler.getInstance().run()
 
         // return thread to low priority (standard)
@@ -96,10 +90,12 @@ class Robot : LoggedRobot() {
 
     override fun teleopInit() {}
 
-    override fun teleopPeriodic() {
-    }
+    override fun teleopPeriodic() {}
 
-    override fun disabledInit() {}
+    override fun disabledInit() {
+        FuelSim.instance.clearFuel()
+        FuelSim.instance.spawnStartingFuel()
+    }
 
     override fun disabledPeriodic() {}
 
@@ -107,7 +103,11 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        configureFuelSim()
+    }
 
-    override fun simulationPeriodic() {}
+    override fun simulationPeriodic() {
+        FuelSim.instance.updateSim()
+    }
 }

@@ -1,8 +1,10 @@
 package frc.team449
 
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.units.Units
-import edu.wpi.first.units.measure.Angle
+import com.pathplanner.lib.config.RobotConfig
+import edu.wpi.first.apriltag.AprilTagFieldLayout
+import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.units.Units.Inches
+import edu.wpi.first.units.measure.Distance
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
 
@@ -16,39 +18,63 @@ object Constants {
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
     const val TUNING_MODE: Boolean = false
 
-    const val PDH_CAN_ID = 1
-
-    /** Controller Configurations */
-    val ROT_RATE_LIMIT: Double = 17.27 * PI // rad /s
-    val NEG_ROT_RATE_LIM: Double = -27.5 * PI // rad / s
-    val SNAP_TO_ANGLE_TOLERANCE_RAD: Angle = Units.Degrees.of(3.5)
-
-    const val USE_ACCEL_LIMIT = true
-
-    val POSE_2D_ZERO = Pose2d()
-
     const val LOOP_TIME = 0.02
 
     const val ROBOT_MASS_KG = 54.43
-    const val ROBOT_WIDTH_INCHES = 35.0 // including bumpers (front to rear)
-    const val ROBOT_LENGTH_INCHES = 35.0 // including bumpers (left to right)
+    const val ROBOT_WIDTH_INCHES = 32.0 // including bumpers (front to rear)
+    const val ROBOT_LENGTH_INCHES = 32.0 // including bumpers (left to right)
 
     object DriveConstants {
-        const val SIM_LOOP_TIME = 0.005
+        const val SIM_LOOP_TIME = 0.01 // 100 Hz
 
-        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.6767
+        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
         const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1.26767 * PI
 
-        val MAX_ACCEL = 25.0 // m/s/s
-
-        const val TRACKWIDTH_INCHES = 30.0 // front to rear
-        const val WHEELBASE_INCHES = 30.0 // left to right
+        const val TRACKWIDTH_INCHES = 27.0 // front to rear
+        const val WHEELBASE_INCHES = 27.0 // left to right
 
         const val TRANSLATION_DEADBAND = 0.05
-        const val ANGULAR_DEADBAND = 0.05
+        const val ANGULAR_DEADBAND = 0.1
 
-        const val WHEEL_FRICTION_COEFFICIENT = 1.2
+        const val WHEEL_COF = 1.4
     }
 
-    object PowerConstants
+    object FieldConstants {
+        // CHS uses AndyMark Rebuilt Field
+        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
+        val FIELD_LENGTH = REBUILT_FIELD_LAYOUT.fieldLength
+        val FIELD_WIDTH = REBUILT_FIELD_LAYOUT.fieldLength
+    }
+
+    object PowerConstants {
+        // current limit configs go here
+    }
+
+    object SensorConstants {
+        // motor and sensor IDs
+    }
+
+    object VisionConstants {
+        // vision constants
+    }
+
+    object AutoConstants {
+        val config: RobotConfig = RobotConfig.fromGUISettings()
+    }
+
+    object LEDConstants {
+        // led constants
+    }
+
+    object Dimensions {
+        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
+        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
+        val FRAME_WIDTH: Distance = Inches.of(27.0) // left to right (y-axis)
+        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
+
+        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
+        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
+    }
+
+    // other subsystem constants when applicable
 }
