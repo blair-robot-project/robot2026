@@ -85,8 +85,11 @@ interface VisionIO {
                     val newAmbiguity = buffer.getDouble()
                     val newCount = buffer.getInt()
                     val newAvgDist = buffer.getDouble()
-                    val newType: PoseObservationType = if (Constants.CURRENT_MODE == Constants.Mode.SIM) PoseObservationType.PHOTONVISION
-                    else PoseObservationType.MEGATAG_2
+                    val newType: PoseObservationType = if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
+                        PoseObservationType.PHOTONVISION
+                    } else {
+                        PoseObservationType.MEGATAG_2
+                    }
                     return PoseObservation(newTimestamp, newPose, newAmbiguity, newCount, newAvgDist, newType)
                 }
             }

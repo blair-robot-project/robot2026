@@ -10,7 +10,6 @@ import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.vision.*
 
-
 object RobotContainer {
     // driver/op controllers
     val driveController: CommandXboxController = CommandXboxController(0)
@@ -48,7 +47,8 @@ object RobotContainer {
             Mode.REPLAY -> Vision(
                 drive::addVisionMeasurement,
                 object : VisionIO {},
-                object : VisionIO {}).also { vision = it };
+                object : VisionIO {}
+            ).also { vision = it }
         }
 
     val bindings = Bindings(this)
