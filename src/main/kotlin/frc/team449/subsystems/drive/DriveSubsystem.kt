@@ -35,6 +35,8 @@ class DriveSubsystem(
 
     val rotation: Supplier<Rotation2d> = Supplier { inputs.Pose.rotation }
 
+    val pose: Supplier<Pose2d> = Supplier { inputs.Pose }
+
     fun getRobotRelativeSpeeds(): ChassisSpeeds {
         return inputs.Speeds
     }
@@ -63,16 +65,6 @@ class DriveSubsystem(
             io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
         }
     }
-
-//    fun addVisionMeasurement(
-//        visionRobotPoseMeters: Pose2d?,
-//        timestampSeconds: Double,
-//        visionMeasurementStdDevs: Matrix<N3?, N1?>?
-//    ) {
-//        poseEstimator.addVisionMeasurement(
-//            visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs
-//        )
-//    }
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)

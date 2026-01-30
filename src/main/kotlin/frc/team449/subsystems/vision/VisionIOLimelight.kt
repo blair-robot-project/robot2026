@@ -17,6 +17,12 @@ import java.util.*
 import java.util.function.Supplier
 
 /** IO implementation for real Limelight hardware.  */
+/**
+ * Creates a new VisionIOLimelight.
+ *
+ * @param name The configured name of the Limelight.
+ * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
+ */
 class VisionIOLimelight(name: String, rotationSupplier: Supplier<Rotation2d>) : VisionIO {
     private val rotationSupplier: Supplier<Rotation2d>
     private val orientationPublisher: DoubleArrayPublisher
@@ -26,12 +32,6 @@ class VisionIOLimelight(name: String, rotationSupplier: Supplier<Rotation2d>) : 
     private val tySubscriber: DoubleSubscriber
     private val megatag2Subscriber: DoubleArraySubscriber
 
-    /**
-     * Creates a new VisionIOLimelight.
-     *
-     * @param name The configured name of the Limelight.
-     * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
-     */
     init {
         val table = NetworkTableInstance.getDefault().getTable(name)
         this.rotationSupplier = rotationSupplier

@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 
 object VisionConstants {
-    var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField)
+    var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
     var camera0Name: String = "camera_0" // TODO: match to names thru configuration
     var camera1Name: String = "camera_1"

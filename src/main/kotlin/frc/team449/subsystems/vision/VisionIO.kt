@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.util.struct.Struct
 import edu.wpi.first.util.struct.StructSerializable
+import frc.team449.Constants
 import org.littletonrobotics.junction.AutoLog
 import java.nio.ByteBuffer
 
@@ -20,19 +21,19 @@ interface VisionIO {
     }
 
     data class TargetObservation(
-        var tx: Rotation2d,
-        var ty: Rotation2d
+        val tx: Rotation2d,
+        val ty: Rotation2d
     ) : StructSerializable {
-        fun getStruct() = struct
         companion object {
-            val struct: Struct<TargetObservation> = object : Struct<TargetObservation> {
+            @JvmField
+            val struct = object : Struct<TargetObservation> {
                 override fun getTypeClass(): Class<TargetObservation> = TargetObservation::class.java
 
                 override fun getTypeName(): String = "TargetObservation"
 
                 override fun getSize(): Int = Rotation2d.struct.size * 2
 
-                override fun getSchema(): String = "Rotation2d"
+                override fun getSchema(): String = "Rotation2d tx; Rotation2d ty"
 
                 override fun pack(buffer: ByteBuffer, value: TargetObservation) {
                     Rotation2d.struct.pack(buffer, value.tx)
@@ -56,8 +57,8 @@ interface VisionIO {
         val averageTagDistance: Double,
         val type: PoseObservationType
     ) : StructSerializable {
-        fun getStruct() = struct
         companion object {
+            @JvmField
             val struct: Struct<PoseObservation> = object : Struct<PoseObservation> {
                 override fun getTypeClass(): Class<PoseObservation> = PoseObservation::class.java
 
@@ -66,7 +67,7 @@ interface VisionIO {
                 override fun getSize(): Int = 8 + Pose3d.struct.size + 8 + 4 + 8 + PoseObservationType.entries.size
 
                 // ggs if this has to be formatted
-                override fun getSchema(): String = "Double, Pose3d, Double, Int, Double, PoseObservationType"
+                override fun getSchema(): String = "Double timestamp; Pose3d pose; Double ambiguity; Int tagCount; Double averageTagDistance; PoseObservationType type"
 
                 override fun pack(buffer: ByteBuffer, value: PoseObservation) {
                     buffer.putDouble(value.timestamp)
@@ -74,7 +75,8 @@ interface VisionIO {
                     buffer.putDouble(value.ambiguity)
                     buffer.putInt(value.tagCount)
                     buffer.putDouble(value.averageTagDistance)
-                    buffer.putInt(value.type.ordinal)
+                    // don't put the pose observation type in the buffer bc in some case it causes it to overflow
+                    // pose observation type will always be megatag2 if not sim and photonvision if sim anyway
                 }
 
                 override fun unpack(buffer: ByteBuffer): PoseObservation {
@@ -83,7 +85,8 @@ interface VisionIO {
                     val newAmbiguity = buffer.getDouble()
                     val newCount = buffer.getInt()
                     val newAvgDist = buffer.getDouble()
-                    val newType = PoseObservationType.entries[buffer.getInt()]
+                    val newType: PoseObservationType = if (Constants.CURRENT_MODE == Constants.Mode.SIM) PoseObservationType.PHOTONVISION
+                    else PoseObservationType.MEGATAG_2
                     return PoseObservation(newTimestamp, newPose, newAmbiguity, newCount, newAvgDist, newType)
                 }
             }

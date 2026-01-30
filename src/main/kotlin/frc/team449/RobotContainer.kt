@@ -9,7 +9,9 @@ import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionConstants
 import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 
 object RobotContainer {
     // driver/op controllers
@@ -39,7 +41,12 @@ object RobotContainer {
                     VisionIOLimelight("limelight1", drive.rotation),
                     VisionIOLimelight("limelight2", drive.rotation)
                 )
-            Mode.SIM -> TODO()
+            Mode.SIM ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOPhotonVisionSim("camera1", VisionConstants.robotToCamera0, drive.pose),
+                    VisionIOPhotonVisionSim("camera2", VisionConstants.robotToCamera1, drive.pose),
+                )
             Mode.REPLAY -> TODO()
         }
 
