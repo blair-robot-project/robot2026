@@ -1,6 +1,7 @@
 package frc.team449
 
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
@@ -48,6 +49,24 @@ object Constants {
         const val ANGULAR_DEADBAND = 0.05
 
         const val WHEEL_FRICTION_COEFFICIENT = 1.2
+    }
+
+    object ShooterConstants {
+        const val LEFT_FLYWHEEL_LEADER_ID = 1
+        const val LEFT_FLYWHEEL_FOLLOWER_ID = 2
+        const val RIGHT_FLYWHEEL_LEADER_ID = 3
+        const val RIGHT_FLYWHEEL_FOLLOWER_ID = 4
+
+        const val SUPPLY_LIM = 40.0
+        const val STATOR_LIM = 80.0
+
+        val kSimGearbox = DCMotor.getKrakenX60Foc(4)
+        val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
+        const val kSimMOI: Double = 52.0
+
+        const val SHOOTER_VOLTAGE = 11.0
+
+        const val GEARING = 1.0 // TODO: find
     }
 
     object PowerConstants
