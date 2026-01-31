@@ -7,7 +7,7 @@ import frc.team449.RobotContainer.intake
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
