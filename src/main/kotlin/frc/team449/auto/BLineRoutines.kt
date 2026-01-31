@@ -7,6 +7,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.robot.lib.BLine.*
 import frc.team449.Robot
 import frc.team449.RobotContainer.drive
@@ -55,23 +56,35 @@ class BLineRoutines(
 
     fun trench2cycle(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_1")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shoot", PrintCommand("Starting shoot"))
+        FollowPath.registerEventTrigger("end_shoot", PrintCommand("Ending shoot"))
+        FollowPath.registerEventTrigger("start_climb", PrintCommand("Starting climb"))
+
         routine.active().onTrue(
-            Commands.sequence(
-                pathBuilder.build(Path("trench_1")), // 9.5
-                // use the event triggers on the path
-            ),
+            pathBuilder.build(path),
         )
+
         return routine
     }
 
     fun trench_chute(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_2")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+        FollowPath.registerEventTrigger("chute_intake", PrintCommand("Intaking from chute"))
+        FollowPath.registerEventTrigger("start_climb", PrintCommand("Starting climb"))
+
         routine.active().onTrue(
-            Commands.sequence(
-                pathBuilder.build(Path("trench_2")), // 9.5
-                // use the event triggers on the path
-            ),
+            pathBuilder.build(path),
         )
+
         return routine
     }
 

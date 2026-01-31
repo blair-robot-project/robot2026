@@ -116,6 +116,11 @@
       "lib_key": "shoot"
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 1.0,
+      "lib_key": "start_climb"
+    },
+    {
       "type": "waypoint",
       "translation_target": {
         "x_meters": 1.477960776188602,
