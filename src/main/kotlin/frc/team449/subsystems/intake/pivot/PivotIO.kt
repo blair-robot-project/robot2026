@@ -1,19 +1,15 @@
 package frc.team449.subsystems.intake.pivot
 
-import edu.wpi.first.units.measure.Angle
 import org.littletonrobotics.junction.AutoLog
 
 interface PivotIO {
     @AutoLog
     open class PivotIOInputs {
         @JvmField
-        var currentAngle: Double = 0.0
+        var currentVoltage: Double = 0.0
 
         @JvmField
-        var targetAngle: Double = 0.0
-
-        @JvmField
-        var voltage: Double = 0.0
+        var targetVoltage: Double = 0.0
 
         @JvmField
         var supplyCurrent: Double = 0.0
@@ -30,5 +26,5 @@ interface PivotIO {
 
     fun updateInputs(pivotInputs: PivotIOInputs) {}
 
-    fun setAngle(angle: Angle) {}
+    fun setVoltage(voltage: Double) {}
 }

@@ -11,11 +11,13 @@ import frc.team449.Constants.IntakeConstants.ROLLER_KP
 import frc.team449.Constants.IntakeConstants.ROLLER_KV
 
 class RollerIOSim : RollerIO {
-    private val motor = TalonFX(41)
-    private val motorSim = motor.simState
+    private val leftMotor = TalonFX(41)
+    private val rightMotor = TalonFX(21)
+    private val leftMotorSim = leftMotor.simState
+    private val rightMotorSim = rightMotor.simState
 
     private val rollerSim =
-        LinearSystemSim<N1, N1, N1>(
+        LinearSystemSim<N1, N1, N1>( // 1 state, 1 input, 1 output
             identifyVelocitySystem(
                 ROLLER_KV,
                 0.1,
@@ -23,7 +25,16 @@ class RollerIOSim : RollerIO {
         )
 
     init {
-        motor.configurator.apply(
+        leftMotor.configurator.apply(
+            TalonFXConfiguration()
+                .withSlot0(
+                    Slot0Configs()
+                        .withKP(ROLLER_KP)
+                        .withKV(ROLLER_KV),
+                ),
+        )
+
+        rightMotor.configurator.apply(
             TalonFXConfiguration()
                 .withSlot0(
                     Slot0Configs()
@@ -34,22 +45,34 @@ class RollerIOSim : RollerIO {
     }
 
     override fun updateInputs(rollerInputs: RollerIO.RollerIOInputs) {
-        val appliedVoltage = motorSim.motorVoltage
+        val appliedVoltage = leftMotorSim.motorVoltage
 
         rollerSim.setInput(appliedVoltage)
         rollerSim.update(0.02)
 
-        motorSim.setRotorVelocity(rollerSim.output[0, 0])
+        leftMotorSim.setRotorVelocity(rollerSim.output[0, 0])
+        rightMotorSim.setRotorVelocity(rollerSim.output[0, 0])
 
-        rollerInputs.currentVelocity = rollerSim.output[0, 0]
-        rollerInputs.voltage = appliedVoltage
+        rollerInputs.leftMotor.currentVelocity = rollerSim.output[0, 0]
+        rollerInputs.leftMotor.voltage = appliedVoltage
+
+        rollerInputs.rightMotor.currentVelocity = rollerSim.output[0, 0]
+        rollerInputs.rightMotor.voltage = appliedVoltage
     }
 
-    override fun setVelocity(velocity: Double) { // rps
-        motor.setControl(VelocityVoltage(velocity).withSlot(0))
+    override fun setVelocity(velocity: Double) {
+        leftMotor.setControl(
+            VelocityVoltage(velocity)
+                .withSlot(0),
+        )
+        rightMotor.setControl(
+            VelocityVoltage(velocity)
+                .withSlot(0),
+        )
     }
 
     fun stop() {
-        motor.stopMotor()
+        leftMotor.stopMotor()
+        rightMotor.stopMotor()
     }
 }

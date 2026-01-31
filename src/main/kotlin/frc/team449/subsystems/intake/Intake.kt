@@ -1,8 +1,5 @@
 package frc.team449.subsystems.intake
 
-import edu.wpi.first.units.Units.Degrees
-import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.subsystems.intake.pivot.PivotIO
 import frc.team449.subsystems.intake.pivot.PivotIOInputsAutoLogged
@@ -17,7 +14,7 @@ class Intake(
     private val pivotInputs: PivotIOInputsAutoLogged = PivotIOInputsAutoLogged()
     private val rollerInputs: RollerIOInputsAutoLogged = RollerIOInputsAutoLogged()
 
-    private var targetAngle: Angle = Radians.of(0.0)
+    private var targetVolt: Double = 0.0
     private var targetVel: Double = 0.0
 
     override fun periodic() {
@@ -26,23 +23,21 @@ class Intake(
 
         Logger.processInputs("Intake/Pivot", pivotInputs)
         Logger.processInputs("Intake/Roller", rollerInputs)
-        Logger.recordOutput("Intake/Pivot/targetAngle", targetAngle)
         Logger.recordOutput("Intake/Roller/targetVelocity", targetVel)
     }
 
     fun intake() {
-        targetAngle = Radians.of(0.0)
-        targetVel = 50.0
-
-        pivotIo.setAngle(targetAngle)
+        targetVolt = 0.0
+        targetVel = 40.0 // 40 rotation per second
+        pivotIo.setVoltage(targetVolt)
         rollerIO.setVelocity(targetVel)
     }
 
     fun stow() {
-        targetAngle = Degrees.of(90.0)
+        targetVolt = 10.0 // ??
         targetVel = 0.0
 
-        pivotIo.setAngle(targetAngle)
+        pivotIo.setVoltage(targetVolt)
         rollerIO.setVelocity(targetVel)
     }
 }
