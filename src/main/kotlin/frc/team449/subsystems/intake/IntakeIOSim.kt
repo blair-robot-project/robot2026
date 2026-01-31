@@ -28,7 +28,7 @@ class IntakeIOSim : IntakeIO {
     override fun setVoltage(
         pivotVoltage: Double,
         leftRollerVoltage: Double,
-        rightRollerVoltage: Double,
+        rightRollerVoltage: Double
     ) {
         targetPivotVoltage = pivotVoltage
         targetLeftVoltage = leftRollerVoltage
