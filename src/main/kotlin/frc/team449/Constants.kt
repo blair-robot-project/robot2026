@@ -1,10 +1,7 @@
 package frc.team449
 
-import com.pathplanner.lib.config.RobotConfig
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.units.Units.Inches
-import edu.wpi.first.units.measure.Distance
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
 
@@ -39,6 +36,10 @@ object Constants {
         const val WHEEL_COF = 1.4
     }
 
+    object AutoConstants {
+        // auto constants
+    }
+
     object FieldConstants {
         // CHS uses AndyMark Rebuilt Field
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
@@ -58,44 +59,29 @@ object Constants {
         // vision constants
     }
 
-    object AutoConstants {
-        val config: RobotConfig = RobotConfig.fromGUISettings()
-    }
-
     object LEDConstants {
         // led constants
     }
 
-    object FuelSimDimensions {
-        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
-        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
-        val FRAME_WIDTH: Distance = Inches.of(27.0) // left to right (y-axis)
-        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
-
-        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
-        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
-    }
+    // other subsystem constants when applicable
 
     object IntakeConstants {
         // config constants
         const val PIVOT_MOTOR_ID = 40
 
-        const val PIVOT_STATOR_LIMIT = 80.0
-        const val PIVOT_SUPPLY_LIMIT = 40.0
+        const val DEFAULT_STATOR_LIMIT = 80.0
+        const val DEFAULT_SUPPLY_LIMIT = 40.0
 
         const val LEFT_ROLLER_MOTOR_ID = 41
         const val RIGHT_ROLLER_MOTOR_ID = 42
 
-        const val ROLLER_STATOR_LIMIT = 80.0
-        const val ROLLER_SUPPLY_LIMIT = 40.0
-
-        const val ROLLER_KP = 5.0
-        const val ROLLER_KV = 0.12
-
-        // sim constants
-
         // setpoint constants
-    }
+        const val PIVOT_INTAKE_VOLTAGE = 0.0
+        const val LEFT_ROLLER_INTAKE_VOLTAGE = 8.0
+        const val RIGHT_ROLLER_INTAKE_VOLTAGE = 8.0
 
-    // other subsystem constants when applicable
+        const val PIVOT_STOW_VOLTAGE = 5.0
+        const val LEFT_ROLLER_STOW_VOLTAGE = 0.0
+        const val RIGHT_ROLLER_STOW_VOLTAGE = 0.0
+    }
 }

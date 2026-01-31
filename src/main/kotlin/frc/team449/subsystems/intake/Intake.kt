@@ -1,47 +1,36 @@
 package frc.team449.subsystems.intake
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.subsystems.intake.pivot.PivotIO
-import frc.team449.subsystems.intake.pivot.PivotIOInputsAutoLogged
-import frc.team449.subsystems.intake.roller.RollerIO
-import frc.team449.subsystems.intake.roller.RollerIOInputsAutoLogged
+import frc.team449.Constants.IntakeConstants.LEFT_ROLLER_INTAKE_VOLTAGE
+import frc.team449.Constants.IntakeConstants.LEFT_ROLLER_STOW_VOLTAGE
+import frc.team449.Constants.IntakeConstants.PIVOT_INTAKE_VOLTAGE
+import frc.team449.Constants.IntakeConstants.PIVOT_STOW_VOLTAGE
+import frc.team449.Constants.IntakeConstants.RIGHT_ROLLER_INTAKE_VOLTAGE
+import frc.team449.Constants.IntakeConstants.RIGHT_ROLLER_STOW_VOLTAGE
 import org.littletonrobotics.junction.Logger
-import java.util.function.BooleanSupplier
 
 class Intake(
-    private val pivotIo: PivotIO,
-    private val rollerIO: RollerIO
+    private val io: IntakeIO
 ) : SubsystemBase() {
-    private val pivotInputs: PivotIOInputsAutoLogged = PivotIOInputsAutoLogged()
-    private val rollerInputs: RollerIOInputsAutoLogged = RollerIOInputsAutoLogged()
-
-    private var targetVolt: Double = 0.0
-    private var targetVel: Double = 0.0
+    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
     override fun periodic() {
-        pivotIo.updateInputs(pivotInputs)
-        rollerIO.updateInputs(rollerInputs)
-
-        Logger.processInputs("Intake/Pivot", pivotInputs)
-        Logger.processInputs("Intake/Roller", rollerInputs)
-        Logger.recordOutput("Intake/Roller/targetVelocity", targetVel)
-        Logger.recordOutput("Intake/isIntakeActive", isActive().asBoolean)
+        io.updateInputs(inputs)
+        Logger.processInputs("Intake", inputs)
     }
 
     fun intake() {
-        targetVolt = 0.0
-        targetVel = 40.0 // 40 rotation per second
-        pivotIo.setVoltage(targetVolt)
-        rollerIO.setVelocity(targetVel)
+        io.setVoltage(
+            PIVOT_INTAKE_VOLTAGE,
+            LEFT_ROLLER_INTAKE_VOLTAGE,
+            RIGHT_ROLLER_INTAKE_VOLTAGE,
+        )
     }
 
     fun stow() {
-        targetVolt = 10.0 // ??
-        targetVel = 0.0
-
-        pivotIo.setVoltage(targetVolt)
-        rollerIO.setVelocity(targetVel)
+        io.setVoltage(
+            PIVOT_STOW_VOLTAGE,
+            LEFT_ROLLER_STOW_VOLTAGE,
+            RIGHT_ROLLER_STOW_VOLTAGE,
+        )
     }
-
-    fun isActive(): BooleanSupplier = { targetVel > 0.0 && targetVolt < 0.5 }
 }
