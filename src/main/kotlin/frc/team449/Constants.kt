@@ -66,7 +66,7 @@ object Constants {
         // led constants
     }
 
-    object Dimensions {
+    object FuelSimDimensions {
         val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
         val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
         val FRAME_WIDTH: Distance = Inches.of(27.0) // left to right (y-axis)

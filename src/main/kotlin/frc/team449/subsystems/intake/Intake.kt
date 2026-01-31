@@ -6,6 +6,7 @@ import frc.team449.subsystems.intake.pivot.PivotIOInputsAutoLogged
 import frc.team449.subsystems.intake.roller.RollerIO
 import frc.team449.subsystems.intake.roller.RollerIOInputsAutoLogged
 import org.littletonrobotics.junction.Logger
+import java.util.function.BooleanSupplier
 
 class Intake(
     private val pivotIo: PivotIO,
@@ -24,6 +25,7 @@ class Intake(
         Logger.processInputs("Intake/Pivot", pivotInputs)
         Logger.processInputs("Intake/Roller", rollerInputs)
         Logger.recordOutput("Intake/Roller/targetVelocity", targetVel)
+        Logger.recordOutput("Intake/isIntakeActive", isActive().asBoolean)
     }
 
     fun intake() {
@@ -40,4 +42,6 @@ class Intake(
         pivotIo.setVoltage(targetVolt)
         rollerIO.setVelocity(targetVel)
     }
+
+    fun isActive(): BooleanSupplier = { targetVel > 0.0 && targetVolt < 0.5 }
 }
