@@ -69,5 +69,5 @@ interface ShooterIO {
 
     fun holdHood() {}
 
-    fun atTolerance() : Boolean { return true }
+    fun atTolerance(): Boolean { return true }
 }
