@@ -1,4 +1,7 @@
 package frc.team449.subsystems.shooter
+import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.measure.Angle
+import frc.team449.Constants
 import org.littletonrobotics.junction.AutoLog
 
 interface ShooterIO {
@@ -38,10 +41,10 @@ interface ShooterIO {
         var hoodVoltage: Double = 0.0
 
         @JvmField
-        var hoodCurrentPos: Double = 0.0
+        var hoodCurrentPos: Double = Constants.ShooterConstants.HOOD_MIN_ANGLE.`in`(Radians)
 
         @JvmField
-        var hoodTargetPos: Double = 0.0
+        var hoodTargetPos: Double = Constants.ShooterConstants.HOOD_MIN_ANGLE.`in`(Radians)
 
         @JvmField
         var hoodSupplyCurrent: Double = 0.0
@@ -61,4 +64,8 @@ interface ShooterIO {
     fun run(voltage: Double) {}
 
     fun stop() {}
+
+    fun setHood(angle: Angle) {}
+
+    fun holdHood() {}
 }

@@ -1,5 +1,6 @@
 package frc.team449.subsystems.shooter
 
+import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants
 import org.littletonrobotics.junction.Logger
@@ -8,7 +9,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs
 class ShooterSubsystem(
     private val io: ShooterIO
 ) : SubsystemBase() {
-    private val inputs: ShooterIO.ShooterIOInputs = ShooterIO.ShooterIOInputs()
+    private val inputs: ShooterIOInputsAutoLogged = ShooterIOInputesAutoLogged()
     private var targetPos = 0.0
 
     override fun periodic() {
@@ -23,5 +24,13 @@ class ShooterSubsystem(
 
     fun stop() {
         io.stop()
+    }
+
+    fun setHood(angle: Angle) {
+        io.setHood(angle)
+    }
+
+    fun holdHood() {
+        io.holdHood()
     }
 }

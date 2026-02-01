@@ -95,7 +95,7 @@ class ShooterIOHardware : ShooterIO {
         val hoodMotorOutput =
             MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake)
-                .withInverted(InvertedValue.CounterClockwise_Positive)
+                .withInverted(InvertedValue.Clockwise_Positive)
 
         val feedback =
             FeedbackConfigs()
@@ -229,5 +229,13 @@ class ShooterIOHardware : ShooterIO {
     override fun stop() {
         leftLeaderMotor.stopMotor()
         rightLeaderMotor.stopMotor()
+    }
+
+    override fun setHood(angle: Angle) {
+        super.setHood(angle)
+    }
+
+    override fun holdHood() {
+        super.holdHood()
     }
 }

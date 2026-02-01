@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.units.Units
+import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
@@ -78,9 +79,13 @@ object Constants {
 
         const val HOOD_CRUISE_VELOCITY = 2.0
         const val HOOD_ACCELERATION = 5.0
+
+        val HOOD_MIN_ANGLE = Degrees.of(30.0)
+        val HOOD_MAX_ANGLE = Degrees.of(90.0)
+
         val kSimGearbox = DCMotor.getKrakenX60Foc(4)
         val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
-        const val kSimMOI: Double = 52.0
+        const val kSimMOI: Double = 52.0 // TODO: find real values
 
         const val SHOOTER_VOLTAGE = 11.0
 

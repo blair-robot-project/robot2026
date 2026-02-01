@@ -8,6 +8,10 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.shooter.ShooterIOHardware
+import frc.team449.subsystems.shooter.ShooterIOSim
+import frc.team449.subsystems.shooter.ShooterSubsystem
+import frc.team449.subsystems.shooter.ShooterIO
 
 object RobotContainer {
     // driver/op controllers
@@ -27,6 +31,14 @@ object RobotContainer {
                 arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
             )
             Mode.REPLAY -> object : DriveIO {}
+        }
+    )
+
+    val shooter: ShooterSubsystem = ShooterSubsystem(
+        when (Constants.CURRENT_MODE) {
+            Mode.REAL -> ShooterIOHardware()
+            Mode.SIM -> ShooterIOSim()
+            Mode.REPLAY -> object : ShooterIO {}
         }
     )
 
