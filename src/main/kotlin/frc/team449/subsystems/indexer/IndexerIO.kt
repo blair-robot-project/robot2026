@@ -8,12 +8,15 @@ interface IndexerIO {
     class IndexerInputs{
         var leftVoltage: Double = 0.0
         var rightVoltage: Double = 0.0
+        //add to indexer sim or hardware later
         var current: Double = 0.0
         var supply: Double = 0.0
-        var motorIsConnected: Boolean = false
+        //idk t/f which one to use
 
 
     }
     fun setVoltage(leftVoltage: Double, rightVoltage: Double){}
-    fun updateInputs(IndexerInputs: IndexerInputs){}
+
+    fun resetPosition()
+    fun updateInputs(inputs: IndexerInputs){}
 }
