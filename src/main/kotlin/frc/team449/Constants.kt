@@ -82,7 +82,7 @@ object Constants {
 
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
-        val kSimGearbox = DCMotor.getKrakenX60Foc(4)
+        val kSimGearbox = DCMotor.getKrakenX60Foc(4) // TODO: find
         val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
         const val kSimMOI: Double = 52.0 // TODO: find real values
 
