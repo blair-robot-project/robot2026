@@ -1,6 +1,8 @@
 package frc.team449.subsystems.shooter
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.team449.Constants
 import org.littletonrobotics.junction.AutoLog
 
@@ -61,13 +63,13 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun run(voltage: Double) {}
+    fun run(voltage: Double): Command { return InstantCommand() }
 
-    fun stop() {}
+    fun stop(): Command { return InstantCommand() }
 
-    fun setHood(angle: Angle) {}
+    fun setHood(angle: Angle): Command { return InstantCommand() }
 
-    fun holdHood() {}
+    fun holdHood(): Command { return InstantCommand() }
 
     fun atTolerance(): Boolean { return true }
 

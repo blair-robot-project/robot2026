@@ -21,6 +21,8 @@ import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Temperature
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
+import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import frc.team449.Constants
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID
@@ -234,22 +236,30 @@ class ShooterIOHardware : ShooterIO {
 
     private var request = MotionMagicVoltage(Constants.ShooterConstants.HOOD_MIN_ANGLE)
 
-    override fun run(voltage: Double) {
-        leftLeaderMotor.setVoltage(voltage)
-        rightLeaderMotor.setVoltage(voltage)
+    override fun run(voltage: Double): Command {
+        return runOnce({
+            leftLeaderMotor.setVoltage(voltage)
+            rightLeaderMotor.setVoltage(voltage)
+        })
     }
 
-    override fun stop() {
-        leftLeaderMotor.stopMotor()
-        rightLeaderMotor.stopMotor()
+    override fun stop(): Command {
+        return runOnce({
+            leftLeaderMotor.stopMotor()
+            rightLeaderMotor.stopMotor()
+        })
     }
 
-    override fun setHood(angle: Angle) {
-        hoodMotor.setControl(request.withPosition(angle))
+    override fun setHood(angle: Angle): Command {
+        return runOnce({
+            hoodMotor.setControl(request.withPosition(angle))
+        })
     }
 
-    override fun holdHood() {
-        hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians)))
+    override fun holdHood(): Command {
+        return runOnce({
+            hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians)))
+        })
     }
 
     override fun atTolerance(): Boolean {

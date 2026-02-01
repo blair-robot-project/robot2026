@@ -15,6 +15,10 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
+
+    // used to remove the shooter sim bindings I was using to test
+    const val RUNNING_SHOOTER_SIM = true
+
     const val TUNING_MODE: Boolean = false
 
     const val LOOP_TIME = 0.02
@@ -80,20 +84,19 @@ object Constants {
         val HOOD_MIN_ANGLE = Degrees.of(30.0) // TODO: find
         val HOOD_MAX_ANGLE = Degrees.of(90.0) // TODO: find
 
-        //these are all random ahh gains but it dont matter cuz its sim
-        const val HOOD_SIM_KP = 1.0
+        // these are all random ahh gains but it dont matter cuz its sim
+        const val HOOD_SIM_KP = 3.0
         const val HOOD_SIM_KI = 0.0
         const val HOOD_SIM_KD = 0.0
 
-        const val HOOD_SIM_KS = 1.0
-        const val HOOD_SIM_KG = 0.5
-        const val HOOD_SIM_KV = 0.5
+        const val HOOD_SIM_KS = 0.2
+        const val HOOD_SIM_KG = 0.3
+        const val HOOD_SIM_KV = 0.1
         const val HOOD_SIM_KA = 0.0
 
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
-        const val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
-        const val kSimMOI: Double = 52.0 // TODO: find real values
+        const val HOOD_SIM_GRAVITY = false
 
         const val SHOOTER_VOLTAGE = 11.0 // TODO: find
 
