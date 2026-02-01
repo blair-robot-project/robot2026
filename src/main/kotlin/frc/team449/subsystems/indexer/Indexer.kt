@@ -22,6 +22,12 @@ class Indexer(
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
     }
+ private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
+
+    override fun periodic() {
+        io.updateInputs(inputs)
+        Logger.processInputs("Indexer", inputs)
+    }
 
     override fun periodic() {
         io.updateInputs(inputs)
