@@ -7,9 +7,11 @@ import com.ctre.phoenix6.configs.FeedbackConfigs
 import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
+import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
+import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Angle
@@ -119,6 +121,9 @@ class ShooterIOHardware : ShooterIO {
         rightLeaderMotor.configurator.apply(flywheelConfig)
         rightFollowerMotor.configurator.apply(flywheelConfig)
 
+        leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
+        rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
+
         hoodConfig =
             TalonFXConfiguration()
                 .withCurrentLimits(hoodCurrentLimitConfigs)
@@ -193,6 +198,7 @@ class ShooterIOHardware : ShooterIO {
 
         leftMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
         rightMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
+        hoodMotorDisconnectedAlert.set(!hoodMotorConnected)
 
         inputs.leftVoltage = lmotorVoltage.getValue().`in`(Units.Volts)
         inputs.leftSupplyCurrent = lsupplyCurrent.getValue().`in`(Units.Amps)
