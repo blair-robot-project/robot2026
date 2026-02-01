@@ -1,10 +1,6 @@
 package frc.team449.subsystems.indexer
-import frc.team449.Constants
-import edu.wpi.first.wpilibj2.command.SubsystemBase
-import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.wpilibj2.command.Command
-import org.littletonrobotics.junction.Logger
-
+import edu.wpi.first.wpilibj2.command.SubsystemBase
 
 /**
  * @file Indexer.kt
@@ -13,12 +9,12 @@ import org.littletonrobotics.junction.Logger
  * @author Sean Zhang
 */
 
-class Indexer (
-    private val io: IndexerIO,
+class Indexer(
+    private val io: IndexerIO
 
-): SubsystemBase() {
+) : SubsystemBase() {
 
-    //we need line 23 through 30 but idk how to implement correctly
+    // we need line 23 through 30 but idk how to implement correctly
     /*private val inputs: inputs = IndexerIOInputsAutoLogged()
 
     override fun periodic() {
@@ -27,9 +23,8 @@ class Indexer (
     }
     */
 
-
-    //sets voltage of motor
-    //might be a while true? or something
+    // sets voltage of motor
+    // might be a while true? or something
     private fun setVoltage(voltage: Double, voltage2: Double) {
         io.setVoltage(
             voltage,
@@ -37,18 +32,13 @@ class Indexer (
         )
     }
 
-    //stops motor
+    // stops motor
     fun stop(): Command = runOnce {
         io.setVoltage(0.0, 0.0)
     }
 
-    //reset pos of indexer
+    // reset pos of indexer
     fun resetPos() {
         io.resetPosition()
-
     }
-
-
-
-
 }
