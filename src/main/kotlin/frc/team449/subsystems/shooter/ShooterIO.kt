@@ -70,4 +70,6 @@ interface ShooterIO {
     fun holdHood() {}
 
     fun atTolerance(): Boolean { return true }
+
+    fun simPeriodic() {}
 }

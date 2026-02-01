@@ -2,7 +2,7 @@ package frc.team449
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.math.system.plant.DCMotor
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
@@ -80,16 +80,33 @@ object Constants {
         val HOOD_MIN_ANGLE = Degrees.of(30.0) // TODO: find
         val HOOD_MAX_ANGLE = Degrees.of(90.0) // TODO: find
 
+        //these are all random ahh gains but it dont matter cuz its sim
+        const val HOOD_SIM_KP = 1.0
+        const val HOOD_SIM_KI = 0.0
+        const val HOOD_SIM_KD = 0.0
+
+        const val HOOD_SIM_KS = 1.0
+        const val HOOD_SIM_KG = 0.5
+        const val HOOD_SIM_KV = 0.5
+        const val HOOD_SIM_KA = 0.0
+
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
-        val kSimGearbox = DCMotor.getKrakenX60Foc(4) // TODO: find
-        val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
+        const val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
         const val kSimMOI: Double = 52.0 // TODO: find real values
 
-        const val SHOOTER_VOLTAGE = 11.0
+        const val SHOOTER_VOLTAGE = 11.0 // TODO: find
 
         const val FLYWHEEL_GEARING = 1.0 // TODO: find
         const val HOOD_GEARING = 1.0 // TODO: find
+
+        const val HOOD_ENCODER_A_CHANNEL = 6
+        const val HOOD_ENCODER_B_CHANNEL = 7
+
+        const val HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE = 2 * PI / 4096 // TODO: find
+        const val HOOD_MOTOR_GEARING = 1.0 // TODO: find
+        const val HOOD_MASS = 8.0 // TODO: find (in kilograms)
+        val HOOD_LENGTH = Units.inchesToMeters(30.0) // TODO: find
     }
 
     object LEDConstants {
