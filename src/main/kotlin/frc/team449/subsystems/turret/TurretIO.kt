@@ -1,6 +1,5 @@
 package frc.team449.subsystems.turret
 
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
@@ -13,7 +12,9 @@ interface TurretIO {
     open class TurretIOInputs {
         @JvmField var position: Angle = Radians.of(0.0) // relative to robot
         @JvmField var velocity: AngularVelocity = RadiansPerSecond.of(0.0)
+
         @JvmField var voltage: Voltage = Volts.of(0.0)
+
         @JvmField var current: Current = Amps.of(0.0)
     }
 

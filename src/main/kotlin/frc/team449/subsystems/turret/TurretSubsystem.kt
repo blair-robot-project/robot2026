@@ -4,13 +4,12 @@ import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.Subsystem
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
 
 class TurretSubsystem(
     val io: TurretIO
-): SubsystemBase() {
+) : SubsystemBase() {
     private val inputs: TurretIOInputsAutoLogged = TurretIOInputsAutoLogged()
 
     override fun periodic() {
@@ -23,7 +22,7 @@ class TurretSubsystem(
             io.requestPosition(position)
         })
     }
-    fun setVoltage(voltage: Voltage): Command{
+    fun setVoltage(voltage: Voltage): Command {
         return Commands.runOnce({
             io.requestVoltage(voltage)
         })

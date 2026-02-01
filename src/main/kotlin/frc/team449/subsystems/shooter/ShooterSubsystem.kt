@@ -5,7 +5,6 @@ import frc.team449.Constants
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
 
-
 class ShooterSubsystem(
     private val io: ShooterIO
 ) : SubsystemBase() {

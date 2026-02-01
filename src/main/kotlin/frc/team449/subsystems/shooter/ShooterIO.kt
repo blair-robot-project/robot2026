@@ -1,8 +1,5 @@
 package frc.team449.subsystems.shooter
-import edu.wpi.first.units.measure.Angle
-import edu.wpi.first.units.measure.Voltage
 import org.littletonrobotics.junction.AutoLog
-import org.littletonrobotics.junction.inputs.LoggableInputs
 
 interface ShooterIO {
     @AutoLog
