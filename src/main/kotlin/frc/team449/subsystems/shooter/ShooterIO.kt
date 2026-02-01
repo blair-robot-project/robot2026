@@ -1,4 +1,5 @@
 package frc.team449.subsystems.shooter
+import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.Voltage
 import org.littletonrobotics.junction.AutoLog
 import org.littletonrobotics.junction.inputs.LoggableInputs
@@ -35,6 +36,27 @@ interface ShooterIO {
 
         @JvmField
         var rightMotorIsConnected: Boolean = false
+
+        @JvmField
+        var hoodVoltage: Double = 0.0
+
+        @JvmField
+        var hoodCurrentPos: Double = 0.0
+
+        @JvmField
+        var hoodTargetPos: Double = 0.0
+
+        @JvmField
+        var hoodSupplyCurrent: Double = 0.0
+
+        @JvmField
+        var hoodStatorCurrent: Double = 0.0
+
+        @JvmField
+        var hoodTemperature: Double = 0.0
+
+        @JvmField
+        var hoodMotorIsConnected: Boolean = false
     }
 
     fun updateInputs(inputs: ShooterIOInputs) {}

@@ -56,17 +56,24 @@ object Constants {
         const val LEFT_FLYWHEEL_FOLLOWER_ID = 2
         const val RIGHT_FLYWHEEL_LEADER_ID = 3
         const val RIGHT_FLYWHEEL_FOLLOWER_ID = 4
+        const val HOOD_MOTOR_ID = 5
 
-        const val SUPPLY_LIM = 40.0
-        const val STATOR_LIM = 80.0
+        const val FLYWHEEL_SUPPLY_LIM = 40.0
+        const val FLYWHEEL_STATOR_LIM = 80.0
 
+        const val HOOD_SUPPLY_LIM = 40.0
+        const val HOOD_STATOR_LIM = 80.0
+
+        const val HOOD_CRUISE_VELOCITY = 2.0
+        const val HOOD_ACCELERATION = 5.0
         val kSimGearbox = DCMotor.getKrakenX60Foc(4)
         val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values
         const val kSimMOI: Double = 52.0
 
         const val SHOOTER_VOLTAGE = 11.0
 
-        const val GEARING = 1.0 // TODO: find
+        const val FLYWHEEL_GEARING = 1.0 // TODO: find
+        const val HOOD_GEARING = 1.0 // TODO: find
     }
 
     object PowerConstants
