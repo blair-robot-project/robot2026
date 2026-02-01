@@ -8,21 +8,25 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.controls.MotionMagicVoltage
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.units.Units
+import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Temperature
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants
+import kotlin.math.abs
 
 class ShooterIOHardware : ShooterIO {
     // TODO: p much all the constants
+    // TODO: also are doing current homing
 
     private val leftLeaderMotor = TalonFX(Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
     private val leftFollowerMotor = TalonFX(Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID)
@@ -131,6 +135,8 @@ class ShooterIOHardware : ShooterIO {
                 .withFeedback(hoodFeedback)
                 .withMotionMagic(motionMagicConfigs)
 
+        hoodMotor.configurator.apply(hoodConfig)
+
         ltemperature = leftLeaderMotor.deviceTemp
         lmotorVoltage = leftLeaderMotor.motorVoltage
         lsupplyCurrent = leftLeaderMotor.supplyCurrent
@@ -221,6 +227,8 @@ class ShooterIOHardware : ShooterIO {
         inputs.hoodTargetPos = htargetPos.value
     }
 
+    private var request = MotionMagicVoltage(Constants.ShooterConstants.HOOD_MIN_ANGLE)
+
     override fun run(voltage: Double) {
         leftLeaderMotor.setVoltage(voltage)
         rightLeaderMotor.setVoltage(voltage)
@@ -232,10 +240,14 @@ class ShooterIOHardware : ShooterIO {
     }
 
     override fun setHood(angle: Angle) {
-        super.setHood(angle)
+        hoodMotor.setControl(request.withPosition(angle))
     }
 
     override fun holdHood() {
-        super.holdHood()
+        hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians)))
+    }
+
+    override fun atTolerance(): Boolean {
+        return abs(hoodMotor.position.valueAsDouble - hoodMotor.closedLoopReference.value) < Constants.ShooterConstants.HOOD_TOLERANCE.`in`(Radians)
     }
 }

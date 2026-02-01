@@ -68,4 +68,6 @@ interface ShooterIO {
     fun setHood(angle: Angle) {}
 
     fun holdHood() {}
+
+    fun atTolerance() : Boolean { return true }
 }

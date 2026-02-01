@@ -80,8 +80,10 @@ object Constants {
         const val HOOD_CRUISE_VELOCITY = 2.0
         const val HOOD_ACCELERATION = 5.0
 
-        val HOOD_MIN_ANGLE = Degrees.of(30.0)
-        val HOOD_MAX_ANGLE = Degrees.of(90.0)
+        val HOOD_MIN_ANGLE = Degrees.of(30.0) // TODO: find
+        val HOOD_MAX_ANGLE = Degrees.of(90.0) // TODO: find
+
+        const val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
         val kSimGearbox = DCMotor.getKrakenX60Foc(4)
         val kSimGearing: Double = 30.0 / 8.0 // TODO: find real values

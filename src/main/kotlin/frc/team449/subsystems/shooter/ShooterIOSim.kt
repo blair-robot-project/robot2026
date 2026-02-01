@@ -21,4 +21,8 @@ class ShooterIOSim : ShooterIO {
     override fun holdHood() {
         super.holdHood()
     }
+
+    override fun atTolerance(): Boolean {
+        return super.atTolerance()
+    }
 }
