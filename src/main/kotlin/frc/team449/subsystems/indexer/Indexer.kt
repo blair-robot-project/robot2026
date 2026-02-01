@@ -34,7 +34,7 @@ class Indexer(
     }
 
     // stops motor
-    fun stop(): Command = runOnce {
+    fun stop() =run{
         io.setVoltage(0.0, 0.0)
     }
 }
