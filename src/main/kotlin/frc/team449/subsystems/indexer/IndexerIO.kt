@@ -3,7 +3,7 @@ import org.littletonrobotics.junction.AutoLog
 
 interface IndexerIO {
     @AutoLog
-    class IndexerInputs {
+  open class IndexerInputs {
         var leftVoltage: Double = 0.0
         var rightVoltage: Double = 0.0
 
