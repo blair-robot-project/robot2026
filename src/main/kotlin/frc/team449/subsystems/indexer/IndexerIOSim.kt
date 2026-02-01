@@ -4,25 +4,30 @@ import edu.wpi.first.math.system.plant.DCMotor
 
 // implement from indexer io thing
 class IndexerIOSim : IndexerIO {
-    private val leftIndexerMotorModel = DCMotor.getKrakenX60(1)
-    private val rightIndexerMotorModel = DCMotor.getKrakenX60(1)
+    private val leftIndexerMotorModel = DCMotor.getKrakenX44(1)
+    private val rightIndexerMotorModel = DCMotor.getKrakenX44(1)
     private var leftVoltSim: Double = 0.0
     private var rightVoltSim: Double = 0.0
+    private var leftCurrentSim: Double = 0.0
+    private var rightCurrentSim: Double = 0.0
+
 
     // add current supply to this function
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
+        // Voltage inputs (assigned from your sim variables)
         inputs.leftVoltage = leftVoltSim
         inputs.rightVoltage = rightVoltSim
+
+        inputs.supplyCurrentLeft = leftCurrentSim
+        inputs.statorCurrentLeft = leftCurrentSim
+
+        inputs.supplyCurrentRight = rightCurrentSim
+        inputs.statorCurrentRight = rightCurrentSim
     }
 
-    override fun setVoltage(voltage: Double, voltage2: Double) {
+    override fun setVoltage(leftVoltage: Double, rightVoltage: Double) {
         // include this.leftVoltSim if param is leftVoltSim
-        leftVoltSim = voltage
-        rightVoltSim = voltage2
-    }
-
-    override fun resetPosition() {
-        leftVoltSim = 0.0
-        rightVoltSim = 0.0
+        leftVoltSim = leftVoltage
+        rightVoltSim = rightVoltage
     }
 }

@@ -67,9 +67,11 @@ object Constants {
     object IndexerConstants {
         // motor definitions that are currently placeholders
 
-        const val INDEXER_ID = 1
-        const val INDEXER_DETECTION_THRESHOLD = 30
-        const val INDEXER_ID_2 = 2
+        const val LEFT_INDEXER_ID = 1
+        const val RIGHT_INDEXER_ID = 2
+        const val INDEXER_STATOR_LIMIT = 10.0
+        const val INDEXER_SUPPLY_LIMIT = 10.0
+
         // add more indexers as needed
     }
 }
