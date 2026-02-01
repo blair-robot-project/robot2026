@@ -12,7 +12,7 @@ import frc.team449.Constants
 class IndexerIOHardware : IndexerIO {
     private val leftIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
     private val rightIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    val leftIndexer: TalonFX = TalonFX(Constants.IndexerConstants.INDEXER_ID) // kraken x60
+    val leftIndexer: TalonFX = TalonFX(INDEXER_ID) // kraken x60
     val rightIndexer: TalonFX = TalonFX(Constants.IndexerConstants.INDEXER_ID_2) // kraken x60
     private var config = TalonFXConfiguration()
 
