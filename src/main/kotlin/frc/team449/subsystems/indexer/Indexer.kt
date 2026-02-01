@@ -16,6 +16,12 @@ class Indexer(
 
     // we need line 23 through 30 but idk how to implement correctly
     /*private val inputs: inputs = IndexerIOInputsAutoLogged()
+ private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
+
+    override fun periodic() {
+        io.updateInputs(inputs)
+        Logger.processInputs("Indexer", inputs)
+    }
 
     override fun periodic() {
         io.updateInputs(inputs)
