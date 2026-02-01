@@ -11,12 +11,6 @@ interface IntakeIO {
 
         @JvmField var currentRightRollerVoltage: Double = 0.0
 
-        @JvmField var targetPivotVoltage: Double = 0.0
-
-        @JvmField var targetLeftRollerVoltage: Double = 0.0
-
-        @JvmField var targetRightRollerVoltage: Double = 0.0
-
         @JvmField var pivotSupplyCurrent: Double = 0.0
 
         @JvmField var leftRollerSupplyCurrent: Double = 0.0

@@ -1,4 +1,5 @@
 package frc.team449.subsystems.intake
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants.LEFT_ROLLER_INTAKE_VOLTAGE
 import frc.team449.Constants.IntakeConstants.LEFT_ROLLER_STOW_VOLTAGE
@@ -18,19 +19,21 @@ class Intake(
         Logger.processInputs("Intake", inputs)
     }
 
-    fun intake() {
-        io.setVoltage(
-            PIVOT_INTAKE_VOLTAGE,
-            LEFT_ROLLER_INTAKE_VOLTAGE,
-            RIGHT_ROLLER_INTAKE_VOLTAGE,
-        )
-    }
+    fun intake(): Command =
+        run {
+            io.setVoltage(
+                PIVOT_INTAKE_VOLTAGE,
+                LEFT_ROLLER_INTAKE_VOLTAGE,
+                RIGHT_ROLLER_INTAKE_VOLTAGE,
+            )
+        }
 
-    fun stow() {
-        io.setVoltage(
-            PIVOT_STOW_VOLTAGE,
-            LEFT_ROLLER_STOW_VOLTAGE,
-            RIGHT_ROLLER_STOW_VOLTAGE,
-        )
-    }
+    fun stow(): Command =
+        run {
+            io.setVoltage(
+                PIVOT_STOW_VOLTAGE,
+                LEFT_ROLLER_STOW_VOLTAGE,
+                RIGHT_ROLLER_STOW_VOLTAGE,
+            )
+        }
 }

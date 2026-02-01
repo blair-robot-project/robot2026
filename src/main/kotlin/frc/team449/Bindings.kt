@@ -1,9 +1,7 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.RobotContainer.drive
-import frc.team449.RobotContainer.intake
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
@@ -24,18 +22,6 @@ class Bindings(
     }
 
     fun bindControls() {
-        driveController
-            .x()
-            .onTrue(
-                InstantCommand({ intake.intake() }, intake),
-            )
-
-        driveController
-            .y()
-            .onTrue(
-                InstantCommand({ intake.stow() }, intake),
-            )
-
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward))
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kForward))

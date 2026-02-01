@@ -69,8 +69,11 @@ object Constants {
         // config constants
         const val PIVOT_MOTOR_ID = 40
 
-        const val DEFAULT_STATOR_LIMIT = 80.0
-        const val DEFAULT_SUPPLY_LIMIT = 40.0
+        const val PIVOT_STATOR_LIMIT = 80.0
+        const val PIVOT_SUPPLY_LIMIT = 40.0
+
+        const val ROLLER_STATOR_LIMIT = 80.0
+        const val ROLLER_SUPPLY_LIMIT = 40.0
 
         const val LEFT_ROLLER_MOTOR_ID = 41
         const val RIGHT_ROLLER_MOTOR_ID = 42
