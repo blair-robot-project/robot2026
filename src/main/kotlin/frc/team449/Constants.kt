@@ -88,7 +88,6 @@ object Constants {
         const val HOOD_GEARING = 1.0 // TODO: find
     }
 
-    object PowerConstants
     object LEDConstants {
         // led constants
     }
