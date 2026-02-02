@@ -16,17 +16,16 @@ class SwerveRequestCommand(
     private val strafeSupplier: DoubleSupplier,
     private val turnSupplier: DoubleSupplier
 ) : Command() {
-
-    private val driveNoHeading: SwerveRequest.FieldCentric = SwerveRequest.FieldCentric()
-        .withDeadband(
-            Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-                * Constants.DriveConstants.TRANSLATION_DEADBAND
-        )
-        .withRotationalDeadband(
-            Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
-                * Constants.DriveConstants.ANGULAR_DEADBAND
-        )
-        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+    private val driveNoHeading: SwerveRequest.FieldCentric =
+        SwerveRequest
+            .FieldCentric()
+            .withDeadband(
+                Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+                    * Constants.DriveConstants.TRANSLATION_DEADBAND,
+            ).withRotationalDeadband(
+                Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
+                    * Constants.DriveConstants.ANGULAR_DEADBAND,
+            ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
@@ -45,19 +44,22 @@ class SwerveRequestCommand(
     }
 
     override fun execute() {
-        throttle = abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) * Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-        strafe = abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) * Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-        turn = abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
+        throttle =
+            abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
+            Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+        strafe =
+            abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
+            Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+        turn =
+            abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
 
         drive.setControl(
             driveNoHeading
                 .withVelocityX(throttle)
                 .withVelocityY(strafe)
-                .withRotationalRate(turn)
+                .withRotationalRate(turn),
         )
     }
 
-    override fun isFinished(): Boolean {
-        return false
-    }
+    override fun isFinished(): Boolean = false
 }
