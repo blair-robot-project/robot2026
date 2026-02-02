@@ -12,6 +12,10 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import frc.team449.subsystems.intake.Intake
+import frc.team449.subsystems.intake.IntakeIO
+import frc.team449.subsystems.intake.IntakeIOHardware
+import frc.team449.subsystems.intake.IntakeIOSim
 
 object RobotContainer {
     // driver/op controllers
@@ -20,19 +24,47 @@ object RobotContainer {
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
 
-    val drive: DriveSubsystem = DriveSubsystem(
-        when (Constants.CURRENT_MODE) {
-            Mode.REAL -> DriveIOHardware(
-                TunerConstants.DrivetrainConstants,
-                arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
-            )
-            Mode.SIM -> DriveIOSim(
-                TunerConstants.DrivetrainConstants,
-                arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
-            )
-            Mode.REPLAY -> object : DriveIO {}
-        }
-    )
+    val drive: DriveSubsystem =
+        DriveSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> {
+                    DriveIOHardware(
+                        TunerConstants.DrivetrainConstants,
+                        arrayOf(
+                            TunerConstants.FrontLeft,
+                            TunerConstants.FrontRight,
+                            TunerConstants.BackLeft,
+                            TunerConstants.BackRight,
+                        ),
+                    )
+                }
+
+                Mode.SIM -> {
+                    DriveIOSim(
+                        TunerConstants.DrivetrainConstants,
+                        arrayOf(
+                            TunerConstants.FrontLeft,
+                            TunerConstants.FrontRight,
+                            TunerConstants.BackLeft,
+                            TunerConstants.BackRight,
+                        ),
+                    )
+                }
+
+                Mode.REPLAY -> {
+                    object : DriveIO {}
+                }
+            },
+        )
+
+    val intake: Intake =
+        Intake(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> IntakeIOHardware()
+                Mode.SIM -> IntakeIOSim()
+                Mode.REPLAY -> object : IntakeIO {}
+            },
+        )
 
     val shooter: ShooterSubsystem = ShooterSubsystem(
         when (Constants.CURRENT_MODE) {
