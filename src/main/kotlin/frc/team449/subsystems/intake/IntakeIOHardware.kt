@@ -149,7 +149,7 @@ class IntakeIOHardware : IntakeIO {
     override fun setVoltage(
         pivotVoltage: Double,
         leftRollerVoltage: Double,
-        rightRollerVoltage: Double,
+        rightRollerVoltage: Double
     ) {
         pivotMotor.setControl(pivotVoltageRequest.withOutput(pivotVoltage))
         leftRollerMotor.setControl(leftRollerVoltageRequest.withOutput(leftRollerVoltage))
