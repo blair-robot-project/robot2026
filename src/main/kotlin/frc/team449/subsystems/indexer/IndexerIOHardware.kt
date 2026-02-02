@@ -17,6 +17,7 @@ import frc.team449.Constants
 import frc.team449.Constants.IndexerConstants.INDEXER_STATOR_LIMIT
 import frc.team449.Constants.IndexerConstants.INDEXER_SUPPLY_LIMIT
 import frc.team449.Constants.IndexerConstants.LEFT_INDEXER_ID
+import frc.team449.Constants.IndexerConstants.RIGHT_INDEXER_ID
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 
@@ -35,10 +36,10 @@ class IndexerIOHardware : IndexerIO {
     private val leftVoltageSignal: StatusSignal<Voltage> = leftIndexer.motorVoltage
     private val rightVoltageSignal: StatusSignal<Voltage> = rightIndexer.motorVoltage
     private val leftIndexerDisconnectedAlert =
-        Alert("Left Indexer motor disconnected (ID ${Constants.IndexerConstants.LEFT_INDEXER_ID})", Alert.AlertType.kError)
+        Alert("Left Indexer motor disconnected (ID ${LEFT_INDEXER_ID})", Alert.AlertType.kError)
 
     private val rightIndexerDisconnectedAlert =
-        Alert("Right Indexer motor disconnected (ID ${Constants.IndexerConstants.RIGHT_INDEXER_ID})", Alert.AlertType.kError)
+        Alert("Right Indexer motor disconnected (ID ${RIGHT_INDEXER_ID})", Alert.AlertType.kError)
 
     private val leftIndexerConnected: Boolean
         get() = leftIndexer.isAlive
