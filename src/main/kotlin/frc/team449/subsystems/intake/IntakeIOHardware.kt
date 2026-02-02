@@ -81,12 +81,12 @@ class IntakeIOHardware : IntakeIO {
 
         val leftRollerMotorOutput =
             MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Brake)
+                .withNeutralMode(NeutralModeValue.Coast)
                 .withInverted(InvertedValue.CounterClockwise_Positive)
 
         val rightRollerMotorOutput =
             MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Brake)
+                .withNeutralMode(NeutralModeValue.Coast)
                 .withInverted(InvertedValue.CounterClockwise_Positive)
 
         pivotConfig =
@@ -149,7 +149,7 @@ class IntakeIOHardware : IntakeIO {
     override fun setVoltage(
         pivotVoltage: Double,
         leftRollerVoltage: Double,
-        rightRollerVoltage: Double
+        rightRollerVoltage: Double,
     ) {
         pivotMotor.setControl(pivotVoltageRequest.withOutput(pivotVoltage))
         leftRollerMotor.setControl(leftRollerVoltageRequest.withOutput(leftRollerVoltage))
