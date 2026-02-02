@@ -26,52 +26,50 @@ class DriveIOSim(
     moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
 ) : DriveIOHardware(
     driveConstants,
-    sanitizeConstantsForSim(moduleConstants),
+    sanitizeConstantsForSim(moduleConstants)
 ) {
-    private val simTelemetryConsumer: Consumer<SwerveDriveState> =
-        Consumer { swerveDriveState: SwerveDriveState ->
-            swerveDriveState.Pose = mapleSimDrive.simulatedDriveTrainPose
-            telemetryConsumer.accept(swerveDriveState)
-        }
 
-    private val simulationConfig: DriveTrainSimulationConfig =
-        DriveTrainSimulationConfig
-            .Default()
-            .withRobotMass(Kilograms.of(Constants.ROBOT_MASS_KG))
-            .withBumperSize(Inches.of(Constants.ROBOT_LENGTH_INCHES), Inches.of(Constants.ROBOT_WIDTH_INCHES))
-            .withGyro(COTS.ofPigeon2())
-            .withTrackLengthTrackWidth(
-                Inches.of(Constants.DriveConstants.TRACKWIDTH_INCHES),
-                Inches.of(Constants.DriveConstants.WHEELBASE_INCHES),
-            ).withSwerveModule(
-                SwerveModuleSimulationConfig(
-                    DCMotor.getKrakenX60(1),
-                    DCMotor.getNEO(1),
-                    moduleConstants[0].DriveMotorGearRatio,
-                    moduleConstants[0].SteerMotorGearRatio,
-                    Volts.of(moduleConstants[0].DriveFrictionVoltage),
-                    Volts.of(moduleConstants[0].SteerFrictionVoltage),
-                    Meters.of(moduleConstants[0].WheelRadius),
-                    KilogramSquareMeters.of(moduleConstants[0].SteerInertia),
-                    Constants.DriveConstants.WHEEL_COF,
-                ),
+    private val simTelemetryConsumer: Consumer<SwerveDriveState> = Consumer { swerveDriveState: SwerveDriveState ->
+        swerveDriveState.Pose = mapleSimDrive.simulatedDriveTrainPose
+        telemetryConsumer.accept(swerveDriveState)
+    }
+
+    private val simulationConfig: DriveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+        .withRobotMass(Kilograms.of(Constants.ROBOT_MASS_KG))
+        .withBumperSize(Inches.of(Constants.ROBOT_LENGTH_INCHES), Inches.of(Constants.ROBOT_WIDTH_INCHES))
+        .withGyro(COTS.ofPigeon2())
+        .withTrackLengthTrackWidth(
+            Inches.of(Constants.DriveConstants.TRACKWIDTH_INCHES),
+            Inches.of(Constants.DriveConstants.WHEELBASE_INCHES)
+        )
+        .withSwerveModule(
+            SwerveModuleSimulationConfig(
+                DCMotor.getKrakenX60(1),
+                DCMotor.getNEO(1),
+                moduleConstants[0].DriveMotorGearRatio,
+                moduleConstants[0].SteerMotorGearRatio,
+                Volts.of(moduleConstants[0].DriveFrictionVoltage),
+                Volts.of(moduleConstants[0].SteerFrictionVoltage),
+                Meters.of(moduleConstants[0].WheelRadius),
+                KilogramSquareMeters.of(moduleConstants[0].SteerInertia),
+                Constants.DriveConstants.WHEEL_COF,
             )
+        )
 
     private val startingPose = Pose2d(3.0, 3.0, Rotation2d())
     val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
-    private val simNotifier =
-        Notifier {
-            SimulatedArena.getInstance().simulationPeriodic()
+    private val simNotifier = Notifier {
+        SimulatedArena.getInstance().simulationPeriodic()
 
-            pigeon2.simState.setRawYaw(mapleSimDrive.simulatedDriveTrainPose.rotation.measure)
-            pigeon2.simState.setAngularVelocityZ(
-                RadiansPerSecond.of(
-                    mapleSimDrive.driveTrainSimulatedChassisSpeedsRobotRelative
-                        .omegaRadiansPerSecond,
-                ),
+        pigeon2.simState.setRawYaw(mapleSimDrive.simulatedDriveTrainPose.rotation.measure)
+        pigeon2.simState.setAngularVelocityZ(
+            RadiansPerSecond.of(
+                mapleSimDrive.driveTrainSimulatedChassisSpeedsRobotRelative
+                    .omegaRadiansPerSecond
             )
-        }
+        )
+    }
 
     init {
         initializeSimulation()
@@ -95,7 +93,7 @@ class DriveIOSim(
                     realModule.driveMotor.simState.setSupplyVoltage(SimulatedBattery.getBatteryVoltage())
 
                     realModule.driveMotor.simState.motorVoltageMeasure
-                },
+                }
             )
 
             simModule.useSteerMotorController(
@@ -108,7 +106,7 @@ class DriveIOSim(
                     realModule.steerMotor.simState.setSupplyVoltage(SimulatedBattery.getBatteryVoltage())
 
                     realModule.steerMotor.simState.motorVoltageMeasure
-                },
+                }
             )
         }
     }
@@ -127,23 +125,23 @@ class DriveIOSim(
             originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
         ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>> {
             // create a new array to hold the modified constants
-            return originalConstants
-                .map { module ->
-                    // create a modified copy of the module constant
-                    module
-                        .withEncoderOffset(0.0)
-                        .withDriveMotorInverted(false)
-                        .withSteerMotorInverted(false)
-                        .withEncoderInverted(false)
-                        .withSteerMotorGains(
-                            module
-                                .SteerMotorGains
-                                .withKP(70.0)
-                                .withKD(4.5),
-                        ).withDriveFrictionVoltage(Volts.of(0.1))
-                        .withSteerFrictionVoltage(Volts.of(0.15))
-                        .withSteerInertia(KilogramSquareMeters.of(0.05))
-                }.toTypedArray()
+            return originalConstants.map { module ->
+                // create a modified copy of the module constant
+                module
+                    .withEncoderOffset(0.0)
+                    .withDriveMotorInverted(false)
+                    .withSteerMotorInverted(false)
+                    .withEncoderInverted(false)
+                    .withSteerMotorGains(
+                        module
+                            .SteerMotorGains
+                            .withKP(70.0)
+                            .withKD(4.5)
+                    )
+                    .withDriveFrictionVoltage(Volts.of(0.1))
+                    .withSteerFrictionVoltage(Volts.of(0.15))
+                    .withSteerInertia(KilogramSquareMeters.of(0.05))
+            }.toTypedArray()
         }
     }
 }

@@ -28,17 +28,17 @@ class DriveSubsystem(
         Logger.processInputs("DriveInputs", inputs)
     }
 
-    fun setControl(request: SwerveRequest) {
-        io.setControl(request)
+    fun setControl(request: SwerveRequest) { io.setControl(request) }
+
+    fun resetOdometry(pose: Pose2d) { io.resetOdometry(pose) }
+
+    fun getPose(): Pose2d {
+        return inputs.Pose
     }
 
-    fun resetOdometry(pose: Pose2d) {
-        io.resetOdometry(pose)
+    fun getRobotRelativeSpeeds(): ChassisSpeeds {
+        return inputs.Speeds
     }
-
-    fun getPose(): Pose2d = inputs.Pose
-
-    fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
     fun seedFieldCentric() {
         if (io is DriveIOHardware) {
@@ -54,16 +54,12 @@ class DriveSubsystem(
                     Rotation2d.kZero
                 } else {
                     Rotation2d.k180deg
-                },
+                }
             )
         }
     }
 
-    fun addVisionMeasurement(
-        visionRobotPoseMeters: Pose2d,
-        timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>
-    ) {
+    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
 
@@ -71,78 +67,75 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    // Swerve requests to apply during SysId characterization
+    /* Swerve requests to apply during SysId characterization */
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     private val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
     private val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()
 
-    // SysId routine for characterizing translation. This is used to find PID gains for the drive motors.
-    val sysIDTranslationRoutine =
-        SysIdRoutine(
-            SysIdRoutine.Config(
-                null, // default ramp rate (1 V/s)
-                Volts.of(4.0), // dynamic step voltage
-                null, // default timeout (10 s)
-            ) { state: SysIdRoutineLog.State ->
-                Logger.recordOutput(
-                    "SysIdTranslation_State",
-                    state.toString(),
-                )
-            },
-            Mechanism(
-                { output: Voltage -> setControl(translationCharacterizationRequest.withVolts(output)) },
-                null,
-                this,
-            ),
+    /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
+    val sysIDTranslationRoutine = SysIdRoutine(
+        SysIdRoutine.Config(
+            null, // default ramp rate (1 V/s)
+            Volts.of(4.0), // dynamic step voltage
+            null // default timeout (10 s)
+        ) { state: SysIdRoutineLog.State ->
+            Logger.recordOutput(
+                "SysIdTranslation_State",
+                state.toString()
+            )
+        },
+        Mechanism(
+            { output: Voltage -> setControl(translationCharacterizationRequest.withVolts(output)) },
+            null,
+            this
         )
+    )
 
-    // SysId routine for characterizing steer. This is used to find PID gains for the steer motors.
-    val sysIDSteerRoutine =
-        SysIdRoutine(
-            SysIdRoutine.Config(
-                null, // default ramp rate (1 V/s)
-                Volts.of(7.0), // dynamic voltage of 7 V
-                null, // default timeout (10 s)
-            ) { state: SysIdRoutineLog.State ->
-                Logger.recordOutput(
-                    "SysIdSteer_State",
-                    state.toString(),
-                )
-            },
-            Mechanism(
-                { volts: Voltage -> setControl(steerCharacterizationRequest.withVolts(volts)) },
-                null,
-                this,
-            ),
+    /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
+    val sysIDSteerRoutine = SysIdRoutine(
+        SysIdRoutine.Config(
+            null, // default ramp rate (1 V/s)
+            Volts.of(7.0), // dynamic voltage of 7 V
+            null // default timeout (10 s)
+        ) { state: SysIdRoutineLog.State ->
+            Logger.recordOutput(
+                "SysIdSteer_State",
+                state.toString()
+            )
+        },
+        Mechanism(
+            { volts: Voltage -> setControl(steerCharacterizationRequest.withVolts(volts)) },
+            null,
+            this
         )
+    )
 
     /*
      * SysId routine for characterizing rotation.
      * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
      * See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
      */
-    val sysIDRotationRoutine =
-        SysIdRoutine(
-            SysIdRoutine.Config( // This is in radians per second², but SysId only supports "volts per second"
-                Volts.of(Math.PI / 6).per(Second), // This is in radians per second, but SysId only supports "volts"
-                Volts.of(Math.PI),
-                null,
-            ) // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            { state: SysIdRoutineLog.State ->
-                Logger.recordOutput(
-                    "SysIdRotation_State",
-                    state.toString(),
-                )
+    val sysIDRotationRoutine = SysIdRoutine(
+        SysIdRoutine.Config( /* This is in radians per second², but SysId only supports "volts per second" */
+            Volts.of(Math.PI / 6).per(Second), /* This is in radians per second, but SysId only supports "volts" */
+            Volts.of(Math.PI),
+            null
+        ) // Use default timeout (10 s)
+        // Log state with SignalLogger class
+        { state: SysIdRoutineLog.State ->
+            Logger.recordOutput(
+                "SysIdRotation_State",
+                state.toString()
+            )
+        },
+        Mechanism(
+            { output: Voltage ->
+                /* output is actually radians per second, but SysId only supports "volts" */
+                setControl(rotationCharacterizationRequest.withRotationalRate(output.`in`(Volts)))
+                Logger.recordOutput("Rotational_Rate", output.`in`(Volts)) // log requested output for SysId
             },
-            Mechanism(
-                { output: Voltage ->
-                    // output is actually radians per second, but SysId only supports "volts"
-                    setControl(rotationCharacterizationRequest.withRotationalRate(output.`in`(Volts)))
-                    Logger.recordOutput("Rotational_Rate", output.`in`(Volts)) // log requested output for SysId
-                },
-                null,
-                this,
-            ),
+            null,
+            this
         )
+    )
 }

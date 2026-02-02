@@ -58,6 +58,7 @@ class Robot : LoggedRobot() {
     override fun robotPeriodic() {
         // high priority (real-time) thread for loop timing
         Threads.setCurrentThreadPriority(true, 99)
+
         CommandScheduler.getInstance().run()
 
         // return thread to low priority (standard)
