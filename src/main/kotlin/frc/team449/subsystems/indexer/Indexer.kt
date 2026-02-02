@@ -12,11 +12,7 @@ import org.littletonrobotics.junction.Logger
 
 class Indexer(
     private val io: IndexerIO
-
 ) : SubsystemBase() {
-
-    // error
-
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
     override fun periodic() {
@@ -25,16 +21,20 @@ class Indexer(
     }
 
     // sets voltage of motor
-    // might be a while true? or something
-    public fun setVoltage(leftVoltage: Double, rightVoltage: Double) = run{
-        io.setVoltage(
-            leftVoltage,
-            rightVoltage
-        )
-    }
+    fun setVoltage(
+        leftVoltage: Double,
+        rightVoltage: Double
+    ): Command =
+        run {
+            io.setVoltage(
+                leftVoltage,
+                rightVoltage,
+            )
+        }
 
     // stops motor
-    fun stop() =run{
-        io.setVoltage(0.0, 0.0)
-    }
+    fun stop(): Command =
+        run {
+            io.setVoltage(0.0, 0.0)
+        }
 }

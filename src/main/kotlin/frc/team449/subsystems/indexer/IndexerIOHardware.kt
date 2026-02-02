@@ -13,19 +13,17 @@ import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
-import frc.team449.Constants
 import frc.team449.Constants.IndexerConstants.INDEXER_STATOR_LIMIT
 import frc.team449.Constants.IndexerConstants.INDEXER_SUPPLY_LIMIT
 import frc.team449.Constants.IndexerConstants.LEFT_INDEXER_ID
 import frc.team449.Constants.IndexerConstants.RIGHT_INDEXER_ID
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
-
 class IndexerIOHardware : IndexerIO {
     private val leftIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
     private val rightIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    val leftIndexer: TalonFX = TalonFX(LEFT_INDEXER_ID) // kraken x60
-    val rightIndexer: TalonFX = TalonFX(Constants.IndexerConstants.RIGHT_INDEXER_ID) // kraken x44
+    val leftIndexer: TalonFX = TalonFX(LEFT_INDEXER_ID) // kraken x44
+    val rightIndexer: TalonFX = TalonFX(RIGHT_INDEXER_ID) // kraken x60
 
     private val leftSupplyCurrent: StatusSignal<Current> = leftIndexer.supplyCurrent
     private val rightSupplyCurrent: StatusSignal<Current> = rightIndexer.supplyCurrent
@@ -36,34 +34,47 @@ class IndexerIOHardware : IndexerIO {
     private val leftVoltageSignal: StatusSignal<Voltage> = leftIndexer.motorVoltage
     private val rightVoltageSignal: StatusSignal<Voltage> = rightIndexer.motorVoltage
     private val leftIndexerDisconnectedAlert =
-        Alert("Left Indexer motor disconnected (ID ${LEFT_INDEXER_ID})", Alert.AlertType.kError)
+        Alert("Left Indexer motor disconnected (ID $LEFT_INDEXER_ID)", Alert.AlertType.kError)
 
     private val rightIndexerDisconnectedAlert =
-        Alert("Right Indexer motor disconnected (ID ${RIGHT_INDEXER_ID})", Alert.AlertType.kError)
+        Alert("Right Indexer motor disconnected (ID $RIGHT_INDEXER_ID)", Alert.AlertType.kError)
 
     private val leftIndexerConnected: Boolean
         get() = leftIndexer.isAlive
 
     private val rightIndexerConnected: Boolean
         get() = rightIndexer.isAlive
+
     init {
-        val indexerCurrentLimitConfigs = CurrentLimitsConfigs()
-            .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(INDEXER_SUPPLY_LIMIT)//change this in constants cus idk what it's suppsoed to be
-            .withStatorCurrentLimitEnable(true)
-            .withStatorCurrentLimit(INDEXER_STATOR_LIMIT)
+        val indexerCurrentLimitConfigs =
+            CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(INDEXER_SUPPLY_LIMIT)
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(INDEXER_STATOR_LIMIT)
 
+        val leftIndexerMotorOutput =
+            MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast)
+                .withInverted(InvertedValue.CounterClockwise_Positive)
 
-        val indexerMotorOutput = MotorOutputConfigs()
-            .withNeutralMode(NeutralModeValue.Coast)
-            .withInverted(InvertedValue.CounterClockwise_Positive)
+        val rightIndexerMotorOutput =
+            MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast)
+                .withInverted(InvertedValue.CounterClockwise_Positive)
 
-        val indexerConfig = TalonFXConfiguration()
-            .withCurrentLimits(indexerCurrentLimitConfigs)
-            .withMotorOutput(indexerMotorOutput)
+        val leftIndexerConfig =
+            TalonFXConfiguration()
+                .withCurrentLimits(indexerCurrentLimitConfigs)
+                .withMotorOutput(leftIndexerMotorOutput)
 
-        tryUntilOk(5) { leftIndexer.configurator.apply(indexerConfig, 0.25) }
-        tryUntilOk(5) { rightIndexer.configurator.apply(indexerConfig, 0.25) }
+        val rightIndexerConfig =
+            TalonFXConfiguration()
+                .withCurrentLimits(indexerCurrentLimitConfigs)
+                .withMotorOutput(rightIndexerMotorOutput)
+
+        tryUntilOk(5) { leftIndexer.configurator.apply(leftIndexerConfig, 0.25) }
+        tryUntilOk(5) { rightIndexer.configurator.apply(rightIndexerConfig, 0.25) }
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
@@ -72,13 +83,13 @@ class IndexerIOHardware : IndexerIO {
             leftSupplyCurrent,
             rightSupplyCurrent,
             leftStatorCurrent,
-            rightStatorCurrent
+            rightStatorCurrent,
         )
     }
 
     // 99% percent sure update inputs will need some changes
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        //error
+        // error
         inputs.leftVoltage = leftIndexer.motorVoltage.value.`in`(Units.Volts)
         inputs.rightVoltage = rightIndexer.motorVoltage.value.`in`(Units.Volts)
 

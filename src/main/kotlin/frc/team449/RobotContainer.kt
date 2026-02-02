@@ -9,9 +9,9 @@ import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.Indexer
+import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
-import frc.team449.subsystems.indexer.IndexerIO
 
 object RobotContainer {
     // driver/op controllers
