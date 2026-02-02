@@ -5,7 +5,9 @@ import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.RobotContainer.autoChooser
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -53,6 +55,8 @@ class Robot : LoggedRobot() {
     override fun robotInit() {
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
+        robotContainer.bLineRoutines.addOptions(autoChooser)
+        SmartDashboard.putData("Auto Chooser", autoChooser)
     }
 
     override fun robotPeriodic() {
@@ -65,7 +69,7 @@ class Robot : LoggedRobot() {
     }
 
     override fun autonomousInit() {
-        CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
+        CommandScheduler.getInstance().schedule(robotContainer.autoChooser.selectedCommand())
     }
 
     override fun autonomousPeriodic() {}

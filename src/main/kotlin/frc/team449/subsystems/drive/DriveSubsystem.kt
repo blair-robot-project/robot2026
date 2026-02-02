@@ -1,7 +1,9 @@
 package frc.team449.subsystems.drive
 
+import choreo.trajectory.SwerveSample
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
+import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
@@ -21,6 +23,15 @@ class DriveSubsystem(
     val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+
+    private val autoApplyFieldSpeeds = SwerveRequest.ApplyFieldSpeeds()
+
+    private val autoXController = PIDController(5.0, 0.0, 0.0)
+    private val autoYController = PIDController(5.0, 0.0, 0.0)
+    private val autoThetaController =
+        PIDController(5.0, 0.0, 0.0).apply {
+            enableContinuousInput(-Math.PI, Math.PI)
+        }
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -44,6 +55,22 @@ class DriveSubsystem(
         if (io is DriveIOHardware) {
             io.seedFieldCentric()
         }
+    }
+
+    fun followTrajectory(sample: SwerveSample) {
+        val pose = getPose()
+        val targetSpeeds = sample.chassisSpeeds
+
+        targetSpeeds.vxMetersPerSecond += autoXController.calculate(pose.x, sample.x)
+        targetSpeeds.vyMetersPerSecond += autoYController.calculate(pose.y, sample.y)
+        targetSpeeds.omegaRadiansPerSecond += autoThetaController.calculate(pose.rotation.radians, sample.heading)
+
+        setControl(
+            autoApplyFieldSpeeds
+                .withSpeeds(targetSpeeds)
+                .withWheelForceFeedforwardsX(sample.moduleForcesX())
+                .withWheelForceFeedforwardsY(sample.moduleForcesY()),
+        )
     }
 
     // should only be called in driverStationConnected() to prevent null alliance

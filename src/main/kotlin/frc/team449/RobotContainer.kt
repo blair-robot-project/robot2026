@@ -1,8 +1,9 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.PrintCommand
+import choreo.auto.AutoChooser
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
+import frc.team449.auto.BLineRoutines
 import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
@@ -17,8 +18,6 @@ object RobotContainer {
     // driver/op controllers
     val driveController: CommandXboxController = CommandXboxController(0)
     val opController: CommandXboxController = CommandXboxController(1)
-
-    val autonomousCommand = PrintCommand("This is the autonomous command!")
 
     val drive: DriveSubsystem =
         DriveSubsystem(
@@ -63,4 +62,7 @@ object RobotContainer {
         )
 
     val bindings = Bindings(this)
+
+    val bLineRoutines = BLineRoutines()
+    val autoChooser = AutoChooser()
 }
