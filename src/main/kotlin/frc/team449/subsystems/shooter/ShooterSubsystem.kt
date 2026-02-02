@@ -1,10 +1,11 @@
 package frc.team449.subsystems.shooter
 
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
-import org.littletonrobotics.junction.inputs.LoggableInputs
+import kotlin.math.PI
 
 class ShooterSubsystem(
     private val io: ShooterIO
@@ -14,7 +15,7 @@ class ShooterSubsystem(
 
     override fun periodic() {
         io.updateInputs(inputs)
-        Logger.processInputs("Shooter", inputs as LoggableInputs)
+        Logger.processInputs("Shooter", inputs)
     }
 
     override fun simulationPeriodic() {
@@ -22,19 +23,27 @@ class ShooterSubsystem(
     }
 
     fun shoot(): Command {
-        return io.runFlywheel()
+        return runOnce {
+            io.runFlywheelAtVelocity(RadiansPerSecond.of(PI)) // placeholder velocity
+        }
     }
 
     fun stop(): Command {
-        return io.stopFlywheel()
+        return runOnce {
+            io.runFlywheelAtVelocity(RadiansPerSecond.of(0.0))
+        }
     }
 
     fun setHood(angle: Angle): Command {
-        return io.setHood(angle)
+        return runOnce {
+            io.setHoodPosition(angle)
+        }
     }
 
     fun holdHood(): Command {
-        return io.holdHood()
+        return runOnce {
+            io.setHoodPosition(io.getHoodPosition())
+        }
     }
 
     fun atTolerance(): Boolean {

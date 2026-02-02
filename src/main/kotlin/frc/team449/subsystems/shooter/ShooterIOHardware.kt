@@ -8,38 +8,37 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
-import com.ctre.phoenix6.controls.MotionMagicVoltage
+import com.ctre.phoenix6.controls.PositionVoltage
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import edu.wpi.first.units.Units
+import edu.wpi.first.units.Units.Amps
+import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Temperature
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
-import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_ACCELERATION
 import frc.team449.Constants.ShooterConstants.HOOD_CRUISE_VELOCITY
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
-import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE
-import frc.team449.Constants.ShooterConstants.HOOD_VOLTAGE_CONTROL
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
-import frc.team449.Constants.ShooterConstants.SHOOTER_VOLTAGE
 import kotlin.math.abs
 
 class ShooterIOHardware : ShooterIO {
@@ -121,21 +120,17 @@ class ShooterIOHardware : ShooterIO {
     init {
         val flywheelCurrentLimitConfigs: CurrentLimitsConfigs =
             CurrentLimitsConfigs()
-                .withSupplyCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(FLYWHEEL_SUPPLY_LIM)
-                .withStatorCurrentLimitEnable(true)
                 .withStatorCurrentLimit(FLYWHEEL_STATOR_LIM)
 
         val hoodCurrentLimitConfigs: CurrentLimitsConfigs =
             CurrentLimitsConfigs()
-                .withSupplyCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(HOOD_SUPPLY_LIM)
-                .withStatorCurrentLimitEnable(true)
                 .withStatorCurrentLimit(HOOD_STATOR_LIM)
 
         val flywheelMotorOutput =
             MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Brake)
+                .withNeutralMode(NeutralModeValue.Coast)
                 .withInverted(InvertedValue.CounterClockwise_Positive)
 
         val hoodMotorOutput =
@@ -207,26 +202,31 @@ class ShooterIOHardware : ShooterIO {
         hoodTargetPos = hoodMotor.closedLoopReference
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            150.0, //  doesn't need to update that often
+            50.0, //  doesn't need to update that often
             leftLeaderTemperature,
             leftLeaderMotorVoltage,
             leftLeaderSupplyCurrent,
-            leftLeaderStatorCurrent,
             rightLeaderTemperature,
             rightLeaderMotorVoltage,
             rightLeaderSupplyCurrent,
-            rightLeaderStatorCurrent,
             leftFollowerTemperature,
             leftFollowerMotorVoltage,
             leftFollowerSupplyCurrent,
-            leftFollowerStatorCurrent,
             rightFollowerTemperature,
             rightFollowerMotorVoltage,
             rightFollowerSupplyCurrent,
-            rightFollowerStatorCurrent,
             hoodTemperature,
             hoodMotorVoltage,
             hoodSupplyCurrent,
+            hoodTargetPos
+        )
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            150.0,
+            leftLeaderStatorCurrent,
+            rightLeaderStatorCurrent,
+            leftFollowerStatorCurrent,
+            rightFollowerStatorCurrent,
             hoodStatorCurrent,
             hoodCurrentPos
         )
@@ -273,76 +273,40 @@ class ShooterIOHardware : ShooterIO {
         rightFollowerMotorDisconnectedAlert.set(!rightFollowerMotorConnected)
         hoodMotorDisconnectedAlert.set(!hoodMotorConnected)
 
-        inputs.leftVoltage = leftLeaderMotorVoltage.getValue().`in`(Units.Volts)
-        inputs.leftSupplyCurrent = leftLeaderSupplyCurrent.getValue().`in`(Units.Amps)
-        inputs.leftStatorCurrent = leftLeaderStatorCurrent.getValue().`in`(Units.Amps)
-        inputs.leftTemperature = leftLeaderTemperature.getValue().`in`(Units.Celsius)
+        inputs.leftVoltage = leftLeaderMotorVoltage.getValue().`in`(Volts)
+        inputs.leftSupplyCurrent = leftLeaderSupplyCurrent.getValue().`in`(Amps)
+        inputs.leftStatorCurrent = leftLeaderStatorCurrent.getValue().`in`(Amps)
+        inputs.leftTemperature = leftLeaderTemperature.getValue().`in`(Celsius)
         inputs.leftMotorIsConnected = leftLeaderMotorConnected
 
-        inputs.rightVoltage = rightLeaderMotorVoltage.getValue().`in`(Units.Volts)
-        inputs.rightSupplyCurrent = rightLeaderSupplyCurrent.getValue().`in`(Units.Amps)
-        inputs.rightStatorCurrent = rightLeaderStatorCurrent.getValue().`in`(Units.Amps)
-        inputs.rightTemperature = rightLeaderTemperature.getValue().`in`(Units.Celsius)
+        inputs.rightVoltage = rightLeaderMotorVoltage.getValue().`in`(Volts)
+        inputs.rightSupplyCurrent = rightLeaderSupplyCurrent.getValue().`in`(Amps)
+        inputs.rightStatorCurrent = rightLeaderStatorCurrent.getValue().`in`(Amps)
+        inputs.rightTemperature = rightLeaderTemperature.getValue().`in`(Celsius)
         inputs.rightMotorIsConnected = rightLeaderMotorConnected
 
-        inputs.hoodVoltage = hoodMotorVoltage.getValue().`in`(Units.Volts)
-        inputs.hoodSupplyCurrent = hoodSupplyCurrent.getValue().`in`(Units.Amps)
-        inputs.hoodStatorCurrent = hoodStatorCurrent.getValue().`in`(Units.Amps)
-        inputs.hoodTemperature = hoodTemperature.getValue().`in`(Units.Celsius)
+        inputs.hoodVoltage = hoodMotorVoltage.getValue().`in`(Volts)
+        inputs.hoodSupplyCurrent = hoodSupplyCurrent.getValue().`in`(Amps)
+        inputs.hoodStatorCurrent = hoodStatorCurrent.getValue().`in`(Amps)
+        inputs.hoodTemperature = hoodTemperature.getValue().`in`(Celsius)
         inputs.hoodMotorIsConnected = hoodMotorConnected
-        inputs.hoodCurrentPos = hoodCurrentPos.getValue().`in`(Units.Radians)
+        inputs.hoodCurrentPos = hoodCurrentPos.getValue().`in`(Radians)
         inputs.hoodTargetPos = hoodTargetPos.value
     }
 
-    private var request = MotionMagicVoltage(HOOD_MIN_ANGLE)
-
-    override fun runFlywheel(): Command {
-        return runOnce({
-            leftLeaderMotor.setVoltage(SHOOTER_VOLTAGE)
-            rightLeaderMotor.setVoltage(SHOOTER_VOLTAGE)
-        })
+    override fun runFlywheelAtVelocity(velocity: AngularVelocity) {
+        leftLeaderMotor.setControl(VelocityVoltage(velocity))
     }
 
-    override fun stopFlywheel(): Command {
-        return runOnce({
-            leftLeaderMotor.stopMotor()
-            rightLeaderMotor.stopMotor()
-        })
-    }
-
-    override fun setHood(angle: Angle): Command {
-        return runOnce({
-            hoodMotor.setControl(request.withPosition(angle))
-        })
-    }
-
-    override fun holdHood(): Command {
-        return runOnce({
-            hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians)))
-        })
-    }
-
-    override fun hoodUp(): Command {
-        return runOnce({
-            // hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians) + Degrees.of(7.5).`in`(Radians)))
-            hoodMotor.setVoltage(HOOD_VOLTAGE_CONTROL)
-        })
-    }
-
-    override fun hoodDown(): Command {
-        return runOnce({
-            // hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians) - Degrees.of(7.5).`in`(Radians)))
-            hoodMotor.setVoltage(-HOOD_VOLTAGE_CONTROL)
-        })
-    }
-
-    override fun stopHood(): Command {
-        return runOnce({
-            hoodMotor.setVoltage(0.0)
-        })
+    override fun setHoodPosition(angle: Angle) {
+        hoodMotor.setControl(PositionVoltage(angle))
     }
 
     override fun atTolerance(): Boolean {
         return abs(hoodMotor.position.valueAsDouble - hoodMotor.closedLoopReference.value) < HOOD_TOLERANCE.`in`(Radians)
+    }
+
+    override fun getHoodPosition(): Angle {
+        return hoodMotor.position.value
     }
 }

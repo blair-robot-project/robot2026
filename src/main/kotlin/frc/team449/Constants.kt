@@ -102,14 +102,8 @@ object Constants {
 
         const val HOOD_SIM_GRAVITY = false
 
-        const val SHOOTER_VOLTAGE = 11.0 // TODO: find
-        const val HOOD_VOLTAGE_CONTROL = 5.0 // volts TODO: find
-
         const val FLYWHEEL_GEARING = 1.0 // TODO: find
         const val HOOD_GEARING = 1.0 // TODO: find
-
-        const val HOOD_ENCODER_A_CHANNEL = 6
-        const val HOOD_ENCODER_B_CHANNEL = 7
 
         const val HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE = 2 * PI / 4096 // TODO: find
         const val HOOD_MOTOR_GEARING = 1.0 // TODO: find

@@ -1,8 +1,7 @@
 package frc.team449.subsystems.shooter
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
-import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.units.measure.AngularVelocity
 import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import org.littletonrobotics.junction.AutoLog
 
@@ -63,21 +62,13 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun runFlywheel(): Command { return InstantCommand() }
+    fun runFlywheelAtVelocity(velocity: AngularVelocity) { }
 
-    fun stopFlywheel(): Command { return InstantCommand() }
-
-    fun setHood(angle: Angle): Command { return InstantCommand() }
-
-    fun hoodUp(): Command { return InstantCommand() }
-
-    fun hoodDown(): Command { return InstantCommand() }
-
-    fun stopHood(): Command { return InstantCommand() }
-
-    fun holdHood(): Command { return InstantCommand() }
+    fun setHoodPosition(angle: Angle) { }
 
     fun atTolerance(): Boolean { return true }
 
     fun simPeriodic() {}
+
+    fun getHoodPosition(): Angle { return Radians.of(0.0) }
 }
