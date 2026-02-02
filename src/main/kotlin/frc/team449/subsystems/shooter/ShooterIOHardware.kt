@@ -23,8 +23,17 @@ import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
-import frc.team449.Constants
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
+import frc.team449.Constants.ShooterConstants.HOOD_ACCELERATION
+import frc.team449.Constants.ShooterConstants.HOOD_CRUISE_VELOCITY
+import frc.team449.Constants.ShooterConstants.HOOD_GEARING
+import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
+import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
+import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
+import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE
 import frc.team449.Constants.ShooterConstants.HOOD_VOLTAGE_CONTROL
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
@@ -113,16 +122,16 @@ class ShooterIOHardware : ShooterIO {
         val flywheelCurrentLimitConfigs: CurrentLimitsConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM)
+                .withSupplyCurrentLimit(FLYWHEEL_SUPPLY_LIM)
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(Constants.ShooterConstants.FLYWHEEL_STATOR_LIM)
+                .withStatorCurrentLimit(FLYWHEEL_STATOR_LIM)
 
         val hoodCurrentLimitConfigs: CurrentLimitsConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(Constants.ShooterConstants.HOOD_SUPPLY_LIM)
+                .withSupplyCurrentLimit(HOOD_SUPPLY_LIM)
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(Constants.ShooterConstants.HOOD_STATOR_LIM)
+                .withStatorCurrentLimit(HOOD_STATOR_LIM)
 
         val flywheelMotorOutput =
             MotorOutputConfigs()
@@ -136,16 +145,16 @@ class ShooterIOHardware : ShooterIO {
 
         val flywheelFeedback =
             FeedbackConfigs()
-                .withSensorToMechanismRatio(Constants.ShooterConstants.FLYWHEEL_GEARING)
+                .withSensorToMechanismRatio(FLYWHEEL_GEARING)
 
         val hoodFeedback =
             FeedbackConfigs()
-                .withSensorToMechanismRatio(Constants.ShooterConstants.HOOD_GEARING)
+                .withSensorToMechanismRatio(HOOD_GEARING)
 
         val hoodMotionMagicConfigs =
             MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(Constants.ShooterConstants.HOOD_CRUISE_VELOCITY)
-                .withMotionMagicAcceleration(Constants.ShooterConstants.HOOD_ACCELERATION)
+                .withMotionMagicCruiseVelocity(HOOD_CRUISE_VELOCITY)
+                .withMotionMagicAcceleration(HOOD_ACCELERATION)
 
         flywheelConfig =
             TalonFXConfiguration()
@@ -250,37 +259,13 @@ class ShooterIOHardware : ShooterIO {
             hoodCurrentPos
         )
 
-        leftLeaderMotorConnected =
-            BaseStatusSignal.isAllGood(
-                leftLeaderMotorVoltage,
-                leftLeaderSupplyCurrent,
-                leftLeaderStatorCurrent,
-                leftLeaderTemperature,
-            )
+        leftLeaderMotorConnected = leftLeaderMotor.isAlive
 
-        rightLeaderMotorConnected =
-            BaseStatusSignal.isAllGood(
-                rightLeaderMotorVoltage,
-                rightLeaderSupplyCurrent,
-                rightLeaderStatorCurrent,
-                rightLeaderTemperature,
-            )
+        rightLeaderMotorConnected = rightLeaderMotor.isAlive
 
-        leftFollowerMotorConnected =
-            BaseStatusSignal.isAllGood(
-                leftLeaderMotorVoltage,
-                leftLeaderSupplyCurrent,
-                leftLeaderStatorCurrent,
-                leftLeaderTemperature,
-            )
+        leftFollowerMotorConnected = leftFollowerMotor.isAlive
 
-        rightFollowerMotorConnected =
-            BaseStatusSignal.isAllGood(
-                rightLeaderMotorVoltage,
-                rightLeaderSupplyCurrent,
-                rightLeaderStatorCurrent,
-                rightLeaderTemperature,
-            )
+        rightFollowerMotorConnected = rightFollowerMotor.isAlive
 
         leftLeaderMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
         rightLeaderMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
@@ -309,7 +294,7 @@ class ShooterIOHardware : ShooterIO {
         inputs.hoodTargetPos = hoodTargetPos.value
     }
 
-    private var request = MotionMagicVoltage(Constants.ShooterConstants.HOOD_MIN_ANGLE)
+    private var request = MotionMagicVoltage(HOOD_MIN_ANGLE)
 
     override fun runFlywheel(): Command {
         return runOnce({
@@ -358,6 +343,6 @@ class ShooterIOHardware : ShooterIO {
     }
 
     override fun atTolerance(): Boolean {
-        return abs(hoodMotor.position.valueAsDouble - hoodMotor.closedLoopReference.value) < Constants.ShooterConstants.HOOD_TOLERANCE.`in`(Radians)
+        return abs(hoodMotor.position.valueAsDouble - hoodMotor.closedLoopReference.value) < HOOD_TOLERANCE.`in`(Radians)
     }
 }

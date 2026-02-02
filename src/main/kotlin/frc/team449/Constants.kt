@@ -111,9 +111,6 @@ object Constants {
         const val HOOD_ENCODER_A_CHANNEL = 6
         const val HOOD_ENCODER_B_CHANNEL = 7
 
-        const val FLYWHEEL_ENCODER_A_CHANNEL = 8
-        const val FLYWHEEL_ENCODER_B_CHANNEL = 9
-
         const val HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE = 2 * PI / 4096 // TODO: find
         const val HOOD_MOTOR_GEARING = 1.0 // TODO: find
         const val HOOD_MASS = 8.0 // kg TODO: find

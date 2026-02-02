@@ -22,8 +22,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import frc.team449.Constants
-import frc.team449.Constants.ShooterConstants.FLYWHEEL_ENCODER_A_CHANNEL
-import frc.team449.Constants.ShooterConstants.FLYWHEEL_ENCODER_B_CHANNEL
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE
 import frc.team449.Constants.ShooterConstants.HOOD_ENCODER_A_CHANNEL
@@ -99,8 +97,6 @@ class ShooterIOSim : ShooterIO {
         LinearSystemId.createFlywheelSystem(flywheelGearbox, FLYWHEEL_GEARING, flywheelMomentOfInertia)
 
     private val flywheelSim: FlywheelSim = FlywheelSim(flywheelPlant, flywheelGearbox, 0.0)
-    private val flywheelEncoder: Encoder = Encoder(FLYWHEEL_ENCODER_A_CHANNEL, FLYWHEEL_ENCODER_B_CHANNEL)
-    private val flywheelEncoderSim: EncoderSim = EncoderSim(flywheelEncoder)
 
     init {
         SmartDashboard.putData("Shooter Mech2d", mech)
@@ -188,6 +184,5 @@ class ShooterIOSim : ShooterIO {
         val flywheelVoltage = RobotController.getBatteryVoltage() * (rightFlywheelMotor.get() * 2 + leftFlywheelMotor.get() * 2) // multiplying my 2 to account for the follower
         flywheelSim.setInput(flywheelVoltage)
         flywheelSim.update(0.020) // ms
-        flywheelEncoderSim.rate = flywheelSim.angularVelocityRadPerSec
     }
 }

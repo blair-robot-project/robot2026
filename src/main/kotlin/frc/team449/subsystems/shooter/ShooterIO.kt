@@ -3,7 +3,7 @@ import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.InstantCommand
-import frc.team449.Constants
+import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import org.littletonrobotics.junction.AutoLog
 
 interface ShooterIO {
@@ -43,10 +43,10 @@ interface ShooterIO {
         var hoodVoltage: Double = 0.0
 
         @JvmField
-        var hoodCurrentPos: Double = Constants.ShooterConstants.HOOD_MIN_ANGLE.`in`(Radians)
+        var hoodCurrentPos: Double = HOOD_MIN_ANGLE.`in`(Radians)
 
         @JvmField
-        var hoodTargetPos: Double = Constants.ShooterConstants.HOOD_MIN_ANGLE.`in`(Radians)
+        var hoodTargetPos: Double = HOOD_MIN_ANGLE.`in`(Radians)
 
         @JvmField
         var hoodSupplyCurrent: Double = 0.0
