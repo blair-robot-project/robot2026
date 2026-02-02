@@ -8,14 +8,14 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.intake.Intake
-import frc.team449.subsystems.intake.IntakeIO
-import frc.team449.subsystems.intake.IntakeIOHardware
-import frc.team449.subsystems.intake.IntakeIOSim
 import frc.team449.subsystems.indexer.Indexer
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
+import frc.team449.subsystems.intake.Intake
+import frc.team449.subsystems.intake.IntakeIO
+import frc.team449.subsystems.intake.IntakeIOHardware
+import frc.team449.subsystems.intake.IntakeIOSim
 
 object RobotContainer {
     // driver/op controllers
@@ -65,7 +65,6 @@ object RobotContainer {
                 Mode.REPLAY -> object : IntakeIO {}
             },
         )
-
 
     val indexer: Indexer =
         Indexer(

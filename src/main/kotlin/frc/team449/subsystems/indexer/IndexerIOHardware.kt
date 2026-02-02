@@ -87,7 +87,6 @@ class IndexerIOHardware : IndexerIO {
         )
     }
 
-    // 99% percent sure update inputs will need some changes
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
         // error
         inputs.leftVoltage = leftIndexer.motorVoltage.value.`in`(Units.Volts)
