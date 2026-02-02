@@ -64,4 +64,27 @@ object Constants {
     }
 
     // other subsystem constants when applicable
+
+    object IntakeConstants {
+        // config constants
+        const val PIVOT_MOTOR_ID = 40
+
+        const val PIVOT_STATOR_LIMIT = 80.0
+        const val PIVOT_SUPPLY_LIMIT = 40.0
+
+        const val ROLLER_STATOR_LIMIT = 80.0
+        const val ROLLER_SUPPLY_LIMIT = 40.0
+
+        const val LEFT_ROLLER_MOTOR_ID = 41
+        const val RIGHT_ROLLER_MOTOR_ID = 42
+
+        // setpoint constants
+        const val PIVOT_INTAKE_VOLTAGE = 0.0
+        const val LEFT_ROLLER_INTAKE_VOLTAGE = 8.0
+        const val RIGHT_ROLLER_INTAKE_VOLTAGE = 8.0
+
+        const val PIVOT_STOW_VOLTAGE = 5.0
+        const val LEFT_ROLLER_STOW_VOLTAGE = 0.0
+        const val RIGHT_ROLLER_STOW_VOLTAGE = 0.0
+    }
 }
