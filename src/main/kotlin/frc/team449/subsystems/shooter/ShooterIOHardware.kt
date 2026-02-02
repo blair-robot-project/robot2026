@@ -38,7 +38,6 @@ class ShooterIOHardware : ShooterIO {
     // TODO: current homing
     // TODO: interpolating double map for voltage + hood angle
     // TODO: velocity control for flywheels
-    // TODO: voltage control for hood
 
     private val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
     private val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
@@ -53,17 +52,29 @@ class ShooterIOHardware : ShooterIO {
 
     private var leftLeaderMotorConnected: Boolean = true
     private var rightLeaderMotorConnected: Boolean = true
+    private var leftFollowerMotorConnected: Boolean = true
+    private var rightFollowerMotorConnected: Boolean = true
     private var hoodMotorConnected: Boolean = true
 
-    private val leftMotorVoltage: StatusSignal<Voltage>
-    private val leftSupplyCurrent: StatusSignal<Current>
-    private val leftStatorCurrent: StatusSignal<Current>
-    private val leftTemperature: StatusSignal<Temperature>
+    private val leftLeaderMotorVoltage: StatusSignal<Voltage>
+    private val leftLeaderSupplyCurrent: StatusSignal<Current>
+    private val leftLeaderStatorCurrent: StatusSignal<Current>
+    private val leftLeaderTemperature: StatusSignal<Temperature>
 
-    private val rightMotorVoltage: StatusSignal<Voltage>
-    private val rightSupplyCurrent: StatusSignal<Current>
-    private val rightStatorCurrent: StatusSignal<Current>
-    private val rightTemperature: StatusSignal<Temperature>
+    private val rightLeaderMotorVoltage: StatusSignal<Voltage>
+    private val rightLeaderSupplyCurrent: StatusSignal<Current>
+    private val rightLeaderStatorCurrent: StatusSignal<Current>
+    private val rightLeaderTemperature: StatusSignal<Temperature>
+
+    private val leftFollowerMotorVoltage: StatusSignal<Voltage>
+    private val leftFollowerSupplyCurrent: StatusSignal<Current>
+    private val leftFollowerStatorCurrent: StatusSignal<Current>
+    private val leftFollowerTemperature: StatusSignal<Temperature>
+
+    private val rightFollowerMotorVoltage: StatusSignal<Voltage>
+    private val rightFollowerSupplyCurrent: StatusSignal<Current>
+    private val rightFollowerStatorCurrent: StatusSignal<Current>
+    private val rightFollowerTemperature: StatusSignal<Temperature>
 
     private val hoodMotorVoltage: StatusSignal<Voltage>
     private val hoodSupplyCurrent: StatusSignal<Current>
@@ -72,12 +83,22 @@ class ShooterIOHardware : ShooterIO {
     private val hoodCurrentPos: StatusSignal<Angle>
     private val hoodTargetPos: StatusSignal<Double>
 
-    private val leftMotorDisconnectedAlert =
+    private val leftLeaderMotorDisconnectedAlert =
         Alert(
             "left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)",
             Alert.AlertType.kError,
         )
-    private val rightMotorDisconnectedAlert =
+    private val rightLeaderMotorDisconnectedAlert =
+        Alert(
+            "right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)",
+            Alert.AlertType.kError,
+        )
+    private val leftFollowerMotorDisconnectedAlert =
+        Alert(
+            "left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)",
+            Alert.AlertType.kError,
+        )
+    private val rightFollowerMotorDisconnectedAlert =
         Alert(
             "right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)",
             Alert.AlertType.kError,
@@ -149,15 +170,25 @@ class ShooterIOHardware : ShooterIO {
 
         hoodMotor.configurator.apply(hoodConfig)
 
-        leftTemperature = leftLeaderMotor.deviceTemp
-        leftMotorVoltage = leftLeaderMotor.motorVoltage
-        leftSupplyCurrent = leftLeaderMotor.supplyCurrent
-        leftStatorCurrent = leftLeaderMotor.statorCurrent
+        leftLeaderTemperature = leftLeaderMotor.deviceTemp
+        leftLeaderMotorVoltage = leftLeaderMotor.motorVoltage
+        leftLeaderSupplyCurrent = leftLeaderMotor.supplyCurrent
+        leftLeaderStatorCurrent = leftLeaderMotor.statorCurrent
 
-        rightTemperature = rightLeaderMotor.deviceTemp
-        rightMotorVoltage = rightLeaderMotor.motorVoltage
-        rightSupplyCurrent = rightLeaderMotor.supplyCurrent
-        rightStatorCurrent = rightLeaderMotor.statorCurrent
+        rightLeaderTemperature = rightLeaderMotor.deviceTemp
+        rightLeaderMotorVoltage = rightLeaderMotor.motorVoltage
+        rightLeaderSupplyCurrent = rightLeaderMotor.supplyCurrent
+        rightLeaderStatorCurrent = rightLeaderMotor.statorCurrent
+
+        leftFollowerTemperature = leftFollowerMotor.deviceTemp
+        leftFollowerMotorVoltage = leftFollowerMotor.motorVoltage
+        leftFollowerSupplyCurrent = leftFollowerMotor.supplyCurrent
+        leftFollowerStatorCurrent = leftFollowerMotor.statorCurrent
+
+        rightFollowerTemperature = rightFollowerMotor.deviceTemp
+        rightFollowerMotorVoltage = rightFollowerMotor.motorVoltage
+        rightFollowerSupplyCurrent = rightFollowerMotor.supplyCurrent
+        rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
 
         hoodTemperature = hoodMotor.deviceTemp
         hoodMotorVoltage = hoodMotor.motorVoltage
@@ -168,14 +199,22 @@ class ShooterIOHardware : ShooterIO {
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             150.0, //  doesn't need to update that often
-            leftTemperature,
-            leftMotorVoltage,
-            leftSupplyCurrent,
-            leftStatorCurrent,
-            rightTemperature,
-            rightMotorVoltage,
-            rightSupplyCurrent,
-            rightStatorCurrent,
+            leftLeaderTemperature,
+            leftLeaderMotorVoltage,
+            leftLeaderSupplyCurrent,
+            leftLeaderStatorCurrent,
+            rightLeaderTemperature,
+            rightLeaderMotorVoltage,
+            rightLeaderSupplyCurrent,
+            rightLeaderStatorCurrent,
+            leftFollowerTemperature,
+            leftFollowerMotorVoltage,
+            leftFollowerSupplyCurrent,
+            leftFollowerStatorCurrent,
+            rightFollowerTemperature,
+            rightFollowerMotorVoltage,
+            rightFollowerSupplyCurrent,
+            rightFollowerStatorCurrent,
             hoodTemperature,
             hoodMotorVoltage,
             hoodSupplyCurrent,
@@ -188,46 +227,77 @@ class ShooterIOHardware : ShooterIO {
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         BaseStatusSignal.refreshAll(
-            leftMotorVoltage,
-            leftSupplyCurrent,
-            leftStatorCurrent,
-            leftTemperature,
-            rightMotorVoltage,
-            rightSupplyCurrent,
-            rightStatorCurrent,
-            rightTemperature,
+            leftLeaderTemperature,
+            leftLeaderMotorVoltage,
+            leftLeaderSupplyCurrent,
+            leftLeaderStatorCurrent,
+            rightLeaderTemperature,
+            rightLeaderMotorVoltage,
+            rightLeaderSupplyCurrent,
+            rightLeaderStatorCurrent,
+            leftFollowerTemperature,
+            leftFollowerMotorVoltage,
+            leftFollowerSupplyCurrent,
+            leftFollowerStatorCurrent,
+            rightFollowerTemperature,
+            rightFollowerMotorVoltage,
+            rightFollowerSupplyCurrent,
+            rightFollowerStatorCurrent,
+            hoodTemperature,
+            hoodMotorVoltage,
+            hoodSupplyCurrent,
+            hoodStatorCurrent,
+            hoodCurrentPos
         )
 
         leftLeaderMotorConnected =
             BaseStatusSignal.isAllGood(
-                leftMotorVoltage,
-                leftSupplyCurrent,
-                leftStatorCurrent,
-                leftTemperature,
+                leftLeaderMotorVoltage,
+                leftLeaderSupplyCurrent,
+                leftLeaderStatorCurrent,
+                leftLeaderTemperature,
             )
 
         rightLeaderMotorConnected =
             BaseStatusSignal.isAllGood(
-                rightMotorVoltage,
-                rightSupplyCurrent,
-                rightStatorCurrent,
-                rightTemperature,
+                rightLeaderMotorVoltage,
+                rightLeaderSupplyCurrent,
+                rightLeaderStatorCurrent,
+                rightLeaderTemperature,
             )
 
-        leftMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
-        rightMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
+        leftFollowerMotorConnected =
+            BaseStatusSignal.isAllGood(
+                leftLeaderMotorVoltage,
+                leftLeaderSupplyCurrent,
+                leftLeaderStatorCurrent,
+                leftLeaderTemperature,
+            )
+
+        rightFollowerMotorConnected =
+            BaseStatusSignal.isAllGood(
+                rightLeaderMotorVoltage,
+                rightLeaderSupplyCurrent,
+                rightLeaderStatorCurrent,
+                rightLeaderTemperature,
+            )
+
+        leftLeaderMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
+        rightLeaderMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
+        leftFollowerMotorDisconnectedAlert.set(!leftFollowerMotorConnected)
+        rightFollowerMotorDisconnectedAlert.set(!rightFollowerMotorConnected)
         hoodMotorDisconnectedAlert.set(!hoodMotorConnected)
 
-        inputs.leftVoltage = leftMotorVoltage.getValue().`in`(Units.Volts)
-        inputs.leftSupplyCurrent = leftSupplyCurrent.getValue().`in`(Units.Amps)
-        inputs.leftStatorCurrent = leftStatorCurrent.getValue().`in`(Units.Amps)
-        inputs.leftTemperature = leftTemperature.getValue().`in`(Units.Celsius)
+        inputs.leftVoltage = leftLeaderMotorVoltage.getValue().`in`(Units.Volts)
+        inputs.leftSupplyCurrent = leftLeaderSupplyCurrent.getValue().`in`(Units.Amps)
+        inputs.leftStatorCurrent = leftLeaderStatorCurrent.getValue().`in`(Units.Amps)
+        inputs.leftTemperature = leftLeaderTemperature.getValue().`in`(Units.Celsius)
         inputs.leftMotorIsConnected = leftLeaderMotorConnected
 
-        inputs.rightVoltage = rightMotorVoltage.getValue().`in`(Units.Volts)
-        inputs.rightSupplyCurrent = rightSupplyCurrent.getValue().`in`(Units.Amps)
-        inputs.rightStatorCurrent = rightStatorCurrent.getValue().`in`(Units.Amps)
-        inputs.rightTemperature = rightTemperature.getValue().`in`(Units.Celsius)
+        inputs.rightVoltage = rightLeaderMotorVoltage.getValue().`in`(Units.Volts)
+        inputs.rightSupplyCurrent = rightLeaderSupplyCurrent.getValue().`in`(Units.Amps)
+        inputs.rightStatorCurrent = rightLeaderStatorCurrent.getValue().`in`(Units.Amps)
+        inputs.rightTemperature = rightLeaderTemperature.getValue().`in`(Units.Celsius)
         inputs.rightMotorIsConnected = rightLeaderMotorConnected
 
         inputs.hoodVoltage = hoodMotorVoltage.getValue().`in`(Units.Volts)
