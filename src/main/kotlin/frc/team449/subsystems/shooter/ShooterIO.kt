@@ -63,11 +63,17 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun run(voltage: Double): Command { return InstantCommand() }
+    fun runFlywheel(): Command { return InstantCommand() }
 
-    fun stop(): Command { return InstantCommand() }
+    fun stopFlywheel(): Command { return InstantCommand() }
 
     fun setHood(angle: Angle): Command { return InstantCommand() }
+
+    fun hoodUp(): Command { return InstantCommand() }
+
+    fun hoodDown(): Command { return InstantCommand() }
+
+    fun stopHood(): Command { return InstantCommand() }
 
     fun holdHood(): Command { return InstantCommand() }
 

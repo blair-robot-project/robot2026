@@ -3,7 +3,6 @@ package frc.team449.subsystems.shooter
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.inputs.LoggableInputs
 
@@ -23,11 +22,11 @@ class ShooterSubsystem(
     }
 
     fun shoot(): Command {
-        return io.run(Constants.ShooterConstants.SHOOTER_VOLTAGE)
+        return io.runFlywheel()
     }
 
     fun stop(): Command {
-        return io.stop()
+        return io.stopFlywheel()
     }
 
     fun setHood(angle: Angle): Command {

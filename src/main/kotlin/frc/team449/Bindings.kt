@@ -26,18 +26,31 @@ class Bindings(
     }
 
     fun bindControls() {
-        driveController
-            .x()
-            .onTrue(
-                PrintCommand("X Button Pressed!")
-            )
-
         if (Constants.RUNNING_SHOOTER_SIM) {
             driveController
                 .y()
                 .onTrue(
                     Commands.sequence(
                         PrintCommand("Y Button Pressed!"),
+                        robotContainer.shooter.stop()
+                    )
+                )
+
+            driveController
+                .x()
+                .onTrue(
+                    Commands.sequence(
+                        PrintCommand("X Button Pressed!"),
+                        robotContainer.shooter.shoot()
+                    )
+
+                )
+
+            driveController
+                .a()
+                .onTrue(
+                    Commands.sequence(
+                        PrintCommand("A Button Pressed!"),
                         robotContainer.shooter.setHood(Constants.ShooterConstants.HOOD_MAX_ANGLE),
                         WaitUntilCommand { robotContainer.shooter.atTolerance() },
                         robotContainer.shooter.holdHood()

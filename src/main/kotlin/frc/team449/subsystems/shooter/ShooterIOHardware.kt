@@ -25,15 +25,20 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import frc.team449.Constants
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
+import frc.team449.Constants.ShooterConstants.HOOD_VOLTAGE_CONTROL
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
+import frc.team449.Constants.ShooterConstants.SHOOTER_VOLTAGE
 import kotlin.math.abs
 
 class ShooterIOHardware : ShooterIO {
     // TODO: p much all the constants
-    // TODO: also are we doing current homing?
+    // TODO: current homing
+    // TODO: interpolating double map for voltage + hood angle
+    // TODO: velocity control for flywheels
+    // TODO: voltage control for hood
 
     private val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
     private val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
@@ -236,14 +241,14 @@ class ShooterIOHardware : ShooterIO {
 
     private var request = MotionMagicVoltage(Constants.ShooterConstants.HOOD_MIN_ANGLE)
 
-    override fun run(voltage: Double): Command {
+    override fun runFlywheel(): Command {
         return runOnce({
-            leftLeaderMotor.setVoltage(voltage)
-            rightLeaderMotor.setVoltage(voltage)
+            leftLeaderMotor.setVoltage(SHOOTER_VOLTAGE)
+            rightLeaderMotor.setVoltage(SHOOTER_VOLTAGE)
         })
     }
 
-    override fun stop(): Command {
+    override fun stopFlywheel(): Command {
         return runOnce({
             leftLeaderMotor.stopMotor()
             rightLeaderMotor.stopMotor()
@@ -259,6 +264,26 @@ class ShooterIOHardware : ShooterIO {
     override fun holdHood(): Command {
         return runOnce({
             hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians)))
+        })
+    }
+
+    override fun hoodUp(): Command {
+        return runOnce({
+            // hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians) + Degrees.of(7.5).`in`(Radians)))
+            hoodMotor.setVoltage(HOOD_VOLTAGE_CONTROL)
+        })
+    }
+
+    override fun hoodDown(): Command {
+        return runOnce({
+            // hoodMotor.setControl(request.withPosition(hoodMotor.position.value.`in`(Radians) - Degrees.of(7.5).`in`(Radians)))
+            hoodMotor.setVoltage(-HOOD_VOLTAGE_CONTROL)
+        })
+    }
+
+    override fun stopHood(): Command {
+        return runOnce({
+            hoodMotor.setVoltage(0.0)
         })
     }
 

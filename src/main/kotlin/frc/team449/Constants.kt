@@ -94,11 +94,16 @@ object Constants {
         const val HOOD_SIM_KV = 0.1
         const val HOOD_SIM_KA = 0.0
 
+        const val FLYWHEEL_SIM_KS: Double = 0.0001 // V
+        const val FLYWHEEL_SIM_KV: Double = 0.000195 // V/RPM
+        const val FLYWHEEL_SIM_KA: Double = 0.0003 // V/(RPM/s)
+
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
         const val HOOD_SIM_GRAVITY = false
 
         const val SHOOTER_VOLTAGE = 11.0 // TODO: find
+        const val HOOD_VOLTAGE_CONTROL = 5.0 // volts TODO: find
 
         const val FLYWHEEL_GEARING = 1.0 // TODO: find
         const val HOOD_GEARING = 1.0 // TODO: find
@@ -106,9 +111,12 @@ object Constants {
         const val HOOD_ENCODER_A_CHANNEL = 6
         const val HOOD_ENCODER_B_CHANNEL = 7
 
+        const val FLYWHEEL_ENCODER_A_CHANNEL = 8
+        const val FLYWHEEL_ENCODER_B_CHANNEL = 9
+
         const val HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE = 2 * PI / 4096 // TODO: find
         const val HOOD_MOTOR_GEARING = 1.0 // TODO: find
-        const val HOOD_MASS = 8.0 // TODO: find (in kilograms)
+        const val HOOD_MASS = 8.0 // kg TODO: find
         val HOOD_LENGTH = Units.inchesToMeters(30.0) // TODO: find
     }
 
