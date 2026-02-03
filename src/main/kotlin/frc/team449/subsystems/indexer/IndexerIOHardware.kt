@@ -13,102 +13,166 @@ import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
-import frc.team449.Constants.IndexerConstants.INDEXER_STATOR_LIMIT
-import frc.team449.Constants.IndexerConstants.INDEXER_SUPPLY_LIMIT
-import frc.team449.Constants.IndexerConstants.LEFT_INDEXER_ID
-import frc.team449.Constants.IndexerConstants.RIGHT_INDEXER_ID
+import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_ID
+import frc.team449.Constants.IndexerConstants.TOP_INDEXER_ID
+import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_ID
+import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_STATOR_LIMIT
+import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_SUPPLY_LIMIT
+import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_STATOR_LIMIT
+import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_SUPPLY_LIMIT
+import frc.team449.Constants.IndexerConstants.TOP_INDEXER_STATOR_LIMIT
+import frc.team449.Constants.IndexerConstants.TOP_INDEXER_SUPPLY_LIMIT
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 class IndexerIOHardware : IndexerIO {
-    private val leftIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    private val rightIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    val leftIndexer: TalonFX = TalonFX(LEFT_INDEXER_ID) // kraken x44
-    val rightIndexer: TalonFX = TalonFX(RIGHT_INDEXER_ID) // kraken x60
+    private val topIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
+    private val sideIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
+    private val bottomIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
 
-    private val leftSupplyCurrent: StatusSignal<Current> = leftIndexer.supplyCurrent
-    private val rightSupplyCurrent: StatusSignal<Current> = rightIndexer.supplyCurrent
+    val topIndexer: TalonFX = TalonFX(TOP_INDEXER_ID) // kraken x44
+    val bottomIndexer: TalonFX = TalonFX(BOTTOM_INDEXER_ID) // kraken x44
+    val sideIndexer: TalonFX = TalonFX(SIDE_INDEXER_ID)
 
-    private val leftStatorCurrent: StatusSignal<Current> = leftIndexer.statorCurrent
-    private val rightStatorCurrent: StatusSignal<Current> = rightIndexer.statorCurrent
+    private val topSupplyCurrent: StatusSignal<Current> = topIndexer.supplyCurrent
+    private val sideSupplyCurrent: StatusSignal<Current> = sideIndexer.supplyCurrent
+    private val bottomSupplyCurrent: StatusSignal<Current> = bottomIndexer.supplyCurrent
 
-    private val leftVoltageSignal: StatusSignal<Voltage> = leftIndexer.motorVoltage
-    private val rightVoltageSignal: StatusSignal<Voltage> = rightIndexer.motorVoltage
-    private val leftIndexerDisconnectedAlert =
-        Alert("Left Indexer motor disconnected (ID $LEFT_INDEXER_ID)", Alert.AlertType.kError)
+    private val topStatorCurrent: StatusSignal<Current> = topIndexer.statorCurrent
+    private val sideStatorCurrent: StatusSignal<Current> = sideIndexer.statorCurrent
+    private val bottomStatorCurrent: StatusSignal<Current> = bottomIndexer.statorCurrent
 
-    private val rightIndexerDisconnectedAlert =
-        Alert("Right Indexer motor disconnected (ID $RIGHT_INDEXER_ID)", Alert.AlertType.kError)
+    private val topVoltageSignal: StatusSignal<Voltage> = topIndexer.motorVoltage
+    private val sideVoltageSignal: StatusSignal<Voltage> = sideIndexer.motorVoltage
+    private val bottomVoltageSignal: StatusSignal<Voltage> = bottomIndexer.motorVoltage
 
-    private val leftIndexerConnected: Boolean
-        get() = leftIndexer.isAlive
+    private val topIndexerDisconnectedAlert =
+        Alert("Top Indexer motor disconnected (ID $TOP_INDEXER_ID)", Alert.AlertType.kError)
 
-    private val rightIndexerConnected: Boolean
-        get() = rightIndexer.isAlive
+    private val sideIndexerDisconnectedAlert =
+        Alert("Side Indexer motor disconnected (ID $SIDE_INDEXER_ID)", Alert.AlertType.kError)
+
+    private val bottomIndexerDisconnectedAlert =
+        Alert("Bottom Indexer motor disconnected (ID $BOTTOM_INDEXER_ID)", Alert.AlertType.kError)
+
+    private val topIndexerConnected: Boolean
+        get() = topIndexer.isAlive
+
+    private val sideIndexerConnected: Boolean
+        get() = sideIndexer.isAlive
+
+    private val bottomIndexerConnected: Boolean
+        get() = bottomIndexer.isAlive
 
     init {
-        val indexerCurrentLimitConfigs =
+        //make indexer current limit ocnfigs for all 3
+        val topCurrentLimitConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(INDEXER_SUPPLY_LIMIT)
+                .withSupplyCurrentLimit(TOP_INDEXER_SUPPLY_LIMIT)
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(INDEXER_STATOR_LIMIT)
+                .withStatorCurrentLimit(TOP_INDEXER_STATOR_LIMIT)
 
-        val leftIndexerMotorOutput =
+        val sideCurrentLimitConfigs =
+            CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(SIDE_INDEXER_SUPPLY_LIMIT)
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(SIDE_INDEXER_STATOR_LIMIT)
+
+        val bottomCurrentLimitConfigs =
+            CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(BOTTOM_INDEXER_SUPPLY_LIMIT)
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(BOTTOM_INDEXER_STATOR_LIMIT)
+
+
+        val topIndexerMotorOutput =
             MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Coast)
                 .withInverted(InvertedValue.CounterClockwise_Positive)
 
-        val rightIndexerMotorOutput =
+        val sideIndexerMotorOutput =
             MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Coast)
                 .withInverted(InvertedValue.CounterClockwise_Positive)
 
-        val leftIndexerConfig =
-            TalonFXConfiguration()
-                .withCurrentLimits(indexerCurrentLimitConfigs)
-                .withMotorOutput(leftIndexerMotorOutput)
+        val bottomIndexerMotorOutput =
+            MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast)
+                .withInverted(InvertedValue.CounterClockwise_Positive)
 
-        val rightIndexerConfig =
-            TalonFXConfiguration()
-                .withCurrentLimits(indexerCurrentLimitConfigs)
-                .withMotorOutput(rightIndexerMotorOutput)
 
-        tryUntilOk(5) { leftIndexer.configurator.apply(leftIndexerConfig, 0.25) }
-        tryUntilOk(5) { rightIndexer.configurator.apply(rightIndexerConfig, 0.25) }
+        val topIndexerConfig =
+            TalonFXConfiguration()
+                .withCurrentLimits(topCurrentLimitConfigs)
+                .withMotorOutput(topIndexerMotorOutput)
+
+        val sideIndexerConfig =
+            TalonFXConfiguration()
+                .withCurrentLimits(sideCurrentLimitConfigs)
+                .withMotorOutput(sideIndexerMotorOutput)
+
+        val bottomIndexerConfig =
+            TalonFXConfiguration()
+                .withCurrentLimits(bottomCurrentLimitConfigs)
+                .withMotorOutput(bottomIndexerMotorOutput)
+
+
+        tryUntilOk(5) { topIndexer.configurator.apply(topIndexerConfig, 0.25) }
+        tryUntilOk(5) { sideIndexer.configurator.apply(sideIndexerConfig, 0.25) }
+        tryUntilOk(5) { bottomIndexer.configurator.apply(bottomIndexerConfig, 0.25) }
+
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
-            leftVoltageSignal,
-            rightVoltageSignal,
-            leftSupplyCurrent,
-            rightSupplyCurrent,
-            leftStatorCurrent,
-            rightStatorCurrent,
+            topVoltageSignal,
+            sideVoltageSignal,
+            bottomVoltageSignal,
+            topSupplyCurrent,
+            sideSupplyCurrent,
+            bottomSupplyCurrent,
+            topStatorCurrent,
+            sideStatorCurrent,
+            bottomStatorCurrent
         )
     }
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        inputs.leftVoltage = leftIndexer.motorVoltage.value.`in`(Units.Volts)
-        inputs.rightVoltage = rightIndexer.motorVoltage.value.`in`(Units.Volts)
+        // Refresh all signals first to get synchronized data
+        BaseStatusSignal.refreshAll(
+            topVoltageSignal, sideVoltageSignal, bottomVoltageSignal,
+            topStatorCurrent, sideStatorCurrent, bottomStatorCurrent,
+            topSupplyCurrent, sideSupplyCurrent, bottomSupplyCurrent,
+        )
 
-        inputs.leftStatorCurrent = leftIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.leftSupplyCurrent = leftIndexer.supplyCurrent.value.`in`(Units.Amps)
+        inputs.topVoltage = topVoltageSignal.value.`in`(Units.Volts)
+        inputs.topStatorCurrent = topStatorCurrent.value.`in`(Units.Amps)
+        inputs.topSupplyCurrent = topSupplyCurrent.value.`in`(Units.Amps)
 
-        inputs.rightStatorCurrent = rightIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.rightSupplyCurrent = rightIndexer.supplyCurrent.value.`in`(Units.Amps)
+        inputs.sideVoltage = sideVoltageSignal.value.`in`(Units.Volts)
+        inputs.sideStatorCurrent = sideStatorCurrent.value.`in`(Units.Amps)
+        inputs.sideSupplyCurrent = sideSupplyCurrent.value.`in`(Units.Amps)
 
-        inputs.leftVelocity = leftIndexer.velocity.value.`in`(Units.RotationsPerSecond)
-        inputs.rightVelocity = rightIndexer.velocity.value.`in`(Units.RotationsPerSecond)
+        inputs.bottomVoltage = bottomVoltageSignal.value.`in`(Units.Volts)
+        inputs.bottomStatorCurrent = bottomStatorCurrent.value.`in`(Units.Amps)
+        inputs.bottomSupplyCurrent = bottomSupplyCurrent.value.`in`(Units.Amps)
 
-        leftIndexerDisconnectedAlert.set(!leftIndexerConnected)
-        rightIndexerDisconnectedAlert.set(!rightIndexerConnected)
+
+        topIndexerDisconnectedAlert.set(!topIndexerConnected)
+        sideIndexerDisconnectedAlert.set(!sideIndexerConnected)
+        bottomIndexerDisconnectedAlert.set(!bottomIndexerConnected)
     }
+
 
     override fun setVoltage(
-        leftVoltage: Double,
-        rightVoltage: Double
+        topVoltage: Double,
+        sideVoltage: Double,
+        bottomVoltage: Double
     ) {
-        leftIndexer.setControl(leftIndexerVoltageRequest.withOutput(leftVoltage))
-        rightIndexer.setControl(rightIndexerVoltageRequest.withOutput(rightVoltage))
+        topIndexer.setControl(topIndexerVoltageRequest.withOutput(topVoltage))
+        sideIndexer.setControl(sideIndexerVoltageRequest.withOutput(sideVoltage))
+        bottomIndexer.setControl(bottomIndexerVoltageRequest.withOutput(bottomVoltage))
     }
+
 }

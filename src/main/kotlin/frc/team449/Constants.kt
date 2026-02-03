@@ -143,10 +143,18 @@ object Constants {
     object IndexerConstants {
         // motor definitions that are currently placeholders
 
-        const val LEFT_INDEXER_ID = 1
-        const val RIGHT_INDEXER_ID = 2
-        const val INDEXER_STATOR_LIMIT = 60.0
-        const val INDEXER_SUPPLY_LIMIT = 30.0
+        const val BOTTOM_INDEXER_ID = 1
+        const val SIDE_INDEXER_ID = 2
+        const val TOP_INDEXER_ID = 3
+        const val TOP_INDEXER_STATOR_LIMIT = 60.0
+        const val TOP_INDEXER_SUPPLY_LIMIT = 30.0
+
+        const val SIDE_INDEXER_STATOR_LIMIT = 60.0
+        const val SIDE_INDEXER_SUPPLY_LIMIT = 30.0
+
+        const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
+        const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
+
 
         // add more indexers as needed
     }

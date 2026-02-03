@@ -6,48 +6,68 @@ import edu.wpi.first.units.Units
 import edu.wpi.first.wpilibj.simulation.DCMotorSim
 
 class IndexerIOSim : IndexerIO {
-    private val leftGearbox = DCMotor.getKrakenX44(1)
-    private val rightGearbox = DCMotor.getKrakenX60(1)
+    private val topGearbox = DCMotor.getKrakenX44(1)
+    private val sideGearbox = DCMotor.getKrakenX60(1)
+    private val bottomGearbox = DCMotor.getKrakenX60(1)
 
     // TODO: MOI and gearing
-    private val leftPlant =
+    private val topPlant =
         LinearSystemId.createDCMotorSystem(
-            leftGearbox,
-            0.001,
-            1.0,
-        )
-    private val rightPlant =
-        LinearSystemId.createDCMotorSystem(
-            leftGearbox,
+            topGearbox,
             0.001,
             1.0,
         )
 
-    var leftMotorSim = DCMotorSim(leftPlant, leftGearbox)
-    var rightMotorSim = DCMotorSim(rightPlant, rightGearbox)
+    private val sidePlant =
+        LinearSystemId.createDCMotorSystem(
+            sideGearbox,
+            0.001,
+            1.0,
+        )
 
-    private var leftVoltSim: Double = 0.0
-    private var rightVoltSim: Double = 0.0
+    private val bottomPlant =
+        LinearSystemId.createDCMotorSystem(
+            bottomGearbox,
+            0.001,
+            1.0,
+        )
+
+
+    private var topMotorSim = DCMotorSim(topPlant, topGearbox)
+    private var sideMotorSim = DCMotorSim(sidePlant, sideGearbox)
+    private var bottomMotorSim = DCMotorSim(bottomPlant, bottomGearbox)
+
+    private var topVoltSim: Double = 0.0
+    private var sideVoltSim: Double = 0.0
+    private var bottomVoltSim: Double = 0.0
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        leftMotorSim.update(0.02)
-        rightMotorSim.update(0.02)
+        topMotorSim.update(0.02)
+        sideMotorSim.update(0.02)
+        bottomMotorSim.update(0.02)
 
-        leftMotorSim.setInput(leftVoltSim)
-        rightMotorSim.setInput(rightVoltSim)
+        topMotorSim.setInput(topVoltSim)
+        sideMotorSim.setInput(sideVoltSim)
+        bottomMotorSim.setInput(bottomVoltSim)
 
-        inputs.leftVoltage = leftMotorSim.inputVoltage
-        inputs.rightVoltage = rightMotorSim.inputVoltage
+        inputs.topVoltage = topMotorSim.inputVoltage
+        inputs.topStatorCurrent = topMotorSim.currentDrawAmps
 
-        inputs.leftVelocity = leftMotorSim.angularVelocity.`in`(Units.RotationsPerSecond)
-        inputs.rightVelocity = rightMotorSim.angularVelocity.`in`(Units.RotationsPerSecond)
+        inputs.sideVoltage = sideMotorSim.inputVoltage
+        inputs.sideStatorCurrent = sideMotorSim.currentDrawAmps
+
+        inputs.bottomVoltage = bottomMotorSim.inputVoltage
+        inputs.bottomStatorCurrent = bottomMotorSim.currentDrawAmps
     }
 
     override fun setVoltage(
-        leftVoltage: Double,
-        rightVoltage: Double
+        topVoltage: Double,
+        sideVoltage: Double,
+        bottomVoltage: Double
     ) {
-        leftVoltSim = leftVoltage
-        rightVoltSim = rightVoltage
+        topVoltSim = topVoltage
+        sideVoltSim = sideVoltage
+        bottomVoltSim = bottomVoltage
     }
+
 }

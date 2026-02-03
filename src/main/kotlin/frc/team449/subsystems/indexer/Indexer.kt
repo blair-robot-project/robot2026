@@ -22,19 +22,21 @@ class Indexer(
 
     // sets voltage of motor
     fun setVoltage(
-        leftVoltage: Double,
-        rightVoltage: Double
+        topVoltage: Double,
+        sideVoltage: Double,
+        bottomVoltage: Double,
     ): Command =
         run {
             io.setVoltage(
-                leftVoltage,
-                rightVoltage,
+                topVoltage,
+                sideVoltage,
+                bottomVoltage,
             )
         }
 
     // stops motor
     fun stop(): Command =
         run {
-            io.setVoltage(0.0, 0.0)
+            io.setVoltage(0.0, 0.0, 0.0)
         }
 }
