@@ -1,34 +1,52 @@
 package frc.team449.subsystems.indexer
 
 import edu.wpi.first.math.system.plant.DCMotor
+import edu.wpi.first.math.system.plant.LinearSystemId
+import edu.wpi.first.units.Units
+import edu.wpi.first.wpilibj.simulation.DCMotorSim
 
-// implement from indexer io thing
 class IndexerIOSim : IndexerIO {
-    private val leftIndexerMotorModel = DCMotor.getKrakenX44(1)
-    private val rightIndexerMotorModel = DCMotor.getKrakenX60(1)
+    private val leftGearbox = DCMotor.getKrakenX44(1)
+    private val rightGearbox = DCMotor.getKrakenX60(1)
+
+    // TODO: MOI and gearing
+    private val leftPlant =
+        LinearSystemId.createDCMotorSystem(
+            leftGearbox,
+            0.001,
+            1.0,
+        )
+    private val rightPlant =
+        LinearSystemId.createDCMotorSystem(
+            leftGearbox,
+            0.001,
+            1.0,
+        )
+
+    var leftMotorSim = DCMotorSim(leftPlant, leftGearbox)
+    var rightMotorSim = DCMotorSim(rightPlant, rightGearbox)
+
     private var leftVoltSim: Double = 0.0
     private var rightVoltSim: Double = 0.0
-    private var leftCurrentSim: Double = 0.0
-    private var rightCurrentSim: Double = 0.0
 
-    // add current supply to this function
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        // Voltage inputs (assigned from your sim variables)
-        inputs.leftVoltage = leftVoltSim
-        inputs.rightVoltage = rightVoltSim
+        leftMotorSim.update(0.02)
+        rightMotorSim.update(0.02)
 
-        inputs.supplyCurrentLeft = leftCurrentSim
-        inputs.statorCurrentLeft = leftCurrentSim
+        leftMotorSim.setInput(leftVoltSim)
+        rightMotorSim.setInput(rightVoltSim)
 
-        inputs.supplyCurrentRight = rightCurrentSim
-        inputs.statorCurrentRight = rightCurrentSim
+        inputs.leftVoltage = leftMotorSim.inputVoltage
+        inputs.rightVoltage = rightMotorSim.inputVoltage
+
+        inputs.leftVelocity = leftMotorSim.angularVelocity.`in`(Units.RotationsPerSecond)
+        inputs.rightVelocity = rightMotorSim.angularVelocity.`in`(Units.RotationsPerSecond)
     }
 
     override fun setVoltage(
         leftVoltage: Double,
         rightVoltage: Double
     ) {
-        // include this.leftVoltSim if param is leftVoltSim
         leftVoltSim = leftVoltage
         rightVoltSim = rightVoltage
     }

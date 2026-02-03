@@ -88,15 +88,17 @@ class IndexerIOHardware : IndexerIO {
     }
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        // error
         inputs.leftVoltage = leftIndexer.motorVoltage.value.`in`(Units.Volts)
         inputs.rightVoltage = rightIndexer.motorVoltage.value.`in`(Units.Volts)
 
-        inputs.statorCurrentLeft = leftIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.supplyCurrentLeft = leftIndexer.supplyCurrent.value.`in`(Units.Amps)
+        inputs.leftStatorCurrent = leftIndexer.statorCurrent.value.`in`(Units.Amps)
+        inputs.leftSupplyCurrent = leftIndexer.supplyCurrent.value.`in`(Units.Amps)
 
-        inputs.statorCurrentRight = rightIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.supplyCurrentRight = rightIndexer.supplyCurrent.value.`in`(Units.Amps)
+        inputs.rightStatorCurrent = rightIndexer.statorCurrent.value.`in`(Units.Amps)
+        inputs.rightSupplyCurrent = rightIndexer.supplyCurrent.value.`in`(Units.Amps)
+
+        inputs.leftVelocity = leftIndexer.velocity.value.`in`(Units.RotationsPerSecond)
+        inputs.rightVelocity = rightIndexer.velocity.value.`in`(Units.RotationsPerSecond)
 
         leftIndexerDisconnectedAlert.set(!leftIndexerConnected)
         rightIndexerDisconnectedAlert.set(!rightIndexerConnected)
