@@ -29,7 +29,7 @@ class Vision(
         }
 
         for (i in 1..io.size) {
-            disconnectedAlerts.add(Alert("Vision camera ${inputs[i-1]} is disconnected.", AlertType.kWarning))
+            disconnectedAlerts.add(Alert("Vision camera ${inputs[i - 1]} is disconnected.", AlertType.kWarning))
         }
     }
 
