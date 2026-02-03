@@ -12,6 +12,10 @@ import frc.team449.subsystems.intake.Intake
 import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
+import frc.team449.subsystems.shooter.ShooterIO
+import frc.team449.subsystems.shooter.ShooterIOHardware
+import frc.team449.subsystems.shooter.ShooterIOSim
+import frc.team449.subsystems.shooter.ShooterSubsystem
 
 object RobotContainer {
     // driver/op controllers
@@ -61,6 +65,14 @@ object RobotContainer {
                 Mode.REPLAY -> object : IntakeIO {}
             },
         )
+
+    val shooter: ShooterSubsystem = ShooterSubsystem(
+        when (Constants.CURRENT_MODE) {
+            Mode.REAL -> ShooterIOHardware()
+            Mode.SIM -> ShooterIOSim()
+            Mode.REPLAY -> object : ShooterIO {}
+        }
+    )
 
     val bindings = Bindings(this)
 }
