@@ -4,7 +4,6 @@ import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
@@ -16,33 +15,33 @@ import kotlin.math.abs
 import kotlin.math.pow
 
 class Vision(
-    var visionConsumer: VisionConsumer,
+    visionConsumer: VisionConsumer,
     vararg visionIO: VisionIO
 ) : SubsystemBase() {
-    val consumer = visionConsumer
-    val io = visionIO
-    val inputs = arrayOfNulls<VisionIOInputsAutoLogged>(io.size)
-    val disconnectedAlerts = arrayOfNulls<Alert>(io.size)
+    private val consumer = visionConsumer
+    private val io = visionIO
+    val inputs = mutableListOf<VisionIOInputsAutoLogged>()
+    private val disconnectedAlerts = mutableListOf<Alert>()
 
     init {
-        for (i in inputs.indices) {
-            inputs[i] = VisionIOInputsAutoLogged()
+        for (i in 1..io.size) {
+            inputs.add(VisionIOInputsAutoLogged())
         }
 
-        for (i in inputs.indices) {
-            disconnectedAlerts[i] = Alert("Vision camera $i is disconnected.", AlertType.kWarning)
+        for (i in 1..io.size) {
+            disconnectedAlerts.add(Alert("Vision camera ${inputs[i-1]} is disconnected.", AlertType.kWarning))
         }
     }
 
-    fun getTargetX(cameraIndex: Int): Rotation2d? {
-        return inputs[cameraIndex]?.latestTargetObservation?.tx
-    }
+//    fun getTargetX(cameraIndex: Int): Rotation2d {
+//        return inputs[cameraIndex]!!.latestTargetObservation.tx
+//    }
 
     fun interface VisionConsumer {
         fun accept(
-            visionRobotPoseMeters: Pose2d?,
+            visionRobotPoseMeters: Pose2d,
             timestampSeconds: Double,
-            visionMeasurementStdDevs: Matrix<N3?, N1?>?
+            visionMeasurementStdDevs: Matrix<N3, N1>
         )
     }
 
@@ -61,7 +60,7 @@ class Vision(
         // Loop over cameras
         for (cameraIndex in io.indices) {
             // Update disconnected alert
-            disconnectedAlerts[cameraIndex]!!.set(!inputs[cameraIndex]?.connected!!)
+            disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected)
 
             // Initialize logging values
             val tagPoses: MutableList<Pose3d> = LinkedList()
@@ -70,7 +69,7 @@ class Vision(
             val robotPosesRejected: MutableList<Pose3d> = LinkedList()
 
             // Add tag poses
-            for (tagId in inputs[cameraIndex]?.tagIds!!) {
+            for (tagId in inputs[cameraIndex].tagIds) {
                 val tagPose = VisionConstants.aprilTagLayout.getTagPose(tagId)
                 if (tagPose.isPresent) {
                     tagPoses.add(tagPose.get())
@@ -78,7 +77,7 @@ class Vision(
             }
 
             // Loop over pose observations
-            for (observation in inputs[cameraIndex]?.poseObservations!!) {
+            for (observation in inputs[cameraIndex].poseObservations) {
                 // Check whether to reject pose
                 val rejectPose =
                     observation!!.tagCount == 0 || // Must have at least one tag

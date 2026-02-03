@@ -44,28 +44,27 @@ class VisionIOLimelight(name: String, rotationSupplier: Supplier<Rotation2d>) : 
             table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(doubleArrayOf())
     }
 
-    override fun updateInputs(inputs: VisionIOInputs?) {
-        if (inputs != null) {
-            // Update connection status based on whether an update has been seen in the last 250ms
-            inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.lastChange) / 1000) < 250
+    override fun updateInputs(inputs: VisionIOInputs) {
+        // Update connection status based on whether an update has been seen in the last 250ms
+        inputs.connected = ((RobotController.getFPGATime() - latencySubscriber.lastChange) / 1000) < 250
 
-            // Update target observation
-            inputs.latestTargetObservation = TargetObservation(
-                Rotation2d.fromDegrees(txSubscriber.get()),
-                Rotation2d.fromDegrees(tySubscriber.get())
-            )
+        // Update target observation
+        inputs.latestTargetObservation = TargetObservation(
+            Rotation2d.fromDegrees(txSubscriber.get()),
+            Rotation2d.fromDegrees(tySubscriber.get())
+        )
 
-            // Update orientation for MegaTag 2
-            orientationPublisher.accept(
-                doubleArrayOf(rotationSupplier.get().degrees, 0.0, 0.0, 0.0, 0.0, 0.0)
-            )
-            NetworkTableInstance.getDefault()
-                .flush() // Increases network traffic but recommended by Limelight
+        // Update orientation for MegaTag 2
+        orientationPublisher.accept(
+            doubleArrayOf(rotationSupplier.get().degrees, 0.0, 0.0, 0.0, 0.0, 0.0)
+        )
+        NetworkTableInstance.getDefault()
+            .flush() // Increases network traffic but recommended by Limelight
 
-            // Read new pose observations from NetworkTables
-            val tagIds: MutableSet<Int> = HashSet()
-            val poseObservations: MutableList<PoseObservation> = LinkedList()
-            //    for (var rawSample : megatag1Subscriber.readQueue()) {
+        // Read new pose observations from NetworkTables
+        val tagIds: MutableSet<Int> = HashSet()
+        val poseObservations: MutableList<PoseObservation> = LinkedList()
+        //    for (var rawSample : megatag1Subscriber.readQueue()) {
 //      if (rawSample.value.length == 0) continue;
 //      for (int i = 11; i < rawSample.value.length; i += 7) {
 //        tagIds.add((int) rawSample.value[i]);
@@ -91,42 +90,41 @@ class VisionIOLimelight(name: String, rotationSupplier: Supplier<Rotation2d>) : 
 //              // Observation type
 //              PoseObservationType.MEGATAG_1));
 //    }
-            for (rawSample in megatag2Subscriber.readQueue()) {
-                if (rawSample.value.size == 0) continue
-                var i = 11
-                while (i < rawSample.value.size) {
-                    tagIds.add(rawSample.value[i].toInt())
-                    i += 7
-                }
-                poseObservations.add(
-                    PoseObservation( // Timestamp, based on server timestamp of publish and latency
-                        rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3, // 3D pose estimate
+        for (rawSample in megatag2Subscriber.readQueue()) {
+            if (rawSample.value.isEmpty()) continue
+            var i = 11
+            while (i < rawSample.value.size) {
+                tagIds.add(rawSample.value[i].toInt())
+                i += 7
+            }
+            poseObservations.add(
+                PoseObservation( // Timestamp, based on server timestamp of publish and latency
+                    rawSample.timestamp * 1.0e-6 - rawSample.value[6] * 1.0e-3, // 3D pose estimate
 
-                        parsePose(rawSample.value), // Ambiguity, zeroed because the pose is already disambiguated
+                    parsePose(rawSample.value), // Ambiguity, zeroed because the pose is already disambiguated
 
-                        0.0, // Tag count
+                    0.0, // Tag count
 
-                        rawSample.value[7].toInt(), // Average tag distance
+                    rawSample.value[7].toInt(), // Average tag distance
 
-                        rawSample.value[9], // Observation type
+                    rawSample.value[9], // Observation type
 
-                        PoseObservationType.MEGATAG_2
-                    )
+                    PoseObservationType.MEGATAG_2
                 )
-            }
+            )
+        }
 
-            // Save pose observations to inputs object
-            inputs.poseObservations = arrayOfNulls<PoseObservation>(poseObservations.size)
-            for (i in poseObservations.indices) {
-                inputs.poseObservations[i] = poseObservations[i]
-            }
+        // Save pose observations to inputs object
+        inputs.poseObservations = arrayOfNulls(poseObservations.size)
+        for (i in poseObservations.indices) {
+            inputs.poseObservations[i] = poseObservations[i]
+        }
 
-            // Save tag IDs to inputs objects
-            inputs.tagIds = IntArray(tagIds.size)
-            var i = 0
-            for (id in tagIds) {
-                inputs.tagIds[i++] = id // sahu is having a nightmare rn and doesn't know why
-            }
+        // Save tag IDs to inputs objects
+        inputs.tagIds = IntArray(tagIds.size)
+        var i = 0
+        for (id in tagIds) {
+            inputs.tagIds[i++] = id // sahu is having a nightmare rn and doesn't know why
         }
     }
 

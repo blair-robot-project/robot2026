@@ -60,10 +60,8 @@ class DriveSubsystem(
         }
     }
 
-    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d?, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3?, N1?>?) {
-        if (visionRobotPoseMeters != null && visionMeasurementStdDevs != null) {
-            io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
-        }
+    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {
+        io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {

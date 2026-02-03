@@ -15,7 +15,7 @@ interface VisionIO {
 
         @JvmField var latestTargetObservation: TargetObservation = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
 
-        @JvmField var poseObservations: Array<PoseObservation?> = arrayOfNulls<PoseObservation>(0)
+        @JvmField var poseObservations: Array<PoseObservation?> = arrayOfNulls(0)
 
         @JvmField var tagIds = IntArray(0)
     }
@@ -102,5 +102,5 @@ interface VisionIO {
         PHOTONVISION
     }
 
-    fun updateInputs(inputs: VisionIOInputs?) {}
+    fun updateInputs(inputs: VisionIOInputs) {}
 }

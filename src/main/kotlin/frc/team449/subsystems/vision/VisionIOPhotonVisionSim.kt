@@ -22,29 +22,21 @@ import java.util.function.Supplier
  * @param name The name of the camera.
  * @param poseSupplier Supplier for the robot pose to use in simulation.
  */
-class VisionIOPhotonVisionSim(name: String?, robotToCamera: Transform3d, private val poseSupplier: Supplier<Pose2d>) :
+class VisionIOPhotonVisionSim(name: String, robotToCamera: Transform3d, private val poseSupplier: Supplier<Pose2d>) :
     VisionIOPhotonVision(name, robotToCamera) {
     private val cameraSim: PhotonCameraSim
+    private val visionSim: VisionSystemSim = VisionSystemSim("main")
 
     init {
-        // Initialize vision sim
-        if (visionSim == null) {
-            visionSim = VisionSystemSim("main")
-            visionSim!!.addAprilTags(aprilTagLayout)
-        }
-
+        visionSim.addAprilTags(aprilTagLayout)
         // Add sim camera
         val cameraProperties = SimCameraProperties()
         cameraSim = PhotonCameraSim(camera, cameraProperties, aprilTagLayout)
-        visionSim!!.addCamera(cameraSim, robotToCamera)
+        visionSim.addCamera(cameraSim, robotToCamera)
     }
 
-    override fun updateInputs(inputs: VisionIOInputs?) {
-        visionSim!!.update(poseSupplier.get())
+    override fun updateInputs(inputs: VisionIOInputs) {
+        visionSim.update(poseSupplier.get())
         super.updateInputs(inputs)
-    }
-
-    companion object {
-        private var visionSim: VisionSystemSim? = null
     }
 }
