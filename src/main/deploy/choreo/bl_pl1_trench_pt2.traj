@@ -202,8 +202,7 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Marker", "from":{"target":5, "targetTimestamp":3.67678, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"Marker", "from":{"target":1, "targetTimestamp":0.55605, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"start_intake", "from":{"target":1, "targetTimestamp":0.55605, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"stop_intake", "from":{"target":5, "targetTimestamp":3.67678, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"stop_intake", "from":{"target":5, "targetTimestamp":3.67678, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"start_shooting", "from":{"target":6, "targetTimestamp":null, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }

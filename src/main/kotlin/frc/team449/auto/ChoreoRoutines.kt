@@ -44,6 +44,7 @@ open class choreoRoutines(
                 path1.resetOdometry(),
                 path1.cmd(),
                 //wait about 3-4 seconds for shooting
+                PrintCommand("Stop Shooting"),
                 path2.cmd(),
                 //wait about 3-4 seconds for shooting
                 PrintCommand("Stop Shooting")
@@ -56,6 +57,59 @@ open class choreoRoutines(
         val routine: AutoRoutine = autoFactory.newRoutine("br_trench_same")
         val path1: AutoTrajectory = routine.trajectory("br_trench_pr1_pt1")
         val path2: AutoTrajectory = routine.trajectory("br_pr1_trench_pt2")
+
+        path1.atTime("start_shooting").onTrue(PrintCommand("Start Shooting"))
+        path1.atTime("start_intake").onTrue(PrintCommand("Start Intake"))
+        path1.atTime("stop_intake").onTrue(PrintCommand("Stop Intake"))
+        path2.atTime("start_shooting").onTrue(PrintCommand("Start Shooting"))
+        path2.atTime("stop_shooting").onTrue(PrintCommand("Stop Shooting"))
+        path2.atTime("start_intake").onTrue(PrintCommand("Start Intake"))
+        path2.atTime("stop_intake").onTrue(PrintCommand("Stop Intake"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                path1.resetOdometry(),
+                path1.cmd(),
+                //wait about 3-4 seconds for shooting
+                PrintCommand("Stop Shooting"),
+                path2.cmd(),
+                //wait about 3-4 seconds for shooting
+                PrintCommand("Stop Shooting")
+            )
+        )
+        return routine
+    }
+
+    fun bl_trench_opp(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("bl_trench_opp")
+        val path1: AutoTrajectory = routine.trajectory("bl_opptrench_pr1_pt1")
+        val path2: AutoTrajectory = routine.trajectory("br_opptrench_pl1_pt2")
+
+        path1.atTime("start_shooting").onTrue(PrintCommand("Start Shooting"))
+        path1.atTime("start_intake").onTrue(PrintCommand("Start Intake"))
+        path1.atTime("stop_intake").onTrue(PrintCommand("Stop Intake"))
+        path2.atTime("start_shooting").onTrue(PrintCommand("Start Shooting"))
+        path2.atTime("stop_shooting").onTrue(PrintCommand("Stop Shooting"))
+        path2.atTime("start_intake").onTrue(PrintCommand("Start Intake"))
+        path2.atTime("stop_intake").onTrue(PrintCommand("Stop Intake"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                path1.resetOdometry(),
+                path1.cmd(),
+                //wait about 3-4 seconds for shooting
+                path2.cmd(),
+                //wait about 3-4 seconds for shooting
+                PrintCommand("Stop Shooting")
+            )
+        )
+        return routine
+    }
+
+    fun br_trench_opp(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("br_trench_opp")
+        val path1: AutoTrajectory = routine.trajectory("br_opptrench_pl1_pt1")
+        val path2: AutoTrajectory = routine.trajectory("bl_opptrench_pr1_pt2")
 
         path1.atTime("start_shooting").onTrue(PrintCommand("Start Shooting"))
         path1.atTime("start_intake").onTrue(PrintCommand("Start Intake"))
@@ -89,11 +143,11 @@ open class choreoRoutines(
 
 
 
-
-
-
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("bl_trench_same", this::bl_trench_same)
+        autoChooser.addRoutine("br_trench_same", this::br_trench_same)
+        autoChooser.addRoutine("bl_trench_opp", this::bl_trench_opp)
+        autoChooser.addRoutine("br_trench_opp", this::br_trench_opp)
     }
 
 }
