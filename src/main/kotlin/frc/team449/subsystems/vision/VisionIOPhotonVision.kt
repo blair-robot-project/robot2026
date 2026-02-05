@@ -102,10 +102,7 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
         }
 
         // Save pose observations to inputs object
-        inputs.poseObservations = arrayOfNulls(poseObservations.size)
-        for (i in poseObservations.indices) {
-            inputs.poseObservations[i] = poseObservations[i]
-        }
+        inputs.poseObservations = poseObservations.toTypedArray()
 
         // Save tag IDs to inputs objects
         inputs.tagIds = IntArray(tagIds.size)

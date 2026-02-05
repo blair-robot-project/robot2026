@@ -67,6 +67,11 @@ class Vision(
             val robotPoses: MutableList<Pose3d> = LinkedList()
             val robotPosesAccepted: MutableList<Pose3d> = LinkedList()
             val robotPosesRejected: MutableList<Pose3d> = LinkedList()
+            val numObservations = inputs[cameraIndex].poseObservations.size
+            var sumAngDev = 0.0
+            var sumLinDev = 0.0
+            var sumAmbiguity = 0.0
+            var observationID = 0
 
             // Add tag poses
             for (tagId in inputs[cameraIndex].tagIds) {
@@ -80,7 +85,7 @@ class Vision(
             for (observation in inputs[cameraIndex].poseObservations) {
                 // Check whether to reject pose
                 val rejectPose =
-                    observation!!.tagCount == 0 || // Must have at least one tag
+                    observation.tagCount == 0 || // Must have at least one tag
                         (
                             observation.tagCount == 1 &&
                                 observation.ambiguity > VisionConstants.maxAmbiguity
@@ -116,12 +121,39 @@ class Vision(
                     angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
                 }
 
+                sumAngDev += angularStdDev
+                sumLinDev += linearStdDev
+                sumAmbiguity += observation.ambiguity
+
                 // Send vision observation
                 consumer.accept(
                     observation.pose.toPose2d(),
                     observation.timestamp,
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                 )
+
+                Logger.recordOutput(
+                    "Vision/Camera$cameraIndex/Observation$observationID/TagCount",
+                    observation.tagCount
+                )
+                Logger.recordOutput(
+                    "Vision/Camera$cameraIndex/Observation$observationID/AverageTagDistance",
+                    observation.averageTagDistance
+                )
+                Logger.recordOutput(
+                    "Vision/Camera$cameraIndex/Observation$observationID/Ambiguity",
+                    observation.ambiguity
+                )
+                Logger.recordOutput(
+                    "Vision/Camera$cameraIndex/Observation$observationID/LinearStandardDeviation",
+                    linearStdDev
+                )
+                Logger.recordOutput(
+                    "Vision/Camera$cameraIndex/Observation$observationID/AngularStandardDeviation",
+                    angularStdDev
+                )
+
+                observationID++
             }
 
             // Log camera metadata
@@ -140,6 +172,18 @@ class Vision(
             Logger.recordOutput(
                 "Vision/Camera$cameraIndex/RobotPosesRejected",
                 *robotPosesRejected.toTypedArray<Pose3d>()
+            )
+            Logger.recordOutput(
+                "Vision/Camera$cameraIndex/AverageAngularDeviation",
+                sumAngDev / numObservations
+            )
+            Logger.recordOutput(
+                "Vision/Camera$cameraIndex/AverageLinearDeviation",
+                sumLinDev / numObservations
+            )
+            Logger.recordOutput(
+                "Vision/Camera$cameraIndex/AverageAmbiguity",
+                sumAmbiguity / numObservations
             )
             allTagPoses.addAll(tagPoses)
             allRobotPoses.addAll(robotPoses)

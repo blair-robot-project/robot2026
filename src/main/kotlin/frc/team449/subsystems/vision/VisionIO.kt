@@ -15,7 +15,7 @@ interface VisionIO {
 
         @JvmField var latestTargetObservation: TargetObservation = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
 
-        @JvmField var poseObservations: Array<PoseObservation?> = arrayOfNulls(0)
+        @JvmField var poseObservations: Array<PoseObservation> = emptyArray()
 
         @JvmField var tagIds = IntArray(0)
     }
