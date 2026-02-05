@@ -3,6 +3,7 @@ import edu.wpi.first.math.system.plant.DCMotor
 import org.ironmaple.simulation.IntakeSimulation
 import edu.wpi.first.units.Units.Meters
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation
+import frc.team449.subsystems.shooter.ShooterIOSim
 
 class IntakeIOSim(driveTrainSimulation: SwerveDriveSimulation) : IntakeIO {
     // instant set to target
@@ -14,15 +15,17 @@ class IntakeIOSim(driveTrainSimulation: SwerveDriveSimulation) : IntakeIO {
     private var requestedLeftVoltage: Double = 0.0
     private var requestedRightVoltage: Double = 0.0
 
-    private var pivotAngledRad = 0.0
+    private var pivotAngleRad = 0.0
     private var pivotSpeed = 0.0
     private val intakeSimulation: IntakeSimulation =
         IntakeSimulation.InTheFrameIntake(
-            "Note" //game pieces,
+            "Note",                //game peic ename
             driveTrainSimulation,
-            Meters.of(1)),
-            IntakeSimulation.IntakeSide.FRONT
+            Meters.of(0.7),
+            IntakeSimulation.IntakeSide.BACK,
+            1                             // max notes
         )
+
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         inputs.currentPivotVoltage = requestedPivotVoltage
         inputs.currentLeftRollerVoltage = requestedLeftVoltage
@@ -31,15 +34,38 @@ class IntakeIOSim(driveTrainSimulation: SwerveDriveSimulation) : IntakeIO {
         inputs.pivotSupplyCurrent = pivotMotor.getCurrent(0.0, requestedPivotVoltage)
         inputs.leftRollerSupplyCurrent = leftRollerMotor.getCurrent(0.0, requestedLeftVoltage)
         inputs.rightRollerSupplyCurrent = rightRollerMotor.getCurrent(0.0, requestedRightVoltage)
+        pivotSpeed = requestedPivotVoltage * 0.8
+        pivotAngleRad += pivotSpeed * 0.02
+
+        inputs.pivotAngleRad = pivotAngleRad
+        inputs.pivotSpeed = pivotSpeed
     }
 
-    override fun setVoltage(
+    override fun setVoltagePivot(
         pivotVoltage: Double,
-        leftRollerVoltage: Double,
-        rightRollerVoltage: Double
     ) {
         requestedPivotVoltage = pivotVoltage
-        requestedLeftVoltage = leftRollerVoltage
+    }
+
+    override fun setVoltageRoller(rightRollerVoltage: Double) {
         requestedRightVoltage = rightRollerVoltage
+    }
+
+    override fun setRunning(runIntake: Boolean) {
+        if (runIntake) {
+            intakeSimulation.startIntake()
+        } else {
+            intakeSimulation.stopIntake()
+        }
+    }
+
+    override fun isNoteInsideIntake(): Boolean {
+        return intakeSimulation.gamePiecesAmount != 0
+    }
+
+    override fun launchNote() {
+        if (intakeSimulation.obtainGamePieceFromIntake()) {
+            ShooterIOSim.launchNote()
+        }
     }
 }

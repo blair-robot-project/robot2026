@@ -22,6 +22,12 @@ interface IntakeIO {
         @JvmField var leftRollerStatorCurrent: Double = 0.0
 
         @JvmField var rightRollerStatorCurrent: Double = 0.0
+
+        @JvmField var pivotAngleRad: Double = 0.0
+
+        @JvmField var pivotSpeed: Double = 0.0
+
+
     }
 
     fun updateInputs(inputs: IntakeIOInputs) {}
@@ -33,4 +39,8 @@ interface IntakeIO {
     fun setVoltageRoller(
         rightRollerVoltage: Double
     ) {}
+
+    fun setRunning(runIntake: Boolean) {}
+    fun isNoteInsideIntake(): Boolean = false
+    fun launchNote() {}
 }
