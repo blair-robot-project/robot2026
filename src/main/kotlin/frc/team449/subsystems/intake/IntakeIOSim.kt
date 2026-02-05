@@ -1,7 +1,10 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.system.plant.DCMotor
+import org.ironmaple.simulation.IntakeSimulation
+import edu.wpi.first.units.Units.Meters
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation
 
-class IntakeIOSim : IntakeIO {
+class IntakeIOSim(driveTrainSimulation: SwerveDriveSimulation) : IntakeIO {
     // instant set to target
     private val pivotMotor = DCMotor.getKrakenX44(1)
     private val leftRollerMotor = DCMotor.getKrakenX60(1)
@@ -11,6 +14,15 @@ class IntakeIOSim : IntakeIO {
     private var requestedLeftVoltage: Double = 0.0
     private var requestedRightVoltage: Double = 0.0
 
+    private var pivotAngledRad = 0.0
+    private var pivotSpeed = 0.0
+    private val intakeSimulation: IntakeSimulation =
+        IntakeSimulation.InTheFrameIntake(
+            "Note" //game pieces,
+            driveTrainSimulation,
+            Meters.of(1)),
+            IntakeSimulation.IntakeSide.FRONT
+        )
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         inputs.currentPivotVoltage = requestedPivotVoltage
         inputs.currentLeftRollerVoltage = requestedLeftVoltage
