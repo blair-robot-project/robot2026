@@ -2,6 +2,8 @@ package frc.team449
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.wpilibj.RobotBase
@@ -21,11 +23,14 @@ object Constants {
 
     const val TUNING_MODE: Boolean = false
 
+
     const val LOOP_TIME = 0.02
 
     const val ROBOT_MASS_KG = 54.43
     const val ROBOT_WIDTH_INCHES = 32.0 // including bumpers (front to rear)
     const val ROBOT_LENGTH_INCHES = 32.0 // including bumpers (left to right)
+
+    val GOAL_POSE = Pose2d(0.0, 0.0, Rotation2d(0.0))
 
     object DriveConstants {
         const val SIM_LOOP_TIME = 0.01 // 100 Hz
@@ -149,5 +154,12 @@ object Constants {
         const val INDEXER_SUPPLY_LIMIT = 30.0
 
         // add more indexers as needed
+    }
+
+    object AimbotConstants {
+        // Aimbot PID Constants
+        const val AIMBOT_KP = 10.0
+        const val AIMBOT_KI = 0.0
+        const val AIMBOT_KD = 0.0
     }
 }

@@ -2,6 +2,7 @@ package frc.team449
 
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.RobotContainer.drive
+import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
@@ -13,12 +14,21 @@ class Bindings(
     fun setDefaultCommands() {
         // set default commands for systems here
         robotContainer.drive.defaultCommand =
-            SwerveRequestCommand(
+            AimAtTargetCommand(
                 robotContainer.drive,
                 { -robotContainer.driveController.leftY },
                 { -robotContainer.driveController.leftX },
-                { robotContainer.driveController.rightX },
+                Constants.GOAL_POSE,
             )
+//            SwerveRequestCommand(
+//                robotContainer.drive,
+//                { -robotContainer.driveController.leftY },
+//                { -robotContainer.driveController.leftX },
+//                { robotContainer.driveController.rightX },
+//            )
+
+        // controls for simulation
+
     }
 
     fun bindControls() {
