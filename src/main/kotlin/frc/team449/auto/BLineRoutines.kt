@@ -38,7 +38,7 @@ class BLineRoutines(
                     )
                 },
                 PIDController(1.5, 0.0, 0.05),
-                PIDController(2.65, 0.0, 0.0),
+                PIDController(3.0, 0.0, 0.0),
                 PIDController(1.0, 0.0, 0.0),
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
@@ -54,7 +54,7 @@ class BLineRoutines(
         return routine
     }
 
-    fun trench2cycle(): AutoRoutine {
+    fun trench2cycleRight(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val path = Path("trench_1")
 
@@ -62,7 +62,22 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
         FollowPath.registerEventTrigger("start_shoot", PrintCommand("Starting shoot"))
         FollowPath.registerEventTrigger("end_shoot", PrintCommand("Ending shoot"))
-        FollowPath.registerEventTrigger("start_climb", PrintCommand("Starting climb"))
+
+        routine.active().onTrue(
+            pathBuilder.build(path)
+        )
+
+        return routine
+    }
+
+    fun trench2cycleLeft(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_3")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shoot", PrintCommand("Starting shoot"))
+        FollowPath.registerEventTrigger("end_shoot", PrintCommand("Ending shoot"))
 
         routine.active().onTrue(
             pathBuilder.build(path),
@@ -71,7 +86,7 @@ class BLineRoutines(
         return routine
     }
 
-    fun trench_chute(): AutoRoutine {
+    fun trenchChuteRight(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val path = Path("trench_2")
 
@@ -79,7 +94,6 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
         FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
         FollowPath.registerEventTrigger("chute_intake", PrintCommand("Intaking from chute"))
-        FollowPath.registerEventTrigger("start_climb", PrintCommand("Starting climb"))
 
         routine.active().onTrue(
             pathBuilder.build(path),
@@ -90,7 +104,8 @@ class BLineRoutines(
 
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
-        autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
-        autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trench_chute)
+        autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycleRight)
+        autoChooser.addRoutine("B-Line 2 cycle trench (L)", this::trench2cycleLeft)
+        autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trenchChuteRight)
     }
 }
