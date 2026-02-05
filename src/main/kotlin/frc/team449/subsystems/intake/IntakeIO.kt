@@ -26,9 +26,10 @@ interface IntakeIO {
 
     fun updateInputs(inputs: IntakeIOInputs) {}
 
-    fun setVoltage(
-        pivotVoltage: Double,
-        leftRollerVoltage: Double,
+    fun setVoltagePivot(
+        pivotVoltage: Double
+    ){}
+    fun setVoltageRoller(
         rightRollerVoltage: Double
     ) {}
 }
