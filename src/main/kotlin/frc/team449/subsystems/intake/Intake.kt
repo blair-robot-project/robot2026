@@ -1,8 +1,6 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants.IntakeConstants.LEFT_ROLLER_INTAKE_VOLTAGE
-import frc.team449.Constants.IntakeConstants.LEFT_ROLLER_STOW_VOLTAGE
 import frc.team449.Constants.IntakeConstants.PIVOT_INTAKE_VOLTAGE
 import frc.team449.Constants.IntakeConstants.PIVOT_STOW_VOLTAGE
 import frc.team449.Constants.IntakeConstants.RIGHT_ROLLER_INTAKE_VOLTAGE
@@ -20,27 +18,25 @@ class Intake(
     }
     fun intake(): Command =
         run {
-            io.setVoltage(
-                PIVOT_INTAKE_VOLTAGE,
-                LEFT_ROLLER_INTAKE_VOLTAGE,
-                RIGHT_ROLLER_INTAKE_VOLTAGE,
-            )
+            io.setVoltagePivot(PIVOT_INTAKE_VOLTAGE)
+            io.setVoltageRoller(RIGHT_ROLLER_INTAKE_VOLTAGE)
         }
 
     fun deploy(): Command =
-        run {
-            io.setVoltage(
-                PIVOT_STOW_VOLTAGE,
-                LEFT_ROLLER_STOW_VOLTAGE,
-                RIGHT_ROLLER_STOW_VOLTAGE,
-            )
+        runOnce {
+            io.setVoltagePivot(-PIVOT_STOW_VOLTAGE)
+            io.setVoltageRoller(-RIGHT_ROLLER_STOW_VOLTAGE)
+
         }
     fun stow(): Command =
+        runOnce {
+            io.setVoltagePivot(-PIVOT_STOW_VOLTAGE)
+            io.setVoltageRoller(-RIGHT_ROLLER_STOW_VOLTAGE)
+
+        }
+    fun stop(): Command =
         run {
-            io.setVoltage(
-                PIVOT_STOW_VOLTAGE,
-                LEFT_ROLLER_STOW_VOLTAGE,
-                RIGHT_ROLLER_STOW_VOLTAGE,
-            )
+            io.setVoltagePivot(0.0)
+            io.setVoltageRoller(0.0)
         }
 }

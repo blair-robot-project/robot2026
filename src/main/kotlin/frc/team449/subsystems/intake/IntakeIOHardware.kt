@@ -21,6 +21,9 @@ import frc.team449.Constants.IntakeConstants.RIGHT_ROLLER_MOTOR_ID
 import frc.team449.Constants.IntakeConstants.ROLLER_STATOR_LIMIT
 import frc.team449.Constants.IntakeConstants.ROLLER_SUPPLY_LIMIT
 import frc.team449.util.PhoenixUtil.tryUntilOk
+import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.signals.MotorAlignmentValue
+
 
 class IntakeIOHardware : IntakeIO {
     private val pivotMotor = TalonFX(PIVOT_MOTOR_ID)
@@ -29,27 +32,26 @@ class IntakeIOHardware : IntakeIO {
     private var pivotConfig = TalonFXConfiguration()
     private var leftRollerConfig = TalonFXConfiguration()
     private var rightRollerConfig = TalonFXConfiguration()
-    private val leftFollowerMotor = TalonFX(RIGHT_ROLLER_MOTOR_ID)
     private val pivotVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
     private val leftRollerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
     private val rightRollerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
 
     private val pivotVoltage: StatusSignal<Voltage> = pivotMotor.motorVoltage
-    private val leftRollerVoltage: StatusSignal<Voltage> = leftRollerMotor.motorVoltage
+    private val leftRollerVoltage: StatusSignal<Voltage> = leftFollowerRollerMotor.motorVoltage
     private val rightRollerVoltage: StatusSignal<Voltage> = rightRollerMotor.motorVoltage
 
     private val pivotSupplyCurrent: StatusSignal<Current> = pivotMotor.supplyCurrent
-    private val leftRollerSupplyCurrent: StatusSignal<Current> = leftRollerMotor.supplyCurrent
+    private val leftRollerSupplyCurrent: StatusSignal<Current> = leftFollowerRollerMotor.supplyCurrent
     private val rightRollerSupplyCurrent: StatusSignal<Current> = rightRollerMotor.supplyCurrent
 
     private val pivotStatorCurrent: StatusSignal<Current> = pivotMotor.statorCurrent
-    private val leftRollerStatorCurrent: StatusSignal<Current> = leftRollerMotor.statorCurrent
+    private val leftRollerStatorCurrent: StatusSignal<Current> = leftFollowerRollerMotor.statorCurrent
     private val rightRollerStatorCurrent: StatusSignal<Current> = rightRollerMotor.statorCurrent
 
     private val pivotMotorConnected: Boolean =
         pivotMotor.isAlive
     private val leftRollerMotorConnected: Boolean =
-        leftRollerMotor.isAlive
+        leftFollowerRollerMotor.isAlive
     private val rightRollerMotorConnected: Boolean =
         rightRollerMotor.isAlive
 
@@ -105,8 +107,9 @@ class IntakeIOHardware : IntakeIO {
                 .withMotorOutput(rightRollerMotorOutput)
 
         tryUntilOk(5) { pivotMotor.configurator.apply(pivotConfig, 0.25) }
-        tryUntilOk(5) { leftRollerMotor.configurator.apply(leftRollerConfig, 0.25) }
+        tryUntilOk(5) { leftFollowerRollerMotor.configurator.apply(leftRollerConfig, 0.25) }
         tryUntilOk(5) { rightRollerMotor.configurator.apply(rightRollerConfig, 0.25) }
+        leftFollowerRollerMotor.setControl(Follower(rightRollerMotor.deviceID, MotorAlignmentValue.Aligned))
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
@@ -123,22 +126,22 @@ class IntakeIOHardware : IntakeIO {
 
         ParentDevice.optimizeBusUtilizationForAll(
             pivotMotor,
-            leftRollerMotor,
+            leftFollowerRollerMotor,
             rightRollerMotor,
         )
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         inputs.currentPivotVoltage = pivotMotor.motorVoltage.value.`in`(Units.Volts)
-        inputs.currentLeftRollerVoltage = leftRollerMotor.motorVoltage.value.`in`(Units.Volts)
+        inputs.currentLeftRollerVoltage = leftFollowerRollerMotor.motorVoltage.value.`in`(Units.Volts)
         inputs.currentRightRollerVoltage = rightRollerMotor.motorVoltage.value.`in`(Units.Volts)
 
         inputs.pivotSupplyCurrent = pivotMotor.supplyCurrent.value.`in`(Units.Amps)
-        inputs.leftRollerSupplyCurrent = leftRollerMotor.supplyCurrent.value.`in`(Units.Amps)
+        inputs.leftRollerSupplyCurrent = leftFollowerRollerMotor.supplyCurrent.value.`in`(Units.Amps)
         inputs.rightRollerSupplyCurrent = rightRollerMotor.supplyCurrent.value.`in`(Units.Amps)
 
         inputs.pivotStatorCurrent = pivotMotor.statorCurrent.value.`in`(Units.Amps)
-        inputs.leftRollerStatorCurrent = leftRollerMotor.statorCurrent.value.`in`(Units.Amps)
+        inputs.leftRollerStatorCurrent = leftFollowerRollerMotor.statorCurrent.value.`in`(Units.Amps)
         inputs.rightRollerStatorCurrent = rightRollerMotor.statorCurrent.value.`in`(Units.Amps)
 
         pivotMotorDisconnectedAlert.set(!pivotMotorConnected)
@@ -152,7 +155,7 @@ class IntakeIOHardware : IntakeIO {
         rightRollerVoltage: Double
     ) {
         pivotMotor.setControl(pivotVoltageRequest.withOutput(pivotVoltage))
-        leftRollerMotor.setControl(leftRollerVoltageRequest.withOutput(leftRollerVoltage))
+        leftFollowerRollerMotor.setControl(leftRollerVoltageRequest.withOutput(leftRollerVoltage))
         rightRollerMotor.setControl(rightRollerVoltageRequest.withOutput(rightRollerVoltage))
     }
 }
