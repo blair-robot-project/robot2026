@@ -30,7 +30,8 @@ object Constants {
     const val ROBOT_WIDTH_INCHES = 32.0 // including bumpers (front to rear)
     const val ROBOT_LENGTH_INCHES = 32.0 // including bumpers (left to right)
 
-    val GOAL_POSE = Pose2d(0.0, 0.0, Rotation2d(0.0))
+    val BLUE_GOAL_POSE = Pose2d(4.625594, 4.034536, Rotation2d(0.0))
+    val RED_GOAL_POSE = Pose2d(11.915394, 4.034536, Rotation2d(0.0))
 
     object DriveConstants {
         const val SIM_LOOP_TIME = 0.01 // 100 Hz

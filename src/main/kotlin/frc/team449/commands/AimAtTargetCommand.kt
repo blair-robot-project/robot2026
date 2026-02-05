@@ -11,6 +11,7 @@ import frc.team449.Constants.AimbotConstants
 import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.DoubleSupplier
+import java.util.function.Supplier
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.pow
@@ -20,7 +21,7 @@ class AimAtTargetCommand(
     private val drive: DriveSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
-    private val target: Pose2d
+    private val targetSupplier: Supplier<Pose2d>
 ) : Command() {
 
 
@@ -57,6 +58,7 @@ class AimAtTargetCommand(
     )
 
     override fun execute() {
+        val target = targetSupplier.get()
         throttle =
             abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
                     DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
