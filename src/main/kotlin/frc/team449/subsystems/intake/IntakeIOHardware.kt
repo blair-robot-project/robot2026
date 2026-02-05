@@ -24,12 +24,13 @@ import frc.team449.util.PhoenixUtil.tryUntilOk
 
 class IntakeIOHardware : IntakeIO {
     private val pivotMotor = TalonFX(PIVOT_MOTOR_ID)
-    private val leftRollerMotor = TalonFX(LEFT_ROLLER_MOTOR_ID)
+    private val leftFollowerRollerMotor = TalonFX(LEFT_ROLLER_MOTOR_ID)
     private val rightRollerMotor = TalonFX(RIGHT_ROLLER_MOTOR_ID)
     private var pivotConfig = TalonFXConfiguration()
     private var leftRollerConfig = TalonFXConfiguration()
     private var rightRollerConfig = TalonFXConfiguration()
-
+    private val leftFollowerRollerMotor = TalonFX(LEFT_ROLLER_MOTOR_ID)
+    private val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
     private val pivotVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
     private val leftRollerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
     private val rightRollerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)

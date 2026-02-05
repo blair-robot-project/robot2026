@@ -18,7 +18,6 @@ class Intake(
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
     }
-
     fun intake(): Command =
         run {
             io.setVoltage(
@@ -28,6 +27,14 @@ class Intake(
             )
         }
 
+    fun deploy(): Command =
+        run {
+            io.setVoltage(
+                PIVOT_STOW_VOLTAGE,
+                LEFT_ROLLER_STOW_VOLTAGE,
+                RIGHT_ROLLER_STOW_VOLTAGE,
+            )
+        }
     fun stow(): Command =
         run {
             io.setVoltage(
