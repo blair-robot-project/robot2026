@@ -68,9 +68,10 @@ class AimAtTargetCommand(
 
 
         val targetHeading = Rotation2d(atan2(target.y - drive.getPose().y, target.x - drive.getPose().x))
+        val delta = targetHeading.minus(drive.getPose().rotation).radians
         turn = turnController.calculate(
-            drive.getPose().rotation.radians,
-            targetHeading.radians
+            0.0,
+            delta
         )
 
         drive.setControl(
