@@ -66,11 +66,11 @@ object Constants {
     }
 
     object ShooterConstants {
-        const val LEFT_FLYWHEEL_LEADER_ID = 1
-        const val LEFT_FLYWHEEL_FOLLOWER_ID = 2
-        const val RIGHT_FLYWHEEL_LEADER_ID = 3
-        const val RIGHT_FLYWHEEL_FOLLOWER_ID = 4
-        const val HOOD_MOTOR_ID = 5
+        const val LEFT_FLYWHEEL_LEADER_ID = 11
+        const val LEFT_FLYWHEEL_FOLLOWER_ID = 12
+        const val RIGHT_FLYWHEEL_LEADER_ID = 13
+        const val RIGHT_FLYWHEEL_FOLLOWER_ID = 14
+        const val HOOD_MOTOR_ID = 15
 
         const val FLYWHEEL_SUPPLY_LIM = 40.0
         const val FLYWHEEL_STATOR_LIM = 80.0
@@ -138,5 +138,16 @@ object Constants {
         const val PIVOT_STOW_VOLTAGE = 5.0
         const val LEFT_ROLLER_STOW_VOLTAGE = 0.0
         const val RIGHT_ROLLER_STOW_VOLTAGE = 0.0
+    }
+
+    object IndexerConstants {
+        // motor definitions that are currently placeholders
+
+        const val LEFT_INDEXER_ID = 21
+        const val RIGHT_INDEXER_ID = 22
+        const val INDEXER_STATOR_LIMIT = 60.0
+        const val INDEXER_SUPPLY_LIMIT = 30.0
+
+        // add more indexers as needed
     }
 }
