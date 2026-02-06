@@ -76,13 +76,13 @@ object Constants {
         const val FLYWHEEL_STATOR_LIM = 80.0
 
         const val HOOD_SUPPLY_LIM = 40.0
-        const val HOOD_STATOR_LIM = 80.0
+        const val HOOD_STATOR_LIM = 5.0
 
         const val HOOD_CRUISE_VELOCITY = 2.0
         const val HOOD_ACCELERATION = 5.0
 
-        val HOOD_MIN_ANGLE = Degrees.of(30.0) // TODO: find
-        val HOOD_MAX_ANGLE = Degrees.of(90.0) // TODO: find
+        val HOOD_MIN_ANGLE = Degrees.of(14.85072467)
+        val HOOD_MAX_ANGLE = Degrees.of(46.24524767)
 
         // these are all random ahh gains but it dont matter cuz its sim
         const val HOOD_SIM_KP = 3.0
@@ -94,21 +94,15 @@ object Constants {
         const val HOOD_SIM_KV = 0.1
         const val HOOD_SIM_KA = 0.0
 
-        const val FLYWHEEL_SIM_KS: Double = 0.0001 // V
-        const val FLYWHEEL_SIM_KV: Double = 0.000195 // V/RPM
-        const val FLYWHEEL_SIM_KA: Double = 0.0003 // V/(RPM/s)
-
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
         const val HOOD_SIM_GRAVITY = false
 
-        const val FLYWHEEL_GEARING = 1.0 // TODO: find
-        const val HOOD_GEARING = 1.0 // TODO: find
+        const val FLYWHEEL_GEARING = 32.0/18 // TODO: find
+        const val HOOD_GEARING = 6.0*15 // TODO: rough estimate
 
-        const val HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE = 2 * PI / 4096 // TODO: find
-        const val HOOD_MOTOR_GEARING = 1.0 // TODO: find
-        const val HOOD_MASS = 8.0 // kg TODO: find
-        val HOOD_LENGTH = Units.inchesToMeters(30.0) // TODO: find
+        const val HOOD_MOMENT_OF_INTERIA = 10.0
+        val HOOD_LENGTH = Units.inchesToMeters(5.91)
     }
 
     object LEDConstants {

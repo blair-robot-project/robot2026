@@ -21,12 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
-import frc.team449.Constants.ShooterConstants.HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE
+import frc.team449.Constants.ShooterConstants.HOOD_GEARING
 import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
-import frc.team449.Constants.ShooterConstants.HOOD_MASS
 import frc.team449.Constants.ShooterConstants.HOOD_MAX_ANGLE
 import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
-import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_GEARING
+import frc.team449.Constants.ShooterConstants.HOOD_MOMENT_OF_INTERIA
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_SIM_GRAVITY
 import frc.team449.Constants.ShooterConstants.HOOD_SIM_KA
@@ -68,14 +67,14 @@ class ShooterIOSim : ShooterIO {
 
     private val hoodSim: SingleJointedArmSim = SingleJointedArmSim(
         hoodGearbox,
-        HOOD_MOTOR_GEARING,
-        SingleJointedArmSim.estimateMOI(HOOD_LENGTH, HOOD_MASS),
+        HOOD_GEARING,
+        HOOD_MOMENT_OF_INTERIA,
         HOOD_LENGTH,
         HOOD_MIN_ANGLE.`in`(Radians),
         HOOD_MAX_ANGLE.`in`(Radians),
         HOOD_SIM_GRAVITY,
         HOOD_MIN_ANGLE.`in`(Radians),
-        HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE,
+        0.0,
         0.0
     )
 
@@ -87,7 +86,7 @@ class ShooterIOSim : ShooterIO {
     val flywheelMomentOfInertia: Double = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
 
     private val flywheelPlant: LinearSystem<N1, N1, N1> =
-        LinearSystemId.createFlywheelSystem(flywheelGearbox, FLYWHEEL_GEARING, flywheelMomentOfInertia)
+        LinearSystemId.createFlywheelSystem(flywheelGearbox, flywheelMomentOfInertia, FLYWHEEL_GEARING)
 
     private val flywheelSim: FlywheelSim = FlywheelSim(flywheelPlant, flywheelGearbox, 0.0)
 
