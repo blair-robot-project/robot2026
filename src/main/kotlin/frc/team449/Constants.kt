@@ -197,8 +197,8 @@ object Constants {
 
         val INTAKE_VOLTAGE = Volts.of(8.0)
         val OUTTAKE_VOLTAGE = Volts.of(-8.0)
-        val DEPLOY_VOLTAGE = Volts.of(-8.0)
-        val STOW_VOLTAGE = Volts.of(8.0)
+        val DEPLOY_VOLTAGE = Volts.of(8.0)
+        val STOW_VOLTAGE = Volts.of(-8.0)
 
         val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(10.0)
         val CURRENT_HOMING_TIME_LIMIT = Seconds.of(0.5)

@@ -1,5 +1,7 @@
 package frc.team449.subsystems.intake
 import com.ctre.phoenix6.controls.VoltageOut
+import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
@@ -9,6 +11,7 @@ import frc.team449.Constants
 import frc.team449.Constants.IntakeConstants
 import org.littletonrobotics.junction.Logger
 import kotlin.concurrent.timer
+import kotlin.math.abs
 
 class Intake(
     private val io: IntakeIO
@@ -19,6 +22,10 @@ class Intake(
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
+    }
+
+    override fun simulationPeriodic() {
+        io.simulationPeriodic()
     }
 
     fun intake(): Command =
@@ -50,7 +57,7 @@ class Intake(
             Commands.waitUntil {
                 inputs.pivotStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
                         currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                        inputs.pivotSpeed > IntakeConstants.CURRENT_HOMING_VEL_LIMIT
+                        abs(inputs.pivotSpeed.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
             runOnce {
                 io.setPivotRequest(VoltageOut(0.0))

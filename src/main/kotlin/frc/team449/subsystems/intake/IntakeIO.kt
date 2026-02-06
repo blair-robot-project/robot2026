@@ -40,4 +40,6 @@ interface IntakeIO {
     fun isNoteInsideIntake(): Boolean = false
 
     fun launchNote() {}
+
+    fun simulationPeriodic() {}
 }
