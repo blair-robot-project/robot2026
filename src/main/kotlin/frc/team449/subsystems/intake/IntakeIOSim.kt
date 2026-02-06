@@ -1,71 +1,69 @@
 package frc.team449.subsystems.intake
+import com.ctre.phoenix6.BaseStatusSignal
+import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.hardware.ParentDevice
+import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.sim.TalonFXSimState
 import edu.wpi.first.math.system.plant.DCMotor
 import org.ironmaple.simulation.IntakeSimulation
-import edu.wpi.first.units.Units.Meters
+import edu.wpi.first.units.Units.*
+import edu.wpi.first.wpilibj.RobotController
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
+import frc.team449.Constants.IntakeConstants
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation
 import frc.team449.subsystems.shooter.ShooterIOSim
+import frc.team449.util.PhoenixUtil.tryUntilOk
 
-class IntakeIOSim(driveTrainSimulation: SwerveDriveSimulation) : IntakeIO {
+class IntakeIOSim() : IntakeIOHardware() {
     // instant set to target
-    private val pivotMotor = DCMotor.getKrakenX44(1)
-    private val leftRollerMotor = DCMotor.getKrakenX60(1)
-    private val rightRollerMotor = DCMotor.getKrakenX60(1)
+    private val pivotGearbox = DCMotor.getKrakenX44(1)
+    private val pivotSim = SingleJointedArmSim(
+        pivotGearbox,
+        IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
+        IntakeConstants.PIVOT_MMOI,
+        IntakeConstants.ARM_LENGTH.`in`(Meters),
+        IntakeConstants.DEPLOY_POSITION.`in`(Radians),
+        IntakeConstants.STOW_POSITION.`in`(Radians),
+        true,
+        IntakeConstants.STOW_POSITION.`in`(Radians),
+    )
 
-    private var requestedPivotVoltage: Double = 0.0
-    private var requestedLeftVoltage: Double = 0.0
-    private var requestedRightVoltage: Double = 0.0
-
-    private var pivotAngleRad = 0.0
-    private var pivotSpeed = 0.0
-    private val intakeSimulation: IntakeSimulation =
-        IntakeSimulation.InTheFrameIntake(
-            "Note",                //game peic ename
-            driveTrainSimulation,
-            Meters.of(0.7),
-            IntakeSimulation.IntakeSide.BACK,
-            1                             // max notes
-        )
-
-    override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        inputs.currentPivotVoltage = requestedPivotVoltage
-        inputs.currentLeftRollerVoltage = requestedLeftVoltage
-        inputs.currentRightRollerVoltage = requestedRightVoltage
-
-        inputs.pivotSupplyCurrent = pivotMotor.getCurrent(0.0, requestedPivotVoltage)
-        inputs.leftRollerSupplyCurrent = leftRollerMotor.getCurrent(0.0, requestedLeftVoltage)
-        inputs.rightRollerSupplyCurrent = rightRollerMotor.getCurrent(0.0, requestedRightVoltage)
-        pivotSpeed = requestedPivotVoltage * 0.8
-        pivotAngleRad += pivotSpeed * 0.02
-
-        inputs.pivotAngleRad = pivotAngleRad
-        inputs.pivotSpeed = pivotSpeed
+    init {
+        val pivotMotorSim = pivotMotor.simState
+        val followerRollerMotorSim = followerRollerMotor.simState
+        val leaderRollerMotorSim = leaderRollerMotor.simState
+        pivotMotorSim.Orientation = IntakeConstants.PIVOT_SIM_ORIENTATION
+        followerRollerMotorSim.Orientation = IntakeConstants.FOLLOWER_SIM_ORIENTATON
+        leaderRollerMotorSim.Orientation = IntakeConstants.LEADER_SIM_ORIENTATION
+        pivotMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
+        followerRollerMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
+        leaderRollerMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
     }
 
-    override fun setVoltagePivot(
-        pivotVoltage: Double,
-    ) {
-        requestedPivotVoltage = pivotVoltage
+    fun simulationPeriodic() {
+        val pivotMotorSim = pivotMotor.simState
+        val followerRollerMotorSim = followerRollerMotor.simState
+        val leaderRollerMotorSim = leaderRollerMotor.simState
+
+        pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        followerRollerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        leaderRollerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+
+        // update arm
+        pivotSim.setInputVoltage(pivotMotorSim.motorVoltageMeasure.`in`(Volts))
+        pivotSim.update(0.02)
+        pivotMotorSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
+        pivotMotorSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
     }
 
-    override fun setVoltageRoller(rightRollerVoltage: Double) {
-        requestedRightVoltage = rightRollerVoltage
-    }
 
-    override fun setRunning(runIntake: Boolean) {
-        if (runIntake) {
-            intakeSimulation.startIntake()
-        } else {
-            intakeSimulation.stopIntake()
-        }
-    }
+//    override fun isNoteInsideIntake(): Boolean {
+//        return intakeSimulation.gamePiecesAmount != 0
+//    }
 
-    override fun isNoteInsideIntake(): Boolean {
-        return intakeSimulation.gamePiecesAmount != 0
-    }
-
-    override fun launchNote() {
-        if (intakeSimulation.obtainGamePieceFromIntake()) {
-            ShooterIOSim.launchNote()
-        }
-    }
+//    override fun launchNote() {
+//        if (intakeSimulation.obtainGamePieceFromIntake()) {
+//            ShooterIOSim.launchNote()
+//        }
+//    }
 }

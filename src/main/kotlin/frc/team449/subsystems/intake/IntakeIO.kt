@@ -1,46 +1,43 @@
 package frc.team449.subsystems.intake
 
+import com.ctre.phoenix6.controls.ControlRequest
+import edu.wpi.first.units.Units.*
+import edu.wpi.first.units.measure.*
 import org.littletonrobotics.junction.AutoLog
 
 interface IntakeIO {
     @AutoLog
     open class IntakeIOInputs {
-        @JvmField var currentPivotVoltage: Double = 0.0
+        @JvmField var pivotVoltage: Voltage = Volts.of(0.0)
 
-        @JvmField var currentLeftRollerVoltage: Double = 0.0
+        @JvmField var followerRollerVoltage: Voltage = Volts.of(0.0)
 
-        @JvmField var currentRightRollerVoltage: Double = 0.0
+        @JvmField var leaderRollerVoltage: Voltage = Volts.of(0.0)
 
-        @JvmField var pivotSupplyCurrent: Double = 0.0
+        @JvmField var pivotSupplyCurrent: Current = Amps.of(0.0)
 
-        @JvmField var leftRollerSupplyCurrent: Double = 0.0
+        @JvmField var followerSupplyCurrent: Current = Amps.of(0.0)
 
-        @JvmField var rightRollerSupplyCurrent: Double = 0.0
+        @JvmField var leaderSupplyCurrent: Current = Amps.of(0.0)
 
-        @JvmField var pivotStatorCurrent: Double = 0.0
+        @JvmField var pivotStatorCurrent: Current = Amps.of(0.0)
 
-        @JvmField var leftRollerStatorCurrent: Double = 0.0
+        @JvmField var followerStatorCurrent: Current = Amps.of(0.0)
 
-        @JvmField var rightRollerStatorCurrent: Double = 0.0
+        @JvmField var leaderStatorCurrent: Current = Amps.of(0.0)
 
-        @JvmField var pivotAngleRad: Double = 0.0
+        @JvmField var pivotAngle: Angle = Radians.of(0.0)
 
-        @JvmField var pivotSpeed: Double = 0.0
-
-
+        @JvmField var pivotSpeed: AngularVelocity = RadiansPerSecond.of(0.0)
     }
 
     fun updateInputs(inputs: IntakeIOInputs) {}
 
-    fun setVoltagePivot(
-        pivotVoltage: Double
-    ){}
+    fun setPivotRequest( request: ControlRequest ) {}
 
-    fun setVoltageRoller(
-        rightRollerVoltage: Double
-    ) {}
+    fun setRollerRequest( request: ControlRequest ) {}
 
-    fun setRunning(runIntake: Boolean) {}
     fun isNoteInsideIntake(): Boolean = false
+
     fun launchNote() {}
 }
