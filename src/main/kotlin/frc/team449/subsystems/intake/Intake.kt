@@ -1,18 +1,13 @@
 package frc.team449.subsystems.intake
-import com.ctre.phoenix6.controls.PositionVoltage
-import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
-import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants
 import frc.team449.Constants.IntakeConstants
 import org.littletonrobotics.junction.Logger
-import kotlin.concurrent.timer
 import kotlin.math.abs
 
 class Intake(
@@ -46,9 +41,9 @@ class Intake(
                 io.setPivotRequest(VoltageOut(IntakeConstants.DEPLOY_VOLTAGE))
                 currentHomingTimer.restart() },
             Commands.waitUntil {
-                inputs.pivotStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
+                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
                         currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                        inputs.pivotSpeed > IntakeConstants.CURRENT_HOMING_VEL_LIMIT
+                        inputs.pivotMotorVelocity > IntakeConstants.CURRENT_HOMING_VEL_LIMIT
             },
             runOnce {
                 currentHomingTimer.stop()
@@ -62,9 +57,9 @@ class Intake(
                 io.setPivotRequest(VoltageOut(IntakeConstants.STOW_VOLTAGE))
                 currentHomingTimer.restart() },
             Commands.waitUntil {
-                inputs.pivotStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
+                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
                         currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                        abs(inputs.pivotSpeed.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
+                        abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
             runOnce {
                 currentHomingTimer.stop()

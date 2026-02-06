@@ -8,27 +8,31 @@ import org.littletonrobotics.junction.AutoLog
 interface IntakeIO {
     @AutoLog
     open class IntakeIOInputs {
-        @JvmField var pivotVoltage: Voltage = Volts.of(0.0)
+        @JvmField var pivotMotorVoltage: Voltage = Volts.of(0.0)
+        @JvmField var pivotMotorSupplyCurrent: Current = Amps.of(0.0)
+        @JvmField var pivotMotorStatorCurrent: Current = Amps.of(0.0)
+        @JvmField var pivotMotorPosition: Angle = Radians.of(0.0)
+        @JvmField var pivotMotorVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
+        @JvmField var pivotMotorTemperature: Temperature = Celsius.of(0.0)
 
-        @JvmField var followerRollerVoltage: Voltage = Volts.of(0.0)
+        @JvmField var pivotFollowerVoltage: Voltage = Volts.of(0.0)
+        @JvmField var pivotFollowerSupplyCurrent: Current = Amps.of(0.0)
+        @JvmField var pivotFollowerStatorCurrent: Current = Amps.of(0.0)
+        @JvmField var pivotFollowerPosition: Angle = Radians.of(0.0)
+        @JvmField var pivotFollowerVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
+        @JvmField var pivotFollowerTemperature: Temperature = Celsius.of(0.0)
 
-        @JvmField var leaderRollerVoltage: Voltage = Volts.of(0.0)
+        @JvmField var rollerMotorVoltage: Voltage = Volts.of(0.0)
+        @JvmField var rollerMotorSupplyCurrent: Current = Amps.of(0.0)
+        @JvmField var rollerMotorStatorCurrent: Current = Amps.of(0.0)
+        @JvmField var rollerMotorVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
+        @JvmField var rollerMotorTemperature: Temperature = Celsius.of(0.0)
 
-        @JvmField var pivotSupplyCurrent: Current = Amps.of(0.0)
-
-        @JvmField var followerSupplyCurrent: Current = Amps.of(0.0)
-
-        @JvmField var leaderSupplyCurrent: Current = Amps.of(0.0)
-
-        @JvmField var pivotStatorCurrent: Current = Amps.of(0.0)
-
-        @JvmField var followerStatorCurrent: Current = Amps.of(0.0)
-
-        @JvmField var leaderStatorCurrent: Current = Amps.of(0.0)
-
-        @JvmField var pivotAngle: Angle = Radians.of(0.0)
-
-        @JvmField var pivotSpeed: AngularVelocity = RadiansPerSecond.of(0.0)
+        @JvmField var rollerFollowerVoltage: Voltage = Volts.of(0.0)
+        @JvmField var rollerFollowerSupplyCurrent: Current = Amps.of(0.0)
+        @JvmField var rollerFollowerStatorCurrent: Current = Amps.of(0.0)
+        @JvmField var rollerFollowerVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
+        @JvmField var rollerFollowerTemperature: Temperature = Celsius.of(0.0)
     }
 
     fun updateInputs(inputs: IntakeIOInputs) {}

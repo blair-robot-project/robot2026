@@ -42,31 +42,38 @@ class IntakeIOSim() : IntakeIOHardware() {
 
     init {
         val pivotMotorSim = pivotMotor.simState
-        val followerRollerMotorSim = rollerFollower.simState
-        val leaderRollerMotorSim = rollerMotor.simState
-        pivotMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
-        followerRollerMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
-        leaderRollerMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
+        val pivotFollowerSim = pivotFollower.simState
+        val rollerLeaderSim = rollerMotor.simState
+        val rollerFollowerSim = rollerFollower.simState
+
+        pivotMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
+        pivotFollowerSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
+        rollerLeaderSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
+        rollerFollowerSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
 
         SmartDashboard.putData("Intake", mech)
     }
 
     override fun simulationPeriodic() {
         val pivotMotorSim = pivotMotor.simState
-        val followerRollerMotorSim = rollerFollower.simState
-        val leaderRollerMotorSim = rollerMotor.simState
+        val pivotFollowerSim = pivotFollower.simState
+        val rollerLeaderSim = rollerMotor.simState
+        val rollerFollowerSim = rollerFollower.simState
 
         pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        followerRollerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        leaderRollerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        rollerLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        rollerFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
 
         // update arm
         pivotSim.setInputVoltage(pivotMotorSim.motorVoltageMeasure.`in`(Volts))
         pivotSim.update(0.02)
         pivotMotorSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
         pivotMotorSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
-
+        pivotFollowerSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
+        pivotFollowerSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
         pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads)
+
     }
 
 

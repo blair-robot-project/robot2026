@@ -33,42 +33,67 @@ open class IntakeIOHardware : IntakeIO {
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
             pivotMotor.motorVoltage,
-            rollerFollower.motorVoltage,
-            rollerMotor.motorVoltage,
             pivotMotor.supplyCurrent,
-            rollerFollower.supplyCurrent,
-            rollerMotor.supplyCurrent,
             pivotMotor.statorCurrent,
-            rollerFollower.statorCurrent,
-            rollerMotor.statorCurrent,
             pivotMotor.position,
-            pivotMotor.velocity
+            pivotMotor.velocity,
+            pivotMotor.deviceTemp,
+            pivotFollower.motorVoltage,
+            pivotFollower.supplyCurrent,
+            pivotFollower.statorCurrent,
+            pivotFollower.position,
+            pivotFollower.velocity,
+            pivotFollower.deviceTemp,
+            rollerMotor.motorVoltage,
+            rollerMotor.supplyCurrent,
+            rollerMotor.statorCurrent,
+            rollerMotor.velocity,
+            rollerMotor.deviceTemp,
+            rollerFollower.motorVoltage,
+            rollerFollower.supplyCurrent,
+            rollerFollower.statorCurrent,
+            rollerFollower.velocity,
+            rollerFollower.deviceTemp,
         )
 
         ParentDevice.optimizeBusUtilizationForAll(
             pivotMotor,
+            pivotFollower,
             rollerFollower,
             rollerMotor,
         )
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        inputs.pivotVoltage = pivotMotor.motorVoltage.value
-        inputs.followerRollerVoltage = rollerFollower.motorVoltage.value
-        inputs.leaderRollerVoltage = rollerMotor.motorVoltage.value
+        inputs.pivotMotorVoltage = pivotMotor.motorVoltage.value
+        inputs.pivotMotorSupplyCurrent = pivotMotor.supplyCurrent.value
+        inputs.pivotMotorStatorCurrent = pivotMotor.statorCurrent.value
+        inputs.pivotMotorPosition = pivotMotor.position.value
+        inputs.pivotMotorVelocity = pivotMotor.velocity.value
+        inputs.pivotMotorTemperature = pivotMotor.deviceTemp.value
 
-        inputs.pivotSupplyCurrent = pivotMotor.supplyCurrent.value
-        inputs.followerSupplyCurrent = rollerFollower.supplyCurrent.value
-        inputs.leaderSupplyCurrent = rollerMotor.supplyCurrent.value
+        inputs.pivotFollowerVoltage = pivotFollower.motorVoltage.value
+        inputs.pivotFollowerSupplyCurrent = pivotFollower.supplyCurrent.value
+        inputs.pivotFollowerStatorCurrent = pivotFollower.statorCurrent.value
+        inputs.pivotFollowerPosition = pivotFollower.position.value
+        inputs.pivotFollowerVelocity = pivotFollower.velocity.value
+        inputs.pivotFollowerTemperature = pivotFollower.deviceTemp.value
 
-        inputs.pivotStatorCurrent = pivotMotor.statorCurrent.value
-        inputs.followerStatorCurrent = rollerFollower.statorCurrent.value
-        inputs.leaderStatorCurrent = rollerMotor.statorCurrent.value
+        inputs.rollerMotorVoltage = rollerMotor.motorVoltage.value
+        inputs.rollerMotorSupplyCurrent = rollerMotor.supplyCurrent.value
+        inputs.rollerMotorStatorCurrent = rollerMotor.statorCurrent.value
+        inputs.rollerMotorVelocity = rollerMotor.velocity.value
+        inputs.rollerMotorTemperature = rollerMotor.deviceTemp.value
 
-        inputs.pivotAngle = pivotMotor.position.value
-        inputs.pivotSpeed = pivotMotor.velocity.value
+        inputs.rollerFollowerVoltage = rollerFollower.motorVoltage.value
+        inputs.rollerFollowerSupplyCurrent = rollerFollower.supplyCurrent.value
+        inputs.rollerFollowerStatorCurrent = rollerFollower.statorCurrent.value
+        inputs.rollerFollowerVelocity = rollerFollower.velocity.value
+        inputs.rollerFollowerTemperature = rollerFollower.deviceTemp.value
+
 
         pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
+        pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
         rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
         rollerMotorDisconnectedAlert.set(!rollerMotor.isAlive)
     }
@@ -79,6 +104,7 @@ open class IntakeIOHardware : IntakeIO {
 
     override fun setPivotPosition(newPosition: Angle) {
         pivotMotor.setPosition(newPosition)
+        pivotFollower.setPosition(newPosition)
     }
 
     override fun setRollerRequest(request: ControlRequest) {

@@ -160,7 +160,7 @@ object Constants {
 
         val PIVOT_FEEDBACK_CONFIG =
             FeedbackConfigs()
-                .withSensorToMechanismRatio(PIVOT_GEARING_SENSOR_TO_MECH)
+//                .withSensorToMechanismRatio(PIVOT_GEARING_SENSOR_TO_MECH)
 
         val LEADER_OUTPUT_CONFIG =
             MotorOutputConfigs()
@@ -188,7 +188,7 @@ object Constants {
         val DEPLOY_VOLTAGE = Volts.of(-8.0)
         val STOW_VOLTAGE = Volts.of(8.0)
 
-        val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(10.0)
+        val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
         val CURRENT_HOMING_TIME_LIMIT = Seconds.of(0.5)
         val CURRENT_HOMING_VEL_LIMIT = RadiansPerSecond.of(0.5)
     }
