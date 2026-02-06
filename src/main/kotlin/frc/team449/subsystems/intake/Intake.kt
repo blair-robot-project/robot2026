@@ -1,4 +1,6 @@
 package frc.team449.subsystems.intake
+import com.ctre.phoenix6.controls.PositionVoltage
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
@@ -18,6 +20,10 @@ class Intake(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
     private val currentHomingTimer = Timer()
+
+    init {
+        io.setPivotPosition(IntakeConstants.STOW_POSITION)
+    }
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -45,9 +51,10 @@ class Intake(
                         inputs.pivotSpeed > IntakeConstants.CURRENT_HOMING_VEL_LIMIT
             },
             runOnce {
-                io.setPivotRequest(VoltageOut(0.0))
                 currentHomingTimer.stop()
-            }
+                io.setPivotPosition(IntakeConstants.DEPLOY_POSITION)
+            },
+            stopPivot()
         )
     fun stow(): Command =
         Commands.sequence(
@@ -60,12 +67,14 @@ class Intake(
                         abs(inputs.pivotSpeed.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
             runOnce {
-                io.setPivotRequest(VoltageOut(0.0))
                 currentHomingTimer.stop()
-            }
+                io.setPivotPosition(IntakeConstants.STOW_POSITION)
+            },
         )
     fun stopPivot(): Command =
         runOnce {
-            io.setPivotRequest(VoltageOut(0.0))
+            io.setPivotRequest(
+                VoltageOut(0.0)
+            )
         }
 }

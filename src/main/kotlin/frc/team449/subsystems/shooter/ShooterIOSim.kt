@@ -44,7 +44,7 @@ import kotlin.math.pow
 
 class ShooterIOSim : ShooterIO {
 
-    private val hoodGearbox: DCMotor = DCMotor.getKrakenX60Foc(1)
+    private val hoodGearbox: DCMotor = DCMotor.getKrakenX44Foc(2)
 
     private val hoodMotor: TalonFX = TalonFX(HOOD_MOTOR_ID)
 
@@ -115,30 +115,30 @@ class ShooterIOSim : ShooterIO {
 
     override fun simPeriodic() {
         // hood stuff
-        val feedForwardVoltage = if (HOOD_SIM_GRAVITY) hoodFeedforward.calculate(hoodSetpoint.`in`(Radians), 0.0) else 0.0
-
-        val pidVoltage = hoodPIDController.calculate(
-            hoodMotor.position.value.`in`(Radians),
-            hoodSetpoint.`in`(Radians)
-        )
-        val voltageOutput = pidVoltage + feedForwardVoltage
-        hoodMotor.setVoltage(
-            voltageOutput
-        )
-        hoodSim.setInput(voltageOutput)
-        hoodSim.update(0.020) // 20ms
-
-        hoodMotor.setPosition(Radians.of(hoodSim.angleRads))
-
-        RoboRioSim.setVInVoltage(
-            BatterySim.calculateDefaultBatteryLoadedVoltage(hoodSim.currentDrawAmps)
-        )
-        hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
-
-        // flywheel stuff
-        val flywheelVoltage = RobotController.getBatteryVoltage() * (rightFlywheelMotor.get() * 2 + leftFlywheelMotor.get() * 2) // multiplying my 2 to account for the follower
-        flywheelSim.setInput(flywheelVoltage)
-        flywheelSim.update(0.020) // ms
+//        val feedForwardVoltage = if (HOOD_SIM_GRAVITY) hoodFeedforward.calculate(hoodSetpoint.`in`(Radians), 0.0) else 0.0
+//
+//        val pidVoltage = hoodPIDController.calculate(
+//            hoodMotor.position.value.`in`(Radians),
+//            hoodSetpoint.`in`(Radians)
+//        )
+//        val voltageOutput = pidVoltage + feedForwardVoltage
+//        hoodMotor.setVoltage(
+//            voltageOutput
+//        )
+//        hoodSim.setInput(voltageOutput)
+//        hoodSim.update(0.020) // 20ms
+//
+//        hoodMotor.setPosition(Radians.of(hoodSim.angleRads))
+//
+//        RoboRioSim.setVInVoltage(
+//            BatterySim.calculateDefaultBatteryLoadedVoltage(hoodSim.currentDrawAmps)
+//        )
+//        hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
+//
+//        // flywheel stuff
+//        val flywheelVoltage = RobotController.getBatteryVoltage() * (rightFlywheelMotor.get() * 2 + leftFlywheelMotor.get() * 2) // multiplying my 2 to account for the follower
+//        flywheelSim.setInput(flywheelVoltage)
+//        flywheelSim.update(0.020) // ms
     }
 
     override fun getHoodPosition(): Angle {

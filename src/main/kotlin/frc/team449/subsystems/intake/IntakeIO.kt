@@ -35,6 +35,8 @@ interface IntakeIO {
 
     fun setPivotRequest( request: ControlRequest ) {}
 
+    fun setPivotPosition( newPosition: Angle ) {}
+
     fun setRollerRequest( request: ControlRequest ) {}
 
     fun isNoteInsideIntake(): Boolean = false

@@ -3,78 +3,86 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.controls.ControlRequest
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
-import edu.wpi.first.units.Units
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.util.PhoenixUtil.tryUntilOk
 import com.ctre.phoenix6.controls.Follower
-import com.ctre.phoenix6.signals.MotorAlignmentValue
+import edu.wpi.first.units.measure.Angle
 import frc.team449.Constants.IntakeConstants
 
 
 open class IntakeIOHardware : IntakeIO {
     val pivotMotor = TalonFX(IntakeConstants.PIVOT_MOTOR_ID)
-    val followerRollerMotor = TalonFX(IntakeConstants.LEFT_ROLLER_MOTOR_ID)
-    val leaderRollerMotor = TalonFX(IntakeConstants.RIGHT_ROLLER_MOTOR_ID)
+    val pivotFollower = TalonFX(IntakeConstants.PIVOT_FOLLOWER_ID)
+    val rollerMotor = TalonFX(IntakeConstants.ROLLER_MOTOR_ID)
+    val rollerFollower = TalonFX(IntakeConstants.ROLLER_FOLLOWER_ID)
 
-    private val pivotMotorDisconnectedAlert = Alert("Pivot motor disconnected (ID $IntakeConstants.PIVOT_MOTOR_ID)", Alert.AlertType.kError)
-    private val followerMotorDisconnectedAlert = Alert("Left Roller motor disconnected (ID $IntakeConstants.LEFT_ROLLER_MOTOR_ID)", Alert.AlertType.kError)
-    private val leaderMotorDisconnectedAlert = Alert("Right Roller motor disconnected (ID $IntakeConstants.RIGHT_ROLLER_MOTOR_ID)", Alert.AlertType.kError)
+
+    val pivotMotorDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID})", Alert.AlertType.kError)
+    val pivotFollowerDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
+    val rollerMotorDisconnectedAlert = Alert("Right Roller motor disconnected (ID ${IntakeConstants.ROLLER_MOTOR_ID})", Alert.AlertType.kError)
+    val rollerFollowerDisconnectedAlert = Alert("Left Roller motor disconnected (ID ${IntakeConstants.ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
 
     init {
-        tryUntilOk(5) { pivotMotor.configurator.apply(IntakeConstants.pivotConfig, 0.25) }
-        tryUntilOk(5) { followerRollerMotor.configurator.apply(IntakeConstants.followerRollerConfig, 0.25) }
-        tryUntilOk(5) { leaderRollerMotor.configurator.apply(IntakeConstants.leaderRollerConfig, 0.25) }
-        followerRollerMotor.setControl(Follower(leaderRollerMotor.deviceID, IntakeConstants.followerMotorAlignment))
+        tryUntilOk(5) { pivotMotor.configurator.apply(IntakeConstants.PIVOT_CONFIG, 0.25) }
+        tryUntilOk(5) { pivotFollower.configurator.apply(IntakeConstants.PIVOT_CONFIG, 0.25) }
+        tryUntilOk(5) { rollerMotor.configurator.apply(IntakeConstants.ROLLER_CONFIG, 0.25) }
+        tryUntilOk(5) { rollerFollower.configurator.apply(IntakeConstants.ROLLER_CONFIG, 0.25) }
+        rollerFollower.setControl(Follower(rollerMotor.deviceID, IntakeConstants.ROLLER_FOLLOWER_ALIGNMENT))
+        pivotFollower.setControl(Follower(pivotMotor.deviceID, IntakeConstants.PIVOT_FOLLOWER_ALIGNMENT))
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
             pivotMotor.motorVoltage,
-            followerRollerMotor.motorVoltage,
-            leaderRollerMotor.motorVoltage,
+            rollerFollower.motorVoltage,
+            rollerMotor.motorVoltage,
             pivotMotor.supplyCurrent,
-            followerRollerMotor.supplyCurrent,
-            leaderRollerMotor.supplyCurrent,
+            rollerFollower.supplyCurrent,
+            rollerMotor.supplyCurrent,
             pivotMotor.statorCurrent,
-            followerRollerMotor.statorCurrent,
-            leaderRollerMotor.statorCurrent,
+            rollerFollower.statorCurrent,
+            rollerMotor.statorCurrent,
             pivotMotor.position,
             pivotMotor.velocity
         )
 
         ParentDevice.optimizeBusUtilizationForAll(
             pivotMotor,
-            followerRollerMotor,
-            leaderRollerMotor,
+            rollerFollower,
+            rollerMotor,
         )
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         inputs.pivotVoltage = pivotMotor.motorVoltage.value
-        inputs.followerRollerVoltage = followerRollerMotor.motorVoltage.value
-        inputs.leaderRollerVoltage = leaderRollerMotor.motorVoltage.value
+        inputs.followerRollerVoltage = rollerFollower.motorVoltage.value
+        inputs.leaderRollerVoltage = rollerMotor.motorVoltage.value
 
         inputs.pivotSupplyCurrent = pivotMotor.supplyCurrent.value
-        inputs.followerSupplyCurrent = followerRollerMotor.supplyCurrent.value
-        inputs.leaderSupplyCurrent = leaderRollerMotor.supplyCurrent.value
+        inputs.followerSupplyCurrent = rollerFollower.supplyCurrent.value
+        inputs.leaderSupplyCurrent = rollerMotor.supplyCurrent.value
 
         inputs.pivotStatorCurrent = pivotMotor.statorCurrent.value
-        inputs.followerStatorCurrent = followerRollerMotor.statorCurrent.value
-        inputs.leaderStatorCurrent = leaderRollerMotor.statorCurrent.value
+        inputs.followerStatorCurrent = rollerFollower.statorCurrent.value
+        inputs.leaderStatorCurrent = rollerMotor.statorCurrent.value
 
         inputs.pivotAngle = pivotMotor.position.value
         inputs.pivotSpeed = pivotMotor.velocity.value
 
         pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
-        followerMotorDisconnectedAlert.set(!followerRollerMotor.isAlive)
-        leaderMotorDisconnectedAlert.set(!leaderRollerMotor.isAlive)
+        rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
+        rollerMotorDisconnectedAlert.set(!rollerMotor.isAlive)
     }
 
     override fun setPivotRequest(request: ControlRequest) {
         pivotMotor.setControl(request)
     }
 
+    override fun setPivotPosition(newPosition: Angle) {
+        pivotMotor.setPosition(newPosition)
+    }
+
     override fun setRollerRequest(request: ControlRequest) {
-        leaderRollerMotor.setControl(request)
+        rollerMotor.setControl(request)
     }
 
 }
