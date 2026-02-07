@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.PrintCommand
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.*
 import frc.team449.Robot
 import frc.team449.RobotContainer.drive
@@ -38,7 +39,7 @@ class BLineRoutines(
                     )
                 },
                 PIDController(1.5, 0.0, 0.05),
-                PIDController(3.0, 0.0, 0.0),
+                PIDController(2.65, 0.0, 0.0),
                 PIDController(1.0, 0.0, 0.0),
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
@@ -102,6 +103,34 @@ class BLineRoutines(
         return routine
     }
 
+    fun one_samecycle_test(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("one_samecycle_test")
+        val path1 = Path("one_samecycle_test_pt1")
+        val path2 = Path("one_samecycle_test_pt2")
+        val path3 = Path("one_samecycle_test_pt3")
+        val path4 = Path("one_samecycle_test_pt4")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path3),
+                pathBuilder.build(path4),
+                WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                drive.stopDrive()
+            )
+        )
+
+        return routine
+    }
+
     fun test(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val a = Path("1")
@@ -119,11 +148,25 @@ class BLineRoutines(
         return routine
     }
 
+    fun test1(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto test1")
+        val path = Path("1")
+
+        routine.active().onTrue(
+            pathBuilder.build(path)
+        )
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
+        //autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
+        //autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trench_chute)
+        autoChooser.addRoutine("One same cycle test", this::one_samecycle_test)
         autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycleRight)
         autoChooser.addRoutine("B-Line 2 cycle trench (L)", this::trench2cycleLeft)
         autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trenchChuteRight)
         autoChooser.addRoutine("TEST", this::test)
+        autoChooser.addRoutine("test 1", this::test1)
     }
 }

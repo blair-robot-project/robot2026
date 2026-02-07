@@ -16,6 +16,7 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
@@ -137,6 +138,19 @@ class DriveSubsystem(
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
+    }
+
+    fun stopDrive(): Command {
+        return runOnce {
+            this.setControl(
+                SwerveRequest
+                    .RobotCentric()
+                    .withVelocityX(0.0)
+                    .withVelocityY(0.0)
+                    .withRotationalRate(0.0)
+
+            )
+        }
     }
 
     // Swerve requests to apply during SysId characterization
