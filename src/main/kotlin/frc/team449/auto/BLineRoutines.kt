@@ -153,7 +153,7 @@ class BLineRoutines(
         val path = Path("one_samecycle_test_pt1")
 
         routine.active().onTrue(
-            pathBuilder.build(path)
+            pathBuilder.build(path),
         )
         return routine
     }
