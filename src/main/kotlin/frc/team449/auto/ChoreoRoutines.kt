@@ -5,28 +5,29 @@ import choreo.auto.AutoFactory
 import choreo.auto.AutoRoutine
 import choreo.auto.AutoTrajectory
 import choreo.trajectory.SwerveSample
-import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.team449.Robot
 import frc.team449.RobotContainer.drive
 
-open class choreoRoutines(
-    robot: Robot) {
-    val autoFactory = AutoFactory(
-        drive::getPose,
-        drive::resetOdometry,
-        { sample: SwerveSample -> drive.followTrajectory(robot, sample) },
-        true,
-        drive
-    )
+open class ChoreoRoutines(
+    robot: Robot,
+) {
+    val autoFactory =
+        AutoFactory(
+            drive::getPose,
+            drive::resetOdometry,
+            { sample: SwerveSample -> drive.followTrajectory(robot, sample) },
+            true,
+            drive,
+        )
 
     fun doNothing(): AutoRoutine {
         val nothing: AutoRoutine = autoFactory.newRoutine("Nothing")
         return nothing
     }
 
-    fun bl_trench_same(): AutoRoutine {
+    fun blTrenchSame(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("bl_trench_same")
         val path1: AutoTrajectory = routine.trajectory("bl_trench_pl1_pt1")
         val path2: AutoTrajectory = routine.trajectory("bl_pl1_trench_pt2")
@@ -43,17 +44,17 @@ open class choreoRoutines(
             Commands.sequence(
                 path1.resetOdometry(),
                 path1.cmd(),
-                //wait about 3-4 seconds for shooting
+                // wait about 3-4 seconds for shooting
                 PrintCommand("Stop Shooting"),
                 path2.cmd(),
-                //wait about 3-4 seconds for shooting
-                PrintCommand("Stop Shooting")
-            )
+                // wait about 3-4 seconds for shooting
+                PrintCommand("Stop Shooting"),
+            ),
         )
         return routine
     }
 
-    fun br_trench_same(): AutoRoutine {
+    fun brTrenchSame(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("br_trench_same")
         val path1: AutoTrajectory = routine.trajectory("br_trench_pr1_pt1")
         val path2: AutoTrajectory = routine.trajectory("br_pr1_trench_pt2")
@@ -80,7 +81,7 @@ open class choreoRoutines(
         return routine
     }
 
-    fun bl_trench_opp(): AutoRoutine {
+    fun blTrenchOpp(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("bl_trench_opp")
         val path1: AutoTrajectory = routine.trajectory("bl_opptrench_pr1_pt1")
         val path2: AutoTrajectory = routine.trajectory("br_opptrench_pl1_pt2")
@@ -106,7 +107,7 @@ open class choreoRoutines(
         return routine
     }
 
-    fun br_trench_opp(): AutoRoutine {
+    fun brTrenchOpp(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("br_trench_opp")
         val path1: AutoTrajectory = routine.trajectory("br_opptrench_pl1_pt1")
         val path2: AutoTrajectory = routine.trajectory("bl_opptrench_pr1_pt2")
@@ -123,11 +124,11 @@ open class choreoRoutines(
             Commands.sequence(
                 path1.resetOdometry(),
                 path1.cmd(),
-                //wait about 3-4 seconds for shooting
+                // wait about 3-4 seconds for shooting
                 path2.cmd(),
-                //wait about 3-4 seconds for shooting
-                PrintCommand("Stop Shooting")
-            )
+                // wait about 3-4 seconds for shooting
+                PrintCommand("Stop Shooting"),
+            ),
         )
         return routine
     }
@@ -143,11 +144,14 @@ open class choreoRoutines(
 
 
 
+
+
+
     fun addOptions(autoChooser: AutoChooser) {
-        autoChooser.addRoutine("bl_trench_same", this::bl_trench_same)
-        autoChooser.addRoutine("br_trench_same", this::br_trench_same)
-        autoChooser.addRoutine("bl_trench_opp", this::bl_trench_opp)
-        autoChooser.addRoutine("br_trench_opp", this::br_trench_opp)
+        autoChooser.addRoutine("bl_trench_same", this::blTrenchSame)
+        autoChooser.addRoutine("br_trench_same", this::brTrenchSame)
+        autoChooser.addRoutine("bl_trench_opp", this::blTrenchOpp)
+        autoChooser.addRoutine("br_trench_opp", this::brTrenchOpp)
     }
 
 }

@@ -14,8 +14,8 @@
     },
     {
       "type": "translation",
-      "x_meters": 6.010398050365556,
-      "y_meters": 0.5749463850528054,
+      "x_meters": 5.95340373679935,
+      "y_meters": 0.5749463850528045,
       "intermediate_handoff_radius_meters": 0.09999999999999999
     },
     {
@@ -32,15 +32,21 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.0016648956276341452,
+      "t_ratio": 0.001664895627633471,
       "lib_key": "start_intake"
+    },
+    {
+      "type": "translation",
+      "x_meters": 7.7747812473502655,
+      "y_meters": 2.699035743298139,
+      "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.787978647837672,
-        "y_meters": 2.7977246141348546,
-        "intermediate_handoff_radius_meters": 0.15000000000000002
+        "x_meters": 7.773730069446122,
+        "y_meters": 3.6383907392363994,
+        "intermediate_handoff_radius_meters": 0.25
       },
       "rotation_target": {
         "rotation_radians": 1.5707963267948966,
@@ -49,19 +55,25 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.4277504396787446,
+      "t_ratio": 0.09999999999999963,
       "lib_key": "end_intake"
     },
     {
       "type": "translation",
-      "x_meters": 6.050703261972515,
-      "y_meters": 1.0889463850528074,
+      "x_meters": 6.321426251411995,
+      "y_meters": 1.4451608448415971,
       "intermediate_handoff_radius_meters": 0.25000000000000006
     },
     {
+      "type": "rotation",
+      "rotation_radians": 1.5408117034616702,
+      "t_ratio": 0.465109642272684,
+      "profiled_rotation": true
+    },
+    {
       "type": "translation",
-      "x_meters": 3.6722418484875456,
-      "y_meters": 0.5190032493907424,
+      "x_meters": 3.387270280656516,
+      "y_meters": 0.7469805036555694,
       "intermediate_handoff_radius_meters": 0.3
     },
     {
@@ -82,21 +94,32 @@
       "lib_key": "shoot"
     },
     {
+      "type": "translation",
+      "x_meters": 1.3721079266808176,
+      "y_meters": 1.8288212835093427,
+      "intermediate_handoff_radius_meters": 0.39999999999999997
+    },
+    {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 0.30957734808137216,
-        "y_meters": 0.6329918765231533,
+        "x_meters": 0.32382592647292363,
+        "y_meters": 0.6472404549147033,
         "intermediate_handoff_radius_meters": 0.10000000000000002
       },
       "rotation_target": {
-        "rotation_radians": 0.0,
+        "rotation_radians": 1.5707963267948966,
         "profiled_rotation": true
       }
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.3250059527852333,
+      "t_ratio": 0.0,
       "lib_key": "chute_intake"
+    },
+    {
+      "type": "event_trigger",
+      "t_ratio": 1.0,
+      "lib_key": "shoot"
     },
     {
       "type": "waypoint",
@@ -109,50 +132,33 @@
         "rotation_radians": 0.6024913626332219,
         "profiled_rotation": true
       }
-    },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.27237347363139314,
-      "lib_key": "shoot"
-    },
-    {
-      "type": "event_trigger",
-      "t_ratio": 1.0,
-      "lib_key": "start_climb"
-    },
-    {
-      "type": "waypoint",
-      "translation_target": {
-        "x_meters": 1.477960776188602,
-        "y_meters": 3.7961762794476046,
-        "intermediate_handoff_radius_meters": 0.10000000000000002
-      },
-      "rotation_target": {
-        "rotation_radians": 0.0,
-        "profiled_rotation": true
-      }
     }
   ],
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 3.0,
+        "value": 1.0,
         "start_ordinal": 4,
-        "end_ordinal": 5
+        "end_ordinal": 4
       },
       {
-        "value": 1.2,
+        "value": 1.7,
         "start_ordinal": 2,
         "end_ordinal": 2
       },
       {
-        "value": 3.0,
+        "value": 4.3,
         "start_ordinal": 6,
         "end_ordinal": 6
       },
       {
         "value": 3.0,
         "start_ordinal": 7,
+        "end_ordinal": 8
+      },
+      {
+        "value": 1.0,
+        "start_ordinal": 9,
         "end_ordinal": 9
       }
     ]
