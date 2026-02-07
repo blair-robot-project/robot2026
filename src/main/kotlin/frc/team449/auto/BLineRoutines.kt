@@ -38,7 +38,7 @@ class BLineRoutines(
                         SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
                     )
                 },
-                PIDController(1.5, 0.0, 0.05),
+                PIDController(1.5, 0.0, 0.0),
                 PIDController(2.65, 0.0, 0.0),
                 PIDController(1.0, 0.0, 0.0),
             ).withDefaultShouldFlip()
@@ -124,8 +124,8 @@ class BLineRoutines(
                 pathBuilder.build(path4),
                 WaitCommand(3.5),
                 PrintCommand("Stop shooting"),
-                drive.stopDrive()
-            )
+                drive.stopDrive(),
+            ),
         )
 
         return routine
@@ -153,15 +153,15 @@ class BLineRoutines(
         val path = Path("1")
 
         routine.active().onTrue(
-            pathBuilder.build(path)
+            pathBuilder.build(path),
         )
         return routine
     }
 
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
-        //autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
-        //autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trench_chute)
+        // autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
+        // autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trench_chute)
         autoChooser.addRoutine("One same cycle test", this::one_samecycle_test)
         autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycleRight)
         autoChooser.addRoutine("B-Line 2 cycle trench (L)", this::trench2cycleLeft)
