@@ -73,6 +73,11 @@ open class DriveIOHardware(
 
         inputs.gyroAngle = inputs.Pose.rotation.degrees
 
+        inputs.frontLeftDrivePosition = modules[0].driveMotor.position.value
+        inputs.frontRightDrivePosition = modules[1].driveMotor.position.value
+        inputs.backLeftDrivePosition = modules[2].driveMotor.position.value
+        inputs.backRightDrivePosition = modules[3].driveMotor.position.value
+
         BaseStatusSignal.refreshAll(
             angularRollVelocity,
             angularPitchVelocity,
