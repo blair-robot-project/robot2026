@@ -5,7 +5,7 @@ import frc.team449.RobotContainer.drive
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
-    val robotContainer: RobotContainer
+    val robotContainer: RobotContainer,
 ) {
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
@@ -17,11 +17,15 @@ class Bindings(
                 robotContainer.drive,
                 { -robotContainer.driveController.leftY },
                 { -robotContainer.driveController.leftX },
-                { robotContainer.driveController.rightX },
+                { -robotContainer.driveController.rightX },
             )
     }
 
     fun bindControls() {
+        driveController.povUp().whileTrue(
+            drive.resetGyro(),
+        )
+
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward))
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kForward))

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.units.Units.*
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Notifier
 import frc.team449.Constants
 import frc.team449.Constants.DriveConstants.SIM_LOOP_TIME
@@ -20,14 +21,15 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig
 import org.ironmaple.simulation.motorsims.SimulatedBattery
 import org.ironmaple.simulation.motorsims.SimulatedMotorController
 import java.util.function.Consumer
+import kotlin.jvm.optionals.getOrNull
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
 ) : DriveIOHardware(
-    driveConstants,
-    sanitizeConstantsForSim(moduleConstants),
-) {
+        driveConstants,
+        sanitizeConstantsForSim(moduleConstants),
+    ) {
     private val simTelemetryConsumer: Consumer<SwerveDriveState> =
         Consumer { swerveDriveState: SwerveDriveState ->
             swerveDriveState.Pose = mapleSimDrive.simulatedDriveTrainPose
@@ -122,9 +124,20 @@ class DriveIOSim(
         super.resetPose(pose)
     }
 
+    override fun resetGyro() {
+        mapleSimDrive.gyroSimulation.setRotation(
+            if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
+                Rotation2d.kZero
+            } else {
+                Rotation2d.k180deg
+            },
+        )
+        super.resetGyro()
+    }
+
     companion object {
         private fun sanitizeConstantsForSim(
-            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
         ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>> {
             // create a new array to hold the modified constants
             return originalConstants

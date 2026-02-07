@@ -14,26 +14,30 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
+import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
+import edu.wpi.first.wpilibj.DriverStation
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
+import kotlin.jvm.optionals.getOrNull
 
 open class DriveIOHardware(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
 ) : SwerveDrivetrain<TalonFX, TalonFXS, CANcoder>(
-    ::TalonFX,
-    ::TalonFXS,
-    ::CANcoder,
-    driveConstants,
-    100.0,
-    *moduleConstants,
-),
+        ::TalonFX,
+        ::TalonFXS,
+        ::CANcoder,
+        driveConstants,
+        100.0,
+        *moduleConstants,
+    ),
     DriveIO {
     var telemetryCache: AtomicReference<SwerveDriveState> = AtomicReference()
 
@@ -93,6 +97,14 @@ open class DriveIOHardware(
         super.resetPose(pose)
     }
 
+    override fun resetGyro() {
+        if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
+            super.seedFieldCentric()
+        } else {
+            super.seedFieldCentric(Rotation2d.k180deg)
+        }
+    }
+
     override fun setControl(request: SwerveRequest) {
         super<SwerveDrivetrain>.setControl(request)
     }
@@ -100,7 +112,7 @@ open class DriveIOHardware(
     override fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>
+        visionMeasurementStdDevs: Matrix<N3, N1>,
     ) {
         super<SwerveDrivetrain>.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }

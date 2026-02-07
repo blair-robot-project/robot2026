@@ -52,11 +52,8 @@ class DriveSubsystem(
             inputs.Pose.rotation,
         )
 
-    fun seedFieldCentric() {
-        if (io is DriveIOHardware) {
-            io.seedFieldCentric()
-        }
-    }
+// reset gyro
+    fun resetGyro(): Command = runOnce { io.resetGyro() }
 
     private val xController: PIDController
         get() = PIDController(5.0, 0.0, 0.0)
@@ -138,19 +135,6 @@ class DriveSubsystem(
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
-    }
-
-    fun stopDrive(): Command {
-        return runOnce {
-            this.setControl(
-                SwerveRequest
-                    .RobotCentric()
-                    .withVelocityX(0.0)
-                    .withVelocityY(0.0)
-                    .withRotationalRate(0.0)
-
-            )
-        }
     }
 
     // Swerve requests to apply during SysId characterization
