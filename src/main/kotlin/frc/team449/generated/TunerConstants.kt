@@ -9,6 +9,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory
 import edu.wpi.first.units.Units
+import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.measure.*
 
 // https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
@@ -67,8 +68,13 @@ object TunerConstants {
                 .withStatorCurrentLimitEnable(true)
         )
 
+
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
-    private val pigeonConfigs: Pigeon2Configuration? = null
+    val pigeonConfigs: Pigeon2Configuration = Pigeon2Configuration()
+        .withMountPose(
+        MountPoseConfigs().withMountPoseYaw(
+        Degrees.of(180.0)))
+
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus

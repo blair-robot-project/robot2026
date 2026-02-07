@@ -38,8 +38,8 @@ class BLineRoutines(
                         SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
                     )
                 },
-                PIDController(3.0, 0.0, 0.0),
-                PIDController(2.65, 0.0, 0.0),
+                PIDController(1.5, 0.0, 0.0),
+                PIDController(2.5, 0.0, 0.0),
                 PIDController(1.0, 0.0, 0.0),
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
@@ -131,6 +131,19 @@ class BLineRoutines(
         return routine
     }
 
+    fun just_forward(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("just_forward")
+        val path = Path("just_forward")
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path),
+                drive.stopDrive()
+            )
+        )
+        return routine
+    }
+
     fun test(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val a = Path("1")
@@ -168,5 +181,6 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trenchChuteRight)
         autoChooser.addRoutine("TEST", this::test)
         autoChooser.addRoutine("test 1", this::test1)
+        autoChooser.addRoutine("just forward", this::just_forward)
     }
 }
