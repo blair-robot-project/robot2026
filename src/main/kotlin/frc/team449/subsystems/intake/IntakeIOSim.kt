@@ -15,7 +15,7 @@ import frc.team449.Constants.IntakeConstants
 
 class IntakeIOSim() : IntakeIOHardware() {
     // instant set to target
-    private val pivotGearbox = DCMotor.getKrakenX60(1)
+    private val pivotGearbox = DCMotor.getKrakenX44(2)
     private val pivotSim = SingleJointedArmSim(
         pivotGearbox,
         IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
@@ -23,7 +23,7 @@ class IntakeIOSim() : IntakeIOHardware() {
         IntakeConstants.ARM_LENGTH.`in`(Meters),
         IntakeConstants.DEPLOY_POSITION.`in`(Radians),
         IntakeConstants.STOW_POSITION.`in`(Radians),
-        false,
+        true,
         IntakeConstants.STOW_POSITION.`in`(Radians),
     )
 

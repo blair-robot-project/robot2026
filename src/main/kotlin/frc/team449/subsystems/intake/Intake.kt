@@ -43,7 +43,7 @@ class Intake(
             Commands.waitUntil {
                 inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
                         currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                        inputs.pivotMotorVelocity > IntakeConstants.CURRENT_HOMING_VEL_LIMIT
+                        abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
             runOnce {
                 currentHomingTimer.stop()
@@ -57,7 +57,7 @@ class Intake(
                 io.setPivotRequest(VoltageOut(IntakeConstants.STOW_VOLTAGE))
                 currentHomingTimer.restart() },
             Commands.waitUntil {
-                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
+                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT //&&
                         currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
                         abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
@@ -65,6 +65,7 @@ class Intake(
                 currentHomingTimer.stop()
                 io.setPivotPosition(IntakeConstants.STOW_POSITION)
             },
+            stopPivot()
         )
     fun stopPivot(): Command =
         runOnce {
