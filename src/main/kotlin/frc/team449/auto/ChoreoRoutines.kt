@@ -5,7 +5,6 @@ import choreo.auto.AutoFactory
 import choreo.auto.AutoRoutine
 import choreo.auto.AutoTrajectory
 import choreo.trajectory.SwerveSample
-import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.team449.Robot
@@ -28,7 +27,7 @@ open class ChoreoRoutines(
         return nothing
     }
 
-    fun bl_trench_same(): AutoRoutine {
+    fun blTrenchSame(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("bl_trench_same")
         val path1: AutoTrajectory = routine.trajectory("bl_trench_pl1_pt1")
         val path2: AutoTrajectory = routine.trajectory("bl_pl1_trench_pt2")
@@ -54,7 +53,7 @@ open class ChoreoRoutines(
         return routine
     }
 
-    fun br_trench_same(): AutoRoutine {
+    fun brTrenchSame(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("br_trench_same")
         val path1: AutoTrajectory = routine.trajectory("br_trench_pr1_pt1")
         val path2: AutoTrajectory = routine.trajectory("br_pr1_trench_pt2")
@@ -81,6 +80,6 @@ open class ChoreoRoutines(
     }
 
     fun addOptions(autoChooser: AutoChooser) {
-        autoChooser.addRoutine("bl_trench_same", this::bl_trench_same)
+        autoChooser.addRoutine("bl_trench_same", this::blTrenchSame)
     }
 }

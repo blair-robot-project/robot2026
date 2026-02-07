@@ -14,7 +14,7 @@ import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
 
 class BLineRoutines(
-    robot: Robot
+    robot: Robot,
 ) {
     val autoFactory =
         AutoFactory(
@@ -64,7 +64,7 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("end_shoot", PrintCommand("Ending shoot"))
 
         routine.active().onTrue(
-            pathBuilder.build(path)
+            pathBuilder.build(path),
         )
 
         return routine
@@ -102,10 +102,28 @@ class BLineRoutines(
         return routine
     }
 
+    fun test(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val a = Path("1")
+        val b = Path("2")
+        val c = Path("3")
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(a),
+                pathBuilder.build(b),
+                pathBuilder.build(c),
+            ),
+        )
+
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
         autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycleRight)
         autoChooser.addRoutine("B-Line 2 cycle trench (L)", this::trench2cycleLeft)
         autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trenchChuteRight)
+        autoChooser.addRoutine("TEST", this::test)
     }
 }
