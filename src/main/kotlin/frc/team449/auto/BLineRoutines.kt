@@ -38,7 +38,7 @@ class BLineRoutines(
                         SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
                     )
                 },
-                PIDController(1.5, 0.0, 0.05),
+                PIDController(3.0, 0.0, 0.0),
                 PIDController(2.65, 0.0, 0.0),
                 PIDController(1.0, 0.0, 0.0),
             ).withDefaultShouldFlip()
@@ -118,11 +118,11 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
+                //WaitCommand(3.5),
                 PrintCommand("Stop shooting"),
                 pathBuilder.build(path3),
                 pathBuilder.build(path4),
-                WaitCommand(3.5),
+                //WaitCommand(3.5),
                 PrintCommand("Stop shooting"),
                 drive.stopDrive()
             )
@@ -150,7 +150,7 @@ class BLineRoutines(
 
     fun test1(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto test1")
-        val path = Path("1")
+        val path = Path("one_samecycle_test_pt1")
 
         routine.active().onTrue(
             pathBuilder.build(path)
