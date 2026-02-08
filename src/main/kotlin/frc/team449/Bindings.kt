@@ -34,5 +34,13 @@ class Bindings(
         robotContainer.driveController.b().onTrue(
             robotContainer.shooter.setHood(Constants.ShooterConstants.HOOD_MIN_ANGLE)
         )
+
+        robotContainer.driveController.y().onTrue(
+            robotContainer.shooter.shoot()
+        )
+
+        robotContainer.driveController.x().onTrue(
+            robotContainer.shooter.stop()
+        )
     }
 }

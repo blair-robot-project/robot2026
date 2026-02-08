@@ -76,7 +76,7 @@ object Constants {
         const val FLYWHEEL_STATOR_LIM = 80.0
 
         const val HOOD_SUPPLY_LIM = 40.0
-        const val HOOD_STATOR_LIM = 5.0
+        const val HOOD_STATOR_LIM = 50.0
 
         const val HOOD_CRUISE_VELOCITY = 2.0
         const val HOOD_ACCELERATION = 5.0
@@ -98,7 +98,7 @@ object Constants {
 
         const val HOOD_SIM_GRAVITY = false
 
-        const val FLYWHEEL_GEARING = 32.0/18 // TODO: find
+        const val FLYWHEEL_GEARING = 32.0/18 //
         const val HOOD_GEARING = 6.0*15 // TODO: rough estimate
 
         const val HOOD_MOMENT_OF_INTERIA = 10.0

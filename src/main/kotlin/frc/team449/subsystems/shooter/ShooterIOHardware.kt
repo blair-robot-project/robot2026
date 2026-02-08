@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
@@ -278,12 +279,14 @@ class ShooterIOHardware : ShooterIO {
         inputs.leftStatorCurrent = leftLeaderStatorCurrent.getValue().`in`(Amps)
         inputs.leftTemperature = leftLeaderTemperature.getValue().`in`(Celsius)
         inputs.leftMotorIsConnected = leftLeaderMotorConnected
+        inputs.leftFollowerMotorIsConnected = leftFollowerMotorConnected
 
         inputs.rightVoltage = rightLeaderMotorVoltage.getValue().`in`(Volts)
         inputs.rightSupplyCurrent = rightLeaderSupplyCurrent.getValue().`in`(Amps)
         inputs.rightStatorCurrent = rightLeaderStatorCurrent.getValue().`in`(Amps)
         inputs.rightTemperature = rightLeaderTemperature.getValue().`in`(Celsius)
         inputs.rightMotorIsConnected = rightLeaderMotorConnected
+        inputs.rightFollowerMotorIsConneted = rightFollowerMotorConnected
 
         inputs.hoodVoltage = hoodMotorVoltage.getValue().`in`(Volts)
         inputs.hoodSupplyCurrent = hoodSupplyCurrent.getValue().`in`(Amps)
@@ -292,10 +295,12 @@ class ShooterIOHardware : ShooterIO {
         inputs.hoodMotorIsConnected = hoodMotorConnected
         inputs.hoodCurrentPos = hoodCurrentPos.getValue().`in`(Radians)
         inputs.hoodTargetPos = hoodTargetPos.value
+        inputs.flywheelVelocity = leftLeaderMotor.velocity.value.`in`(RadiansPerSecond)
     }
 
     override fun runFlywheelAtVelocity(velocity: AngularVelocity) {
         leftLeaderMotor.setControl(VelocityVoltage(velocity))
+        rightLeaderMotor.setControl(VelocityVoltage(velocity))
     }
 
     override fun setHoodPosition(angle: Angle) {

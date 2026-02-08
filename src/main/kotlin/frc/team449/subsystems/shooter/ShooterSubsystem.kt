@@ -24,7 +24,8 @@ class ShooterSubsystem(
 
     fun shoot(): Command {
         return runOnce {
-            io.runFlywheelAtVelocity(RadiansPerSecond.of(PI)) // placeholder velocity
+            print("shooting flywheel!")
+            io.runFlywheelAtVelocity(RadiansPerSecond.of(4*PI)) // placeholder velocity
         }
     }
 

@@ -24,6 +24,9 @@ interface ShooterIO {
         var leftMotorIsConnected: Boolean = false
 
         @JvmField
+        var leftFollowerMotorIsConnected: Boolean = false
+
+        @JvmField
         var rightVoltage: Double = 0.0
 
         @JvmField
@@ -37,6 +40,12 @@ interface ShooterIO {
 
         @JvmField
         var rightMotorIsConnected: Boolean = false
+
+        @JvmField
+        var rightFollowerMotorIsConneted: Boolean = false
+
+        @JvmField
+        var flywheelVelocity = 0.0
 
         @JvmField
         var hoodVoltage: Double = 0.0
