@@ -2,17 +2,14 @@ package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.FeedbackConfigs
-import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
-import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
-import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import edu.wpi.first.math.controller.ArmFeedforward
-import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.system.LinearSystem
 import edu.wpi.first.math.system.plant.DCMotor
@@ -25,7 +22,6 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.*
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -34,24 +30,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KP
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KS
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
-import frc.team449.Constants.ShooterConstants.HOOD_ACCELERATION
-import frc.team449.Constants.ShooterConstants.HOOD_CRUISE_VELOCITY
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
 import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
 import frc.team449.Constants.ShooterConstants.HOOD_MAX_ANGLE
 import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
-import frc.team449.Constants.ShooterConstants.HOOD_MOMENT_OF_INTERIA
+import frc.team449.Constants.ShooterConstants.HOOD_MOMENT_OF_INERTIA
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_GRAVITY
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KA
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KD
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KG
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KI
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KP
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KS
-import frc.team449.Constants.ShooterConstants.HOOD_SIM_KV
+import frc.team449.Constants.ShooterConstants.HOOD_KD
+import frc.team449.Constants.ShooterConstants.HOOD_KG
+import frc.team449.Constants.ShooterConstants.HOOD_KI
+import frc.team449.Constants.ShooterConstants.HOOD_KP
+import frc.team449.Constants.ShooterConstants.HOOD_KS
+import frc.team449.Constants.ShooterConstants.HOOD_KV
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE
@@ -69,9 +65,6 @@ class ShooterIOSim : ShooterIO {
     private val mech: Mechanism2d = Mechanism2d(3.0, 3.0)
     private val mechRoot: MechanismRoot2d = mech.getRoot("shooter hood", 1.5, 0.5)
 
-    private val hoodPIDController: PIDController = PIDController(HOOD_SIM_KP, HOOD_SIM_KI, HOOD_SIM_KD)
-    private val hoodFeedforward: ArmFeedforward = ArmFeedforward(HOOD_SIM_KS, HOOD_SIM_KG, HOOD_SIM_KV, HOOD_SIM_KA)
-
     private val hoodMechanism: MechanismLigament2d = mechRoot.append(
         MechanismLigament2d(
             "shooter hood",
@@ -82,16 +75,14 @@ class ShooterIOSim : ShooterIO {
         )
     )
 
-    private var hoodSetpoint = HOOD_MIN_ANGLE
-
     private val hoodSim: SingleJointedArmSim = SingleJointedArmSim(
         hoodGearbox,
         HOOD_GEARING,
-        HOOD_MOMENT_OF_INTERIA,
+        HOOD_MOMENT_OF_INERTIA,
         HOOD_LENGTH,
         HOOD_MIN_ANGLE.`in`(Radians),
         HOOD_MAX_ANGLE.`in`(Radians),
-        HOOD_SIM_GRAVITY,
+        true,
         HOOD_MIN_ANGLE.`in`(Radians),
         0.0,
         0.0
@@ -111,7 +102,6 @@ class ShooterIOSim : ShooterIO {
 
     init {
         SmartDashboard.putData("Shooter Mech2d", mech)
-        hoodPIDController.setPID(HOOD_SIM_KP, HOOD_SIM_KI, HOOD_SIM_KD)
         hoodMotor.setPosition(HOOD_MIN_ANGLE)
 
         val flywheelCurrentLimitConfigs: CurrentLimitsConfigs =
@@ -142,16 +132,28 @@ class ShooterIOSim : ShooterIO {
             FeedbackConfigs()
                 .withSensorToMechanismRatio(HOOD_GEARING)
 
-        val hoodMotionMagicConfigs =
-            MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(HOOD_CRUISE_VELOCITY)
-                .withMotionMagicAcceleration(HOOD_ACCELERATION)
+        val flywheelSlot0Configs =
+            Slot0Configs()
+                .withKP(FLYWHEEL_KP)
+                .withKI(FLYWHEEL_KI)
+                .withKD(FLYWHEEL_KD)
+                .withKS(FLYWHEEL_KS)
+
+        val hoodSlot0Configs =
+            Slot0Configs()
+                .withKP(HOOD_KP)
+                .withKI(HOOD_KI)
+                .withKD(HOOD_KD)
+                .withKS(HOOD_KS)
+                .withKG(HOOD_KG)
+                .withKV(HOOD_KV)
 
         val flywheelConfig =
             TalonFXConfiguration()
                 .withCurrentLimits(flywheelCurrentLimitConfigs)
                 .withMotorOutput(flywheelMotorOutput)
                 .withFeedback(flywheelFeedback)
+                .withSlot0(flywheelSlot0Configs)
 
         leftFlywheelMotor.configurator.apply(flywheelConfig)
         rightFlywheelMotor.configurator.apply(flywheelConfig)
@@ -161,43 +163,31 @@ class ShooterIOSim : ShooterIO {
                 .withCurrentLimits(hoodCurrentLimitConfigs)
                 .withMotorOutput(hoodMotorOutput)
                 .withFeedback(hoodFeedback)
-                .withMotionMagic(hoodMotionMagicConfigs)
+                .withSlot0(hoodSlot0Configs)
 
         hoodMotor.configurator.apply(hoodConfig)
     }
 
     override fun runFlywheelAtVelocity(velocity: AngularVelocity) {
         // set flywheel voltage
-        println("running flywheels")
-        rightFlywheelMotor.setControl(VelocityVoltage(velocity))
-        leftFlywheelMotor.setControl(VelocityVoltage(velocity))
+        println(velocity)
+        rightFlywheelMotor.setControl(VelocityVoltage(velocity).withSlot(0))
+        leftFlywheelMotor.setControl(VelocityVoltage(velocity).withSlot(0))
     }
 
     override fun setHoodPosition(angle: Angle) {
         println("setting hood angle to ${angle.`in`(Radians)}")
-        hoodSetpoint = angle
+        hoodMotor.setControl(PositionVoltage(angle))
     }
 
     override fun atTolerance(): Boolean {
-        return abs(hoodMotor.position.value.`in`(Radians) - hoodSetpoint.`in`(Radians)) < HOOD_TOLERANCE.`in`(Radians)
+        return abs(hoodMotor.position.value.`in`(Radians) - hoodMotor.position.value.`in`(Radians)) < HOOD_TOLERANCE.`in`(Radians)
     }
 
     override fun simPeriodic() {
         // hood stuff
-        val feedForwardVoltage = if (HOOD_SIM_GRAVITY) hoodFeedforward.calculate(hoodSetpoint.`in`(Radians), 0.0) else 0.0
-
-        val pidVoltage = hoodPIDController.calculate(
-            hoodMotor.position.value.`in`(Radians),
-            hoodSetpoint.`in`(Radians)
-        )
-        val voltageOutput = pidVoltage + feedForwardVoltage
-        hoodMotor.setVoltage(
-            voltageOutput
-        )
-
         hoodSim.setInput(hoodMotor.motorVoltage.value.`in`(Volts))
         hoodSim.update(0.020) // 20ms
-
         hoodMotor.setPosition(Radians.of(hoodSim.angleRads))
 
         RoboRioSim.setVInVoltage(
@@ -236,7 +226,7 @@ class ShooterIOSim : ShooterIO {
         inputs.hoodTemperature = hoodMotor.deviceTemp.value.`in`(Celsius)
         inputs.hoodMotorIsConnected = hoodMotor.isAlive
         inputs.hoodCurrentPos = hoodSim.angleRads
-        inputs.hoodTargetPos = hoodSetpoint.`in`(Radians)
+        inputs.hoodTargetPos = hoodMotor.position.value.`in`(Radians)
 
         inputs.flywheelVelocity = flywheelSim.angularVelocity.`in`(RadiansPerSecond)
     }

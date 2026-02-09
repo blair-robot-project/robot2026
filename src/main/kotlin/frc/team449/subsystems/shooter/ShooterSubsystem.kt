@@ -2,6 +2,7 @@ package frc.team449.subsystems.shooter
 
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
@@ -22,15 +23,16 @@ class ShooterSubsystem(
         io.simPeriodic()
     }
 
-    fun shoot(): Command {
+    fun shoot(velocity: AngularVelocity): Command {
         return runOnce {
-            print("shooting flywheel!")
-            io.runFlywheelAtVelocity(RadiansPerSecond.of(4*PI)) // placeholder velocity
+            println("shooting flywheel!")
+            io.runFlywheelAtVelocity(velocity)
         }
     }
 
     fun stop(): Command {
         return runOnce {
+            println("stopping flywheel")
             io.runFlywheelAtVelocity(RadiansPerSecond.of(0.0))
         }
     }

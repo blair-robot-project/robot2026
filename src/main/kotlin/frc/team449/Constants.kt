@@ -16,9 +16,6 @@ object Constants {
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
 
-    // used to remove the shooter sim bindings I was using to test
-    const val RUNNING_SHOOTER_SIM = true
-
     const val TUNING_MODE: Boolean = false
 
     const val LOOP_TIME = 0.02
@@ -78,30 +75,31 @@ object Constants {
         const val HOOD_SUPPLY_LIM = 40.0
         const val HOOD_STATOR_LIM = 50.0
 
-        const val HOOD_CRUISE_VELOCITY = 2.0
-        const val HOOD_ACCELERATION = 5.0
-
         val HOOD_MIN_ANGLE = Degrees.of(14.85072467)
         val HOOD_MAX_ANGLE = Degrees.of(46.24524767)
 
-        // these are all random ahh gains but it dont matter cuz its sim
-        const val HOOD_SIM_KP = 3.0
-        const val HOOD_SIM_KI = 0.0
-        const val HOOD_SIM_KD = 0.0
+        //hood gains
+        const val HOOD_KP = 6.7
+        const val HOOD_KI = 0.67
+        const val HOOD_KD = 0.0
+        //feedforward
+        const val HOOD_KS = 0.1
+        const val HOOD_KG = 0.11
+        const val HOOD_KV = 2.1
 
-        const val HOOD_SIM_KS = 0.2
-        const val HOOD_SIM_KG = 0.3
-        const val HOOD_SIM_KV = 0.1
-        const val HOOD_SIM_KA = 0.0
+        //flywheel gains
+        const val FLYWHEEL_KP = 0.5
+        const val FLYWHEEL_KI = 0.0
+        const val FLYWHEEL_KD = 0.0
+        const val FLYWHEEL_KS = 0.0
+
 
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
-
-        const val HOOD_SIM_GRAVITY = false
 
         const val FLYWHEEL_GEARING = 32.0/18 //
         const val HOOD_GEARING = 6.0*15 // TODO: rough estimate
 
-        const val HOOD_MOMENT_OF_INTERIA = 10.0
+        const val HOOD_MOMENT_OF_INERTIA = 0.07
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
     }
 

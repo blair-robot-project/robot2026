@@ -4,8 +4,8 @@ import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.FeedbackConfigs
-import com.ctre.phoenix6.configs.MotionMagicConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.PositionVoltage
@@ -27,11 +27,19 @@ import edu.wpi.first.units.measure.Temperature
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KP
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KS
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
-import frc.team449.Constants.ShooterConstants.HOOD_ACCELERATION
-import frc.team449.Constants.ShooterConstants.HOOD_CRUISE_VELOCITY
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
+import frc.team449.Constants.ShooterConstants.HOOD_KD
+import frc.team449.Constants.ShooterConstants.HOOD_KG
+import frc.team449.Constants.ShooterConstants.HOOD_KI
+import frc.team449.Constants.ShooterConstants.HOOD_KP
+import frc.team449.Constants.ShooterConstants.HOOD_KS
+import frc.team449.Constants.ShooterConstants.HOOD_KV
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
@@ -43,10 +51,9 @@ import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
 import kotlin.math.abs
 
 class ShooterIOHardware : ShooterIO {
-    // TODO: p much all the constants
+    // TODO: some of the constants
     // TODO: current homing
-    // TODO: interpolating double map for voltage + hood angle
-    // TODO: velocity control for flywheels
+    // TODO: interpolating double map for flywheel velocity + hood angle
 
     private val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
     private val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
@@ -147,16 +154,28 @@ class ShooterIOHardware : ShooterIO {
             FeedbackConfigs()
                 .withSensorToMechanismRatio(HOOD_GEARING)
 
-        val hoodMotionMagicConfigs =
-            MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(HOOD_CRUISE_VELOCITY)
-                .withMotionMagicAcceleration(HOOD_ACCELERATION)
+        val flywheelSlot0Configs =
+            Slot0Configs()
+                .withKP(FLYWHEEL_KP)
+                .withKI(FLYWHEEL_KI)
+                .withKD(FLYWHEEL_KD)
+                .withKS(FLYWHEEL_KS)
+
+        val hoodSlot0Configs =
+            Slot0Configs()
+                .withKP(HOOD_KP)
+                .withKI(HOOD_KI)
+                .withKD(HOOD_KD)
+                .withKS(HOOD_KS)
+                .withKG(HOOD_KG)
+                .withKV(HOOD_KV)
 
         flywheelConfig =
             TalonFXConfiguration()
                 .withCurrentLimits(flywheelCurrentLimitConfigs)
                 .withMotorOutput(flywheelMotorOutput)
                 .withFeedback(flywheelFeedback)
+                .withSlot0(flywheelSlot0Configs)
 
         leftLeaderMotor.configurator.apply(flywheelConfig)
         leftFollowerMotor.configurator.apply(flywheelConfig)
@@ -171,7 +190,7 @@ class ShooterIOHardware : ShooterIO {
                 .withCurrentLimits(hoodCurrentLimitConfigs)
                 .withMotorOutput(hoodMotorOutput)
                 .withFeedback(hoodFeedback)
-                .withMotionMagic(hoodMotionMagicConfigs)
+                .withSlot0(hoodSlot0Configs)
 
         hoodMotor.configurator.apply(hoodConfig)
 
@@ -299,12 +318,12 @@ class ShooterIOHardware : ShooterIO {
     }
 
     override fun runFlywheelAtVelocity(velocity: AngularVelocity) {
-        leftLeaderMotor.setControl(VelocityVoltage(velocity))
-        rightLeaderMotor.setControl(VelocityVoltage(velocity))
+        leftLeaderMotor.setControl(VelocityVoltage(velocity).withSlot(0))
+        rightLeaderMotor.setControl(VelocityVoltage(velocity).withSlot(0))
     }
 
     override fun setHoodPosition(angle: Angle) {
-        hoodMotor.setControl(PositionVoltage(angle))
+        hoodMotor.setControl(PositionVoltage(angle).withSlot(0))
     }
 
     override fun atTolerance(): Boolean {
