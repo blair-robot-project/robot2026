@@ -34,5 +34,4 @@ class Bindings(
             robotContainer.intake.stow()
         )
     }
-
 }

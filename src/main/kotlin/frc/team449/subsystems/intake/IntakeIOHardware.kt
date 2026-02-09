@@ -1,21 +1,19 @@
 package frc.team449.subsystems.intake
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.controls.ControlRequest
+import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
-import edu.wpi.first.wpilibj.Alert
-import frc.team449.util.PhoenixUtil.tryUntilOk
-import com.ctre.phoenix6.controls.Follower
 import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
-
+import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IntakeIOHardware : IntakeIO {
     val pivotMotor = TalonFX(IntakeConstants.PIVOT_MOTOR_ID)
     val pivotFollower = TalonFX(IntakeConstants.PIVOT_FOLLOWER_ID)
     val rollerMotor = TalonFX(IntakeConstants.ROLLER_MOTOR_ID)
     val rollerFollower = TalonFX(IntakeConstants.ROLLER_FOLLOWER_ID)
-
 
     val pivotMotorDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID})", Alert.AlertType.kError)
     val pivotFollowerDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
@@ -91,7 +89,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rollerFollowerVelocity = rollerFollower.velocity.value
         inputs.rollerFollowerTemperature = rollerFollower.deviceTemp.value
 
-
         pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
         pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
         rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
@@ -110,5 +107,4 @@ open class IntakeIOHardware : IntakeIO {
     override fun setRollerRequest(request: ControlRequest) {
         rollerMotor.setControl(request)
     }
-
 }

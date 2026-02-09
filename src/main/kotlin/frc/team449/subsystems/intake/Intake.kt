@@ -30,20 +30,21 @@ class Intake(
     }
 
     fun intake(): Command =
-        runOnce {io.setRollerRequest(VoltageOut(IntakeConstants.INTAKE_VOLTAGE))}
+        runOnce { io.setRollerRequest(VoltageOut(IntakeConstants.INTAKE_VOLTAGE)) }
     fun stopIntake(): Command =
-        runOnce {io.setRollerRequest(VoltageOut(0.0))}
+        runOnce { io.setRollerRequest(VoltageOut(0.0)) }
     fun outtake(): Command =
-        runOnce {io.setRollerRequest(VoltageOut(IntakeConstants.OUTTAKE_VOLTAGE))}
+        runOnce { io.setRollerRequest(VoltageOut(IntakeConstants.OUTTAKE_VOLTAGE)) }
     fun deploy(): Command =
         Commands.sequence(
             runOnce {
                 io.setPivotRequest(VoltageOut(IntakeConstants.DEPLOY_VOLTAGE))
-                currentHomingTimer.restart() },
+                currentHomingTimer.restart()
+            },
             Commands.waitUntil {
                 inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
-                        currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                        abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
+                    currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
+                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
             runOnce {
                 currentHomingTimer.stop()
@@ -55,11 +56,12 @@ class Intake(
         Commands.sequence(
             runOnce {
                 io.setPivotRequest(VoltageOut(IntakeConstants.STOW_VOLTAGE))
-                currentHomingTimer.restart() },
+                currentHomingTimer.restart()
+            },
             Commands.waitUntil {
-                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT //&&
-                        currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                        abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
+                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT // &&
+                currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
+                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             },
             runOnce {
                 currentHomingTimer.stop()

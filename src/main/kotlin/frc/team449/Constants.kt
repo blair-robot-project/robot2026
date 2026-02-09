@@ -178,7 +178,6 @@ object Constants {
                 .withCurrentLimits(ROLLER_CURRENT_CONFIG)
                 .withMotorOutput(LEADER_OUTPUT_CONFIG)
 
-
         // setpoint constants
         val STOW_POSITION = Degrees.of(92.0) // TODO: Find
         val DEPLOY_POSITION = Degrees.of(0.0) // TODO: Find

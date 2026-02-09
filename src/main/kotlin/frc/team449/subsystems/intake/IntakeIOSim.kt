@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants.IntakeConstants
 
-
 class IntakeIOSim() : IntakeIOHardware() {
     // instant set to target
     private val pivotGearbox = DCMotor.getKrakenX44(2)
@@ -73,9 +72,7 @@ class IntakeIOSim() : IntakeIOHardware() {
         pivotFollowerSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
         pivotFollowerSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
         pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads)
-
     }
-
 
 //    override fun isNoteInsideIntake(): Boolean {
 //        return intakeSimulation.gamePiecesAmount != 0
