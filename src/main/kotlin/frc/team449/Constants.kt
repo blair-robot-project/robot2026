@@ -78,26 +78,26 @@ object Constants {
         val HOOD_MIN_ANGLE = Degrees.of(14.85072467)
         val HOOD_MAX_ANGLE = Degrees.of(46.24524767)
 
-        //hood gains
+        // hood gains
         const val HOOD_KP = 6.7
         const val HOOD_KI = 0.67
         const val HOOD_KD = 0.0
-        //feedforward
+
+        // feedforward
         const val HOOD_KS = 0.1
         const val HOOD_KG = 0.11
         const val HOOD_KV = 2.1
 
-        //flywheel gains
+        // flywheel gains
         const val FLYWHEEL_KP = 0.5
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
         const val FLYWHEEL_KS = 0.0
 
-
         val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
 
-        const val FLYWHEEL_GEARING = 32.0/18 //
-        const val HOOD_GEARING = 6.0*15 // TODO: rough estimate
+        const val FLYWHEEL_GEARING = 32.0 / 18 //
+        const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
 
         const val HOOD_MOMENT_OF_INERTIA = 0.07
         val HOOD_LENGTH = Units.inchesToMeters(5.91)

@@ -37,17 +37,17 @@ import frc.team449.Constants.ShooterConstants.FLYWHEEL_KS
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
-import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
-import frc.team449.Constants.ShooterConstants.HOOD_MAX_ANGLE
-import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
-import frc.team449.Constants.ShooterConstants.HOOD_MOMENT_OF_INERTIA
-import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_KD
 import frc.team449.Constants.ShooterConstants.HOOD_KG
 import frc.team449.Constants.ShooterConstants.HOOD_KI
 import frc.team449.Constants.ShooterConstants.HOOD_KP
 import frc.team449.Constants.ShooterConstants.HOOD_KS
 import frc.team449.Constants.ShooterConstants.HOOD_KV
+import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
+import frc.team449.Constants.ShooterConstants.HOOD_MAX_ANGLE
+import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
+import frc.team449.Constants.ShooterConstants.HOOD_MOMENT_OF_INERTIA
+import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE
@@ -196,7 +196,7 @@ class ShooterIOSim : ShooterIO {
         hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
 
         // flywheel stuff
-        val flywheelVoltage = (rightFlywheelMotor.motorVoltage.value.`in`(Volts) + leftFlywheelMotor.motorVoltage.value.`in`(Volts)) / 2 //average the two voltages
+        val flywheelVoltage = (rightFlywheelMotor.motorVoltage.value.`in`(Volts) + leftFlywheelMotor.motorVoltage.value.`in`(Volts)) / 2 // average the two voltages
         flywheelSim.setInput(flywheelVoltage)
         flywheelSim.update(0.020) // ms
     }

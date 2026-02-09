@@ -35,12 +35,12 @@ class Bindings(
 
         robotContainer.driveController.b().onTrue(
             robotContainer.shooter.setHood(Constants.ShooterConstants.HOOD_MIN_ANGLE)
-                .andThen(WaitUntilCommand { robotContainer.shooter.atTolerance()})
+                .andThen(WaitUntilCommand { robotContainer.shooter.atTolerance() })
                 .andThen(robotContainer.shooter.holdHood())
         )
 
         robotContainer.driveController.y().onTrue(
-            robotContainer.shooter.shoot(RadiansPerSecond.of(4*Math.PI))
+            robotContainer.shooter.shoot(RadiansPerSecond.of(4 * Math.PI))
         )
 
         robotContainer.driveController.x().onTrue(
