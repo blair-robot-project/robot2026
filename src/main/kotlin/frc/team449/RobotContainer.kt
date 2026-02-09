@@ -1,14 +1,10 @@
 package frc.team449
 
-import edu.wpi.first.units.Units.Inches
-import edu.wpi.first.units.Units.Meters
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
+import frc.robot.FuelSim
 import frc.team449.Constants.Mode
 import frc.team449.generated.TunerConstants
-import frc.team449.subsystems.FuelSim
 import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
@@ -32,6 +28,8 @@ object RobotContainer {
     val opController: CommandXboxController = CommandXboxController(1)
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
+
+    val fuelSim = FuelSim("test")
 
     val drive: DriveSubsystem =
         DriveSubsystem(
@@ -92,46 +90,4 @@ object RobotContainer {
     )
 
     val bindings = Bindings(this)
-
-    fun configureFuelSim() {
-        val instance = FuelSim.instance
-        instance.spawnStartingFuel()
-        instance.registerRobot(
-            Constants.Dimensions.FULL_WIDTH.`in`(Meters),
-            Constants.Dimensions.FULL_LENGTH.`in`(Meters),
-            Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
-            { drive.getPose() },
-            drive::getFieldRelativeSpeeds,
-        )
-
-        instance.registerIntake(
-            Constants.Dimensions.FULL_LENGTH
-                .div(2.0)
-                .`in`(Meters),
-            Constants.Dimensions.FULL_LENGTH
-                .div(2.0)
-                .plus(Inches.of(3.0))
-                .`in`(Meters),
-            -Constants.Dimensions.FULL_WIDTH
-                .div(2.0)
-                .minus(Inches.of(2.0))
-                .`in`(Meters),
-            Constants.Dimensions.FULL_WIDTH
-                .div(2.0)
-                .minus(Inches.of(5.0))
-                .`in`(Meters),
-        )
-
-        instance.start()
-        SmartDashboard.putData(
-            Commands
-                .runOnce(
-                    {
-                        FuelSim.instance.clearFuel()
-                        FuelSim.instance.spawnStartingFuel()
-                    },
-                ).withName("Reset Fuel")
-                .ignoringDisable(true),
-        )
-    }
 }

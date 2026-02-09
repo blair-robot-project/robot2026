@@ -3,15 +3,21 @@ package frc.team449
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
+import edu.wpi.first.units.Units.Inches
+import edu.wpi.first.units.Units.Meters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.Commands
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
+import frc.team449.RobotContainer.drive
+import frc.team449.RobotContainer.fuelSim
 
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
@@ -74,7 +80,8 @@ class Robot : LoggedRobot() {
 
     override fun teleopPeriodic() {}
 
-    override fun disabledInit() {}
+    override fun disabledInit() {
+    }
 
     override fun disabledPeriodic() {}
 
@@ -82,7 +89,48 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        fuelSim.spawnStartingFuel()
+        fuelSim.registerRobot(
+            Constants.Dimensions.FULL_WIDTH.`in`(Meters),
+            Constants.Dimensions.FULL_LENGTH.`in`(Meters),
+            Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
+            { drive.getPose() },
+            drive::getFieldRelativeSpeeds,
+        )
 
-    override fun simulationPeriodic() {}
+        fuelSim.registerIntake(
+            Constants.Dimensions.FULL_LENGTH
+                .div(2.0)
+                .`in`(Meters),
+            Constants.Dimensions.FULL_LENGTH
+                .div(2.0)
+                .plus(Inches.of(3.0))
+                .`in`(Meters),
+            -Constants.Dimensions.FULL_WIDTH
+                .div(2.0)
+                .minus(Inches.of(2.0))
+                .`in`(Meters),
+            Constants.Dimensions.FULL_WIDTH
+                .div(2.0)
+                .minus(Inches.of(5.0))
+                .`in`(Meters),
+        )
+
+        fuelSim.start()
+        SmartDashboard.putData(
+            Commands
+                .runOnce(
+                    {
+                        fuelSim.clearFuel()
+                        fuelSim.spawnStartingFuel()
+                    },
+                ).withName("Reset Fuel")
+                .ignoringDisable(true),
+        )
+    }
+
+    override fun simulationPeriodic() {
+        fuelSim.updateSim()
+    }
 }
