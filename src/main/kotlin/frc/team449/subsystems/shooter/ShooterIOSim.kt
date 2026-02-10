@@ -22,6 +22,7 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
+import edu.wpi.first.units.measure.Current
 import edu.wpi.first.wpilibj.simulation.*
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -203,6 +204,22 @@ class ShooterIOSim : ShooterIO {
 
     override fun getHoodPosition(): Angle {
         return hoodMotor.position.value
+    }
+
+    override fun setHoodVoltage(voltage: Double) {
+        hoodMotor.setVoltage(voltage)
+    }
+
+    override fun stopHoodVoltage() {
+        hoodMotor.setVoltage(0.0)
+    }
+
+    override fun getHoodStatorCurrent(): Current {
+        return hoodMotor.statorCurrent.value
+    }
+
+    override fun resetHoodPosition() {
+        hoodMotor.setPosition(HOOD_MIN_ANGLE)
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {

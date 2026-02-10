@@ -1,7 +1,9 @@
 package frc.team449.subsystems.shooter
+import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
+import edu.wpi.first.units.measure.Current
 import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import org.littletonrobotics.junction.AutoLog
 
@@ -80,4 +82,12 @@ interface ShooterIO {
     fun simPeriodic() {}
 
     fun getHoodPosition(): Angle { return Radians.of(0.0) }
+
+    fun setHoodVoltage(voltage: Double) { }
+
+    fun stopHoodVoltage() { }
+
+    fun getHoodStatorCurrent(): Current { return Amps.of(0.0) }
+
+    fun resetHoodPosition() { }
 }

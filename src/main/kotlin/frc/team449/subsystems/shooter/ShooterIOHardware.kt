@@ -333,4 +333,16 @@ class ShooterIOHardware : ShooterIO {
     override fun getHoodPosition(): Angle {
         return hoodMotor.position.value
     }
+
+    override fun setHoodVoltage(voltage: Double) {
+        hoodMotor.setVoltage(voltage)
+    }
+
+    override fun stopHoodVoltage() {
+        hoodMotor.setVoltage(0.0)
+    }
+
+    override fun getHoodStatorCurrent(): Current {
+        return hoodMotor.statorCurrent.value
+    }
 }

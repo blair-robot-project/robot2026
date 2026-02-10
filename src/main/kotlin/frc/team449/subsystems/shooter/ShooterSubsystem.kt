@@ -1,10 +1,15 @@
 package frc.team449.subsystems.shooter
 
+import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand
+import frc.team449.Constants.ShooterConstants.CURRENT_HOMING_STATOR_THRESH
+import frc.team449.Constants.ShooterConstants.CURRENT_HOMING_VOLTAGE
 import org.littletonrobotics.junction.Logger
 
 class ShooterSubsystem(
@@ -50,5 +55,18 @@ class ShooterSubsystem(
 
     fun atTolerance(): Boolean {
         return io.atTolerance()
+    }
+
+    fun currentHoming(): Command {
+        return Commands.sequence(
+            runOnce {
+                io.setHoodVoltage(CURRENT_HOMING_VOLTAGE)
+            },
+            WaitUntilCommand { io.getHoodStatorCurrent().`in`(Amps) > CURRENT_HOMING_STATOR_THRESH },
+            runOnce {
+                io.stopHoodVoltage()
+                io.resetHoodPosition()
+            }
+        )
     }
 }

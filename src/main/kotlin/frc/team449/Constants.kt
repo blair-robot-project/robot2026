@@ -101,6 +101,9 @@ object Constants {
 
         const val HOOD_MOMENT_OF_INERTIA = 0.07
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
+
+        const val CURRENT_HOMING_VOLTAGE = 2.0
+        const val CURRENT_HOMING_STATOR_THRESH = 45.0 // amps
     }
 
     object LEDConstants {
