@@ -168,7 +168,58 @@ class BLineRoutines(
         )
         return routine
     }
-
+    fun bumpsL() : AutoRoutine {
+        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+        FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
+        FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
+        FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
+        FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("bumptwoleft"))
+            )
+        )
+        return routine
+    }
+    fun bumpsR() : AutoRoutine {
+        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+        FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
+        FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
+        FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
+        FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("bumptworight"))
+            )
+        )
+        return routine
+    }
+    fun trenchBumpL() : AutoRoutine {
+        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+        FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
+        FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
+        FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
+        FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("tenchbumpleft"))
+            )
+        )
+        return routine
+    }
+    fun trenchBumpR() : AutoRoutine {
+        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+        FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
+        FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
+        FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
+        FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("tenchbumpright"))
+            )
+        )
+        return routine
+    }
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
         // autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
@@ -180,5 +231,9 @@ class BLineRoutines(
         autoChooser.addRoutine("TEST", this::test)
         autoChooser.addRoutine("test 1", this::test1)
         autoChooser.addRoutine("just forward", this::just_forward)
+        autoChooser.addRoutine("B-Line 2 cycle with trench 2bump then trench (R)", this::bumpsR)
+        autoChooser.addRoutine("B-Line 2 cycle with trench 2bump then trench (L)", this::bumpsL)
+        autoChooser.addRoutine("B-Line 2 cycle with trench bump  other side trench bump (L)", this::trenchBumpL)
+        autoChooser.addRoutine("B-Line 2 cycle with trench bump  other side trench bump (R)", this::trenchBumpR)
     }
 }
