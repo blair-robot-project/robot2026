@@ -99,7 +99,7 @@ object Constants {
         const val FLYWHEEL_GEARING = 32.0 / 18 //
         const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
 
-        const val HOOD_MOMENT_OF_INERTIA = 0.07
+        const val HOOD_MOMENT_OF_INERTIA = 0.0694270649
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
 
         const val CURRENT_HOMING_VOLTAGE = 2.0
