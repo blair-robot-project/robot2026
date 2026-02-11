@@ -30,6 +30,7 @@ class Vision(
 
         for (i in 1..io.size) {
             disconnectedAlerts.add(Alert("Vision camera ${inputs[i - 1]} is disconnected.", AlertType.kWarning))
+            println("womp womp disconnected $i")
         }
     }
 
@@ -61,6 +62,7 @@ class Vision(
         for (cameraIndex in io.indices) {
             // Update disconnected alert
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected)
+            println("camera $cameraIndex connected ${inputs[cameraIndex].connected}")
 
             // Initialize logging values
             val tagPoses: MutableList<Pose3d> = LinkedList()

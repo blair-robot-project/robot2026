@@ -14,13 +14,13 @@ import edu.wpi.first.math.geometry.Transform3d
 object VisionConstants {
     var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
-    var camera0Name: String = "camera_0" // TODO: match to names thru configuration
-    var camera1Name: String = "camera_1"
+    var camera0Name: String = "limelight-right" // TODO: match to names thru configuration
+    var camera1Name: String = "limelight-left"
 
     // Robot to camera transforms
     // (Not used by Limelight, configure in web UI instead) <--- TODO
-    var robotToCamera0: Transform3d = Transform3d(0.2, 0.0, 0.2, Rotation3d(0.0, -0.4, 0.0))
-    var robotToCamera1: Transform3d = Transform3d(-0.2, 0.0, 0.2, Rotation3d(0.0, -0.4, Math.PI))
+    var robotToCamera0: Transform3d = Transform3d(0.2, 0.0, 0.2, Rotation3d(0.0, 0.0, 0.0))
+    var robotToCamera1: Transform3d = Transform3d(-0.2, 0.0, 0.2, Rotation3d(0.0, 0.0, Math.PI))
 
     // Basic filtering thresholds
     var maxAmbiguity: Double = 0.3

@@ -35,8 +35,8 @@ object RobotContainer {
             Mode.REAL ->
                 Vision(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight("limelight1", drive.rotation),
-                    VisionIOLimelight("limelight2", drive.rotation)
+                    VisionIOLimelight("limelight-right", drive.rotation),
+                    VisionIOLimelight("limelight-left", drive.rotation)
                 )
             Mode.SIM ->
                 Vision(
