@@ -15,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
+import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
@@ -31,6 +32,7 @@ import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KP
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KS
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_KV
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
@@ -40,6 +42,7 @@ import frc.team449.Constants.ShooterConstants.HOOD_KI
 import frc.team449.Constants.ShooterConstants.HOOD_KP
 import frc.team449.Constants.ShooterConstants.HOOD_KS
 import frc.team449.Constants.ShooterConstants.HOOD_KV
+import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
@@ -48,11 +51,12 @@ import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
+import frc.team449.Constants.ShooterConstants.TOLERANCE_DEBOUNCE_TIME
+import frc.team449.Constants.ShooterConstants.TOLERANCE_DEBOUNCE_TYPE
 import kotlin.math.abs
 
 class ShooterIOHardware : ShooterIO {
-    // TODO: some of the constants
-    // TODO: current homing
+    // TODO: a little constants
     // TODO: interpolating double map for flywheel velocity + hood angle
 
     private val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
@@ -63,9 +67,10 @@ class ShooterIOHardware : ShooterIO {
 
     private val hoodMotor = TalonFX(HOOD_MOTOR_ID)
 
+    private val toleranceDebouncer: Debouncer = Debouncer(TOLERANCE_DEBOUNCE_TIME, TOLERANCE_DEBOUNCE_TYPE)
+
     private val flywheelConfig: TalonFXConfiguration
     private val hoodConfig: TalonFXConfiguration
-
     private var leftLeaderMotorConnected: Boolean = true
     private var rightLeaderMotorConnected: Boolean = true
     private var leftFollowerMotorConnected: Boolean = true
@@ -160,6 +165,7 @@ class ShooterIOHardware : ShooterIO {
                 .withKI(FLYWHEEL_KI)
                 .withKD(FLYWHEEL_KD)
                 .withKS(FLYWHEEL_KS)
+                .withKV(FLYWHEEL_KV)
 
         val hoodSlot0Configs =
             Slot0Configs()
@@ -222,12 +228,12 @@ class ShooterIOHardware : ShooterIO {
         hoodTargetPos = hoodMotor.closedLoopReference
 
         BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0, //  doesn't need to update that often
+            4.0, //  doesn't need to update that often
             leftLeaderTemperature,
-            leftLeaderMotorVoltage,
+
             leftLeaderSupplyCurrent,
             rightLeaderTemperature,
-            rightLeaderMotorVoltage,
+
             rightLeaderSupplyCurrent,
             leftFollowerTemperature,
             leftFollowerMotorVoltage,
@@ -243,6 +249,11 @@ class ShooterIOHardware : ShooterIO {
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             150.0,
+            leftLeaderMotorVoltage,
+            rightLeaderMotorVoltage,
+        )
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            50.0,
             leftLeaderStatorCurrent,
             rightLeaderStatorCurrent,
             leftFollowerStatorCurrent,
@@ -314,10 +325,11 @@ class ShooterIOHardware : ShooterIO {
         inputs.hoodMotorIsConnected = hoodMotorConnected
         inputs.hoodCurrentPos = hoodCurrentPos.getValue().`in`(Radians)
         inputs.hoodTargetPos = hoodTargetPos.value
-        inputs.flywheelVelocity = leftLeaderMotor.velocity.value.`in`(RadiansPerSecond)
+        inputs.leftFlywheelVelocity = leftLeaderMotor.velocity.value.`in`(RadiansPerSecond)
+        inputs.rightFlywheelVelocity = rightLeaderMotor.velocity.value.`in`(RadiansPerSecond)
     }
 
-    override fun runFlywheelAtVelocity(velocity: AngularVelocity) {
+    override fun setFlywheelVelocity(velocity: AngularVelocity) {
         leftLeaderMotor.setControl(VelocityVoltage(velocity).withSlot(0))
         rightLeaderMotor.setControl(VelocityVoltage(velocity).withSlot(0))
     }
@@ -326,8 +338,8 @@ class ShooterIOHardware : ShooterIO {
         hoodMotor.setControl(PositionVoltage(angle).withSlot(0))
     }
 
-    override fun atTolerance(): Boolean {
-        return abs(hoodMotor.position.valueAsDouble - hoodMotor.closedLoopReference.value) < HOOD_TOLERANCE.`in`(Radians)
+    override fun inTolerance(): Boolean {
+        return toleranceDebouncer.calculate(abs(hoodMotor.closedLoopError.value) < HOOD_TOLERANCE.`in`(Radians))
     }
 
     override fun getHoodPosition(): Angle {
@@ -344,5 +356,14 @@ class ShooterIOHardware : ShooterIO {
 
     override fun getHoodStatorCurrent(): Current {
         return hoodMotor.statorCurrent.value
+    }
+
+    override fun resetHoodPosition() {
+        hoodMotor.setPosition(HOOD_MIN_ANGLE)
+    }
+
+    override fun setFlywheelVoltage(voltage: Double) {
+        leftLeaderMotor.setVoltage(voltage)
+        rightLeaderMotor.setVoltage(voltage)
     }
 }

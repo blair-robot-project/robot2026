@@ -47,7 +47,10 @@ interface ShooterIO {
         var rightFollowerMotorIsConneted: Boolean = false
 
         @JvmField
-        var flywheelVelocity = 0.0
+        var leftFlywheelVelocity = 0.0
+
+        @JvmField
+        var rightFlywheelVelocity = 0.0
 
         @JvmField
         var hoodVoltage: Double = 0.0
@@ -73,11 +76,13 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun runFlywheelAtVelocity(velocity: AngularVelocity) { }
+    fun setFlywheelVelocity(velocity: AngularVelocity) { }
+
+    fun setFlywheelVoltage(voltage: Double) { }
 
     fun setHoodPosition(angle: Angle) { }
 
-    fun atTolerance(): Boolean { return true }
+    fun inTolerance(): Boolean { return true }
 
     fun simPeriodic() {}
 

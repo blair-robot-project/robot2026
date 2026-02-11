@@ -2,6 +2,7 @@ package frc.team449
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.wpilibj.RobotBase
@@ -92,9 +93,17 @@ object Constants {
         const val FLYWHEEL_KP = 0.5
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.0
+        const val FLYWHEEL_KS = 0.05
+        const val FLYWHEEL_KV = 0.1
 
-        val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
+        // debouncer
+        const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
+        val HOMING_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
+
+        const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
+        val TOLERANCE_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
+
+        val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: refine
 
         const val FLYWHEEL_GEARING = 32.0 / 18 //
         const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
