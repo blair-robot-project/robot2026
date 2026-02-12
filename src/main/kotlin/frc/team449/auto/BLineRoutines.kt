@@ -202,7 +202,7 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("tenchbumpleft"))
+                pathBuilder.build(Path("trenchbumpleft"))
             )
         )
         return routine
@@ -215,11 +215,72 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("tenchbumpright"))
+                pathBuilder.build(Path("trenchbumpright"))
             )
         )
         return routine
     }
+
+    fun trenchSameR(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_5")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+
+        routine.active().onTrue(
+            pathBuilder.build(path),
+        )
+
+        return routine
+    }
+
+    fun trenchSameL(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_7")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+
+        routine.active().onTrue(
+            pathBuilder.build(path),
+        )
+
+        return routine
+    }
+
+    fun trenchDifferentR(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_4")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+
+        routine.active().onTrue(
+            pathBuilder.build(path),
+        )
+
+        return routine
+    }
+
+    fun trenchDifferentL(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
+        val path = Path("trench_6")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+
+        routine.active().onTrue(
+            pathBuilder.build(path),
+        )
+
+        return routine
+    }
+
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
         // autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
@@ -235,5 +296,9 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line 2 cycle with trench 2bump then trench (L)", this::bumpsL)
         autoChooser.addRoutine("B-Line 2 cycle with trench bump  other side trench bump (L)", this::trenchBumpL)
         autoChooser.addRoutine("B-Line 2 cycle with trench bump  other side trench bump (R)", this::trenchBumpR)
+        autoChooser.addRoutine("B-Line 2 cycle same trench auto (R)", this::trenchSameR)
+        autoChooser.addRoutine("B-Line 2 cycle same trench auto (L)", this::trenchSameL)
+        autoChooser.addRoutine("B-Line 2 cycle different trench auto (R)", this::trenchDifferentR)
+        autoChooser.addRoutine("B-Line 2 cycle different trench auto (L)", this::trenchDifferentL)
     }
 }
