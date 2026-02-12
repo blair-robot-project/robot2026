@@ -12,32 +12,33 @@ import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants.IntakeConstants
 
-class IntakeIOSim() : IntakeIOHardware() {
-    // instant set to target
+class IntakeIOSim : IntakeIOHardware() {
     private val pivotGearbox = DCMotor.getKrakenX44(2)
-    private val pivotSim = SingleJointedArmSim(
-        pivotGearbox,
-        IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
-        IntakeConstants.PIVOT_MMOI,
-        IntakeConstants.ARM_LENGTH.`in`(Meters),
-        IntakeConstants.DEPLOY_POSITION.`in`(Radians),
-        IntakeConstants.STOW_POSITION.`in`(Radians),
-        true,
-        IntakeConstants.STOW_POSITION.`in`(Radians),
-    )
+    private val pivotSim =
+        SingleJointedArmSim(
+            pivotGearbox,
+            IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
+            IntakeConstants.PIVOT_MOI,
+            IntakeConstants.ARM_LENGTH.`in`(Meters),
+            IntakeConstants.DEPLOY_POSITION.`in`(Radians),
+            IntakeConstants.STOW_POSITION.`in`(Radians),
+            true,
+            IntakeConstants.STOW_POSITION.`in`(Radians),
+        )
 
     // mech2d stuff
     val mech = Mechanism2d(3.0, 3.0)
     val mechRoot = mech.getRoot("Intake Pivot", 1.0, 1.0)
-    val pivotMechanism = mechRoot.append(
-        MechanismLigament2d(
-            "Intake Pivot Ligament",
-            1.0,
-            IntakeConstants.STOW_POSITION.`in`(Radians),
-            4.0,
-            Color8Bit(Color.kRed)
+    val pivotMechanism =
+        mechRoot.append(
+            MechanismLigament2d(
+                "Intake Pivot Ligament",
+                1.0,
+                IntakeConstants.STOW_POSITION.`in`(Radians),
+                4.0,
+                Color8Bit(Color.kRed),
+            ),
         )
-    )
 
     init {
         val pivotMotorSim = pivotMotor.simState
@@ -73,14 +74,4 @@ class IntakeIOSim() : IntakeIOHardware() {
         pivotFollowerSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
         pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads)
     }
-
-//    override fun isNoteInsideIntake(): Boolean {
-//        return intakeSimulation.gamePiecesAmount != 0
-//    }
-
-//    override fun launchNote() {
-//        if (intakeSimulation.obtainGamePieceFromIntake()) {
-//            ShooterIOSim.launchNote()
-//        }
-//    }
 }

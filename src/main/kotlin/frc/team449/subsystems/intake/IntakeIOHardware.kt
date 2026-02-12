@@ -2,9 +2,12 @@ package frc.team449.subsystems.intake
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.controls.ControlRequest
 import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.controls.PositionVoltage
+import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
 import frc.team449.util.PhoenixUtil.tryUntilOk
@@ -17,8 +20,10 @@ open class IntakeIOHardware : IntakeIO {
 
     val pivotMotorDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID})", Alert.AlertType.kError)
     val pivotFollowerDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
-    val rollerMotorDisconnectedAlert = Alert("Right Roller motor disconnected (ID ${IntakeConstants.ROLLER_MOTOR_ID})", Alert.AlertType.kError)
-    val rollerFollowerDisconnectedAlert = Alert("Left Roller motor disconnected (ID ${IntakeConstants.ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
+    val rollerMotorDisconnectedAlert =
+        Alert("Right Roller motor disconnected (ID ${IntakeConstants.ROLLER_MOTOR_ID})", Alert.AlertType.kError)
+    val rollerFollowerDisconnectedAlert =
+        Alert("Left Roller motor disconnected (ID ${IntakeConstants.ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
 
     init {
         tryUntilOk(5) { pivotMotor.configurator.apply(IntakeConstants.PIVOT_CONFIG, 0.25) }
@@ -31,27 +36,19 @@ open class IntakeIOHardware : IntakeIO {
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
             pivotMotor.motorVoltage,
-            pivotMotor.supplyCurrent,
             pivotMotor.statorCurrent,
             pivotMotor.position,
             pivotMotor.velocity,
-            pivotMotor.deviceTemp,
             pivotFollower.motorVoltage,
-            pivotFollower.supplyCurrent,
             pivotFollower.statorCurrent,
             pivotFollower.position,
             pivotFollower.velocity,
-            pivotFollower.deviceTemp,
             rollerMotor.motorVoltage,
-            rollerMotor.supplyCurrent,
             rollerMotor.statorCurrent,
             rollerMotor.velocity,
-            rollerMotor.deviceTemp,
             rollerFollower.motorVoltage,
-            rollerFollower.supplyCurrent,
             rollerFollower.statorCurrent,
             rollerFollower.velocity,
-            rollerFollower.deviceTemp,
         )
 
         ParentDevice.optimizeBusUtilizationForAll(
@@ -99,12 +96,19 @@ open class IntakeIOHardware : IntakeIO {
         pivotMotor.setControl(request)
     }
 
-    override fun setPivotPosition(newPosition: Angle) {
-        pivotMotor.setPosition(newPosition)
-        pivotFollower.setPosition(newPosition)
+    override fun setPivotPosition(position: Angle) {
+        pivotMotor.setControl(PositionVoltage(position).withSlot(0))
+    }
+
+    override fun setRollerVelocity(velocity: AngularVelocity) {
+        rollerMotor.setControl(VelocityVoltage(velocity).withSlot(0))
     }
 
     override fun setRollerRequest(request: ControlRequest) {
         rollerMotor.setControl(request)
+    }
+
+    override fun resetPivotPosition(position: Angle) {
+        pivotMotor.setPosition(position)
     }
 }

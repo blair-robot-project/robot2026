@@ -1,12 +1,22 @@
 package frc.team449.subsystems.intake
 import com.ctre.phoenix6.controls.VoltageOut
+import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.units.Units.Seconds
-import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants.IntakeConstants
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand
+import frc.team449.Constants.IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT
+import frc.team449.Constants.IntakeConstants.CURRENT_HOMING_VEL_LIMIT
+import frc.team449.Constants.IntakeConstants.DEPLOY_POSITION
+import frc.team449.Constants.IntakeConstants.DEPLOY_VOLTAGE
+import frc.team449.Constants.IntakeConstants.HOMING_DEBOUNCE_TIME
+import frc.team449.Constants.IntakeConstants.HOMING_DEBOUNCE_TYPE
+import frc.team449.Constants.IntakeConstants.HOMING_TIME_OUT
+import frc.team449.Constants.IntakeConstants.INTAKE_VELOCITY
+import frc.team449.Constants.IntakeConstants.OUTTAKE_VOLTAGE
+import frc.team449.Constants.IntakeConstants.STOW_POSITION
+import frc.team449.Constants.IntakeConstants.STOW_VOLTAGE
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
@@ -14,11 +24,12 @@ class Intake(
     private val io: IntakeIO
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
-    private val currentHomingTimer = Timer()
 
     init {
-        io.setPivotPosition(IntakeConstants.STOW_POSITION)
+        io.setPivotPosition(STOW_POSITION)
     }
+
+    val currentHomingDebouncer = Debouncer(HOMING_DEBOUNCE_TIME, HOMING_DEBOUNCE_TYPE)
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -30,49 +41,66 @@ class Intake(
     }
 
     fun intake(): Command =
-        runOnce { io.setRollerRequest(VoltageOut(IntakeConstants.INTAKE_VOLTAGE)) }
+        runOnce {
+            io.setRollerVelocity(INTAKE_VELOCITY)
+        }
+
     fun stopIntake(): Command =
-        runOnce { io.setRollerRequest(VoltageOut(0.0)) }
+        runOnce {
+            io.setRollerRequest(VoltageOut(0.0))
+        }
+
     fun outtake(): Command =
-        runOnce { io.setRollerRequest(VoltageOut(IntakeConstants.OUTTAKE_VOLTAGE)) }
+        runOnce {
+            io.setRollerRequest(
+                VoltageOut(OUTTAKE_VOLTAGE),
+            )
+        }
+
     fun deploy(): Command =
         Commands.sequence(
             runOnce {
-                io.setPivotRequest(VoltageOut(IntakeConstants.DEPLOY_VOLTAGE))
-                currentHomingTimer.restart()
+                currentHomingDebouncer.calculate(false)
+                io.setPivotRequest(VoltageOut(DEPLOY_VOLTAGE))
             },
-            Commands.waitUntil {
-                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT &&
-                    currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
-            },
+            WaitUntilCommand {
+                currentHomingDebouncer.calculate(
+                    inputs.pivotMotorStatorCurrent >
+                        CURRENT_HOMING_CURRENT_LIMIT,
+                ) &&
+                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
+                        CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
+            }.withTimeout(HOMING_TIME_OUT),
             runOnce {
-                currentHomingTimer.stop()
-                io.setPivotPosition(IntakeConstants.DEPLOY_POSITION)
+                //  io.setPivotRequest(VoltageOut(0.0))
+                io.resetPivotPosition(DEPLOY_POSITION)
             },
-            stopPivot()
+            holdPivot(),
         )
+
     fun stow(): Command =
         Commands.sequence(
             runOnce {
-                io.setPivotRequest(VoltageOut(IntakeConstants.STOW_VOLTAGE))
-                currentHomingTimer.restart()
+                currentHomingDebouncer.calculate(false)
+                io.setPivotRequest(VoltageOut(STOW_VOLTAGE))
             },
-            Commands.waitUntil {
-                inputs.pivotMotorStatorCurrent > IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT // &&
-                currentHomingTimer.get() > IntakeConstants.CURRENT_HOMING_TIME_LIMIT.`in`(Seconds) &&
-                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) < IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
-            },
+            WaitUntilCommand {
+                currentHomingDebouncer.calculate(
+                    inputs.pivotMotorStatorCurrent >
+                        CURRENT_HOMING_CURRENT_LIMIT,
+                ) &&
+                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
+                        CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
+            }.withTimeout(HOMING_TIME_OUT),
             runOnce {
-                currentHomingTimer.stop()
-                io.setPivotPosition(IntakeConstants.STOW_POSITION)
+                // io.setPivotRequest(VoltageOut(0.0))
+                io.resetPivotPosition(STOW_POSITION)
             },
-            stopPivot()
+            holdPivot(),
         )
-    fun stopPivot(): Command =
+
+    fun holdPivot(): Command =
         runOnce {
-            io.setPivotRequest(
-                VoltageOut(0.0)
-            )
+            io.setPivotPosition(inputs.pivotMotorPosition)
         }
 }

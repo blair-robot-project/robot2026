@@ -57,13 +57,13 @@ interface IntakeIO {
 
     fun setPivotRequest(request: ControlRequest) {}
 
-    fun setPivotPosition(newPosition: Angle) {}
+    fun setPivotPosition(position: Angle) {}
 
     fun setRollerRequest(request: ControlRequest) {}
 
-    fun isNoteInsideIntake(): Boolean = false
-
-    fun launchNote() {}
+    fun setRollerVelocity(velocity: AngularVelocity) {}
 
     fun simulationPeriodic() {}
+
+    fun resetPivotPosition(position: Angle) {}
 }
