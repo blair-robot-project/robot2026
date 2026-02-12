@@ -2,9 +2,13 @@ package frc.team449.subsystems.drive
 
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics
+import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.Units.Second
@@ -15,6 +19,7 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
+import frc.team449.subsystems.vision.VisionConstants
 import org.littletonrobotics.junction.Logger
 import java.util.function.Supplier
 
@@ -33,9 +38,22 @@ class DriveSubsystem(
 
     fun resetOdometry(pose: Pose2d) { io.resetOdometry(pose) }
 
-    val rotation: Supplier<Rotation2d> = Supplier { inputs.Pose.rotation }
+    val rotation: Supplier<Rotation2d> = Supplier { Rotation2d(inputs.gyroAngle * Math.PI/180 ) } // TODO !!! this got changed hopefully good now
 
     val pose: Supplier<Pose2d> = Supplier { inputs.Pose }
+
+    private val estimator = SwerveDrivePoseEstimator(
+        SwerveDriveKinematics(
+            Translation2d(0.3429, 0.3429),
+            Translation2d(-0.3429, 0.3429),
+            Translation2d(-0.3429, -0.3429),
+            Translation2d(0.3429, -0.3429)),
+        inputs.Pose.rotation, arrayOf(
+            SwerveModulePosition(),
+            SwerveModulePosition(),
+            SwerveModulePosition(),
+            SwerveModulePosition()),
+        Pose2d())
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds {
         return inputs.Speeds
@@ -60,8 +78,12 @@ class DriveSubsystem(
         }
     }
 
+//    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {
+//        io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
+//    }
+
     fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {
-        io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
+        estimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {

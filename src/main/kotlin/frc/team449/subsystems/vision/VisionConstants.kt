@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Transform3d
 object VisionConstants {
     var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
-    var camera0Name: String = "limelight-right" // TODO: match to names thru configuration
+    var camera0Name: String = "limelight-right"
     var camera1Name: String = "limelight-left"
 
     // Robot to camera transforms
