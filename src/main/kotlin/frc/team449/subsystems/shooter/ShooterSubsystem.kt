@@ -2,7 +2,6 @@ package frc.team449.subsystems.shooter
 
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.Amps
-import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
@@ -41,7 +40,7 @@ class ShooterSubsystem(
     fun stop(): Command {
         return runOnce {
             println("stopping flywheel")
-            io.setFlywheelVelocity(RadiansPerSecond.of(0.0))
+            io.setFlywheelVoltage(0.0)
         }
     }
 

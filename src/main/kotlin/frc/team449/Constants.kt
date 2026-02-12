@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
+import kotlin.math.pow
 
 object Constants {
     enum class Mode {
@@ -110,6 +111,7 @@ object Constants {
 
         const val HOOD_MOMENT_OF_INERTIA = 0.0694270649
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
+        val FLYWHEEL_MOI = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
 
         const val CURRENT_HOMING_VOLTAGE = 2.0
         const val CURRENT_HOMING_STATOR_THRESH = 45.0 // amps

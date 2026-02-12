@@ -39,6 +39,7 @@ import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KP
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KS
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KV
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_MOI
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_SUPPLY_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
@@ -63,7 +64,6 @@ import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.TOLERANCE_DEBOUNCE_TIME
 import frc.team449.Constants.ShooterConstants.TOLERANCE_DEBOUNCE_TYPE
 import kotlin.math.abs
-import kotlin.math.pow
 
 class ShooterIOSim : ShooterIO {
 
@@ -108,8 +108,8 @@ class ShooterIOSim : ShooterIO {
     private val rightFollowerMotor: TalonFX = TalonFX(RIGHT_FLYWHEEL_FOLLOWER_ID)
 
     // 1/2 MR^2
-    val leftFlywheelMomentOfInertia: Double = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
-    val rightFlywheelMomentOfInertia: Double = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
+    val leftFlywheelMomentOfInertia: Double = FLYWHEEL_MOI
+    val rightFlywheelMomentOfInertia: Double = FLYWHEEL_MOI
 
     private val leftFlywheelPlant: LinearSystem<N1, N1, N1> =
         LinearSystemId.createFlywheelSystem(leftFlywheelGearbox, leftFlywheelMomentOfInertia, FLYWHEEL_GEARING)
