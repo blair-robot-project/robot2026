@@ -42,7 +42,6 @@ import frc.team449.Constants.ShooterConstants.HOOD_KI
 import frc.team449.Constants.ShooterConstants.HOOD_KP
 import frc.team449.Constants.ShooterConstants.HOOD_KS
 import frc.team449.Constants.ShooterConstants.HOOD_KV
-import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
@@ -358,8 +357,8 @@ class ShooterIOHardware : ShooterIO {
         return hoodMotor.statorCurrent.value
     }
 
-    override fun resetHoodPosition() {
-        hoodMotor.setPosition(HOOD_MIN_ANGLE)
+    override fun resetHoodPosition(angle: Angle) {
+        hoodMotor.setPosition(angle)
     }
 
     override fun setFlywheelVoltage(voltage: Double) {

@@ -12,6 +12,7 @@ import frc.team449.Constants.ShooterConstants.CURRENT_HOMING_STATOR_THRESH
 import frc.team449.Constants.ShooterConstants.CURRENT_HOMING_VOLTAGE
 import frc.team449.Constants.ShooterConstants.HOMING_DEBOUNCE_TIME
 import frc.team449.Constants.ShooterConstants.HOMING_DEBOUNCE_TYPE
+import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import org.littletonrobotics.junction.Logger
 
 class ShooterSubsystem(
@@ -68,7 +69,7 @@ class ShooterSubsystem(
             WaitUntilCommand { currentHomingDebouncer.calculate(io.getHoodStatorCurrent().`in`(Amps) > CURRENT_HOMING_STATOR_THRESH) },
             runOnce {
                 io.stopHoodVoltage()
-                io.resetHoodPosition()
+                io.resetHoodPosition(HOOD_MIN_ANGLE)
             }
         )
     }

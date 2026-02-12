@@ -245,8 +245,8 @@ class ShooterIOSim : ShooterIO {
         return hoodMotor.statorCurrent.value
     }
 
-    override fun resetHoodPosition() {
-        hoodMotor.setPosition(HOOD_MIN_ANGLE)
+    override fun resetHoodPosition(angle: Angle) {
+        hoodMotor.setPosition(angle)
     }
 
     override fun setFlywheelVoltage(voltage: Double) {

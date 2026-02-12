@@ -94,5 +94,5 @@ interface ShooterIO {
 
     fun getHoodStatorCurrent(): Current { return Amps.of(0.0) }
 
-    fun resetHoodPosition() { }
+    fun resetHoodPosition(angle: Angle) { }
 }
