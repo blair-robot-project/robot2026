@@ -202,7 +202,7 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("tenchbumpleft"))
+                pathBuilder.build(Path("tr4cenchbumpleft"))
             )
         )
         return routine
@@ -215,7 +215,33 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("tenchbumpright"))
+                pathBuilder.build(Path("trenchbumpright"))
+            )
+        )
+        return routine
+    }
+    fun bump2cycleLeft() : AutoRoutine{
+        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+        FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
+        FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
+        FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
+        FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("lebronJamesLeft"))
+            )
+        )
+        return routine
+    }
+    fun bump2cycleRight() : AutoRoutine{
+        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+        FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
+        FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
+        FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
+        FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(Path("lebronJamesRight"))
             )
         )
         return routine
@@ -235,5 +261,8 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line 2 cycle with trench 2bump then trench (L)", this::bumpsL)
         autoChooser.addRoutine("B-Line 2 cycle with trench bump  other side trench bump (L)", this::trenchBumpL)
         autoChooser.addRoutine("B-Line 2 cycle with trench bump  other side trench bump (R)", this::trenchBumpR)
+        autoChooser.addRoutine("B-Line 2 cycle start trench bump same side trench all the way bump back (L)", this::bump2cycleLeft)
+        autoChooser.addRoutine("B-Line 2 cycle start trench bump same side trench all the way bump back (R)", this::bump2cycleRight)
+
     }
 }
