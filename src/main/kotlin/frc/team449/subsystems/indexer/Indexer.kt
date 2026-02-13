@@ -1,4 +1,5 @@
 package frc.team449.subsystems.indexer
+import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
@@ -24,7 +25,7 @@ class Indexer(
     fun setVoltage(
         topVoltage: Double,
         sideVoltage: Double,
-        bottomVoltage: Double,
+        bottomVoltage: Double
     ): Command =
         run {
             io.setVoltage(
@@ -38,5 +39,14 @@ class Indexer(
     fun stop(): Command =
         run {
             io.setVoltage(0.0, 0.0, 0.0)
+        }
+
+    fun setIndexerVelocity(
+        topVel: AngularVelocity,
+        sideVel: AngularVelocity,
+        bottomVel: AngularVelocity
+    ): Command =
+        runOnce {
+            io.setIndexerVelocity(topVel, sideVel, bottomVel)
         }
 }

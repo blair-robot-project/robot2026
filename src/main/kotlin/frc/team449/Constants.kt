@@ -155,7 +155,6 @@ object Constants {
         const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
         const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
 
-
         // add more indexers as needed
     }
 }
