@@ -19,14 +19,13 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
-import frc.team449.subsystems.vision.VisionConstants
 import org.littletonrobotics.junction.Logger
 import java.util.function.Supplier
 
 class DriveSubsystem(
     val io: DriveIO
 ) : SubsystemBase() {
-    private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+    val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -38,7 +37,7 @@ class DriveSubsystem(
 
     fun resetOdometry(pose: Pose2d) { io.resetOdometry(pose) }
 
-    val rotation: Supplier<Rotation2d> = Supplier { Rotation2d(inputs.gyroAngle * Math.PI/180 ) } // TODO !!! this got changed hopefully good now
+    val rotation: Supplier<Rotation2d> = Supplier { Rotation2d(inputs.gyroAngle * Math.PI / 180) } // TODO !!! this got changed hopefully good now
 
     val pose: Supplier<Pose2d> = Supplier { inputs.Pose }
 
@@ -47,13 +46,17 @@ class DriveSubsystem(
             Translation2d(0.3429, 0.3429),
             Translation2d(-0.3429, 0.3429),
             Translation2d(-0.3429, -0.3429),
-            Translation2d(0.3429, -0.3429)),
-        inputs.Pose.rotation, arrayOf(
+            Translation2d(0.3429, -0.3429)
+        ),
+        inputs.Pose.rotation,
+        arrayOf(
             SwerveModulePosition(),
             SwerveModulePosition(),
             SwerveModulePosition(),
-            SwerveModulePosition()),
-        Pose2d())
+            SwerveModulePosition()
+        ),
+        Pose2d()
+    )
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds {
         return inputs.Speeds

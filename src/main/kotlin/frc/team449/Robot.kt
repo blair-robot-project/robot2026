@@ -6,6 +6,7 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.subsystems.vision.LimelightHelpers
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -53,6 +54,29 @@ class Robot : LoggedRobot() {
     override fun robotInit() {
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
+
+        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
+            LimelightHelpers.SetRobotOrientation(
+                "limelight-right",
+                robotContainer.drive.inputs.gyroAngle,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            )
+            LimelightHelpers.SetRobotOrientation(
+                "limelight-left",
+                robotContainer.drive.inputs.gyroAngle,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            )
+            LimelightHelpers.SetIMUMode("limelight-right", 1)
+            LimelightHelpers.SetIMUMode("limelight-left", 1)
+        }
     }
 
     override fun robotPeriodic() {
@@ -67,13 +91,60 @@ class Robot : LoggedRobot() {
 
     override fun autonomousInit() {
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
+
+        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
+            LimelightHelpers.SetIMUMode("limelight-right", 4)
+            LimelightHelpers.SetIMUMode("limelight-left", 4)
+        }
     }
 
-    override fun autonomousPeriodic() {}
+    override fun autonomousPeriodic() {
+        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
+            LimelightHelpers.SetRobotOrientation(
+                "limelight-right",
+                robotContainer.drive.inputs.gyroAngle,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            )
+            LimelightHelpers.SetRobotOrientation(
+                "limelight-left",
+                robotContainer.drive.inputs.gyroAngle,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            )
+        }
+    }
 
     override fun teleopInit() {}
 
-    override fun teleopPeriodic() {}
+    override fun teleopPeriodic() {
+        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
+            LimelightHelpers.SetRobotOrientation(
+                "limelight-right",
+                robotContainer.drive.inputs.gyroAngle,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            )
+            LimelightHelpers.SetRobotOrientation(
+                "limelight-left",
+                robotContainer.drive.inputs.gyroAngle,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+            )
+        }
+    }
 
     override fun disabledInit() {}
 
