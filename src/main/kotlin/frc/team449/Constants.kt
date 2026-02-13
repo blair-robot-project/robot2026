@@ -13,7 +13,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY
+        REPLAY,
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -35,8 +35,8 @@ object Constants {
         const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
         const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1.26767 * PI
 
-        const val TRACKWIDTH_INCHES = 27.0 // front to rear
-        const val WHEELBASE_INCHES = 27.0 // left to right
+        const val TRACKWIDTH_INCHES = 22.0 // front to rear
+        const val WHEELBASE_INCHES = 22.0 // left to right
 
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
