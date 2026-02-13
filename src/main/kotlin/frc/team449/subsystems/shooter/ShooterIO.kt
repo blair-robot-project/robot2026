@@ -1,7 +1,9 @@
 package frc.team449.subsystems.shooter
+import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
+import edu.wpi.first.units.measure.Current
 import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import org.littletonrobotics.junction.AutoLog
 
@@ -24,6 +26,9 @@ interface ShooterIO {
         var leftMotorIsConnected: Boolean = false
 
         @JvmField
+        var leftFollowerMotorIsConnected: Boolean = false
+
+        @JvmField
         var rightVoltage: Double = 0.0
 
         @JvmField
@@ -37,6 +42,15 @@ interface ShooterIO {
 
         @JvmField
         var rightMotorIsConnected: Boolean = false
+
+        @JvmField
+        var rightFollowerMotorIsConneted: Boolean = false
+
+        @JvmField
+        var leftFlywheelVelocity = 0.0
+
+        @JvmField
+        var rightFlywheelVelocity = 0.0
 
         @JvmField
         var hoodVoltage: Double = 0.0
@@ -62,13 +76,23 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun runFlywheelAtVelocity(velocity: AngularVelocity) { }
+    fun setFlywheelVelocity(velocity: AngularVelocity) { }
+
+    fun setFlywheelVoltage(voltage: Double) { }
 
     fun setHoodPosition(angle: Angle) { }
 
-    fun atTolerance(): Boolean { return true }
+    fun inTolerance(): Boolean { return true }
 
     fun simPeriodic() {}
 
     fun getHoodPosition(): Angle { return Radians.of(0.0) }
+
+    fun setHoodVoltage(voltage: Double) { }
+
+    fun stopHoodVoltage() { }
+
+    fun getHoodStatorCurrent(): Current { return Amps.of(0.0) }
+
+    fun resetHoodPosition(angle: Angle) { }
 }
