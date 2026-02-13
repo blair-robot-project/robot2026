@@ -46,6 +46,18 @@ object Constants {
 
     object AutoConstants {
         // auto constants
+// TODO: tune
+        const val TRANSLATION_P = 3.0
+        const val TRANSLATION_I = 0.0
+        const val TRANSLATION_D = 0.0
+
+        const val ROTATION_P = 2.0
+        const val ROTATION_I = 0.0
+        const val ROTATION_D = 0.0
+
+        const val CTC_P = 1.0
+        const val CTC_I = 0.0
+        const val CTC_D = 0.0
     }
 
     object FieldConstants {
@@ -112,8 +124,6 @@ object Constants {
         const val HOOD_MASS = 8.0 // kg TODO: find
         val HOOD_LENGTH = Units.inchesToMeters(30.0) // TODO: find
     }
-
-
 
     object LEDConstants {
         // led constants

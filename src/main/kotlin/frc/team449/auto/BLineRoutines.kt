@@ -4,18 +4,31 @@ import choreo.auto.AutoFactory
 import choreo.auto.AutoRoutine
 import choreo.trajectory.SwerveSample
 import com.ctre.phoenix6.swerve.SwerveRequest
+import edu.wpi.first.math.Pair
 import edu.wpi.first.math.controller.PIDController
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.PrintCommand
-import edu.wpi.first.wpilibj2.command.WaitCommand
-import frc.robot.lib.BLine.*
+import frc.robot.lib.BLine.FollowPath
+import frc.robot.lib.BLine.Path
+import frc.team449.Constants.AutoConstants.CTC_D
+import frc.team449.Constants.AutoConstants.CTC_I
+import frc.team449.Constants.AutoConstants.CTC_P
+import frc.team449.Constants.AutoConstants.ROTATION_D
+import frc.team449.Constants.AutoConstants.ROTATION_I
+import frc.team449.Constants.AutoConstants.ROTATION_P
+import frc.team449.Constants.AutoConstants.TRANSLATION_D
+import frc.team449.Constants.AutoConstants.TRANSLATION_I
+import frc.team449.Constants.AutoConstants.TRANSLATION_P
 import frc.team449.Robot
 import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
+import java.util.function.Consumer
 
 class BLineRoutines(
-    robot: Robot,
+    robot: Robot
 ) {
     val autoFactory =
         AutoFactory(
@@ -25,6 +38,42 @@ class BLineRoutines(
             true,
             drive,
         )
+
+    private val transP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
+    private val transI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
+    private val transD = LoggedNetworkNumber("Auto/Translation/D", TRANSLATION_D)
+
+    private val rotP = LoggedNetworkNumber("Auto/Rotation/P", ROTATION_P)
+    private val rotI = LoggedNetworkNumber("Auto/Rotation/I", ROTATION_I)
+    private val rotD = LoggedNetworkNumber("Auto/Rotation/D", ROTATION_D)
+
+    private val ctcP = LoggedNetworkNumber("Auto/CrossTrack/P", CTC_P)
+    private val ctcI = LoggedNetworkNumber("Auto/CrossTrack/I", CTC_I)
+    private val ctcD = LoggedNetworkNumber("Auto/CrossTrack/D", CTC_D)
+
+    fun logBLineAuto() {
+        translationController.setPID(transP.get(), transI.get(), transD.get())
+        rotationController.setPID(rotP.get(), rotI.get(), rotD.get())
+        crossTrackController.setPID(ctcP.get(), ctcI.get(), ctcD.get())
+
+        FollowPath.setPoseLoggingConsumer { pair ->
+            Logger.recordOutput(pair.first, pair.second)
+        }
+
+        FollowPath.setTranslationListLoggingConsumer(
+            Consumer { pair: Pair<String, Array<Translation2d>> ->
+                Logger.recordOutput<Translation2d>(pair.getFirst(), *pair.getSecond())
+            },
+        )
+
+        FollowPath.setDoubleLoggingConsumer { pair ->
+            Logger.recordOutput(pair.first, pair.second)
+        }
+    }
+
+    val translationController: PIDController = PIDController(TRANSLATION_P, TRANSLATION_I, TRANSLATION_D)
+    val rotationController: PIDController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
+    val crossTrackController: PIDController = PIDController(CTC_P, CTC_I, CTC_D)
 
     var pathBuilder: FollowPath.Builder =
         FollowPath
@@ -38,9 +87,9 @@ class BLineRoutines(
                         SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
                     )
                 },
-                PIDController(1.5, 0.0, 0.0),
-                PIDController(2.5, 0.0, 0.0),
-                PIDController(1.0, 0.0, 0.0),
+                translationController,
+                rotationController,
+                crossTrackController,
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
 
@@ -168,55 +217,59 @@ class BLineRoutines(
         )
         return routine
     }
-    fun bumpsL() : AutoRoutine {
-        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+
+    fun bumpsL(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
         FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
         FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
         FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("bumptwoleft"))
-            )
+                pathBuilder.build(Path("bumptwoleft")),
+            ),
         )
         return routine
     }
-    fun bumpsR() : AutoRoutine {
-        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+
+    fun bumpsR(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
         FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
         FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
         FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("bumptworight"))
-            )
+                pathBuilder.build(Path("bumptworight")),
+            ),
         )
         return routine
     }
-    fun trenchBumpL() : AutoRoutine {
-        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+
+    fun trenchBumpL(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
         FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
         FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
         FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("trenchbumpleft"))
-            )
+                pathBuilder.build(Path("trenchbumpleft")),
+            ),
         )
         return routine
     }
-    fun trenchBumpR() : AutoRoutine {
-        val routine : AutoRoutine = autoFactory.newRoutine("auto")
+
+    fun trenchBumpR(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("auto")
         FollowPath.registerEventTrigger("intake", PrintCommand("Start intake"))
         FollowPath.registerEventTrigger("stop_intake", PrintCommand("Stop intake"))
         FollowPath.registerEventTrigger("fire", PrintCommand("Start fire"))
         FollowPath.registerEventTrigger("stop_fire", PrintCommand("Stop fire"))
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(Path("trenchbumpright"))
-            )
+                pathBuilder.build(Path("trenchbumpright")),
+            ),
         )
         return routine
     }

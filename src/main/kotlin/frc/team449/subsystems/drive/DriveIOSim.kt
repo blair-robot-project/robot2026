@@ -25,11 +25,11 @@ import kotlin.jvm.optionals.getOrNull
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
 ) : DriveIOHardware(
-        driveConstants,
-        sanitizeConstantsForSim(moduleConstants),
-    ) {
+    driveConstants,
+    sanitizeConstantsForSim(moduleConstants),
+) {
     private val simTelemetryConsumer: Consumer<SwerveDriveState> =
         Consumer { swerveDriveState: SwerveDriveState ->
             swerveDriveState.Pose = mapleSimDrive.simulatedDriveTrainPose
@@ -137,7 +137,7 @@ class DriveIOSim(
 
     companion object {
         private fun sanitizeConstantsForSim(
-            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
+            originalConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
         ): Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>> {
             // create a new array to hold the modified constants
             return originalConstants

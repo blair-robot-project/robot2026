@@ -101,5 +101,6 @@ class Robot : LoggedRobot() {
     }
 
     override fun simulationPeriodic() {
+        bLineRoutines.logBLineAuto()
     }
 }

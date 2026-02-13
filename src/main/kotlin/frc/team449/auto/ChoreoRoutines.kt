@@ -11,7 +11,7 @@ import frc.team449.Robot
 import frc.team449.RobotContainer.drive
 
 open class ChoreoRoutines(
-    robot: Robot,
+    robot: Robot
 ) {
     val autoFactory =
         AutoFactory(
@@ -71,10 +71,10 @@ open class ChoreoRoutines(
             Commands.sequence(
                 path1.resetOdometry(),
                 path1.cmd(),
-                //wait about 3-4 seconds for shooting
+                // wait about 3-4 seconds for shooting
                 PrintCommand("Stop Shooting"),
                 path2.cmd(),
-                //wait about 3-4 seconds for shooting
+                // wait about 3-4 seconds for shooting
                 PrintCommand("Stop Shooting")
             )
         )
@@ -98,9 +98,9 @@ open class ChoreoRoutines(
             Commands.sequence(
                 path1.resetOdometry(),
                 path1.cmd(),
-                //wait about 3-4 seconds for shooting
+                // wait about 3-4 seconds for shooting
                 path2.cmd(),
-                //wait about 3-4 seconds for shooting
+                // wait about 3-4 seconds for shooting
                 PrintCommand("Stop Shooting")
             )
         )
@@ -133,25 +133,10 @@ open class ChoreoRoutines(
         return routine
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("bl_trench_same", this::blTrenchSame)
         autoChooser.addRoutine("br_trench_same", this::brTrenchSame)
         autoChooser.addRoutine("bl_trench_opp", this::blTrenchOpp)
         autoChooser.addRoutine("br_trench_opp", this::brTrenchOpp)
     }
-
 }

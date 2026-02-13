@@ -39,7 +39,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.02384326489817708,
-      "lib_key": "start_intkae"
+      "lib_key": "start_intake"
     },
     {
       "type": "translation",
