@@ -6,8 +6,7 @@ import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
-import edu.wpi.first.units.measure.Angle
-import edu.wpi.first.units.measure.AngularVelocity
+import edu.wpi.first.units.measure.*
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
 import frc.team449.util.PhoenixUtil.tryUntilOk
@@ -17,6 +16,32 @@ open class IntakeIOHardware : IntakeIO {
     val pivotFollower = TalonFX(IntakeConstants.PIVOT_FOLLOWER_ID)
     val rollerMotor = TalonFX(IntakeConstants.ROLLER_MOTOR_ID)
     val rollerFollower = TalonFX(IntakeConstants.ROLLER_FOLLOWER_ID)
+
+    val pivotMotorVoltage = pivotMotor.motorVoltage
+    val pivotMotorSupplyCurrent = pivotMotor.supplyCurrent
+    val pivotMotorStatorCurrent = pivotMotor.statorCurrent
+    val pivotMotorPosition = pivotMotor.position
+    val pivotMotorVelocity = pivotMotor.velocity
+    val pivotMotorTemperature = pivotMotor.deviceTemp
+
+    val pivotFollowerVoltage = pivotMotor.motorVoltage
+    val pivotFollowerSupplyCurrent = pivotMotor.supplyCurrent
+    val pivotFollowerStatorCurrent = pivotMotor.statorCurrent
+    val pivotFollowerPosition = pivotMotor.position
+    val pivotFollowerVelocity = pivotMotor.velocity
+    val pivotFollowerTemperature = pivotMotor.deviceTemp
+
+    val rollerMotorVoltage = pivotMotor.motorVoltage
+    val rollerMotorSupplyCurrent = pivotMotor.supplyCurrent
+    val rollerMotorStatorCurrent = pivotMotor.statorCurrent
+    val rollerMotorVelocity = pivotMotor.velocity
+    val rollerMotorTemperature = pivotMotor.deviceTemp
+
+    val rollerFollowerVoltage = pivotMotor.motorVoltage
+    val rollerFollowerSupplyCurrent = pivotMotor.supplyCurrent
+    val rollerFollowerStatorCurrent = pivotMotor.statorCurrent
+    val rollerFollowerVelocity = pivotMotor.velocity
+    val rollerFollowerTemperature = pivotMotor.deviceTemp
 
     val pivotMotorDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID})", Alert.AlertType.kError)
     val pivotFollowerDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
@@ -35,20 +60,28 @@ open class IntakeIOHardware : IntakeIO {
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
-            pivotMotor.motorVoltage,
-            pivotMotor.statorCurrent,
-            pivotMotor.position,
-            pivotMotor.velocity,
-            pivotFollower.motorVoltage,
-            pivotFollower.statorCurrent,
-            pivotFollower.position,
-            pivotFollower.velocity,
-            rollerMotor.motorVoltage,
-            rollerMotor.statorCurrent,
-            rollerMotor.velocity,
-            rollerFollower.motorVoltage,
-            rollerFollower.statorCurrent,
-            rollerFollower.velocity,
+            pivotMotorVoltage,
+            pivotMotorSupplyCurrent,
+            pivotMotorStatorCurrent,
+            pivotMotorPosition,
+            pivotMotorVelocity,
+            pivotMotorTemperature,
+            pivotFollowerVoltage,
+            pivotFollowerSupplyCurrent,
+            pivotFollowerStatorCurrent,
+            pivotFollowerPosition,
+            pivotFollowerVelocity,
+            pivotFollowerTemperature,
+            rollerMotorVoltage,
+            rollerMotorSupplyCurrent,
+            rollerMotorStatorCurrent,
+            rollerMotorVelocity,
+            rollerMotorTemperature,
+            rollerFollowerVoltage,
+            rollerFollowerSupplyCurrent,
+            rollerFollowerStatorCurrent,
+            rollerFollowerVelocity,
+            rollerFollowerTemperature
         )
 
         ParentDevice.optimizeBusUtilizationForAll(
@@ -60,31 +93,31 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        inputs.pivotMotorVoltage = pivotMotor.motorVoltage.value
-        inputs.pivotMotorSupplyCurrent = pivotMotor.supplyCurrent.value
-        inputs.pivotMotorStatorCurrent = pivotMotor.statorCurrent.value
-        inputs.pivotMotorPosition = pivotMotor.position.value
-        inputs.pivotMotorVelocity = pivotMotor.velocity.value
-        inputs.pivotMotorTemperature = pivotMotor.deviceTemp.value
+        inputs.pivotMotorVoltage = pivotMotorVoltage.value
+        inputs.pivotMotorSupplyCurrent = pivotMotorSupplyCurrent.value
+        inputs.pivotMotorStatorCurrent = pivotMotorStatorCurrent.value
+        inputs.pivotMotorPosition = pivotMotorPosition.value
+        inputs.pivotMotorVelocity = pivotMotorVelocity.value
+        inputs.pivotMotorTemperature = pivotMotorTemperature.value
 
-        inputs.pivotFollowerVoltage = pivotFollower.motorVoltage.value
-        inputs.pivotFollowerSupplyCurrent = pivotFollower.supplyCurrent.value
-        inputs.pivotFollowerStatorCurrent = pivotFollower.statorCurrent.value
-        inputs.pivotFollowerPosition = pivotFollower.position.value
-        inputs.pivotFollowerVelocity = pivotFollower.velocity.value
-        inputs.pivotFollowerTemperature = pivotFollower.deviceTemp.value
+        inputs.pivotFollowerVoltage = pivotFollowerVoltage.value
+        inputs.pivotFollowerSupplyCurrent = pivotFollowerSupplyCurrent.value
+        inputs.pivotFollowerStatorCurrent = pivotFollowerStatorCurrent.value
+        inputs.pivotFollowerPosition = pivotFollowerPosition.value
+        inputs.pivotFollowerVelocity = pivotFollowerVelocity.value
+        inputs.pivotFollowerTemperature = pivotFollowerTemperature.value
 
-        inputs.rollerMotorVoltage = rollerMotor.motorVoltage.value
-        inputs.rollerMotorSupplyCurrent = rollerMotor.supplyCurrent.value
-        inputs.rollerMotorStatorCurrent = rollerMotor.statorCurrent.value
-        inputs.rollerMotorVelocity = rollerMotor.velocity.value
-        inputs.rollerMotorTemperature = rollerMotor.deviceTemp.value
+        inputs.rollerMotorVoltage = rollerMotorVoltage.value
+        inputs.rollerMotorSupplyCurrent = rollerMotorSupplyCurrent.value
+        inputs.rollerMotorStatorCurrent = rollerMotorStatorCurrent.value
+        inputs.rollerMotorVelocity = rollerMotorVelocity.value
+        inputs.rollerMotorTemperature = rollerMotorTemperature.value
 
-        inputs.rollerFollowerVoltage = rollerFollower.motorVoltage.value
-        inputs.rollerFollowerSupplyCurrent = rollerFollower.supplyCurrent.value
-        inputs.rollerFollowerStatorCurrent = rollerFollower.statorCurrent.value
-        inputs.rollerFollowerVelocity = rollerFollower.velocity.value
-        inputs.rollerFollowerTemperature = rollerFollower.deviceTemp.value
+        inputs.rollerFollowerVoltage = rollerFollowerVoltage.value
+        inputs.rollerFollowerSupplyCurrent = rollerFollowerSupplyCurrent.value
+        inputs.rollerFollowerStatorCurrent = rollerFollowerStatorCurrent.value
+        inputs.rollerFollowerVelocity = rollerFollowerVelocity.value
+        inputs.rollerFollowerTemperature = rollerFollowerTemperature.value
 
         pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
         pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
