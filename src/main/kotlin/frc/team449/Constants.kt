@@ -14,7 +14,6 @@ import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.Angle
-import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Distance
 import edu.wpi.first.units.measure.Time
 import edu.wpi.first.units.measure.Voltage
@@ -214,7 +213,6 @@ object Constants {
         val STOW_VOLTAGE: Voltage = Volts.of(8.0)
 
 //        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(45.0)
-
 
         val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
         val CURRENT_HOMING_TIME_LIMIT = Seconds.of(0.5)

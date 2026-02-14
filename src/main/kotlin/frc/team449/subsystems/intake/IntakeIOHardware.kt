@@ -146,7 +146,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rollerFollowerVelocity = rollerFollowerVelocity.value
         inputs.rollerFollowerTemperature = rollerFollowerTemperature.value
 
-
         pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
         pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
         rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
