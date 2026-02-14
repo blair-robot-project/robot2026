@@ -10,14 +10,14 @@ import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
+import frc.team449.RobotContainer.drive
+import frc.team449.RobotContainer.fuelSim
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
-import frc.team449.RobotContainer.drive
-import frc.team449.RobotContainer.fuelSim
 
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
