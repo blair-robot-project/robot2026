@@ -141,11 +141,9 @@ object Constants {
     }
 
     object IndexerConstants {
-        // motor definitions that are currently placeholders
-
-        const val BOTTOM_INDEXER_ID = 1
-        const val SIDE_INDEXER_ID = 2
-        const val TOP_INDEXER_ID = 3
+        const val BOTTOM_INDEXER_ID = 23
+        const val SIDE_INDEXER_ID = 22
+        const val TOP_INDEXER_ID = 21
         const val TOP_INDEXER_STATOR_LIMIT = 60.0
         const val TOP_INDEXER_SUPPLY_LIMIT = 30.0
 
@@ -155,6 +153,12 @@ object Constants {
         const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
         const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
 
-        // add more indexers as needed
+        const val TOP_INDEXER_GEARING = 1.0
+        const val SIDE_INDEXER_GEARING = 1.0
+        const val BOTTOM_INDEXER_GEARING = 1.0
+
+        const val TOP_INDEXER_MOI = 0.01
+        const val SIDE_INDEXER_MOI = 0.01
+        const val BOTTOM_INDEXER_MOI = 0.01
     }
 }

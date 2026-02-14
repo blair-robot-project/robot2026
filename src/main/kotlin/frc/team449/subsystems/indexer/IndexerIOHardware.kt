@@ -10,7 +10,9 @@ import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import edu.wpi.first.units.Units
+import edu.wpi.first.units.Units.Amps
+import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Voltage
@@ -33,7 +35,7 @@ class IndexerIOHardware : IndexerIO {
 
     val topIndexer: TalonFX = TalonFX(TOP_INDEXER_ID) // kraken x44
     val bottomIndexer: TalonFX = TalonFX(BOTTOM_INDEXER_ID) // kraken x44
-    val sideIndexer: TalonFX = TalonFX(SIDE_INDEXER_ID)
+    val sideIndexer: TalonFX = TalonFX(SIDE_INDEXER_ID) // kraken x60
 
     private val topSupplyCurrent: StatusSignal<Current> = topIndexer.supplyCurrent
     private val sideSupplyCurrent: StatusSignal<Current> = sideIndexer.supplyCurrent
@@ -66,7 +68,7 @@ class IndexerIOHardware : IndexerIO {
         get() = bottomIndexer.isAlive
 
     init {
-        // make indexer current limit ocnfigs for all 3
+        // make indexer current limit configs for all 3
         val topCurrentLimitConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
@@ -150,22 +152,20 @@ class IndexerIOHardware : IndexerIO {
             bottomSupplyCurrent,
         )
 
-        inputs.topVoltage = topVoltageSignal.value.`in`(Units.Volts)
-        inputs.topVelocity = topIndexer.velocity.value.`in`(Units.RadiansPerSecond)
-        inputs.topStatorCurrent = topStatorCurrent.value.`in`(Units.Amps)
-        inputs.topSupplyCurrent = topSupplyCurrent.value.`in`(Units.Amps)
+        inputs.topVoltage = topVoltageSignal.value.`in`(Volts)
+        inputs.topVelocity = topIndexer.velocity.value.`in`(RadiansPerSecond)
+        inputs.topStatorCurrent = topStatorCurrent.value.`in`(Amps)
+        inputs.topSupplyCurrent = topSupplyCurrent.value.`in`(Amps)
 
-        inputs.sideVoltage = sideVoltageSignal.value.`in`(Units.Volts)
-        inputs.sideVelocity = sideIndexer.velocity.value.`in`(Units.RadiansPerSecond)
+        inputs.sideVoltage = sideVoltageSignal.value.`in`(Volts)
+        inputs.sideVelocity = sideIndexer.velocity.value.`in`(RadiansPerSecond)
+        inputs.sideStatorCurrent = sideStatorCurrent.value.`in`(Amps)
+        inputs.sideSupplyCurrent = sideSupplyCurrent.value.`in`(Amps)
 
-        inputs.sideStatorCurrent = sideStatorCurrent.value.`in`(Units.Amps)
-        inputs.sideSupplyCurrent = sideSupplyCurrent.value.`in`(Units.Amps)
-
-        inputs.bottomVoltage = bottomVoltageSignal.value.`in`(Units.Volts)
-        inputs.bottomVelocity = bottomIndexer.velocity.value.`in`(Units.RadiansPerSecond)
-
-        inputs.bottomStatorCurrent = bottomStatorCurrent.value.`in`(Units.Amps)
-        inputs.bottomSupplyCurrent = bottomSupplyCurrent.value.`in`(Units.Amps)
+        inputs.bottomVoltage = bottomVoltageSignal.value.`in`(Volts)
+        inputs.bottomVelocity = bottomIndexer.velocity.value.`in`(RadiansPerSecond)
+        inputs.bottomStatorCurrent = bottomStatorCurrent.value.`in`(Amps)
+        inputs.bottomSupplyCurrent = bottomSupplyCurrent.value.`in`(Amps)
 
         topIndexerDisconnectedAlert.set(!topIndexerConnected)
         sideIndexerDisconnectedAlert.set(!sideIndexerConnected)

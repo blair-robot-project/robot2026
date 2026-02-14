@@ -8,10 +8,10 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.indexer.Indexer
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
+import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.Intake
 import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
@@ -70,21 +70,22 @@ object RobotContainer {
             },
         )
 
-    val indexer: Indexer =
-        Indexer(
+    val indexer: IndexerSubsystem =
+        IndexerSubsystem(
             when (Constants.CURRENT_MODE) {
                 Mode.REAL -> IndexerIOHardware()
                 Mode.SIM -> IndexerIOSim()
                 Mode.REPLAY -> object : IndexerIO {}
             },
         )
-    val shooter: ShooterSubsystem = ShooterSubsystem(
-        when (Constants.CURRENT_MODE) {
-            Mode.REAL -> ShooterIOHardware()
-            Mode.SIM -> ShooterIOSim()
-            Mode.REPLAY -> object : ShooterIO {}
-        }
-    )
+    val shooter: ShooterSubsystem =
+        ShooterSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> ShooterIOHardware()
+                Mode.SIM -> ShooterIOSim()
+                Mode.REPLAY -> object : ShooterIO {}
+            },
+        )
 
     val bindings = Bindings(this)
 }

@@ -39,11 +39,13 @@ interface IndexerIO {
         bottomVoltage: Double
     ) {}
 
-    fun updateInputs(inputs: IndexerInputs) {}
-
     fun setIndexerVelocity(
         topVel: AngularVelocity,
         sideVel: AngularVelocity,
         bottomVel: AngularVelocity
-    )
+    ) {}
+
+    fun simPeriodic() {}
+
+    fun updateInputs(inputs: IndexerInputs) {}
 }
