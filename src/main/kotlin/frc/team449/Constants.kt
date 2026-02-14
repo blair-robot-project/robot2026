@@ -198,7 +198,7 @@ object Constants {
             TalonFXConfiguration()
                 .withCurrentLimits(ROLLER_CURRENT_CONFIG)
                 .withMotorOutput(ROLLER_LEADER_OUTPUT_CONFIG)
-                .withSlot0(rollerSlot0Configs)
+//                .withSlot0(rollerSlot0Configs)
 
         const val HOMING_DEBOUNCE_TIME = 0.5
         val HOMING_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
@@ -208,11 +208,13 @@ object Constants {
         val STOW_POSITION: Angle = Degrees.of(92.0) // TODO: Find
         val DEPLOY_POSITION: Angle = Degrees.of(0.0) // TODO: Find
 
+        val INTAKE_VOLTAGE: Voltage = Volts.of(8.0)
         val OUTTAKE_VOLTAGE: Voltage = Volts.of(-8.0)
         val DEPLOY_VOLTAGE: Voltage = Volts.of(-8.0)
         val STOW_VOLTAGE: Voltage = Volts.of(8.0)
 
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(45.0)
+//        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(45.0)
+
 
         val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
         val CURRENT_HOMING_TIME_LIMIT = Seconds.of(0.5)

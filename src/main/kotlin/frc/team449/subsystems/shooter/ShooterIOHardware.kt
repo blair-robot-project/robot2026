@@ -326,6 +326,7 @@ class ShooterIOHardware : ShooterIO {
         inputs.hoodTargetPos = hoodTargetPos.value
         inputs.leftFlywheelVelocity = leftLeaderMotor.velocity.value.`in`(RadiansPerSecond)
         inputs.rightFlywheelVelocity = rightLeaderMotor.velocity.value.`in`(RadiansPerSecond)
+
     }
 
     override fun setFlywheelVelocity(velocity: AngularVelocity) {

@@ -13,7 +13,7 @@ import frc.team449.Constants.IntakeConstants.DEPLOY_VOLTAGE
 import frc.team449.Constants.IntakeConstants.HOMING_DEBOUNCE_TIME
 import frc.team449.Constants.IntakeConstants.HOMING_DEBOUNCE_TYPE
 import frc.team449.Constants.IntakeConstants.HOMING_TIME_OUT
-import frc.team449.Constants.IntakeConstants.INTAKE_VELOCITY
+import frc.team449.Constants.IntakeConstants.INTAKE_VOLTAGE
 import frc.team449.Constants.IntakeConstants.OUTTAKE_VOLTAGE
 import frc.team449.Constants.IntakeConstants.STOW_POSITION
 import frc.team449.Constants.IntakeConstants.STOW_VOLTAGE
@@ -34,6 +34,9 @@ class Intake(
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
+
+        // Hacky solution for now, replace if you find a better one.
+        Logger.recordOutput("Intake/Current command", currentCommand?.name ?: "None")
     }
 
     override fun simulationPeriodic() {
@@ -42,7 +45,9 @@ class Intake(
 
     fun intake(): Command =
         runOnce {
-            io.setRollerVelocity(INTAKE_VELOCITY)
+            io.setRollerRequest(
+                VoltageOut(INTAKE_VOLTAGE),
+            )
         }
 
     fun stopIntake(): Command =
@@ -72,11 +77,11 @@ class Intake(
                         CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             }.withTimeout(HOMING_TIME_OUT),
             runOnce {
-                //  io.setPivotRequest(VoltageOut(0.0))
+                io.setPivotRequest(VoltageOut(0.0))
                 io.resetPivotPosition(DEPLOY_POSITION)
             },
             holdPivot(),
-        )
+        ).withName("Deploy")
 
     fun stow(): Command =
         Commands.sequence(
@@ -93,14 +98,16 @@ class Intake(
                         CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             }.withTimeout(HOMING_TIME_OUT),
             runOnce {
-                // io.setPivotRequest(VoltageOut(0.0))
+                io.setPivotRequest(VoltageOut(0.0))
                 io.resetPivotPosition(STOW_POSITION)
             },
             holdPivot(),
-        )
+        ).withName("Stow")
 
     fun holdPivot(): Command =
         runOnce {
-            io.setPivotPosition(inputs.pivotMotorPosition)
-        }
+            io.setPivotRequest(
+                VoltageOut(0.0)
+            )
+        }.withName("Hold")
 }

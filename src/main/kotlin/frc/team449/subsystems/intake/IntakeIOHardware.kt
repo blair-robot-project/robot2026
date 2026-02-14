@@ -93,6 +93,32 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
+        BaseStatusSignal.refreshAll(
+            pivotMotorVoltage,
+            pivotMotorSupplyCurrent,
+            pivotMotorStatorCurrent,
+            pivotMotorPosition,
+            pivotMotorVelocity,
+            pivotMotorTemperature,
+            pivotFollowerVoltage,
+            pivotFollowerSupplyCurrent,
+            pivotFollowerStatorCurrent,
+            pivotFollowerPosition,
+            pivotFollowerVelocity,
+            pivotFollowerTemperature,
+            rollerMotorVoltage,
+            rollerMotorSupplyCurrent,
+            rollerMotorStatorCurrent,
+            rollerMotorVelocity,
+            rollerMotorTemperature,
+            rollerFollowerVoltage,
+            rollerFollowerSupplyCurrent,
+            rollerFollowerStatorCurrent,
+            rollerFollowerVelocity,
+            rollerFollowerTemperature
+        )
+
+        inputs.pivotMotorControlMode = pivotMotor.controlMode.name
         inputs.pivotMotorVoltage = pivotMotorVoltage.value
         inputs.pivotMotorSupplyCurrent = pivotMotorSupplyCurrent.value
         inputs.pivotMotorStatorCurrent = pivotMotorStatorCurrent.value
@@ -107,6 +133,7 @@ open class IntakeIOHardware : IntakeIO {
         inputs.pivotFollowerVelocity = pivotFollowerVelocity.value
         inputs.pivotFollowerTemperature = pivotFollowerTemperature.value
 
+        inputs.rollerMotorControlMode = rollerMotor.controlMode.name
         inputs.rollerMotorVoltage = rollerMotorVoltage.value
         inputs.rollerMotorSupplyCurrent = rollerMotorSupplyCurrent.value
         inputs.rollerMotorStatorCurrent = rollerMotorStatorCurrent.value
@@ -118,6 +145,7 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rollerFollowerStatorCurrent = rollerFollowerStatorCurrent.value
         inputs.rollerFollowerVelocity = rollerFollowerVelocity.value
         inputs.rollerFollowerTemperature = rollerFollowerTemperature.value
+
 
         pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
         pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
