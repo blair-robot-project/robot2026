@@ -222,13 +222,35 @@ object Constants {
     }
 
     object IndexerConstants {
-        // motor definitions that are currently placeholders
+        const val BOTTOM_INDEXER_ID = 23
+        const val SIDE_INDEXER_ID = 22
+        const val TOP_INDEXER_ID = 21
+        const val TOP_INDEXER_STATOR_LIMIT = 60.0
+        const val TOP_INDEXER_SUPPLY_LIMIT = 30.0
 
-        const val LEFT_INDEXER_ID = 21
-        const val RIGHT_INDEXER_ID = 22
-        const val INDEXER_STATOR_LIMIT = 60.0
-        const val INDEXER_SUPPLY_LIMIT = 30.0
+        const val SIDE_INDEXER_STATOR_LIMIT = 60.0
+        const val SIDE_INDEXER_SUPPLY_LIMIT = 30.0
 
-        // add more indexers as needed
+        const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
+        const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
+
+        const val TOP_INDEXER_GEARING = 62.0 / 22.0
+        const val SIDE_INDEXER_GEARING = 3.0 / 2.0
+        const val BOTTOM_INDEXER_GEARING = 1.0
+
+        const val TOP_INDEXER_MOI = 8.73508159e-9
+        const val SIDE_INDEXER_MOI = 0.00002984924
+        const val BOTTOM_INDEXER_MOI = 0.0001241161
+
+        const val REQUEST_UPDATE_FREQ_HZ = 50.0
+
+        val TOP_INDEXER_FORWARD_VEL = RadiansPerSecond.of(5.0)
+        val TOP_INDEXER_BACKWARD_VEL = RadiansPerSecond.of(-5.0)
+
+        val SIDE_INDEXER_FORWARD_VEL = RadiansPerSecond.of(5.0)
+        val SIDE_INDEXER_BACKWARD_VEL = RadiansPerSecond.of(-5.0)
+
+        val BOTTOM_INDEXER_FORWARD_VEL = RadiansPerSecond.of(5.0)
+        val BOTTOM_INDEXER_BACKWARD_VEL = RadiansPerSecond.of(-5.0)
     }
 }
