@@ -56,7 +56,7 @@ interface ShooterIO {
         var hoodVoltage: Double = 0.0
 
         @JvmField
-        var hoodCurrentPos: Double = HOOD_MIN_ANGLE.`in`(Radians)
+        var hoodCurrentPos: Angle = HOOD_MIN_ANGLE
 
         @JvmField
         var hoodTargetPos: Double = HOOD_MIN_ANGLE.`in`(Radians)

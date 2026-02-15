@@ -85,6 +85,9 @@ object Constants {
         const val FLYWHEEL_SUPPLY_LIM = 40.0
         const val FLYWHEEL_STATOR_LIM = 80.0
 
+        val FLYWHEEL_RADIUS = Meters.of(3.965079 / 2)
+        val SHOOTER_HEIGHT = Meters.of(1.0) // TODO: Find
+
         const val HOOD_SUPPLY_LIM = 40.0
         const val HOOD_STATOR_LIM = 50.0
 
