@@ -8,6 +8,8 @@ import org.littletonrobotics.junction.AutoLog
 interface IntakeIO {
     @AutoLog
     open class IntakeIOInputs {
+        @JvmField var pivotMotorControlMode: String = "None"
+
         @JvmField var pivotMotorVoltage: Voltage = Volts.of(0.0)
 
         @JvmField var pivotMotorSupplyCurrent: Current = Amps.of(0.0)
@@ -31,6 +33,8 @@ interface IntakeIO {
         @JvmField var pivotFollowerVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
 
         @JvmField var pivotFollowerTemperature: Temperature = Celsius.of(0.0)
+
+        @JvmField var rollerMotorControlMode: String = "None"
 
         @JvmField var rollerMotorVoltage: Voltage = Volts.of(0.0)
 
@@ -57,13 +61,9 @@ interface IntakeIO {
 
     fun setPivotRequest(request: ControlRequest) {}
 
-    fun setPivotPosition(newPosition: Angle) {}
-
     fun setRollerRequest(request: ControlRequest) {}
 
-    fun isNoteInsideIntake(): Boolean = false
-
-    fun launchNote() {}
-
     fun simulationPeriodic() {}
+
+    fun setPivotPosition(position: Angle) {}
 }

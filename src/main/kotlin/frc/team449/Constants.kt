@@ -3,6 +3,7 @@ package frc.team449
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.FeedbackConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
@@ -151,60 +152,81 @@ object Constants {
         val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         const val PIVOT_GEARING_SENSOR_TO_MECH = 50.0
-        const val PIVOT_MMOI = 0.1549510896
-        val ARM_LENGTH = Meters.of(0.2996692)
+        const val PIVOT_MOI = 0.1549510896
+        val ARM_LENGTH: Distance = Meters.of(0.2996692)
 
-        val PIVOT_CURRENT_CONFIG =
+        const val ROLLER_MOI = 0.0001411489
+        const val ROLLER_GEARING = 4.0 / 3
+
+        val PIVOT_CURRENT_CONFIG: CurrentLimitsConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(40.0)
                 .withStatorCurrentLimitEnable(true)
                 .withStatorCurrentLimit(120.0)
 
-        val ROLLER_CURRENT_CONFIG =
-            CurrentLimitsConfigs()
-                .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(40.0)
-                .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(120.0)
-
-        val PIVOT_OUTPUT_CONFIG =
+        val PIVOT_OUTPUT_CONFIG: MotorOutputConfigs =
             MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake)
                 .withInverted(InvertedValue.CounterClockwise_Positive) // TODO: Find
 
-        val PIVOT_FEEDBACK_CONFIG =
+        val PIVOT_FEEDBACK_CONFIG: FeedbackConfigs =
             FeedbackConfigs()
-//                .withSensorToMechanismRatio(PIVOT_GEARING_SENSOR_TO_MECH)
+                .withSensorToMechanismRatio(PIVOT_GEARING_SENSOR_TO_MECH)
 
-        val LEADER_OUTPUT_CONFIG =
-            MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Coast)
-                .withInverted(InvertedValue.CounterClockwise_Positive) // TODO: Find
+        val pivotSlot0Configs: Slot0Configs =
+            Slot0Configs()
+                .withKP(5.0)
+                .withKG(0.1)
 
-        val PIVOT_CONFIG =
+        val PIVOT_CONFIG: TalonFXConfiguration =
             TalonFXConfiguration()
                 .withCurrentLimits(PIVOT_CURRENT_CONFIG)
                 .withMotorOutput(PIVOT_OUTPUT_CONFIG)
                 .withFeedback(PIVOT_FEEDBACK_CONFIG)
+                .withSlot0(pivotSlot0Configs)
 
-        val ROLLER_CONFIG =
+        val ROLLER_CURRENT_CONFIG: CurrentLimitsConfigs =
+            CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(40.0)
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(120.0)
+
+        val ROLLER_LEADER_OUTPUT_CONFIG: MotorOutputConfigs =
+            MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Coast)
+                .withInverted(InvertedValue.CounterClockwise_Positive) // TODO: Find
+
+        val rollerSlot0Configs: Slot0Configs =
+            Slot0Configs()
+                .withKP(6.0)
+                .withKV(0.12)
+
+        val ROLLER_CONFIG: TalonFXConfiguration =
             TalonFXConfiguration()
                 .withCurrentLimits(ROLLER_CURRENT_CONFIG)
-                .withMotorOutput(LEADER_OUTPUT_CONFIG)
+                .withMotorOutput(ROLLER_LEADER_OUTPUT_CONFIG)
+//                .withSlot0(rollerSlot0Configs)
+
+        const val HOMING_DEBOUNCE_TIME = 0.5
+        val HOMING_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
+        val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
+        val CURRENT_HOMING_TIMEOUT = Seconds.of(0.7)
+        val CURRENT_HOMING_VEL_LIMIT = RadiansPerSecond.of(0.5)
 
         // setpoint constants
-        val STOW_POSITION = Degrees.of(92.0) // TODO: Find
-        val DEPLOY_POSITION = Degrees.of(0.0) // TODO: Find
+        val STOW_POSITION: Angle = Degrees.of(92.0) // TODO: Find
+        val DEPLOY_POSITION: Angle = Degrees.of(0.0) // TODO: Find
 
-        val INTAKE_VOLTAGE = Volts.of(8.0)
-        val OUTTAKE_VOLTAGE = Volts.of(-8.0)
-        val DEPLOY_VOLTAGE = Volts.of(-8.0)
-        val STOW_VOLTAGE = Volts.of(8.0)
+        val INTAKE_VOLTAGE: Voltage = Volts.of(8.0)
+        val OUTTAKE_VOLTAGE: Voltage = Volts.of(-8.0)
+        val DEPLOY_VOLTAGE: Voltage = Volts.of(-8.0)
+        val DEPLOY_HOLD_VOLTAGE: Voltage = Volts.of(-2.0)
+        val STOW_VOLTAGE: Voltage = Volts.of(8.0)
+        val STOW_HOLD_VOLTAGE: Voltage = Volts.of(-2.0)
 
-        val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
-        val CURRENT_HOMING_TIME_LIMIT = Seconds.of(0.5)
-        val CURRENT_HOMING_VEL_LIMIT = RadiansPerSecond.of(0.5)
+//        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(45.0)
     }
 
     object IndexerConstants {
