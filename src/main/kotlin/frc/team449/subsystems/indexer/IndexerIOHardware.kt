@@ -17,78 +17,86 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
-import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_ID
-import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_STATOR_LIMIT
-import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_SUPPLY_LIMIT
-import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_ID
-import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_STATOR_LIMIT
-import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_SUPPLY_LIMIT
-import frc.team449.Constants.IndexerConstants.TOP_INDEXER_ID
-import frc.team449.Constants.IndexerConstants.TOP_INDEXER_STATOR_LIMIT
-import frc.team449.Constants.IndexerConstants.TOP_INDEXER_SUPPLY_LIMIT
+import frc.team449.Constants
+import frc.team449.Constants.IndexerConstants
 import frc.team449.util.PhoenixUtil.tryUntilOk
+import jdk.jshell.Snippet
 
-class IndexerIOHardware : IndexerIO {
-    private val topIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    private val sideIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
-    private val bottomIndexerVoltageRequest = VoltageOut(0.0).withUpdateFreqHz(0.0)
+open class IndexerIOHardware : IndexerIO {
+    private val voltageRequest = VoltageOut(0.0)
+        .withUpdateFreqHz(IndexerConstants.REQUEST_UPDATE_FREQ_HZ)
+        .withEnableFOC(false)
 
-    val topIndexer: TalonFX = TalonFX(TOP_INDEXER_ID) // kraken x44
-    val bottomIndexer: TalonFX = TalonFX(BOTTOM_INDEXER_ID) // kraken x44
-    val sideIndexer: TalonFX = TalonFX(SIDE_INDEXER_ID) // kraken x60
 
-    private val topSupplyCurrent: StatusSignal<Current> = topIndexer.supplyCurrent
-    private val sideSupplyCurrent: StatusSignal<Current> = sideIndexer.supplyCurrent
-    private val bottomSupplyCurrent: StatusSignal<Current> = bottomIndexer.supplyCurrent
+    private val velocityRequest = VelocityVoltage(0.0)
+        .withUpdateFreqHz(IndexerConstants.REQUEST_UPDATE_FREQ_HZ)
+        .withSlot(0)
+        .withEnableFOC(false)
 
-    private val topStatorCurrent: StatusSignal<Current> = topIndexer.statorCurrent
-    private val sideStatorCurrent: StatusSignal<Current> = sideIndexer.statorCurrent
-    private val bottomStatorCurrent: StatusSignal<Current> = bottomIndexer.statorCurrent
+    val topIndexerMotor: TalonFX = TalonFX(IndexerConstants.TOP_INDEXER_ID) // kraken x44
+    val bottomIndexerMotor: TalonFX = TalonFX(IndexerConstants.BOTTOM_INDEXER_ID) // kraken x44
+    val sideIndexerMotor: TalonFX = TalonFX(IndexerConstants.SIDE_INDEXER_ID) // kraken x60
 
-    private val topVoltageSignal: StatusSignal<Voltage> = topIndexer.motorVoltage
-    private val sideVoltageSignal: StatusSignal<Voltage> = sideIndexer.motorVoltage
-    private val bottomVoltageSignal: StatusSignal<Voltage> = bottomIndexer.motorVoltage
+    private val topSupplyCurrent: StatusSignal<Current> = topIndexerMotor.supplyCurrent
+    private val sideSupplyCurrent: StatusSignal<Current> = sideIndexerMotor.supplyCurrent
+    private val bottomSupplyCurrent: StatusSignal<Current> = bottomIndexerMotor.supplyCurrent
+
+    private val topStatorCurrent: StatusSignal<Current> = topIndexerMotor.statorCurrent
+    private val sideStatorCurrent: StatusSignal<Current> = sideIndexerMotor.statorCurrent
+    private val bottomStatorCurrent: StatusSignal<Current> = bottomIndexerMotor.statorCurrent
+
+    private val topVelocity: StatusSignal<AngularVelocity> = topIndexerMotor.velocity
+    private val sideVelocity: StatusSignal<AngularVelocity> = sideIndexerMotor.velocity
+    private val bottomVelocity: StatusSignal<AngularVelocity> = bottomIndexerMotor.velocity
+
+    private val topVelocitySetpoint: StatusSignal<Double> = topIndexerMotor.closedLoopReference
+    private val sideVelocitySetpoint: StatusSignal<Double> = sideIndexerMotor.closedLoopReference
+    private val bottomVelocitySetpoint: StatusSignal<Double> = bottomIndexerMotor.closedLoopReference
+
+    private val topVoltageSignal: StatusSignal<Voltage> = topIndexerMotor.motorVoltage
+    private val sideVoltageSignal: StatusSignal<Voltage> = sideIndexerMotor.motorVoltage
+    private val bottomVoltageSignal: StatusSignal<Voltage> = bottomIndexerMotor.motorVoltage
 
     private val topIndexerDisconnectedAlert =
-        Alert("Top Indexer motor disconnected (ID $TOP_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Top Indexer motor disconnected (ID ${IndexerConstants.TOP_INDEXER_ID})", Alert.AlertType.kError)
 
     private val sideIndexerDisconnectedAlert =
-        Alert("Side Indexer motor disconnected (ID $SIDE_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Side Indexer motor disconnected (ID ${IndexerConstants.SIDE_INDEXER_ID})", Alert.AlertType.kError)
 
     private val bottomIndexerDisconnectedAlert =
-        Alert("Bottom Indexer motor disconnected (ID $BOTTOM_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Bottom Indexer motor disconnected (ID ${IndexerConstants.BOTTOM_INDEXER_ID})", Alert.AlertType.kError)
 
     private val topIndexerConnected: Boolean
-        get() = topIndexer.isAlive
+        get() = topIndexerMotor.isAlive
 
     private val sideIndexerConnected: Boolean
-        get() = sideIndexer.isAlive
+        get() = sideIndexerMotor.isAlive
 
     private val bottomIndexerConnected: Boolean
-        get() = bottomIndexer.isAlive
+        get() = bottomIndexerMotor.isAlive
 
     init {
         // make indexer current limit configs for all 3
         val topCurrentLimitConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(TOP_INDEXER_SUPPLY_LIMIT)
+                .withSupplyCurrentLimit(IndexerConstants.TOP_INDEXER_SUPPLY_LIMIT)
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(TOP_INDEXER_STATOR_LIMIT)
+                .withStatorCurrentLimit(IndexerConstants.TOP_INDEXER_STATOR_LIMIT)
 
         val sideCurrentLimitConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(SIDE_INDEXER_SUPPLY_LIMIT)
+                .withSupplyCurrentLimit(IndexerConstants.SIDE_INDEXER_SUPPLY_LIMIT)
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(SIDE_INDEXER_STATOR_LIMIT)
+                .withStatorCurrentLimit(IndexerConstants.SIDE_INDEXER_STATOR_LIMIT)
 
         val bottomCurrentLimitConfigs =
             CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(BOTTOM_INDEXER_SUPPLY_LIMIT)
+                .withSupplyCurrentLimit(IndexerConstants.BOTTOM_INDEXER_SUPPLY_LIMIT)
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(BOTTOM_INDEXER_STATOR_LIMIT)
+                .withStatorCurrentLimit(IndexerConstants.BOTTOM_INDEXER_STATOR_LIMIT)
 
         val topIndexerMotorOutput =
             MotorOutputConfigs()
@@ -120,9 +128,9 @@ class IndexerIOHardware : IndexerIO {
                 .withCurrentLimits(bottomCurrentLimitConfigs)
                 .withMotorOutput(bottomIndexerMotorOutput)
 
-        tryUntilOk(5) { topIndexer.configurator.apply(topIndexerConfig, 0.25) }
-        tryUntilOk(5) { sideIndexer.configurator.apply(sideIndexerConfig, 0.25) }
-        tryUntilOk(5) { bottomIndexer.configurator.apply(bottomIndexerConfig, 0.25) }
+        tryUntilOk(5) { topIndexerMotor.configurator.apply(topIndexerConfig, 0.25) }
+        tryUntilOk(5) { sideIndexerMotor.configurator.apply(sideIndexerConfig, 0.25) }
+        tryUntilOk(5) { bottomIndexerMotor.configurator.apply(bottomIndexerConfig, 0.25) }
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0,
@@ -153,17 +161,20 @@ class IndexerIOHardware : IndexerIO {
         )
 
         inputs.topVoltage = topVoltageSignal.value.`in`(Volts)
-        inputs.topVelocity = topIndexer.velocity.value.`in`(RadiansPerSecond)
+        inputs.topVelocity = topVelocity.value.`in`(RadiansPerSecond)
+        inputs.topSetpoint = topVelocitySetpoint.value
         inputs.topStatorCurrent = topStatorCurrent.value.`in`(Amps)
         inputs.topSupplyCurrent = topSupplyCurrent.value.`in`(Amps)
 
         inputs.sideVoltage = sideVoltageSignal.value.`in`(Volts)
-        inputs.sideVelocity = sideIndexer.velocity.value.`in`(RadiansPerSecond)
+        inputs.sideVelocity = sideVelocity.value.`in`(RadiansPerSecond)
+        inputs.sideSetpoint = sideVelocitySetpoint.value
         inputs.sideStatorCurrent = sideStatorCurrent.value.`in`(Amps)
         inputs.sideSupplyCurrent = sideSupplyCurrent.value.`in`(Amps)
 
         inputs.bottomVoltage = bottomVoltageSignal.value.`in`(Volts)
-        inputs.bottomVelocity = bottomIndexer.velocity.value.`in`(RadiansPerSecond)
+        inputs.bottomVelocity = bottomVelocity.value.`in`(RadiansPerSecond)
+        inputs.sideSetpoint = sideVelocitySetpoint.value
         inputs.bottomStatorCurrent = bottomStatorCurrent.value.`in`(Amps)
         inputs.bottomSupplyCurrent = bottomSupplyCurrent.value.`in`(Amps)
 
@@ -177,9 +188,9 @@ class IndexerIOHardware : IndexerIO {
         sideVoltage: Double,
         bottomVoltage: Double
     ) {
-        topIndexer.setControl(topIndexerVoltageRequest.withOutput(topVoltage))
-        sideIndexer.setControl(sideIndexerVoltageRequest.withOutput(sideVoltage))
-        bottomIndexer.setControl(bottomIndexerVoltageRequest.withOutput(bottomVoltage))
+        topIndexerMotor.setControl(voltageRequest.withOutput(topVoltage))
+        sideIndexerMotor.setControl(voltageRequest.withOutput(sideVoltage))
+        bottomIndexerMotor.setControl(voltageRequest.withOutput(bottomVoltage))
     }
 
     override fun setIndexerVelocity(
@@ -187,8 +198,8 @@ class IndexerIOHardware : IndexerIO {
         sideVel: AngularVelocity,
         bottomVel: AngularVelocity
     ) {
-        topIndexer.setControl(VelocityVoltage(topVel))
-        sideIndexer.setControl(VelocityVoltage(sideVel))
-        bottomIndexer.setControl(VelocityVoltage(bottomVel))
+        topIndexerMotor.setControl(velocityRequest.withVelocity(topVel))
+        sideIndexerMotor.setControl(velocityRequest.withVelocity(sideVel))
+        bottomIndexerMotor.setControl(velocityRequest.withVelocity(bottomVel))
     }
 }

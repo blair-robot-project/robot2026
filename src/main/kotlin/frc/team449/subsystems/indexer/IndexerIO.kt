@@ -10,6 +10,8 @@ interface IndexerIO {
 
         @JvmField var topVelocity: Double = 0.0
 
+        @JvmField var topSetpoint: Double = 0.0
+
         @JvmField var topSupplyCurrent: Double = 0.0
 
         @JvmField var topStatorCurrent: Double = 0.0
@@ -19,6 +21,8 @@ interface IndexerIO {
 
         @JvmField var sideVelocity: Double = 0.0
 
+        @JvmField var sideSetpoint: Double = 0.0
+
         @JvmField var sideSupplyCurrent: Double = 0.0
 
         @JvmField var sideStatorCurrent: Double = 0.0
@@ -27,6 +31,8 @@ interface IndexerIO {
         @JvmField var bottomVoltage: Double = 0.0
 
         @JvmField var bottomVelocity: Double = 0.0
+
+        @JvmField var bottomSetpoint: Double = 0.0
 
         @JvmField var bottomSupplyCurrent: Double = 0.0
 

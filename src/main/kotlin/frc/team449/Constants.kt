@@ -167,5 +167,7 @@ object Constants {
         const val TOP_INDEXER_MOI = 8.73508159e-9
         const val SIDE_INDEXER_MOI = 0.00002984924
         const val BOTTOM_INDEXER_MOI = 0.0001241161
+
+        const val REQUEST_UPDATE_FREQ_HZ = 50.0
     }
 }
