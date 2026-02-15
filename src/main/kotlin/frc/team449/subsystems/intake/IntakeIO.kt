@@ -61,13 +61,9 @@ interface IntakeIO {
 
     fun setPivotRequest(request: ControlRequest) {}
 
-    fun setPivotPosition(position: Angle) {}
-
     fun setRollerRequest(request: ControlRequest) {}
-
-    fun setRollerVelocity(velocity: AngularVelocity) {}
 
     fun simulationPeriodic() {}
 
-    fun resetPivotPosition(position: Angle) {}
+    fun setPivotPosition(position: Angle) {}
 }

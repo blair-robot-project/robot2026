@@ -1,9 +1,11 @@
 package frc.team449.subsystems.intake
 import com.ctre.phoenix6.sim.TalonFXSimState
 import edu.wpi.first.math.system.plant.DCMotor
+import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.RobotController
+import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -26,6 +28,17 @@ class IntakeIOSim : IntakeIOHardware() {
             IntakeConstants.STOW_POSITION.`in`(Radians),
         )
 
+    private val rollerGearbox = DCMotor.getKrakenX60(2)
+    private val rollerSim =
+        FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                rollerGearbox,
+                IntakeConstants.ROLLER_MOI,
+                IntakeConstants.ROLLER_GEARING
+            ),
+            rollerGearbox
+        )
+
     // mech2d stuff
     val mech = Mechanism2d(3.0, 3.0)
     val mechRoot = mech.getRoot("Intake Pivot", 1.0, 1.0)
@@ -43,12 +56,12 @@ class IntakeIOSim : IntakeIOHardware() {
     init {
         val pivotMotorSim = pivotMotor.simState
         val pivotFollowerSim = pivotFollower.simState
-        val rollerLeaderSim = rollerMotor.simState
+        val rollerMotorSim = rollerMotor.simState
         val rollerFollowerSim = rollerFollower.simState
 
         pivotMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
         pivotFollowerSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
-        rollerLeaderSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
+        rollerMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
         rollerFollowerSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
 
         SmartDashboard.putData("Intake", mech)
@@ -57,12 +70,12 @@ class IntakeIOSim : IntakeIOHardware() {
     override fun simulationPeriodic() {
         val pivotMotorSim = pivotMotor.simState
         val pivotFollowerSim = pivotFollower.simState
-        val rollerLeaderSim = rollerMotor.simState
+        val rollerMotorSim = rollerMotor.simState
         val rollerFollowerSim = rollerFollower.simState
 
         pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        rollerLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        rollerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         rollerFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
 
         // update arm
@@ -73,5 +86,16 @@ class IntakeIOSim : IntakeIOHardware() {
         pivotFollowerSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
         pivotFollowerSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
         pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads)
+
+        // update roller
+        rollerSim.inputVoltage = rollerMotorSim.motorVoltageMeasure.`in`(Volts)
+        rollerSim.update(0.02)
+        rollerMotorSim.setRotorVelocity(rollerSim.angularVelocity)
+        rollerFollowerSim.setRotorVelocity(rollerSim.angularVelocity)
+        if (rollerSim.angularVelocity.isNear(RadiansPerSecond.of(0.0), 0.01)){
+            pivotMechanism.color = Color8Bit(Color.kRed)
+        } else {
+            pivotMechanism.color = Color8Bit(Color.kGreen)
+        }
     }
 }

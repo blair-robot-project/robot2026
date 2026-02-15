@@ -2,8 +2,6 @@ package frc.team449.subsystems.intake
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.controls.ControlRequest
 import com.ctre.phoenix6.controls.Follower
-import com.ctre.phoenix6.controls.PositionVoltage
-import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.measure.*
@@ -156,19 +154,11 @@ open class IntakeIOHardware : IntakeIO {
         pivotMotor.setControl(request)
     }
 
-    override fun setPivotPosition(position: Angle) {
-        pivotMotor.setControl(PositionVoltage(position).withSlot(0))
-    }
-
-    override fun setRollerVelocity(velocity: AngularVelocity) {
-        rollerMotor.setControl(VelocityVoltage(velocity).withSlot(0))
-    }
-
     override fun setRollerRequest(request: ControlRequest) {
         rollerMotor.setControl(request)
     }
 
-    override fun resetPivotPosition(position: Angle) {
+    override fun setPivotPosition(position: Angle) {
         pivotMotor.setPosition(position)
     }
 }

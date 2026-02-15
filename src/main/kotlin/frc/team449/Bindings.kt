@@ -26,12 +26,5 @@ class Bindings(
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kForward))
         opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kReverse))
-
-        driveController.a().onTrue(
-            robotContainer.intake.deploy()
-        )
-        driveController.b().onTrue(
-            robotContainer.intake.stow()
-        )
     }
 }

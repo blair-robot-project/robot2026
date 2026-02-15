@@ -12,7 +12,7 @@ import frc.team449.subsystems.indexer.Indexer
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
-import frc.team449.subsystems.intake.Intake
+import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
@@ -61,8 +61,8 @@ object RobotContainer {
             },
         )
 
-    val intake: Intake =
-        Intake(
+    val intake: IntakeSubsystem =
+        IntakeSubsystem(
             when (Constants.CURRENT_MODE) {
                 Mode.REAL -> IntakeIOHardware()
                 Mode.SIM -> IntakeIOSim()

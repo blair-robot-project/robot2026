@@ -144,9 +144,12 @@ object Constants {
 
         val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
-        const val PIVOT_GEARING_SENSOR_TO_MECH = 50.0 // TODO: find this value
-        const val PIVOT_MOI = 0.1549510896 // TODO: verify this
+        const val PIVOT_GEARING_SENSOR_TO_MECH = 50.0
+        const val PIVOT_MOI = 0.1549510896
         val ARM_LENGTH: Distance = Meters.of(0.2996692)
+
+        const val ROLLER_MOI = 0.0001411489
+        const val ROLLER_GEARING = 4.0 / 3
 
         val PIVOT_CURRENT_CONFIG: CurrentLimitsConfigs =
             CurrentLimitsConfigs()
@@ -210,7 +213,9 @@ object Constants {
         val INTAKE_VOLTAGE: Voltage = Volts.of(8.0)
         val OUTTAKE_VOLTAGE: Voltage = Volts.of(-8.0)
         val DEPLOY_VOLTAGE: Voltage = Volts.of(-8.0)
+        val DEPLOY_HOLD_VOLTAGE: Voltage = Volts.of(-2.0)
         val STOW_VOLTAGE: Voltage = Volts.of(8.0)
+        val STOW_HOLD_VOLTAGE: Voltage = Volts.of(-2.0)
 
 //        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(45.0)
 
