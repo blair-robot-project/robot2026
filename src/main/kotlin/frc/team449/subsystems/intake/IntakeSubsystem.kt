@@ -2,6 +2,8 @@ package frc.team449.subsystems.intake
 import com.ctre.phoenix6.controls.VoltageOut
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -54,43 +56,38 @@ class IntakeSubsystem(
             )
         }
 
-    fun deploy(): Command =
+    fun currentHome(voltage: Voltage, endPosition: Angle, holdVoltage: Voltage): Command =
         Commands.sequence(
             runOnce {
                 currentHomingDebouncer.calculate(false)
-                io.setPivotRequest(request.withOutput(IntakeConstants.DEPLOY_VOLTAGE))
+                io.setPivotRequest(request.withOutput(voltage))
             },
             WaitUntilCommand {
                 currentHomingDebouncer.calculate(
                     inputs.pivotMotorStatorCurrent >
-                        IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
+                            IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
                 ) &&
-                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
+                        abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
                         IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
-            }.withTimeout(IntakeConstants.HOMING_TIME_OUT),
+            }.withTimeout(IntakeConstants.CURRENT_HOMING_TIMEOUT),
             runOnce {
-                io.setPivotPosition(IntakeConstants.DEPLOY_POSITION)
-                io.setPivotRequest(request.withOutput(IntakeConstants.DEPLOY_HOLD_VOLTAGE))
+                io.setPivotPosition(endPosition)
+                io.setPivotRequest(request.withOutput(holdVoltage))
             }
+        )
+
+    fun deploy(): Command =
+        currentHome(
+            IntakeConstants.DEPLOY_VOLTAGE,
+            IntakeConstants.DEPLOY_POSITION,
+            IntakeConstants.DEPLOY_HOLD_VOLTAGE
         ).withName("Deploy")
 
+
     fun stow(): Command =
-        Commands.sequence(
-            runOnce {
-                currentHomingDebouncer.calculate(false)
-                io.setPivotRequest(request.withOutput(IntakeConstants.STOW_VOLTAGE))
-            },
-            WaitUntilCommand {
-                currentHomingDebouncer.calculate(
-                    inputs.pivotMotorStatorCurrent >
-                        IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
-                ) &&
-                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
-                        IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
-            }.withTimeout(IntakeConstants.HOMING_TIME_OUT),
-            runOnce {
-                io.setPivotPosition(IntakeConstants.STOW_POSITION)
-                io.setPivotRequest(request.withOutput(IntakeConstants.STOW_HOLD_VOLTAGE))
-            }
+        currentHome(
+            IntakeConstants.STOW_VOLTAGE,
+            IntakeConstants.STOW_POSITION,
+            IntakeConstants.STOW_HOLD_VOLTAGE
         ).withName("Stow")
 }

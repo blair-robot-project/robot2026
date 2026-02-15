@@ -204,7 +204,9 @@ object Constants {
 
         const val HOMING_DEBOUNCE_TIME = 0.5
         val HOMING_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
-        val HOMING_TIME_OUT: Time = Seconds.of(0.7)
+        val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
+        val CURRENT_HOMING_TIMEOUT = Seconds.of(0.7)
+        val CURRENT_HOMING_VEL_LIMIT = RadiansPerSecond.of(0.5)
 
         // setpoint constants
         val STOW_POSITION: Angle = Degrees.of(92.0) // TODO: Find
@@ -219,9 +221,6 @@ object Constants {
 
 //        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(45.0)
 
-        val CURRENT_HOMING_CURRENT_LIMIT = Amps.of(20.0)
-        val CURRENT_HOMING_TIME_LIMIT = Seconds.of(0.5)
-        val CURRENT_HOMING_VEL_LIMIT = RadiansPerSecond.of(0.5)
     }
 
     object IndexerConstants {
