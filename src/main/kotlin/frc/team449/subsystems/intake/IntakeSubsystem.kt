@@ -65,9 +65,9 @@ class IntakeSubsystem(
             WaitUntilCommand {
                 currentHomingDebouncer.calculate(
                     inputs.pivotMotorStatorCurrent >
-                            IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
+                        IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
                 ) &&
-                        abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
+                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
                         IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
             }.withTimeout(IntakeConstants.CURRENT_HOMING_TIMEOUT),
             runOnce {
@@ -82,7 +82,6 @@ class IntakeSubsystem(
             IntakeConstants.DEPLOY_POSITION,
             IntakeConstants.DEPLOY_HOLD_VOLTAGE
         ).withName("Deploy")
-
 
     fun stow(): Command =
         currentHome(
