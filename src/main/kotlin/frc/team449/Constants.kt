@@ -153,12 +153,17 @@ object Constants {
         const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
         const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
 
-        const val TOP_INDEXER_GEARING = 1.0
-        const val SIDE_INDEXER_GEARING = 1.0
+        // 24:16
+        const val TOP_INDEXER_GEARING = 62.0 / 22.0
+
+        // 3:2
+        const val SIDE_INDEXER_GEARING = 3.0 / 2.0
+
+        // 1:1
         const val BOTTOM_INDEXER_GEARING = 1.0
 
-        const val TOP_INDEXER_MOI = 0.01
-        const val SIDE_INDEXER_MOI = 0.01
-        const val BOTTOM_INDEXER_MOI = 0.01
+        const val TOP_INDEXER_MOI = 8.73508159e-9
+        const val SIDE_INDEXER_MOI = 0.00002984924
+        const val BOTTOM_INDEXER_MOI = 0.0001241161
     }
 }
