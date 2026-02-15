@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
 import kotlin.math.pow
@@ -159,7 +160,6 @@ object Constants {
         const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
         const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
 
-
         const val TOP_INDEXER_GEARING = 62.0 / 22.0
         const val SIDE_INDEXER_GEARING = 3.0 / 2.0
         const val BOTTOM_INDEXER_GEARING = 1.0
@@ -169,5 +169,14 @@ object Constants {
         const val BOTTOM_INDEXER_MOI = 0.0001241161
 
         const val REQUEST_UPDATE_FREQ_HZ = 50.0
+
+        val TOP_INDEXER_FORWARD_VEL = RadiansPerSecond.of(5.0)
+        val TOP_INDEXER_BACKWARD_VEL = RadiansPerSecond.of(-5.0)
+
+        val SIDE_INDEXER_FORWARD_VEL = RadiansPerSecond.of(5.0)
+        val SIDE_INDEXER_BACKWARD_VEL = RadiansPerSecond.of(-5.0)
+
+        val BOTTOM_INDEXER_FORWARD_VEL = RadiansPerSecond.of(5.0)
+        val BOTTOM_INDEXER_BACKWARD_VEL = RadiansPerSecond.of(-5.0)
     }
 }

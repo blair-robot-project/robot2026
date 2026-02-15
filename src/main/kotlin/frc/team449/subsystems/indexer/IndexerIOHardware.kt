@@ -17,16 +17,13 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Current
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
-import frc.team449.Constants
 import frc.team449.Constants.IndexerConstants
 import frc.team449.util.PhoenixUtil.tryUntilOk
-import jdk.jshell.Snippet
 
 open class IndexerIOHardware : IndexerIO {
     private val voltageRequest = VoltageOut(0.0)
         .withUpdateFreqHz(IndexerConstants.REQUEST_UPDATE_FREQ_HZ)
         .withEnableFOC(false)
-
 
     private val velocityRequest = VelocityVoltage(0.0)
         .withUpdateFreqHz(IndexerConstants.REQUEST_UPDATE_FREQ_HZ)
