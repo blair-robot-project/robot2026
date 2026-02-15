@@ -63,7 +63,7 @@ class IntakeSubsystem(
             WaitUntilCommand {
                 currentHomingDebouncer.calculate(
                     inputs.pivotMotorStatorCurrent >
-                            IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
+                        IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
                 ) &&
                     abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
                         IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
@@ -83,7 +83,7 @@ class IntakeSubsystem(
             WaitUntilCommand {
                 currentHomingDebouncer.calculate(
                     inputs.pivotMotorStatorCurrent >
-                            IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
+                        IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
                 ) &&
                     abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
                         IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)

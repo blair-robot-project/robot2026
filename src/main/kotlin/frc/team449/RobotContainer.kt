@@ -12,10 +12,10 @@ import frc.team449.subsystems.indexer.Indexer
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
-import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
+import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim

@@ -92,7 +92,7 @@ class IntakeIOSim : IntakeIOHardware() {
         rollerSim.update(0.02)
         rollerMotorSim.setRotorVelocity(rollerSim.angularVelocity)
         rollerFollowerSim.setRotorVelocity(rollerSim.angularVelocity)
-        if (rollerSim.angularVelocity.isNear(RadiansPerSecond.of(0.0), 0.01)){
+        if (rollerSim.angularVelocity.isNear(RadiansPerSecond.of(0.0), 0.01)) {
             pivotMechanism.color = Color8Bit(Color.kRed)
         } else {
             pivotMechanism.color = Color8Bit(Color.kGreen)
