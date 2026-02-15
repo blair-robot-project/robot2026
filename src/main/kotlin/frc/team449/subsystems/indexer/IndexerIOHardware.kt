@@ -159,19 +159,19 @@ open class IndexerIOHardware : IndexerIO {
 
         inputs.topVoltage = topVoltageSignal.value.`in`(Volts)
         inputs.topVelocity = topVelocity.value.`in`(RadiansPerSecond)
-        inputs.topSetpoint = topVelocitySetpoint.value
+        inputs.topVelocityTarget = topVelocitySetpoint.value
         inputs.topStatorCurrent = topStatorCurrent.value.`in`(Amps)
         inputs.topSupplyCurrent = topSupplyCurrent.value.`in`(Amps)
 
         inputs.sideVoltage = sideVoltageSignal.value.`in`(Volts)
         inputs.sideVelocity = sideVelocity.value.`in`(RadiansPerSecond)
-        inputs.sideSetpoint = sideVelocitySetpoint.value
+        inputs.sideVelocityTarget = sideVelocitySetpoint.value
         inputs.sideStatorCurrent = sideStatorCurrent.value.`in`(Amps)
         inputs.sideSupplyCurrent = sideSupplyCurrent.value.`in`(Amps)
 
         inputs.bottomVoltage = bottomVoltageSignal.value.`in`(Volts)
         inputs.bottomVelocity = bottomVelocity.value.`in`(RadiansPerSecond)
-        inputs.sideSetpoint = sideVelocitySetpoint.value
+        inputs.bottomVelocityTarget = sideVelocitySetpoint.value
         inputs.bottomStatorCurrent = bottomStatorCurrent.value.`in`(Amps)
         inputs.bottomSupplyCurrent = bottomSupplyCurrent.value.`in`(Amps)
 
