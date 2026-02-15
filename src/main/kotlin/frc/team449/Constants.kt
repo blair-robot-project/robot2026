@@ -2,10 +2,12 @@ package frc.team449
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
+import kotlin.math.pow
 
 object Constants {
     enum class Mode {
@@ -15,9 +17,6 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-
-    // used to remove the shooter sim bindings I was using to test
-    const val RUNNING_SHOOTER_SIM = true
 
     const val TUNING_MODE: Boolean = false
 
@@ -66,49 +65,56 @@ object Constants {
     }
 
     object ShooterConstants {
-        const val LEFT_FLYWHEEL_LEADER_ID = 1
-        const val LEFT_FLYWHEEL_FOLLOWER_ID = 2
-        const val RIGHT_FLYWHEEL_LEADER_ID = 3
-        const val RIGHT_FLYWHEEL_FOLLOWER_ID = 4
-        const val HOOD_MOTOR_ID = 5
+        const val LEFT_FLYWHEEL_LEADER_ID = 11
+        const val LEFT_FLYWHEEL_FOLLOWER_ID = 12
+        const val RIGHT_FLYWHEEL_LEADER_ID = 13
+        const val RIGHT_FLYWHEEL_FOLLOWER_ID = 14
+        const val HOOD_MOTOR_ID = 15
 
         const val FLYWHEEL_SUPPLY_LIM = 40.0
         const val FLYWHEEL_STATOR_LIM = 80.0
 
         const val HOOD_SUPPLY_LIM = 40.0
-        const val HOOD_STATOR_LIM = 80.0
+        const val HOOD_STATOR_LIM = 50.0
 
-        const val HOOD_CRUISE_VELOCITY = 2.0
-        const val HOOD_ACCELERATION = 5.0
+        val HOOD_MIN_ANGLE = Degrees.of(14.85072467)
+        val HOOD_MAX_ANGLE = Degrees.of(46.24524767)
 
-        val HOOD_MIN_ANGLE = Degrees.of(30.0) // TODO: find
-        val HOOD_MAX_ANGLE = Degrees.of(90.0) // TODO: find
+        // hood gains
+        const val HOOD_KP = 6.7
+        const val HOOD_KI = 0.67
+        const val HOOD_KD = 0.0
 
-        // these are all random ahh gains but it dont matter cuz its sim
-        const val HOOD_SIM_KP = 3.0
-        const val HOOD_SIM_KI = 0.0
-        const val HOOD_SIM_KD = 0.0
+        // feedforward
+        const val HOOD_KS = 0.1
+        const val HOOD_KG = 0.11
+        const val HOOD_KV = 2.1
 
-        const val HOOD_SIM_KS = 0.2
-        const val HOOD_SIM_KG = 0.3
-        const val HOOD_SIM_KV = 0.1
-        const val HOOD_SIM_KA = 0.0
+        // flywheel gains
+        const val FLYWHEEL_KP = 0.5
+        const val FLYWHEEL_KI = 0.0
+        const val FLYWHEEL_KD = 0.0
+        const val FLYWHEEL_KS = 0.05
+        const val FLYWHEEL_KV = 0.1
 
-        const val FLYWHEEL_SIM_KS: Double = 0.0001 // V
-        const val FLYWHEEL_SIM_KV: Double = 0.000195 // V/RPM
-        const val FLYWHEEL_SIM_KA: Double = 0.0003 // V/(RPM/s)
+        // debouncer
+        const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
+        val HOMING_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
 
-        val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: find
+        const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
+        val TOLERANCE_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
 
-        const val HOOD_SIM_GRAVITY = false
+        val HOOD_TOLERANCE = Degrees.of(5.0) // TODO: refine
 
-        const val FLYWHEEL_GEARING = 1.0 // TODO: find
-        const val HOOD_GEARING = 1.0 // TODO: find
+        const val FLYWHEEL_GEARING = 32.0 / 18 //
+        const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
 
-        const val HOOD_ANGLE_ENCODER_DISTANCE_PER_PULSE = 2 * PI / 4096 // TODO: find
-        const val HOOD_MOTOR_GEARING = 1.0 // TODO: find
-        const val HOOD_MASS = 8.0 // kg TODO: find
-        val HOOD_LENGTH = Units.inchesToMeters(30.0) // TODO: find
+        const val HOOD_MOMENT_OF_INERTIA = 0.0694270649
+        val HOOD_LENGTH = Units.inchesToMeters(5.91)
+        val FLYWHEEL_MOI = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
+
+        const val CURRENT_HOMING_VOLTAGE = 2.0
+        const val CURRENT_HOMING_STATOR_THRESH = 45.0 // amps
     }
 
     object LEDConstants {
@@ -153,13 +159,9 @@ object Constants {
         const val BOTTOM_INDEXER_STATOR_LIMIT = 60.0
         const val BOTTOM_INDEXER_SUPPLY_LIMIT = 30.0
 
-        // 24:16
+
         const val TOP_INDEXER_GEARING = 62.0 / 22.0
-
-        // 3:2
         const val SIDE_INDEXER_GEARING = 3.0 / 2.0
-
-        // 1:1
         const val BOTTOM_INDEXER_GEARING = 1.0
 
         const val TOP_INDEXER_MOI = 8.73508159e-9
