@@ -3,24 +3,27 @@ package frc.team449
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Degrees
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
+import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 import kotlin.math.pow
 
 object Constants {
+    const val LOOP_TIME = 0.02
+
     enum class Mode {
         REAL,
         SIM,
         REPLAY
     }
-
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
 
     const val TUNING_MODE: Boolean = false
-
-    const val LOOP_TIME = 0.02
 
     const val ROBOT_MASS_KG = 54.43
     const val ROBOT_WIDTH_INCHES = 32.0 // including bumpers (front to rear)
@@ -37,27 +40,27 @@ object Constants {
 
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
+        const val X_LOCK_DEADBAND = 0.25
 
         const val WHEEL_COF = 1.4
     }
 
     object AutoConstants {
-        // auto constants
+        const val AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 1.26767 * PI
+        const val AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND = PI
     }
 
     object FieldConstants {
         // CHS uses AndyMark Rebuilt Field
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
-        val FIELD_LENGTH = REBUILT_FIELD_LAYOUT.fieldLength
-        val FIELD_WIDTH = REBUILT_FIELD_LAYOUT.fieldLength
-    }
 
-    object PowerConstants {
-        // current limit configs go here
-    }
+        val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
+        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
 
-    object SensorConstants {
-        // motor and sensor IDs
+        val BLUE_TRENCH_POSES: List<Pose2d> = listOf(
+            Pose2d(4.35, 0.45, Rotation2d(1.5)),
+            Pose2d(4.35, 7.60, Rotation2d(-1.5))
+        )
     }
 
     object VisionConstants {

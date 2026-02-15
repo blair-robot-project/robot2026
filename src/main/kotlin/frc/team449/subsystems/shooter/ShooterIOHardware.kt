@@ -1,7 +1,6 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.FeedbackConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
@@ -10,6 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VelocityVoltage
+import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
@@ -24,8 +24,6 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Current
-import edu.wpi.first.units.measure.Temperature
-import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
@@ -60,48 +58,51 @@ class ShooterIOHardware : ShooterIO {
 
     private val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
     private val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
-
     private val rightLeaderMotor = TalonFX(RIGHT_FLYWHEEL_LEADER_ID)
     private val rightFollowerMotor = TalonFX(RIGHT_FLYWHEEL_FOLLOWER_ID)
-
     private val hoodMotor = TalonFX(HOOD_MOTOR_ID)
+
+    private val flywheelVelocityRequest = VelocityVoltage(0.0).withSlot(0)
+    private val flywheelVoltageRequest = VoltageOut(0.0)
+    private val hoodPositionRequest = PositionVoltage(0.0).withSlot(0)
+    private val hoodVoltageRequest = VoltageOut(0.0)
 
     private val toleranceDebouncer: Debouncer = Debouncer(TOLERANCE_DEBOUNCE_TIME, TOLERANCE_DEBOUNCE_TYPE)
 
     private val flywheelConfig: TalonFXConfiguration
     private val hoodConfig: TalonFXConfiguration
-    private var leftLeaderMotorConnected: Boolean = true
-    private var rightLeaderMotorConnected: Boolean = true
-    private var leftFollowerMotorConnected: Boolean = true
-    private var rightFollowerMotorConnected: Boolean = true
-    private var hoodMotorConnected: Boolean = true
+    private var leftLeaderMotorConnected = leftLeaderMotor.isAlive
+    private var rightLeaderMotorConnected = rightLeaderMotor.isAlive
+    private var leftFollowerMotorConnected = leftFollowerMotor.isAlive
+    private var rightFollowerMotorConnected = rightFollowerMotor.isAlive
+    private var hoodMotorConnected = hoodMotor.isAlive
 
-    private val leftLeaderMotorVoltage: StatusSignal<Voltage>
-    private val leftLeaderSupplyCurrent: StatusSignal<Current>
-    private val leftLeaderStatorCurrent: StatusSignal<Current>
-    private val leftLeaderTemperature: StatusSignal<Temperature>
+    private val leftLeaderTemperature = leftLeaderMotor.deviceTemp
+    private val leftLeaderMotorVoltage = leftLeaderMotor.motorVoltage
+    private val leftLeaderSupplyCurrent = leftLeaderMotor.supplyCurrent
+    private val leftLeaderStatorCurrent = leftLeaderMotor.statorCurrent
 
-    private val rightLeaderMotorVoltage: StatusSignal<Voltage>
-    private val rightLeaderSupplyCurrent: StatusSignal<Current>
-    private val rightLeaderStatorCurrent: StatusSignal<Current>
-    private val rightLeaderTemperature: StatusSignal<Temperature>
+    private val rightLeaderTemperature = rightLeaderMotor.deviceTemp
+    private val rightLeaderMotorVoltage = rightLeaderMotor.motorVoltage
+    private val rightLeaderSupplyCurrent = rightLeaderMotor.supplyCurrent
+    private val rightLeaderStatorCurrent = rightLeaderMotor.statorCurrent
 
-    private val leftFollowerMotorVoltage: StatusSignal<Voltage>
-    private val leftFollowerSupplyCurrent: StatusSignal<Current>
-    private val leftFollowerStatorCurrent: StatusSignal<Current>
-    private val leftFollowerTemperature: StatusSignal<Temperature>
+    private val leftFollowerTemperature = leftFollowerMotor.deviceTemp
+    private val leftFollowerMotorVoltage = leftFollowerMotor.motorVoltage
+    private val leftFollowerSupplyCurrent = leftFollowerMotor.supplyCurrent
+    private val leftFollowerStatorCurrent = leftFollowerMotor.statorCurrent
 
-    private val rightFollowerMotorVoltage: StatusSignal<Voltage>
-    private val rightFollowerSupplyCurrent: StatusSignal<Current>
-    private val rightFollowerStatorCurrent: StatusSignal<Current>
-    private val rightFollowerTemperature: StatusSignal<Temperature>
+    private val rightFollowerTemperature = rightFollowerMotor.deviceTemp
+    private val rightFollowerMotorVoltage = rightFollowerMotor.motorVoltage
+    private val rightFollowerSupplyCurrent = rightFollowerMotor.supplyCurrent
+    private val rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
 
-    private val hoodMotorVoltage: StatusSignal<Voltage>
-    private val hoodSupplyCurrent: StatusSignal<Current>
-    private val hoodStatorCurrent: StatusSignal<Current>
-    private val hoodTemperature: StatusSignal<Temperature>
-    private val hoodCurrentPos: StatusSignal<Angle>
-    private val hoodTargetPos: StatusSignal<Double>
+    private val hoodTemperature = hoodMotor.deviceTemp
+    private val hoodMotorVoltage = hoodMotor.motorVoltage
+    private val hoodSupplyCurrent = hoodMotor.supplyCurrent
+    private val hoodStatorCurrent = hoodMotor.statorCurrent
+    private val hoodCurrentPos = hoodMotor.position
+    private val hoodTargetPos = hoodMotor.closedLoopReference
 
     private val leftLeaderMotorDisconnectedAlert =
         Alert(
@@ -125,7 +126,7 @@ class ShooterIOHardware : ShooterIO {
         )
     private val hoodMotorDisconnectedAlert =
         Alert(
-            "hood motor disconnected (ID $HOOD_MOTOR_ID",
+            "hood motor disconnected (ID $HOOD_MOTOR_ID)",
             Alert.AlertType.kError
         )
 
@@ -199,40 +200,11 @@ class ShooterIOHardware : ShooterIO {
 
         hoodMotor.configurator.apply(hoodConfig)
 
-        leftLeaderTemperature = leftLeaderMotor.deviceTemp
-        leftLeaderMotorVoltage = leftLeaderMotor.motorVoltage
-        leftLeaderSupplyCurrent = leftLeaderMotor.supplyCurrent
-        leftLeaderStatorCurrent = leftLeaderMotor.statorCurrent
-
-        rightLeaderTemperature = rightLeaderMotor.deviceTemp
-        rightLeaderMotorVoltage = rightLeaderMotor.motorVoltage
-        rightLeaderSupplyCurrent = rightLeaderMotor.supplyCurrent
-        rightLeaderStatorCurrent = rightLeaderMotor.statorCurrent
-
-        leftFollowerTemperature = leftFollowerMotor.deviceTemp
-        leftFollowerMotorVoltage = leftFollowerMotor.motorVoltage
-        leftFollowerSupplyCurrent = leftFollowerMotor.supplyCurrent
-        leftFollowerStatorCurrent = leftFollowerMotor.statorCurrent
-
-        rightFollowerTemperature = rightFollowerMotor.deviceTemp
-        rightFollowerMotorVoltage = rightFollowerMotor.motorVoltage
-        rightFollowerSupplyCurrent = rightFollowerMotor.supplyCurrent
-        rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
-
-        hoodTemperature = hoodMotor.deviceTemp
-        hoodMotorVoltage = hoodMotor.motorVoltage
-        hoodSupplyCurrent = hoodMotor.supplyCurrent
-        hoodStatorCurrent = hoodMotor.statorCurrent
-        hoodCurrentPos = hoodMotor.position
-        hoodTargetPos = hoodMotor.closedLoopReference
-
         BaseStatusSignal.setUpdateFrequencyForAll(
             4.0, //  doesn't need to update that often
             leftLeaderTemperature,
-
             leftLeaderSupplyCurrent,
             rightLeaderTemperature,
-
             rightLeaderSupplyCurrent,
             leftFollowerTemperature,
             leftFollowerMotorVoltage,
@@ -290,12 +262,10 @@ class ShooterIOHardware : ShooterIO {
         )
 
         leftLeaderMotorConnected = leftLeaderMotor.isAlive
-
         rightLeaderMotorConnected = rightLeaderMotor.isAlive
-
         leftFollowerMotorConnected = leftFollowerMotor.isAlive
-
         rightFollowerMotorConnected = rightFollowerMotor.isAlive
+        hoodMotorConnected = hoodMotor.isAlive
 
         leftLeaderMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
         rightLeaderMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
