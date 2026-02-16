@@ -152,12 +152,12 @@ class BLineRoutines(
         return routine
     }
 
-    fun one_samecycle_test(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("one_samecycle_test")
-        val path1 = Path("one_samecycle_test_pt1")
-        val path2 = Path("one_samecycle_test_pt2")
-        val path3 = Path("one_samecycle_test_pt3")
-        val path4 = Path("one_samecycle_test_pt4")
+    fun R_half_close(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("R_half_close")
+        val path1 = Path("R_half_reg_pt1")
+        val path2 = Path("R_half_reg_pt2")
+        val path3 = Path("R_half_close_pt1")
+        val path4 = Path("R_half_close_pt2")
 
         FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
         FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
@@ -178,6 +178,335 @@ class BLineRoutines(
 
         return routine
     }
+
+    fun R_half_far(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("R_half_far")
+        val path1 = Path("R_half_reg_pt1")
+        val path2 = Path("R_half_reg_pt2")
+        val path3 = Path("R_half_far_pt1")
+        val path4 = Path("R_half_far_pt2")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path3),
+                pathBuilder.build(path4),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun R_half_thenregloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("R_half_thenregloop")
+        val path1 = Path("R_half_reg_pt1")
+        val path2 = Path("R_half_reg_pt2")
+        val path3 = Path("R_loop_reg")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path3),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+
+        return routine
+    }
+
+    fun R_half_thencloseloop(): AutoRoutine {
+        val routine : AutoRoutine = autoFactory.newRoutine("R_half_thencloseloop")
+        val path1 = Path("R_half_reg_pt1")
+        val path2 = Path("R_half_reg_pt2")
+        val path3 = Path("R_loop_close")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path3),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun R_half_thenfarloop(): AutoRoutine {
+        val routine : AutoRoutine = autoFactory.newRoutine("R_half_thenfarloop")
+        val path1 = Path("R_half_reg_pt1")
+        val path2 = Path("R_half_reg_pt2")
+        val path3 = Path("R_loop_far")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path3),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun L_half_close(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_half_close")
+        val path1 = Path("L_half_reg_pt1")
+        val path2 = Path("L_half_reg_pt2")
+        val path3 = Path("L_half_close_pt1")
+        val path4 = Path("L_half_close_pt2")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommnad(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path3),
+                pathBuilder.build(path4),
+                //WaitCommand(3.5)
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun L_half_far(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_half_far")
+        val path1 = Path("L_half_reg_pt1")
+        val path2 = Path("L_half_reg_pt2")
+        val path3 = Path("L_half_far_pt1")
+        val path4 = Path("L_half_far_pt2")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommnad(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path3),
+                pathBuilder.build(path4),
+                //WaitCommand(3.5)
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun L_half_thenregloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_half_thenregloop")
+        val path1 = Path("L_half_reg_pt1")
+        val path2 = Path("L_half_reg_pt2")
+        val path3 = Path("L_loop_reg")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path3),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun L_half_thencloseloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_half_thencloseloop")
+        val path1 = Path("L_half_reg_pt1")
+        val path2 = Path("L_half_reg_pt2")
+        val path3 = Path("L_half_close")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path3),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+
+        return routine
+    }
+
+    fun L_half_thenfarloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_half_thenfarloop")
+        val path1: Path = Path("L_half_reg_pt1")
+        val path2: Path = Path("L_half_reg_pt2")
+        val path3 = Path("L_half_far")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path3),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+
+    fun R_regloop_thencloseloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("R_regloop_thencloseloop")
+        val path1: Path = Path("R_loop_reg")
+        val path2: Path = Path("L_loop_close")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                //WaitCommand(3.5),
+                PrintCommand("Start shooting"),
+                pathBuilder.build(path2),
+                //WaitCommand(3.0),
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun R_regloop_thenfarloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("R_regloop_thenfarloop")
+        val path1: Path = Path("R_loop_reg")
+        val path2: Path = Path("L_loop_far")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun L_regloop_thencloseloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_regloop_thencloseloop")
+        val path1: Path = Path("L_loop_reg")
+        val path2: Path = Path("R_loop_close")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+
+    fun L_regloop_thenfarloop(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("L_regloop_thenfarloop")
+        val path1: Path = Path("L_loop_reg")
+        val path2: Path = Path("R_loop_far")
+
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path1),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path2),
+                //WaitCommand(3.5),
+                PrintCommand("Stop Shooting")
+            )
+        )
+
+        return routine
+    }
+
+
 
     fun just_forward(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("just_forward")
@@ -338,7 +667,20 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line 2 cycle bump (R)", this::bump2cycle)
         // autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycle)
         // autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trench_chute)
-        autoChooser.addRoutine("One same cycle test", this::one_samecycle_test)
+        autoChooser.addRoutine("B-Line R half close", this::R_half_close)
+        autoChooser.addRoutine("B-Line R half far", this::R_half_far)
+        autoChooser.addRoutine("B-Line R half then reg loop", this::R_half_thenregloop)
+        autoChooser.addRoutine("B-Line R half then close loop", this::R_half_thencloseloop)
+        autoChooser.addRoutine("B-Line R half then far loop", this::R_half_thenfarloop)
+        autoChooser.addRoutine("B-Line L half close", this::L_half_close)
+        autoChooser.addRoutine("B-Line L half far", this::L_half_far)
+        autoChooser.addRoutine("B-Line L half then reg loop", this::L_half_thenregloop)
+        autoChooser.addRoutine("B-Line L half then close loop", this::L_half_thencloseloop)
+        autoChooser.addRoutine("B-Line L half then far loop", this::L_half_thenfarloop)
+        autoChooser.addRoutine("B-Line R reg loop then close loop", this::R_regloop_thencloseloop)
+        autoChooser.addRoutine("B-Line R reg loop then far loop", this::R_regloop_thenfarloop)
+        autoChooser.addRoutine("B-Line L reg loop then close loop", this::L_regloop_thencloseloop)
+        autoChooser.addRoutine("B-Line L reg loop then far loop", this::L_regloop_thenfarloop)
         autoChooser.addRoutine("B-Line 2 cycle trench (R)", this::trench2cycleRight)
         autoChooser.addRoutine("B-Line 2 cycle trench (L)", this::trench2cycleLeft)
         autoChooser.addRoutine("B-Line 1 cycle trench + chute cycle (R)", this::trenchChuteRight)
