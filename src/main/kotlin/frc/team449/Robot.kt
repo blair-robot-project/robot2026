@@ -6,6 +6,7 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -56,6 +57,8 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotPeriodic() {
+        PhoenixUtil.refreshAll()
+
         // high priority (real-time) thread for loop timing
         Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()

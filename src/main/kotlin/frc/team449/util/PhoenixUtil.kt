@@ -26,6 +26,4 @@ object PhoenixUtil {
 
         BaseStatusSignal.refreshAll(*rioSignals)
     }
-
-
 }
