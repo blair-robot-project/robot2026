@@ -92,10 +92,10 @@ class DriveSubsystem(
                 heading,
             )
 
-        println("desiredAngle: $desiredAngle ")
-        println("Angle: $heading ")
-        println("desiredOmega: $desiredOmega ")
-        println("Omega: ${speeds.omegaRadiansPerSecond} ")
+        //println("desiredAngle: $desiredAngle ")
+        //println("Angle: $heading ")
+        //println("desiredOmega: $desiredOmega ")
+        //println("Omega: ${speeds.omegaRadiansPerSecond} ")
         // Apply generated speeds
         setControl(
             SwerveRequest

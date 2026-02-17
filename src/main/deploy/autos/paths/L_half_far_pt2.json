@@ -33,7 +33,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.8565706603558335,
-      "lib_key": "stop_intake"
+      "lib_key": "end_intake"
     },
     {
       "type": "translation",

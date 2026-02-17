@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers
 import frc.team449.auto.BLineRoutines
-import frc.team449.auto.ChoreoRoutines
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -21,7 +20,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-    val choreoRoutines = ChoreoRoutines(this)
+    //val choreoRoutines = ChoreoRoutines(this)
     val autoChooser = AutoChooser()
     val bLineRoutines = BLineRoutines(this)
 
@@ -63,7 +62,7 @@ class Robot : LoggedRobot() {
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
 
-        choreoRoutines.addOptions(autoChooser)
+        //choreoRoutines.addOptions(autoChooser)
         bLineRoutines.addOptions(autoChooser)
         SmartDashboard.putData("Auto Chooser", autoChooser)
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler())

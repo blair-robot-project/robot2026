@@ -33,7 +33,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.37724058321719306,
-      "lib_key": "stop_intake"
+      "lib_key": "end_intake"
     },
     {
       "type": "event_trigger",

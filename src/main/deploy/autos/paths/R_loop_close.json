@@ -56,7 +56,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.6471807668796749,
-      "lib_key": "stop_intake"
+      "lib_key": "end_intake"
     },
     {
       "type": "waypoint",
