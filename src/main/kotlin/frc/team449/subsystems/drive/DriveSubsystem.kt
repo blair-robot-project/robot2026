@@ -28,6 +28,9 @@ class DriveSubsystem(
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
+    val pose: Pose2d
+        get() = inputs.Pose
+
     override fun periodic() {
         io.updateInputs(inputs)
         io.logModules(inputs)
@@ -41,8 +44,6 @@ class DriveSubsystem(
     fun resetOdometry(pose: Pose2d) {
         io.resetOdometry(pose)
     }
-
-    fun getPose(): Pose2d = inputs.Pose
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
@@ -104,6 +105,12 @@ class DriveSubsystem(
                 .withVelocityY(newSpeeds.vyMetersPerSecond)
                 .withRotationalRate(newSpeeds.omegaRadiansPerSecond),
         )
+    fun seedFieldCentric(): Command {
+        return this.runOnce {
+            if (io is DriveIOHardware) {
+                io.seedFieldCentric()
+            }
+        }
     }
 
     var heading: Rotation2d
@@ -137,7 +144,7 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    // Swerve requests to apply during SysId characterization
+    // swerve requests to apply during SysId characterization
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     private val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
     private val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()

@@ -59,7 +59,7 @@ class DriveIOSim(
                 ),
             )
 
-    private val startingPose = Pose2d(3.0, 3.0, Rotation2d())
+    private val startingPose = Pose2d(0.0, 0.0, Rotation2d())
     val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier =
@@ -83,6 +83,9 @@ class DriveIOSim(
     }
 
     private fun initializeSimulation() {
+        // ONLY FOR CONFIG
+        SimulatedArena.getInstance().shutDown()
+
         SimulatedArena.overrideSimulationTimings(Seconds.of(SIM_LOOP_TIME), 1)
         SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive)
 

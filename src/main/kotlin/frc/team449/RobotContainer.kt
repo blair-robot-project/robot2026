@@ -12,10 +12,10 @@ import frc.team449.subsystems.indexer.Indexer
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
-import frc.team449.subsystems.intake.Intake
 import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
+import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
@@ -61,8 +61,8 @@ object RobotContainer {
             },
         )
 
-    val intake: Intake =
-        Intake(
+    val intake: IntakeSubsystem =
+        IntakeSubsystem(
             when (Constants.CURRENT_MODE) {
                 Mode.REAL -> IntakeIOHardware()
                 Mode.SIM -> IntakeIOSim()
@@ -78,14 +78,14 @@ object RobotContainer {
                 Mode.REPLAY -> object : IndexerIO {}
             },
         )
-    val shooter: ShooterSubsystem =
-        ShooterSubsystem(
-            when (Constants.CURRENT_MODE) {
-                Mode.REAL -> ShooterIOHardware()
-                Mode.SIM -> ShooterIOSim()
-                Mode.REPLAY -> object : ShooterIO {}
-            },
-        )
+
+    val shooter: ShooterSubsystem = ShooterSubsystem(
+        when (Constants.CURRENT_MODE) {
+            Mode.REAL -> ShooterIOHardware()
+            Mode.SIM -> ShooterIOSim()
+            Mode.REPLAY -> object : ShooterIO {}
+        }
+    )
 
     val bindings = Bindings(this)
 }
