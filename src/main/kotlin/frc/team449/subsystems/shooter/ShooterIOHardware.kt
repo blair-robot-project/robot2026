@@ -196,9 +196,9 @@ open class ShooterIOHardware : ShooterIO {
     }
 
     // probably used for characterization
-    override fun setFlywheelVoltage(voltage: Double) {
-        leftLeaderMotor.setVoltage(voltage)
-        rightLeaderMotor.setVoltage(voltage)
+    override fun setFlywheelVoltage(volts: Double) {
+        leftLeaderMotor.setVoltage(volts)
+        rightLeaderMotor.setVoltage(volts)
     }
 
     override fun setHoodAngle(angle: Angle) {

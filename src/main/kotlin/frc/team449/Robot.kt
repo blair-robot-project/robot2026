@@ -3,6 +3,9 @@ package frc.team449
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
+import edu.wpi.first.math.MathUtil
+import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.units.Units.Inches
 import edu.wpi.first.units.Units.Meters
 import edu.wpi.first.wpilibj.DriverStation
@@ -120,6 +123,31 @@ class Robot : LoggedRobot() {
                 .`in`(Meters),
         )
 
+    override fun simulationPeriodic() {
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
+        Logger.recordOutput(
+            "FinalComponentPoses",
+            *arrayOf(
+                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
+                Pose3d(
+                    MathUtil.inverseInterpolate(
+                        Constants.IntakeConstants.STOW_POS_RADS,
+                        Constants.IntakeConstants.DEPLOY_POS_RADS,
+                        robotContainer.intake.intakeSimAngle
+                    ) * 0.3,
+                    0.0,
+                    0.0,
+                    Rotation3d()
+                ),
+                Pose3d(
+                    -0.1,
+                    0.0,
+                    0.4,
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
+                )
+            )
+        )
+    }
         fuelSim.start()
         SmartDashboard.putData(
             Commands

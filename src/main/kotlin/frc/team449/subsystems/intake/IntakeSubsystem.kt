@@ -12,6 +12,8 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
+    var intakeSimAngle: Double = 0.0
+
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
@@ -64,6 +66,7 @@ class IntakeSubsystem(
     override fun simulationPeriodic() {
         if (io is IntakeIOSim) {
             io.simulationPeriodic()
+            intakeSimAngle = io.pivotSim.angleRads
         }
     }
 }

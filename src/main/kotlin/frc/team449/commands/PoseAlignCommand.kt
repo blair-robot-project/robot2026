@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.DoubleSupplier
@@ -82,6 +83,8 @@ class PoseAlignCommand(
     }
 
     override fun end(interrupted: Boolean) {
-        drive.setControl(SwerveRequest.SwerveDriveBrake())
+        CommandScheduler.getInstance().schedule(
+            SmartXLockCommand(drive, throttleSupplier, strafeSupplier, turnSupplier)
+        )
     }
 }
