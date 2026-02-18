@@ -106,10 +106,10 @@ class Robot : LoggedRobot() {
         )
 
         fuelSim.registerIntake(
-            Constants.Dimensions.FULL_LENGTH
+            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
                 .div(2.0)
                 .`in`(Meters),
-            Constants.Dimensions.FULL_LENGTH
+            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
                 .div(2.0)
                 .plus(Inches.of(3.0))
                 .`in`(Meters),
@@ -121,33 +121,9 @@ class Robot : LoggedRobot() {
                 .div(2.0)
                 .minus(Inches.of(5.0))
                 .`in`(Meters),
+            robotContainer.intake.isSimIntaking(),
         )
 
-    override fun simulationPeriodic() {
-        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
-        Logger.recordOutput(
-            "FinalComponentPoses",
-            *arrayOf(
-                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
-                Pose3d(
-                    MathUtil.inverseInterpolate(
-                        Constants.IntakeConstants.STOW_POS_RADS,
-                        Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle
-                    ) * 0.3,
-                    0.0,
-                    0.0,
-                    Rotation3d()
-                ),
-                Pose3d(
-                    -0.1,
-                    0.0,
-                    0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
-                )
-            )
-        )
-    }
         fuelSim.start()
         SmartDashboard.putData(
             Commands
@@ -163,5 +139,30 @@ class Robot : LoggedRobot() {
 
     override fun simulationPeriodic() {
         fuelSim.updateSim()
+        Logger.recordOutput("isSimintaking", robotContainer.intake.isSimIntaking())
+
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
+        Logger.recordOutput(
+            "FinalComponentPoses",
+            *arrayOf(
+                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
+                Pose3d(
+                    MathUtil.inverseInterpolate(
+                        Constants.IntakeConstants.STOW_POS_RADS,
+                        Constants.IntakeConstants.DEPLOY_POS_RADS,
+                        robotContainer.intake.intakeSimAngle,
+                    ) * 0.3,
+                    0.0,
+                    0.0,
+                    Rotation3d(),
+                ),
+                Pose3d(
+                    -0.1,
+                    0.0,
+                    0.4,
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0),
+                ),
+            ),
+        )
     }
 }

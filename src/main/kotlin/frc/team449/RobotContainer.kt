@@ -82,13 +82,15 @@ object RobotContainer {
             },
         )
 
-    val shooter: ShooterSubsystem = ShooterSubsystem(
-        when (Constants.CURRENT_MODE) {
-            Mode.REAL -> ShooterIOHardware()
-            Mode.SIM -> ShooterIOSim()
-            Mode.REPLAY -> object : ShooterIO {}
-        }
-    )
+    val shooter: ShooterSubsystem =
+        ShooterSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> ShooterIOHardware()
+                Mode.SIM -> ShooterIOSim()
+                Mode.REPLAY -> object : ShooterIO {}
+            },
+            fuelSim,
+        )
 
     val bindings = Bindings(this)
 }

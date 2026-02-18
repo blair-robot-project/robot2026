@@ -10,12 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.robot.FuelSim
-import frc.team449.Constants
-import frc.team449.Constants.ShooterConstants.CURRENT_HOMING_STATOR_THRESH
-import frc.team449.Constants.ShooterConstants.CURRENT_HOMING_VOLTAGE
-import frc.team449.Constants.ShooterConstants.HOMING_DEBOUNCE_TIME
-import frc.team449.Constants.ShooterConstants.HOMING_DEBOUNCE_TYPE
-import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import frc.team449.Constants.ShooterConstants
 import org.littletonrobotics.junction.Logger
 import kotlin.math.PI
@@ -46,45 +40,42 @@ class ShooterSubsystem(
         }
     }
 
-    fun setFlywheelVelocity(velocity: AngularVelocity): Command {
-        return runOnce {
+    fun setFlywheelVelocity(velocity: AngularVelocity): Command =
+        runOnce {
             flywheelTargetVelocity = velocity
             io.setFlywheelVelocity(velocity)
+
             fuelSim.launchFuel(
                 MetersPerSecond.of(
-                    velocity.`in`(RotationsPerSecond) * Constants.ShooterConstants.FLYWHEEL_RADIUS.`in`(Meters) * 2 * PI
+                    inputs.rightLeaderVelocityRadPerSec *
+                        ShooterConstants.FLYWHEEL_RADIUS.`in`(Meters) * 2 * PI,
                 ),
-                inputs.hoodCurrentPos,
+                Radians.of(inputs.hoodPositionRad),
                 Radians.of(0.0),
-                Constants.ShooterConstants.SHOOTER_HEIGHT
+                ShooterConstants.SHOOTER_HEIGHT,
             )
         }
-    }
 
-    fun stopFlywheel(): Command {
-        return runOnce {
+    fun stopFlywheel(): Command =
+        runOnce {
             flywheelTargetVelocity = RadiansPerSecond.of(0.0)
             io.setFlywheelVoltage(0.0)
         }
-    }
 
-    fun setHoodAngle(angle: Angle): Command {
-        return runOnce {
+    fun setHoodAngle(angle: Angle): Command =
+        runOnce {
             io.setHoodAngle(angle)
         }
-    }
 
-    fun setHoodVoltage(volts: Double): Command {
-        return runOnce {
+    fun setHoodVoltage(volts: Double): Command =
+        runOnce {
             io.setHoodVoltage(volts)
         }
-    }
 
-    fun resetHoodPosition(angle: Angle): Command {
-        return runOnce {
+    fun resetHoodPosition(angle: Angle): Command =
+        runOnce {
             io.resetHoodPosition(angle)
         }
-    }
 
     fun isFlywheelAtTolerance(): Boolean {
         val target = flywheelTargetVelocity.`in`(RadiansPerSecond)
@@ -101,8 +92,8 @@ class ShooterSubsystem(
         return hoodDebouncer.calculate(error < ShooterConstants.HOOD_TOLERANCE_RAD)
     }
 
-    fun homeHood(): Command {
-        return Commands.sequence(
+    fun homeHood(): Command =
+        Commands.sequence(
             runOnce {
                 io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)
             },
@@ -110,7 +101,6 @@ class ShooterSubsystem(
             runOnce {
                 setHoodVoltage(0.0)
                 resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
-            }
+            },
         )
-    }
 }

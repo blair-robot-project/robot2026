@@ -53,11 +53,12 @@ class DriveSubsystem(
             inputs.Pose.rotation,
         )
 
-    fun seedFieldCentric() {
-        if (io is DriveIOHardware) {
-            io.seedFieldCentric()
+    fun seedFieldCentric(): Command =
+        runOnce {
+            if (io is DriveIOHardware) {
+                io.seedFieldCentric()
+            }
         }
-    }
 
     private val xController: PIDController
         get() = PIDController(5.0, 0.0, 0.0)
@@ -82,11 +83,11 @@ class DriveSubsystem(
 
         val speeds =
             ChassisSpeeds(
-                sample.vx + xController.calculate(getPose().x, sample.x),
-                sample.vy + yController.calculate(getPose().y, sample.y),
+                sample.vx + xController.calculate(pose.x, sample.x),
+                sample.vy + yController.calculate(pose.y, sample.y),
                 sample.omega +
                     headingController.calculate(
-                        getPose().rotation.minus(Rotation2d.fromRadians(MathUtil.angleModulus(sample.heading))).radians,
+                        pose.rotation.minus(Rotation2d.fromRadians(MathUtil.angleModulus(sample.heading))).radians,
                     ),
             )
 
@@ -111,9 +112,9 @@ class DriveSubsystem(
     }
 
     var heading: Rotation2d
-        get() = Rotation2d(MathUtil.angleModulus(getPose().rotation.radians))
+        get() = Rotation2d(MathUtil.angleModulus(pose.rotation.radians))
         set(value) {
-            inputs.Pose = Pose2d(Translation2d(getPose().x, getPose().y), value)
+            inputs.Pose = Pose2d(Translation2d(pose.x, pose.y), value)
         }
 
     // should only be called in driverStationConnected() to prevent null alliance

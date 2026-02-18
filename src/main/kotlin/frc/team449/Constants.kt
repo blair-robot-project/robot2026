@@ -57,10 +57,11 @@ object Constants {
         val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
         val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
 
-        val BLUE_TRENCH_POSES: List<Pose2d> = listOf(
-            Pose2d(4.35, 0.45, Rotation2d(1.5)),
-            Pose2d(4.35, 7.60, Rotation2d(-1.5))
-        )
+        val BLUE_TRENCH_POSES: List<Pose2d> =
+            listOf(
+                Pose2d(4.35, 0.45, Rotation2d(1.5)),
+                Pose2d(4.35, 7.60, Rotation2d(-1.5)),
+            )
     }
 
     object VisionConstants {
@@ -120,7 +121,23 @@ object Constants {
 
         const val HOOD_MOI = 0.0694270649
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
+
+        // fuel sim
+        val FLYWHEEL_RADIUS = Meters.of(3.965079 / 2)
+        val SHOOTER_HEIGHT = Inches.of(18.0)
     }
+
+    object Dimensions {
+        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
+        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
+        val FRAME_WIDTH: Distance = Inches.of(33.0) // i think? // left to right (y-axis)
+        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
+
+        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
+        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
+    }
+
+    // other subsystem constants when applicable
 
     object IntakeConstants {
         // config constants
