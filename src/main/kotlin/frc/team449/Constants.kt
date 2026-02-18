@@ -3,7 +3,6 @@ package frc.team449
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
@@ -69,65 +68,59 @@ object Constants {
     }
 
     object ShooterConstants {
+        // FLYWHEEL
         const val LEFT_FLYWHEEL_LEADER_ID = 11
         const val LEFT_FLYWHEEL_FOLLOWER_ID = 12
         const val RIGHT_FLYWHEEL_LEADER_ID = 13
         const val RIGHT_FLYWHEEL_FOLLOWER_ID = 14
-        const val HOOD_MOTOR_ID = 15
 
         const val FLYWHEEL_SUPPLY_LIM = 40.0
         const val FLYWHEEL_STATOR_LIM = 80.0
 
-        const val HOOD_SUPPLY_LIM = 40.0
-        const val HOOD_STATOR_LIM = 50.0
+        const val FLYWHEEL_GEARING = 32.0 / 18
 
-        val MIN_HOOD_ANGLE = Degrees.of(14.85072467)
-        val MAX_HOOD_ANGLE = Degrees.of(46.24524767)
-
-        // hood gains
-        const val HOOD_KP = 6.7
-        const val HOOD_KI = 0.67
-        const val HOOD_KD = 0.0
-
-        // feedforward
-        const val HOOD_KS = 0.1
-        const val HOOD_KG = 0.11
-        const val HOOD_KV = 2.1
-
-        // flywheel gains
         const val FLYWHEEL_KP = 0.5
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
         const val FLYWHEEL_KS = 0.05
         const val FLYWHEEL_KV = 0.1
 
-        // debouncer
-        const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
-        val HOMING_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
+        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
+        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
 
-        const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
-        val TOLERANCE_DEBOUNCE_TYPE = Debouncer.DebounceType.kRising
+        // HOOD
+        const val HOOD_MOTOR_ID = 15
 
-        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
+        const val HOOD_SUPPLY_LIM = 40.0
+        const val HOOD_STATOR_LIM = 50.0
 
-        const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
-
-        const val FLYWHEEL_GEARING = 32.0 / 18 //
         const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
 
-        const val HOOD_MOMENT_OF_INERTIA = 0.0694270649
-        val HOOD_LENGTH = Units.inchesToMeters(5.91)
-        val FLYWHEEL_MOI = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
+        const val HOOD_KP = 6.7
+        const val HOOD_KI = 0.67
+        const val HOOD_KD = 0.0
+        const val HOOD_KS = 0.1
+        const val HOOD_KG = 0.11
+        const val HOOD_KV = 2.1
+
+        // HOMING AND TOLERANCE
+        const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
+        const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
 
         const val HOMING_VOLTAGE = 2.0
         const val HOMING_STATOR_AMPS = 45.0 // amps
-    }
 
-    object LEDConstants {
-        // led constants
-    }
+        const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
+        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
-    // other subsystem constants when applicable
+        val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467)
+        val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767)
+
+        val FLYWHEEL_MOI = 0.5 * Units.lbsToKilograms(1.5) * Units.inchesToMeters(4.0).pow(2.0)
+
+        const val HOOD_MOI = 0.0694270649
+        val HOOD_LENGTH = Units.inchesToMeters(5.91)
+    }
 
     object IntakeConstants {
         // config constants
@@ -139,37 +132,39 @@ object Constants {
         val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
-        const val STOW_POS_RADS = 0.0
-        const val DEPLOY_POS_RADS = 1.61
-
+        const val STOW_POS_RADS = 0.0 // TODO: fix positions
+        const val DEPLOY_POS_RADS = 2.0
         const val DEPLOY_VOLTS = 8.0
+
         const val DEPLOY_HOLD_VOLTS = 2.0
         const val STOW_VOLTS = -8.0
         const val STOW_HOLD_VOLTS = -2.0
-
         const val PIVOT_GEARING_SENSOR_TO_MECH = 50.0
+
         const val PIVOT_MOI = 0.1549510896
         const val ARM_LENGTH_METERS = 0.2996692
         const val VIZ_OFFSET_DEG = 33.873
-
         val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
+
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
-
         const val ROLLER_MOI = 0.0001411489
-        const val ROLLER_GEARING = 4.0 / 3
 
+        const val ROLLER_GEARING = 4.0 / 3
         val HOMING_CURRENT_AMPS = 20.0
+
         val HOMING_VELOCITY_RAD_PER_SEC = 0.5
     }
 
     object IndexerConstants {
-        // motor definitions that are currently placeholders
-
         const val LEFT_INDEXER_ID = 21
+
         const val RIGHT_INDEXER_ID = 22
         const val INDEXER_STATOR_LIMIT = 60.0
         const val INDEXER_SUPPLY_LIMIT = 30.0
-
         // add more indexers as needed
+    }
+
+    object LEDConstants {
+        // led constants
     }
 }

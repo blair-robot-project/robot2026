@@ -18,7 +18,9 @@ class ShooterSubsystem(
     private val inputs: ShooterIOInputsAutoLogged = ShooterIOInputsAutoLogged()
     private var flywheelTargetVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
 
-    private val currentHomingDebouncer: Debouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, ShooterConstants.HOMING_DEBOUNCE_TYPE)
+    var hoodSimAngle: Double = 0.0
+
+    private val currentHomingDebouncer: Debouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
     private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
     private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
 
@@ -30,6 +32,7 @@ class ShooterSubsystem(
     override fun simulationPeriodic() {
         if (io is ShooterIOSim) {
             io.simulationPeriodic()
+            hoodSimAngle = io.hoodSim.angleRads
         }
     }
 
@@ -80,7 +83,7 @@ class ShooterSubsystem(
         return hoodDebouncer.calculate(error < ShooterConstants.HOOD_TOLERANCE_RAD)
     }
 
-    fun currentHoming(): Command {
+    fun homeHood(): Command {
         return Commands.sequence(
             runOnce {
                 io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)

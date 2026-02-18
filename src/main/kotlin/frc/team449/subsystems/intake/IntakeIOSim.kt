@@ -16,7 +16,7 @@ import frc.team449.Constants.IntakeConstants
 import kotlin.math.abs
 
 class IntakeIOSim : IntakeIOHardware() {
-    private val pivotSim = SingleJointedArmSim(
+    val pivotSim = SingleJointedArmSim(
         DCMotor.getKrakenX44(2),
         IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
         IntakeConstants.PIVOT_MOI,

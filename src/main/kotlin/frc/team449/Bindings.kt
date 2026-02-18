@@ -1,10 +1,12 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer.drive
 import frc.team449.commands.PoseAlignCommand
-import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.util.Field
 
 class Bindings(
     val robotContainer: RobotContainer
@@ -27,57 +29,83 @@ class Bindings(
         driver
             .rightTrigger()
             .onTrue(
-                InstantCommand()
-                // intake deploy THEN
-                // run intake
+                SequentialCommandGroup(
+                    robotContainer.intake.deploy(),
+                    robotContainer.intake.intake()
+                )
             )
 
         driver
             .leftTrigger()
             .onTrue(
-                InstantCommand()
-                // intake retract
+                SequentialCommandGroup(
+                    robotContainer.intake.stopRollers(),
+                    robotContainer.intake.stow()
+                )
             )
 
         driver
             .rightBumper()
             .whileTrue(
-                InstantCommand()
-                // manual shoot
+                robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL)
+                // check tol and feed
             )
             .onFalse(
-                InstantCommand()
-                // coast shooter
+                robotContainer.shooter.stopFlywheel()
+                // coast hopper
             )
 
         driver
             .x()
             .onTrue(
-                PoseAlignCommand(
-                    robotContainer.drive,
-                    { Field.getClosestTrenchPose(robotContainer.drive.pose) },
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { driver.rightX },
+                SequentialCommandGroup(
+                    ParallelCommandGroup(
+                        PoseAlignCommand(
+                            robotContainer.drive,
+                            { Field.getClosestTrenchPose(robotContainer.drive.pose) },
+                            { -driver.leftY },
+                            { -driver.leftX },
+                            { driver.rightX },
+                        ),
+                        robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL)
+                    )
                 )
-                // shoot
+                // feed
             )
 
-        driver
-            .a()
-            .onTrue(
-                SmartXLockCommand(
-                    robotContainer.drive,
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { driver.rightX },
-                )
-            )
+//        driver
+//            .a()
+//            .onTrue(
+//                SmartXLockCommand(
+//                    robotContainer.drive,
+//                    { -driver.leftY },
+//                    { -driver.leftX },
+//                    { driver.rightX },
+//                )
+//            )
 
         driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric()
+            )
+
+        driver
+            .b()
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE)
+            )
+            .onFalse(
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+            )
+
+        driver
+            .a()
+            .onTrue(
+                robotContainer.intake.deploy()
+            )
+            .onFalse(
+                robotContainer.intake.stow()
             )
     }
 }

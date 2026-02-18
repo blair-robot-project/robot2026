@@ -16,7 +16,7 @@ import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_MOI
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
 import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
-import frc.team449.Constants.ShooterConstants.HOOD_MOMENT_OF_INERTIA
+import frc.team449.Constants.ShooterConstants.HOOD_MOI
 import frc.team449.Constants.ShooterConstants.MAX_HOOD_ANGLE
 import frc.team449.Constants.ShooterConstants.MIN_HOOD_ANGLE
 
@@ -32,10 +32,10 @@ class ShooterIOSim : ShooterIOHardware() {
     )
     // two flywheel sims will have the exact same behavior -- unnecessary
 
-    private val hoodSim: SingleJointedArmSim = SingleJointedArmSim(
+    val hoodSim: SingleJointedArmSim = SingleJointedArmSim(
         DCMotor.getKrakenX60(1),
         HOOD_GEARING,
-        HOOD_MOMENT_OF_INERTIA,
+        HOOD_MOI,
         HOOD_LENGTH,
         MIN_HOOD_ANGLE.`in`(Radians),
         MAX_HOOD_ANGLE.`in`(Radians),
