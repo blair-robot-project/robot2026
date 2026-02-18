@@ -85,7 +85,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 1.0,
-      "lib_key": "shoot"
+      "lib_key": "start_shooting"
     },
     {
       "type": "waypoint",
@@ -172,7 +172,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 1.0,
-      "lib_key": "shoot"
+      "lib_key": "start_shooting"
     },
     {
       "type": "waypoint",

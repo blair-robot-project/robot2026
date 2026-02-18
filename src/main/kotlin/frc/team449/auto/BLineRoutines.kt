@@ -33,7 +33,7 @@ class BLineRoutines(
 ) {
     val autoFactory =
         AutoFactory(
-            drive::getPose,
+            drive::pose,
             drive::resetOdometry,
             { sample: SwerveSample -> drive.followTrajectory(robot, sample) },
             true,
@@ -80,7 +80,7 @@ class BLineRoutines(
         FollowPath
             .Builder(
                 drive,
-                drive::getPose,
+                drive::pose,
                 drive::getRobotRelativeSpeeds,
                 { speeds: ChassisSpeeds ->
                     Logger.recordOutput("Bline speed", speeds)
@@ -94,6 +94,12 @@ class BLineRoutines(
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
 
+    fun eventTriggerCommands() {
+        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
+        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
+        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+    }
+
     fun R_half_close(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("R_half_close")
         val path1 = Path("R_half_reg_pt1")
@@ -101,9 +107,7 @@ class BLineRoutines(
         val path3 = Path("R_half_close_pt1")
         val path4 = Path("R_half_close_pt2")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             Commands.sequence(
@@ -128,9 +132,7 @@ class BLineRoutines(
         val path3 = Path("R_half_far_pt1")
         val path4 = Path("R_half_far_pt2")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             Commands.sequence(
@@ -154,9 +156,7 @@ class BLineRoutines(
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_loop_reg")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             Commands.sequence(
@@ -181,9 +181,7 @@ class BLineRoutines(
         val path3 = Path("L_half_close_pt1")
         val path4 = Path("L_half_close_pt2")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             Commands.sequence(
@@ -208,20 +206,36 @@ class BLineRoutines(
         val path3 = Path("L_half_far_pt1")
         val path4 = Path("L_half_far_pt2")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start Shooting"))
+        eventTriggerCommands()
+
+        routine.active().onTrue(
+            Commands.sequence(
+                pathBuilder.build(path3),
+                pathBuilder.build(path4),
+                WaitCommand(3.5),
+                PrintCommand("Stop shooting"),
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
+                WaitCommand(3.5),
+                PrintCommand("Stop shooting")
+            )
+        )
+
+        return routine
+    }
+
+    fun L_half_far_test(): AutoRoutine {
+        val routine: AutoRoutine = autoFactory.newRoutine("test")
+        val path1 = Path("L_half_far_pt1")
+        val path2 = Path("L_half_far_pt2")
+
+        eventTriggerCommands()
 
         routine.active().onTrue(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
-                PrintCommand("Stop shooting"),
-                pathBuilder.build(path3),
-                pathBuilder.build(path4),
-                WaitCommand(3.5),
-                PrintCommand("Stop shooting")
+                WaitCommand(6.0),
             )
         )
 
@@ -234,9 +248,7 @@ class BLineRoutines(
         val path2 = Path("L_half_reg_pt2")
         val path3 = Path("L_loop_reg")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             Commands.sequence(
@@ -257,9 +269,7 @@ class BLineRoutines(
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val path = Path("trench_5")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             pathBuilder.build(path),
@@ -272,9 +282,7 @@ class BLineRoutines(
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val path = Path("trench_7")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             pathBuilder.build(path),
@@ -287,9 +295,7 @@ class BLineRoutines(
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val path = Path("trench_4")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+       eventTriggerCommands()
 
         routine.active().onTrue(
             pathBuilder.build(path),
@@ -302,9 +308,7 @@ class BLineRoutines(
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
         val path = Path("trench_6")
 
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("shoot", PrintCommand("Shooting"))
+        eventTriggerCommands()
 
         routine.active().onTrue(
             pathBuilder.build(path),
@@ -325,5 +329,7 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line 2 cycle same trench auto (L)", this::trenchSameL)
         autoChooser.addRoutine("B-Line 2 cycle different trench auto (R)", this::trenchDifferentR)
         autoChooser.addRoutine("B-Line 2 cycle different trench auto (L)", this::trenchDifferentL)
+
+        autoChooser.addRoutine("L half far test", this::L_half_far_test)
     }
 }

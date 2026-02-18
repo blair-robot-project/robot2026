@@ -70,6 +70,12 @@ class DriveSubsystem(
         headingController.enableContinuousInput(-Math.PI, Math.PI)
     }
 
+    var heading: Rotation2d
+        get() = Rotation2d(MathUtil.angleModulus(pose.rotation.radians))
+        set(value) {
+            inputs.Pose = Pose2d(Translation2d(pose.x, pose.y), value)
+        }
+
     fun followTrajectory(
         robot: Robot,
         sample: SwerveSample
@@ -79,11 +85,11 @@ class DriveSubsystem(
 
         val speeds =
             ChassisSpeeds(
-                sample.vx + xController.calculate(getPose().x, sample.x),
-                sample.vy + yController.calculate(getPose().y, sample.y),
+                sample.vx + xController.calculate(pose.x, sample.x),
+                sample.vy + yController.calculate(pose.y, sample.y),
                 sample.omega +
                     headingController.calculate(
-                        getPose().rotation.minus(Rotation2d.fromRadians(MathUtil.angleModulus(sample.heading))).radians,
+                        pose.rotation.minus(Rotation2d.fromRadians(MathUtil.angleModulus(sample.heading))).radians,
                     ),
             )
 
@@ -113,12 +119,6 @@ class DriveSubsystem(
         }
     }
 
-    var heading: Rotation2d
-        get() = Rotation2d(MathUtil.angleModulus(getPose().rotation.radians))
-        set(value) {
-            inputs.Pose = Pose2d(Translation2d(getPose().x, getPose().y), value)
-        }
-
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
         if (io is DriveIOHardware) {
@@ -145,9 +145,9 @@ class DriveSubsystem(
     }
 
     // swerve requests to apply during SysId characterization
-    private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
-    private val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
-    private val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()
+    val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
+    val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
+    val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()
 
     // SysId routine for characterizing translation. This is used to find PID gains for the drive motors.
     val sysIDTranslationRoutine =
@@ -218,4 +218,4 @@ class DriveSubsystem(
                 this,
             ),
         )
-}
+}}

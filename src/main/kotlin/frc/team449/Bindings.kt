@@ -84,11 +84,11 @@ class Bindings(
 //                )
 //            )
 
-        driver
-            .start()
-            .onTrue(
-                robotContainer.drive.seedFieldCentric()
-            )
+      //  driver
+         //   .start()
+       //     .onTrue(
+      //          robotContainer.drive.seedFieldCentric()
+      //      )
 
         driver
             .b()

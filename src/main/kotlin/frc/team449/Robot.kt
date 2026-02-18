@@ -58,9 +58,9 @@ class Robot : LoggedRobot() {
 
     private val robotContainer = RobotContainer
 
-    override fun driverStationConnected() {
-        robotContainer.drive.setOperatorPerspectiveForward()
-    }
+    //override fun driverStationConnected() {
+     //   robotContainer.drive.setOperatorPerspectiveForward()
+    //}
 
     override fun robotInit() {
         robotContainer.bindings.setDefaultCommands()
