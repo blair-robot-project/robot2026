@@ -81,6 +81,7 @@ object RobotContainer {
                 Mode.REPLAY -> object : IndexerIO {}
             },
         )
+
     val shooter: ShooterSubsystem = ShooterSubsystem(
         when (Constants.CURRENT_MODE) {
             Mode.REAL -> ShooterIOHardware()

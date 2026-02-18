@@ -16,6 +16,7 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
@@ -26,6 +27,9 @@ class DriveSubsystem(
     val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+
+    val pose: Pose2d
+        get() = inputs.Pose
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -40,8 +44,6 @@ class DriveSubsystem(
     fun resetOdometry(pose: Pose2d) {
         io.resetOdometry(pose)
     }
-
-    fun getPose(): Pose2d = inputs.Pose
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
@@ -139,7 +141,7 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    // Swerve requests to apply during SysId characterization
+    // swerve requests to apply during SysId characterization
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     private val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
     private val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()

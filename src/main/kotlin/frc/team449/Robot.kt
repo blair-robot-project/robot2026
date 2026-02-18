@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.team449.RobotContainer.drive
 import frc.team449.RobotContainer.fuelSim
+import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -62,6 +63,8 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotPeriodic() {
+        PhoenixUtil.refreshAll()
+
         // high priority (real-time) thread for loop timing
         Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()
@@ -95,7 +98,7 @@ class Robot : LoggedRobot() {
             Constants.Dimensions.FULL_WIDTH.`in`(Meters),
             Constants.Dimensions.FULL_LENGTH.`in`(Meters),
             Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
-            { drive.getPose() },
+            { drive.pose },
             drive::getFieldRelativeSpeeds,
         )
 

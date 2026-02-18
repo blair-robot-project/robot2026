@@ -1,30 +1,83 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.team449.RobotContainer.drive
+import frc.team449.commands.PoseAlignCommand
+import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
     val robotContainer: RobotContainer
 ) {
-    val driveController = robotContainer.driveController
-    val opController = robotContainer.opController
+    val driver = robotContainer.driveController
+    val operator = robotContainer.opController
 
     fun setDefaultCommands() {
         // set default commands for systems here
         robotContainer.drive.defaultCommand =
             SwerveRequestCommand(
                 robotContainer.drive,
-                { -robotContainer.driveController.leftY },
-                { -robotContainer.driveController.leftX },
-                { robotContainer.driveController.rightX },
+                { -driver.leftY },
+                { -driver.leftX },
+                { driver.rightX },
             )
     }
 
     fun bindControls() {
-        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward))
-        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
-        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kForward))
-        opController.povUp().whileTrue(drive.sysIDTranslationRoutine.dynamic(SysIdRoutine.Direction.kReverse))
+        driver
+            .rightTrigger()
+            .onTrue(
+                InstantCommand()
+                // intake deploy THEN
+                // run intake
+            )
+
+        driver
+            .leftTrigger()
+            .onTrue(
+                InstantCommand()
+                // intake retract
+            )
+
+        driver
+            .rightBumper()
+            .whileTrue(
+                InstantCommand()
+                // manual shoot
+            )
+            .onFalse(
+                InstantCommand()
+                // coast shooter
+            )
+
+        driver
+            .x()
+            .onTrue(
+                PoseAlignCommand(
+                    robotContainer.drive,
+                    { Field.getClosestTrenchPose(robotContainer.drive.pose) },
+                    { -driver.leftY },
+                    { -driver.leftX },
+                    { driver.rightX },
+                )
+                // shoot
+            )
+
+        driver
+            .a()
+            .onTrue(
+                SmartXLockCommand(
+                    robotContainer.drive,
+                    { -driver.leftY },
+                    { -driver.leftX },
+                    { driver.rightX },
+                )
+            )
+
+        driver
+            .start()
+            .onTrue(
+                robotContainer.drive.seedFieldCentric()
+            )
     }
 }
