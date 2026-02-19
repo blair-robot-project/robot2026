@@ -249,12 +249,13 @@ class BLineRoutines(
 
     fun trenchSameR(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path = Path("trench_5")
+        val path1 = Path("R_trench_start")
+        val path2 = Path("R_trench_beyond")
 
         eventTriggerCommands()
 
         routine.active().onTrue(
-            pathBuilder.build(path),
+            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
         )
 
         return routine
@@ -262,12 +263,13 @@ class BLineRoutines(
 
     fun trenchSameL(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path = Path("trench_7")
+        val path1 = Path("L_trench_start")
+        val path2 = Path("L_trench_beyond")
 
         eventTriggerCommands()
 
         routine.active().onTrue(
-            pathBuilder.build(path),
+            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
         )
 
         return routine
@@ -275,12 +277,13 @@ class BLineRoutines(
 
     fun trenchDifferentR(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path = Path("trench_4")
+        val path1 = Path("R_trench_start")
+        val path2 = Path("R_trench_across")
 
        eventTriggerCommands()
 
         routine.active().onTrue(
-            pathBuilder.build(path),
+            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
         )
 
         return routine
@@ -288,12 +291,13 @@ class BLineRoutines(
 
     fun trenchDifferentL(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path = Path("trench_6")
+        val path1 = Path("L_trench_start")
+        val path2 = Path("L_trench_across")
 
         eventTriggerCommands()
 
         routine.active().onTrue(
-            pathBuilder.build(path),
+            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
         )
 
         return routine
