@@ -4,7 +4,7 @@
       "type": "waypoint",
       "translation_target": {
         "x_meters": 4.246422199963723,
-        "y_meters": 0.5647650501210624,
+        "y_meters": 0.534,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -15,7 +15,7 @@
     {
       "type": "translation",
       "x_meters": 5.7287721877390725,
-      "y_meters": 0.5669229137255218,
+      "y_meters": 0.534,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -26,8 +26,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.521767387376594,
-        "y_meters": 0.5924321926289338,
+        "x_meters": 6.994569986889186,
+        "y_meters": 0.7776637117191036,
         "intermediate_handoff_radius_meters": 0.4
       },
       "rotation_target": {
@@ -39,7 +39,7 @@
       "type": "waypoint",
       "translation_target": {
         "x_meters": 7.629224757638678,
-        "y_meters": 3.123975732098777,
+        "y_meters": 3.2,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -51,17 +51,17 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 2.35,
+        "value": 3.9,
         "start_ordinal": 3,
         "end_ordinal": 3
       },
       {
-        "value": 2.0,
+        "value": 3.7,
         "start_ordinal": 2,
         "end_ordinal": 2
       },
       {
-        "value": 4.5,
+        "value": 4.7,
         "start_ordinal": 0,
         "end_ordinal": 1
       }

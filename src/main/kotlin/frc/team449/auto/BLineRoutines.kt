@@ -113,11 +113,11 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop shooting"),
                 pathBuilder.build(path3),
                 pathBuilder.build(path4),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop shooting"),
             ),
         )
@@ -138,11 +138,11 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop Shooting"),
                 pathBuilder.build(path3),
                 pathBuilder.build(path4),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop Shooting")
             )
         )
@@ -162,10 +162,10 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop Shooting"),
                 pathBuilder.build(path3),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop Shooting")
             )
         )
@@ -187,11 +187,11 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop shooting"),
                 pathBuilder.build(path3),
                 pathBuilder.build(path4),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop shooting")
             )
         )
@@ -212,30 +212,12 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path3),
                 pathBuilder.build(path4),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop shooting"),
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
-                PrintCommand("Stop shooting")
-            )
-        )
-
-        return routine
-    }
-
-    fun L_half_far_test(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("test")
-        val path1 = Path("L_half_far_pt1")
-        val path2 = Path("L_half_far_pt2")
-
-        eventTriggerCommands()
-
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
                 WaitCommand(6.0),
+                PrintCommand("Stop shooting")
             )
         )
 
@@ -254,10 +236,10 @@ class BLineRoutines(
             Commands.sequence(
                 pathBuilder.build(path1),
                 pathBuilder.build(path2),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop Shooting"),
                 pathBuilder.build(path3),
-                WaitCommand(3.5),
+                WaitCommand(6.0),
                 PrintCommand("Stop Shooting")
             )
         )
@@ -329,7 +311,5 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line 2 cycle same trench auto (L)", this::trenchSameL)
         autoChooser.addRoutine("B-Line 2 cycle different trench auto (R)", this::trenchDifferentR)
         autoChooser.addRoutine("B-Line 2 cycle different trench auto (L)", this::trenchDifferentL)
-
-        autoChooser.addRoutine("L half far test", this::L_half_far_test)
     }
 }
