@@ -102,8 +102,8 @@ object Constants {
 
         const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
 
-        const val HOOD_KP = 6.7
-        const val HOOD_KI = 0.67
+        const val HOOD_KP = 100.0
+        const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
         const val HOOD_KS = 0.1
         const val HOOD_KG = 0.11
