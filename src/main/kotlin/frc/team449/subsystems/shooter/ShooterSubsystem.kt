@@ -31,6 +31,7 @@ class ShooterSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Shooter", inputs)
+        Logger.recordOutput("FlyWheel at Tolerance ", isFlywheelAtTolerance())
     }
 
     override fun simulationPeriodic() {
@@ -103,4 +104,6 @@ class ShooterSubsystem(
                 resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
             },
         )
+
+    fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
 }

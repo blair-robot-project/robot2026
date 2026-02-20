@@ -4,6 +4,7 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.*
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -62,19 +63,23 @@ class ShooterIOSim : ShooterIOHardware() {
     private val hoodSimState = hoodMotor.simState
     private val leftLeaderSimState = leftLeaderMotor.simState
     private val leftFollowerSimState = leftFollowerMotor.simState
+    private val rightLeaderSimState = rightLeaderMotor.simState
+    private val rightFollowerSimState = rightFollowerMotor.simState
 
     init {
         SmartDashboard.putData("Hood", mech)
     }
 
     fun simulationPeriodic() {
-        val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps * 2 // simulating two flywheels
+        val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
         val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
         RoboRioSim.setVInVoltage(loadedVoltage)
 
         hoodSimState.setSupplyVoltage(loadedVoltage)
         leftLeaderSimState.setSupplyVoltage(loadedVoltage)
         leftFollowerSimState.setSupplyVoltage(loadedVoltage)
+        rightLeaderSimState.setSupplyVoltage(loadedVoltage)
+        rightFollowerSimState.setSupplyVoltage(loadedVoltage)
 
         hoodSim.setInput(hoodSimState.motorVoltage)
         hoodSim.update(Constants.LOOP_TIME)
@@ -90,10 +95,12 @@ class ShooterIOSim : ShooterIOHardware() {
         flywheelSim.setInput(leftLeaderSimState.motorVoltage)
         flywheelSim.update(Constants.LOOP_TIME)
 
-        val leftRotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * FLYWHEEL_GEARING
+        val rotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * FLYWHEEL_GEARING
 
-        leftLeaderSimState.setRotorVelocity(leftRotorVel)
-        leftFollowerSimState.setRotorVelocity(leftRotorVel)
+        leftLeaderSimState.setRotorVelocity(rotorVel)
+        leftFollowerSimState.setRotorVelocity(rotorVel)
+        rightLeaderSimState.setRotorVelocity(rotorVel)
+        rightFollowerSimState.setRotorVelocity(rotorVel)
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
