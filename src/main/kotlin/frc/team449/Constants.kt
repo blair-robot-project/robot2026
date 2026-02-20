@@ -128,7 +128,7 @@ object Constants {
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
 
         // fuel sim
-        val FLYWHEEL_RADIUS = Meters.of(3.965079 / 2)
+        val FLYWHEEL_RADIUS = Inches.of(3.965079 / 2)
         val SHOOTER_HEIGHT = Inches.of(18.0)
     }
 

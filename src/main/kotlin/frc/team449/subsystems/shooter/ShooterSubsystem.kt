@@ -48,7 +48,7 @@ class ShooterSubsystem(
 
             fuelSim.launchFuel(
                 MetersPerSecond.of(
-                    inputs.rightLeaderVelocityRadPerSec *
+                    velocity.`in`(RadiansPerSecond) *
                         ShooterConstants.FLYWHEEL_RADIUS.`in`(Meters) * 2 * PI,
                 ),
                 Radians.of(inputs.hoodPositionRad),
