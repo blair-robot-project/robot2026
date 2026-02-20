@@ -24,6 +24,9 @@ object Constants {
         REPLAY
     }
 
+    val BLUE_GOAL_POSE = Pose2d(4.625594, 4.034536, Rotation2d(0.0))
+    val RED_GOAL_POSE = Pose2d(11.915394, 4.034536, Rotation2d(0.0))
+
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
 
     const val TUNING_MODE: Boolean = false
@@ -211,6 +214,15 @@ object Constants {
         const val TOP_MOI = .000000008 // TODO: Find
 
         val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
+    }
+
+    object AimbotConstants {
+        // Aimbot PID Constants
+        const val AIMBOT_KP = 10.0
+        const val AIMBOT_KI = 0.0
+        const val AIMBOT_KD = 0.0
+        const val VELOCITY_COEFFICIENT = 1.5
+        const val PERIODIC_TIME = 0.02
     }
 
     object LEDConstants {
