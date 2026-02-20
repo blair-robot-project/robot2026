@@ -4,8 +4,8 @@ import edu.wpi.first.units.Units.RotationsPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
+import frc.team449.Constants.IntakeConstants.DEPLOY_POS_RADS
 import org.littletonrobotics.junction.Logger
-import java.util.function.BooleanSupplier
 import kotlin.math.abs
 
 class IntakeSubsystem(
@@ -73,11 +73,7 @@ class IntakeSubsystem(
         )
     }
 
-    fun isSimIntaking(): BooleanSupplier =
-        BooleanSupplier {
-            inputs.pivotPositionRad >= 1.5 &&
-                inputs.rollerVelocityRadPerSec != 0.0
-        }
+    fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2
 
     override fun simulationPeriodic() {
         if (io is IntakeIOSim) {
