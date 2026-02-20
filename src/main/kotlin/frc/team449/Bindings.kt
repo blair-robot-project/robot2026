@@ -1,13 +1,12 @@
 package frc.team449
 
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
@@ -101,11 +100,11 @@ class Bindings(
                 robotContainer.intake.deploy(),
             )
 
-        driver
-            .x()
-            .onTrue(
-                robotContainer.intake.intake(),
-            )
+//        driver
+//            .x()
+//            .onTrue(
+//                robotContainer.intake.intake(),
+//            )
 
         driver
             .y()
@@ -114,11 +113,11 @@ class Bindings(
             ).onFalse(
                 robotContainer.indexer.stop(),
             )
-//
-//        driver
-//            .x()
-//            .onTrue(
-//                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(160.0)),
-//            ).onFalse(robotContainer.shooter.stopFlywheel())
+
+        driver
+            .x()
+            .onTrue(
+                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(100.0)),
+            ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

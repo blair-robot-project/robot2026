@@ -91,8 +91,8 @@ object Constants {
 
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
 
-        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
-        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
+        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(70.0)
+        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(130.0)
 
         // HOOD
         const val HOOD_MOTOR_ID = 15
@@ -128,7 +128,7 @@ object Constants {
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
 
         // fuel sim
-        val FLYWHEEL_RADIUS = Meters.of(3.965079 / 2)
+        val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT = Inches.of(18.0)
     }
 
