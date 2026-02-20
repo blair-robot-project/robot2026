@@ -1,101 +1,99 @@
 package frc.team449.subsystems.intake
-import com.ctre.phoenix6.sim.TalonFXSimState
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
-import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
+import frc.team449.Constants
 import frc.team449.Constants.IntakeConstants
+import kotlin.math.abs
 
 class IntakeIOSim : IntakeIOHardware() {
-    private val pivotGearbox = DCMotor.getKrakenX44(2)
-    private val pivotSim =
-        SingleJointedArmSim(
-            pivotGearbox,
-            IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
-            IntakeConstants.PIVOT_MOI,
-            IntakeConstants.ARM_LENGTH.`in`(Meters),
-            IntakeConstants.DEPLOY_POSITION.`in`(Radians),
-            IntakeConstants.STOW_POSITION.`in`(Radians),
-            true,
-            IntakeConstants.STOW_POSITION.`in`(Radians),
-        )
+    val pivotSim = SingleJointedArmSim(
+        DCMotor.getKrakenX44(2),
+        IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
+        IntakeConstants.PIVOT_MOI,
+        IntakeConstants.ARM_LENGTH_METERS,
+        IntakeConstants.STOW_POS_RADS,
+        IntakeConstants.DEPLOY_POS_RADS,
+        true,
+        IntakeConstants.STOW_POS_RADS,
+    )
 
-    private val rollerGearbox = DCMotor.getKrakenX60(2)
-    private val rollerSim =
-        FlywheelSim(
-            LinearSystemId.createFlywheelSystem(
-                rollerGearbox,
-                IntakeConstants.ROLLER_MOI,
-                IntakeConstants.ROLLER_GEARING
-            ),
-            rollerGearbox
-        )
+    private val rollerSim = FlywheelSim(
+        LinearSystemId.createFlywheelSystem(
+            DCMotor.getKrakenX60(2),
+            IntakeConstants.ROLLER_MOI,
+            IntakeConstants.ROLLER_GEARING
+        ),
+        DCMotor.getKrakenX60(2)
+    )
 
     // mech2d stuff
     val mech = Mechanism2d(3.0, 3.0)
-    val mechRoot = mech.getRoot("Intake Pivot", 1.0, 1.0)
-    val pivotMechanism =
-        mechRoot.append(
-            MechanismLigament2d(
-                "Intake Pivot Ligament",
-                1.0,
-                IntakeConstants.STOW_POSITION.`in`(Radians),
-                4.0,
-                Color8Bit(Color.kRed),
-            ),
+    val mechRoot: MechanismRoot2d = mech.getRoot("Intake Pivot", 1.0, 1.0)
+    val pivotMechanism: MechanismLigament2d = mechRoot.append(
+        MechanismLigament2d(
+            "Intake Pivot Ligament",
+            1.0,
+            Units.radiansToDegrees(IntakeConstants.STOW_POS_RADS) + 90 - IntakeConstants.VIZ_OFFSET_DEG,
+            4.0,
+            Color8Bit(Color.kRed)
         )
+    )
+
+    private val pivotLeaderSim = pivotLeader.simState
+    private val pivotFollowerSim = pivotFollower.simState
+    private val rollerLeaderSim = rollerLeader.simState
+    private val rollerFollowerSim = rollerFollower.simState
 
     init {
-        val pivotMotorSim = pivotMotor.simState
-        val pivotFollowerSim = pivotFollower.simState
-        val rollerMotorSim = rollerMotor.simState
-        val rollerFollowerSim = rollerFollower.simState
-
-        pivotMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
-        pivotFollowerSim.setMotorType(TalonFXSimState.MotorType.KrakenX44)
-        rollerMotorSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
-        rollerFollowerSim.setMotorType(TalonFXSimState.MotorType.KrakenX60)
-
         SmartDashboard.putData("Intake", mech)
     }
 
-    override fun simulationPeriodic() {
-        val pivotMotorSim = pivotMotor.simState
-        val pivotFollowerSim = pivotFollower.simState
-        val rollerMotorSim = rollerMotor.simState
-        val rollerFollowerSim = rollerFollower.simState
+    override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
+        super.updateInputs(inputs)
+    }
 
-        pivotMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+    fun simulationPeriodic() {
+        pivotLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        rollerMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        rollerLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         rollerFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
 
-        // update arm
-        pivotSim.setInputVoltage(pivotMotorSim.motorVoltageMeasure.`in`(Volts))
-        pivotSim.update(0.02)
-        pivotMotorSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
-        pivotMotorSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
-        pivotFollowerSim.setRawRotorPosition(Radians.of(pivotSim.angleRads))
-        pivotFollowerSim.setRotorVelocity(RadiansPerSecond.of(pivotSim.velocityRadPerSec))
-        pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads)
+        pivotSim.setInput(pivotLeaderSim.motorVoltage)
+        pivotSim.update(Constants.LOOP_TIME)
 
-        // update roller
-        rollerSim.inputVoltage = rollerMotorSim.motorVoltageMeasure.`in`(Volts)
-        rollerSim.update(0.02)
-        rollerMotorSim.setRotorVelocity(rollerSim.angularVelocity)
-        rollerFollowerSim.setRotorVelocity(rollerSim.angularVelocity)
-        if (rollerSim.angularVelocity.isNear(RadiansPerSecond.of(0.0), 0.01)) {
-            pivotMechanism.color = Color8Bit(Color.kRed)
-        } else {
+        val pivotRotorPos = Units.radiansToRotations(pivotSim.angleRads) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+        val pivotRotorVel = Units.radiansToRotations(pivotSim.velocityRadPerSec) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+
+        pivotLeaderSim.setRawRotorPosition(pivotRotorPos)
+        pivotLeaderSim.setRotorVelocity(pivotRotorVel)
+        pivotFollowerSim.setRawRotorPosition(pivotRotorPos)
+        pivotFollowerSim.setRotorVelocity(pivotRotorVel)
+
+        rollerSim.setInput(rollerLeaderSim.motorVoltage)
+        rollerSim.update(0.020)
+
+        val rollerRotorVel = Units.radiansToRotations(rollerSim.angularVelocityRadPerSec) * IntakeConstants.ROLLER_GEARING
+
+        rollerLeaderSim.setRotorVelocity(rollerRotorVel)
+        rollerFollowerSim.setRotorVelocity(rollerRotorVel)
+
+        // update viz
+        pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads) + 90 - IntakeConstants.VIZ_OFFSET_DEG
+
+        if (abs(rollerSim.angularVelocityRadPerSec) > 1.0) {
             pivotMechanism.color = Color8Bit(Color.kGreen)
+        } else {
+            pivotMechanism.color = Color8Bit(Color.kRed)
         }
     }
 }

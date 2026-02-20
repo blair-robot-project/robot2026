@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.configs.TalonFXSConfiguration
 import com.ctre.phoenix6.hardware.CANcoder
+import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.hardware.TalonFXS
 import com.ctre.phoenix6.swerve.SwerveDrivetrain
@@ -19,6 +20,7 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
+import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
@@ -50,9 +52,19 @@ open class DriveIOHardware(
     val accelX: StatusSignal<LinearAcceleration> = pigeon2.accelerationX
     val accelY: StatusSignal<LinearAcceleration> = pigeon2.accelerationY
 
+    val gyroSignals = arrayOf(
+        angularPitchVelocity,
+        angularRollVelocity,
+        angularYawVelocity,
+        roll,
+        pitch,
+        accelX,
+        accelY
+    )
+
     init {
         BaseStatusSignal.setUpdateFrequencyForAll(
-            100.0,
+            50.0,
             angularPitchVelocity,
             angularRollVelocity,
             angularYawVelocity,
@@ -61,6 +73,9 @@ open class DriveIOHardware(
             accelX,
             accelY,
         )
+
+        ParentDevice.optimizeBusUtilizationForAll(pigeon2)
+        PhoenixUtil.registerSignals(*gyroSignals)
 
         this.odometryThread.setThreadPriority(99)
 
@@ -108,10 +123,6 @@ open class DriveIOHardware(
         val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
         if (driveState.ModuleStates == null) return
         for (i in 0 until modules.count()) {
-            Logger.recordOutput(
-                moduleNames[i] + "/Absolute Encoder Angle",
-                getModule(i).steerMotor.rawPulseWidthPosition.valueAsDouble * 360,
-            )
             Logger.recordOutput(
                 moduleNames[i] + "/Steering Angle",
                 driveState.ModuleStates[i].angle,

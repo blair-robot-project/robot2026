@@ -1,21 +1,17 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.StatusSignal
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
-import com.ctre.phoenix6.configs.FeedbackConfigs
-import com.ctre.phoenix6.configs.MotorOutputConfigs
-import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VelocityVoltage
+import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
@@ -23,10 +19,9 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.units.measure.Current
-import edu.wpi.first.units.measure.Temperature
-import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.Alert
+import frc.team449.Constants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
@@ -45,257 +40,125 @@ import frc.team449.Constants.ShooterConstants.HOOD_KV
 import frc.team449.Constants.ShooterConstants.HOOD_MOTOR_ID
 import frc.team449.Constants.ShooterConstants.HOOD_STATOR_LIM
 import frc.team449.Constants.ShooterConstants.HOOD_SUPPLY_LIM
-import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
-import frc.team449.Constants.ShooterConstants.TOLERANCE_DEBOUNCE_TIME
-import frc.team449.Constants.ShooterConstants.TOLERANCE_DEBOUNCE_TYPE
+import frc.team449.util.PhoenixUtil
 import kotlin.math.abs
 
-class ShooterIOHardware : ShooterIO {
+open class ShooterIOHardware : ShooterIO {
     // TODO: a little constants
     // TODO: interpolating double map for flywheel velocity + hood angle
 
-    private val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
-    private val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
+    val leftLeaderMotor = TalonFX(LEFT_FLYWHEEL_LEADER_ID)
+    val leftFollowerMotor = TalonFX(LEFT_FLYWHEEL_FOLLOWER_ID)
+    val rightLeaderMotor = TalonFX(RIGHT_FLYWHEEL_LEADER_ID)
+    val rightFollowerMotor = TalonFX(RIGHT_FLYWHEEL_FOLLOWER_ID)
+    val hoodMotor = TalonFX(HOOD_MOTOR_ID)
 
-    private val rightLeaderMotor = TalonFX(RIGHT_FLYWHEEL_LEADER_ID)
-    private val rightFollowerMotor = TalonFX(RIGHT_FLYWHEEL_FOLLOWER_ID)
+    private val flywheelVelocityRequest = VelocityVoltage(0.0)
+        .withEnableFOC(false)
+        .withSlot(0)
+    private val flywheelVoltageRequest = VoltageOut(0.0)
+    private val hoodPositionRequest = PositionVoltage(0.0)
+    private val hoodVoltageRequest = VoltageOut(0.0)
 
-    private val hoodMotor = TalonFX(HOOD_MOTOR_ID)
+    private val leftLeaderVelocity = leftLeaderMotor.velocity
+    private val leftLeaderMotorVoltage = leftLeaderMotor.motorVoltage
+    private val leftLeaderSupplyCurrent = leftLeaderMotor.supplyCurrent
+    private val leftLeaderStatorCurrent = leftLeaderMotor.statorCurrent
+    private val leftLeaderTemperature = leftLeaderMotor.deviceTemp
 
-    private val toleranceDebouncer: Debouncer = Debouncer(TOLERANCE_DEBOUNCE_TIME, TOLERANCE_DEBOUNCE_TYPE)
+    private val leftFollowerMotorVoltage = leftFollowerMotor.motorVoltage
+    private val leftFollowerSupplyCurrent = leftFollowerMotor.supplyCurrent
+    private val leftFollowerStatorCurrent = leftFollowerMotor.statorCurrent
+    private val leftFollowerTemperature = leftFollowerMotor.deviceTemp
 
-    private val flywheelConfig: TalonFXConfiguration
-    private val hoodConfig: TalonFXConfiguration
-    private var leftLeaderMotorConnected: Boolean = true
-    private var rightLeaderMotorConnected: Boolean = true
-    private var leftFollowerMotorConnected: Boolean = true
-    private var rightFollowerMotorConnected: Boolean = true
-    private var hoodMotorConnected: Boolean = true
+    private val rightLeaderVelocity = rightLeaderMotor.velocity
+    private val rightLeaderMotorVoltage = rightLeaderMotor.motorVoltage
+    private val rightLeaderSupplyCurrent = rightLeaderMotor.supplyCurrent
+    private val rightLeaderStatorCurrent = rightLeaderMotor.statorCurrent
+    private val rightLeaderTemperature = rightLeaderMotor.deviceTemp
 
-    private val leftLeaderMotorVoltage: StatusSignal<Voltage>
-    private val leftLeaderSupplyCurrent: StatusSignal<Current>
-    private val leftLeaderStatorCurrent: StatusSignal<Current>
-    private val leftLeaderTemperature: StatusSignal<Temperature>
+    private val rightFollowerMotorVoltage = rightFollowerMotor.motorVoltage
+    private val rightFollowerSupplyCurrent = rightFollowerMotor.supplyCurrent
+    private val rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
+    private val rightFollowerTemperature = rightFollowerMotor.deviceTemp
 
-    private val rightLeaderMotorVoltage: StatusSignal<Voltage>
-    private val rightLeaderSupplyCurrent: StatusSignal<Current>
-    private val rightLeaderStatorCurrent: StatusSignal<Current>
-    private val rightLeaderTemperature: StatusSignal<Temperature>
+    private val hoodPosition = hoodMotor.position
+    private val hoodTargetPosition = hoodMotor.closedLoopReference
+    private val hoodMotorVoltage = hoodMotor.motorVoltage
+    private val hoodSupplyCurrent = hoodMotor.supplyCurrent
+    private val hoodStatorCurrent = hoodMotor.statorCurrent
+    private val hoodTemperature = hoodMotor.deviceTemp
 
-    private val leftFollowerMotorVoltage: StatusSignal<Voltage>
-    private val leftFollowerSupplyCurrent: StatusSignal<Current>
-    private val leftFollowerStatorCurrent: StatusSignal<Current>
-    private val leftFollowerTemperature: StatusSignal<Temperature>
+    private val lowPrioSignals = arrayOf(
+        leftLeaderSupplyCurrent,
+        leftLeaderTemperature,
+        leftFollowerMotorVoltage,
+        leftFollowerSupplyCurrent,
+        leftFollowerStatorCurrent,
+        leftFollowerTemperature,
 
-    private val rightFollowerMotorVoltage: StatusSignal<Voltage>
-    private val rightFollowerSupplyCurrent: StatusSignal<Current>
-    private val rightFollowerStatorCurrent: StatusSignal<Current>
-    private val rightFollowerTemperature: StatusSignal<Temperature>
+        rightLeaderSupplyCurrent,
+        rightLeaderTemperature,
+        rightFollowerMotorVoltage,
+        rightFollowerSupplyCurrent,
+        rightFollowerStatorCurrent,
+        rightFollowerTemperature,
 
-    private val hoodMotorVoltage: StatusSignal<Voltage>
-    private val hoodSupplyCurrent: StatusSignal<Current>
-    private val hoodStatorCurrent: StatusSignal<Current>
-    private val hoodTemperature: StatusSignal<Temperature>
-    private val hoodCurrentPos: StatusSignal<Angle>
-    private val hoodTargetPos: StatusSignal<Double>
+        hoodTargetPosition,
+        hoodMotorVoltage,
+        hoodSupplyCurrent,
+        hoodTemperature
+    )
 
-    private val leftLeaderMotorDisconnectedAlert =
-        Alert(
-            "left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)",
-            Alert.AlertType.kError,
-        )
-    private val rightLeaderMotorDisconnectedAlert =
-        Alert(
-            "right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)",
-            Alert.AlertType.kError,
-        )
-    private val leftFollowerMotorDisconnectedAlert =
-        Alert(
-            "left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)",
-            Alert.AlertType.kError,
-        )
-    private val rightFollowerMotorDisconnectedAlert =
-        Alert(
-            "right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)",
-            Alert.AlertType.kError,
-        )
-    private val hoodMotorDisconnectedAlert =
-        Alert(
-            "hood motor disconnected (ID $HOOD_MOTOR_ID",
-            Alert.AlertType.kError
-        )
+    private val highPrioSignals = arrayOf(
+        leftLeaderVelocity,
+        leftLeaderMotorVoltage,
+        leftLeaderStatorCurrent,
+
+        rightLeaderVelocity,
+        rightLeaderMotorVoltage,
+        rightLeaderStatorCurrent,
+
+        hoodPosition,
+        hoodStatorCurrent,
+    )
+
+    private val leftLeaderMotorDisconnectedAlert = Alert("left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val rightLeaderMotorDisconnectedAlert = Alert("right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val leftFollowerMotorDisconnectedAlert = Alert("left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val rightFollowerMotorDisconnectedAlert = Alert("right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val hoodMotorDisconnectedAlert = Alert("hood motor disconnected (ID $HOOD_MOTOR_ID)", Alert.AlertType.kError)
 
     init {
-        val flywheelCurrentLimitConfigs: CurrentLimitsConfigs =
-            CurrentLimitsConfigs()
-                .withSupplyCurrentLimit(FLYWHEEL_SUPPLY_LIM)
-                .withStatorCurrentLimit(FLYWHEEL_STATOR_LIM)
-
-        val hoodCurrentLimitConfigs: CurrentLimitsConfigs =
-            CurrentLimitsConfigs()
-                .withSupplyCurrentLimit(HOOD_SUPPLY_LIM)
-                .withStatorCurrentLimit(HOOD_STATOR_LIM)
-
-        val flywheelMotorOutput =
-            MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Coast)
-                .withInverted(InvertedValue.CounterClockwise_Positive)
-
-        val hoodMotorOutput =
-            MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Brake)
-                .withInverted(InvertedValue.CounterClockwise_Positive)
-
-        val flywheelFeedback =
-            FeedbackConfigs()
-                .withSensorToMechanismRatio(FLYWHEEL_GEARING)
-
-        val hoodFeedback =
-            FeedbackConfigs()
-                .withSensorToMechanismRatio(HOOD_GEARING)
-
-        val flywheelSlot0Configs =
-            Slot0Configs()
-                .withKP(FLYWHEEL_KP)
-                .withKI(FLYWHEEL_KI)
-                .withKD(FLYWHEEL_KD)
-                .withKS(FLYWHEEL_KS)
-                .withKV(FLYWHEEL_KV)
-
-        val hoodSlot0Configs =
-            Slot0Configs()
-                .withKP(HOOD_KP)
-                .withKI(HOOD_KI)
-                .withKD(HOOD_KD)
-                .withKS(HOOD_KS)
-                .withKG(HOOD_KG)
-                .withKV(HOOD_KV)
-
-        flywheelConfig =
-            TalonFXConfiguration()
-                .withCurrentLimits(flywheelCurrentLimitConfigs)
-                .withMotorOutput(flywheelMotorOutput)
-                .withFeedback(flywheelFeedback)
-                .withSlot0(flywheelSlot0Configs)
-
         leftLeaderMotor.configurator.apply(flywheelConfig)
         leftFollowerMotor.configurator.apply(flywheelConfig)
         rightLeaderMotor.configurator.apply(flywheelConfig)
         rightFollowerMotor.configurator.apply(flywheelConfig)
+        hoodMotor.configurator.apply(hoodConfig)
 
         leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
         rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
 
-        hoodConfig =
-            TalonFXConfiguration()
-                .withCurrentLimits(hoodCurrentLimitConfigs)
-                .withMotorOutput(hoodMotorOutput)
-                .withFeedback(hoodFeedback)
-                .withSlot0(hoodSlot0Configs)
-
-        hoodMotor.configurator.apply(hoodConfig)
-
-        leftLeaderTemperature = leftLeaderMotor.deviceTemp
-        leftLeaderMotorVoltage = leftLeaderMotor.motorVoltage
-        leftLeaderSupplyCurrent = leftLeaderMotor.supplyCurrent
-        leftLeaderStatorCurrent = leftLeaderMotor.statorCurrent
-
-        rightLeaderTemperature = rightLeaderMotor.deviceTemp
-        rightLeaderMotorVoltage = rightLeaderMotor.motorVoltage
-        rightLeaderSupplyCurrent = rightLeaderMotor.supplyCurrent
-        rightLeaderStatorCurrent = rightLeaderMotor.statorCurrent
-
-        leftFollowerTemperature = leftFollowerMotor.deviceTemp
-        leftFollowerMotorVoltage = leftFollowerMotor.motorVoltage
-        leftFollowerSupplyCurrent = leftFollowerMotor.supplyCurrent
-        leftFollowerStatorCurrent = leftFollowerMotor.statorCurrent
-
-        rightFollowerTemperature = rightFollowerMotor.deviceTemp
-        rightFollowerMotorVoltage = rightFollowerMotor.motorVoltage
-        rightFollowerSupplyCurrent = rightFollowerMotor.supplyCurrent
-        rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
-
-        hoodTemperature = hoodMotor.deviceTemp
-        hoodMotorVoltage = hoodMotor.motorVoltage
-        hoodSupplyCurrent = hoodMotor.supplyCurrent
-        hoodStatorCurrent = hoodMotor.statorCurrent
-        hoodCurrentPos = hoodMotor.position
-        hoodTargetPos = hoodMotor.closedLoopReference
-
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            4.0, //  doesn't need to update that often
-            leftLeaderTemperature,
-
-            leftLeaderSupplyCurrent,
-            rightLeaderTemperature,
-
-            rightLeaderSupplyCurrent,
-            leftFollowerTemperature,
-            leftFollowerMotorVoltage,
-            leftFollowerSupplyCurrent,
-            rightFollowerTemperature,
-            rightFollowerMotorVoltage,
-            rightFollowerSupplyCurrent,
-            hoodTemperature,
-            hoodMotorVoltage,
-            hoodSupplyCurrent,
-            hoodTargetPos
-        )
-
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            150.0,
-            leftLeaderMotorVoltage,
-            rightLeaderMotorVoltage,
-        )
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0,
-            leftLeaderStatorCurrent,
-            rightLeaderStatorCurrent,
-            leftFollowerStatorCurrent,
-            rightFollowerStatorCurrent,
-            hoodStatorCurrent,
-            hoodCurrentPos
-        )
-
         ParentDevice.optimizeBusUtilizationForAll(leftLeaderMotor, leftFollowerMotor, rightLeaderMotor, rightFollowerMotor, hoodMotor)
+
+        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
+
+        PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
-        BaseStatusSignal.refreshAll(
-            leftLeaderTemperature,
-            leftLeaderMotorVoltage,
-            leftLeaderSupplyCurrent,
-            leftLeaderStatorCurrent,
-            rightLeaderTemperature,
-            rightLeaderMotorVoltage,
-            rightLeaderSupplyCurrent,
-            rightLeaderStatorCurrent,
-            leftFollowerTemperature,
-            leftFollowerMotorVoltage,
-            leftFollowerSupplyCurrent,
-            leftFollowerStatorCurrent,
-            rightFollowerTemperature,
-            rightFollowerMotorVoltage,
-            rightFollowerSupplyCurrent,
-            rightFollowerStatorCurrent,
-            hoodTemperature,
-            hoodMotorVoltage,
-            hoodSupplyCurrent,
-            hoodStatorCurrent,
-            hoodCurrentPos
-        )
+        BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
 
-        leftLeaderMotorConnected = leftLeaderMotor.isAlive
-
-        rightLeaderMotorConnected = rightLeaderMotor.isAlive
-
-        leftFollowerMotorConnected = leftFollowerMotor.isAlive
-
-        rightFollowerMotorConnected = rightFollowerMotor.isAlive
+        val leftLeaderMotorConnected = leftLeaderMotor.isAlive
+        val leftFollowerMotorConnected = leftFollowerMotor.isAlive
+        val rightLeaderMotorConnected = rightLeaderMotor.isAlive
+        val rightFollowerMotorConnected = rightFollowerMotor.isAlive
+        val hoodMotorConnected = hoodMotor.isAlive
 
         leftLeaderMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
         rightLeaderMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
@@ -303,66 +166,105 @@ class ShooterIOHardware : ShooterIO {
         rightFollowerMotorDisconnectedAlert.set(!rightFollowerMotorConnected)
         hoodMotorDisconnectedAlert.set(!hoodMotorConnected)
 
-        inputs.leftVoltage = leftLeaderMotorVoltage.getValue().`in`(Volts)
-        inputs.leftSupplyCurrent = leftLeaderSupplyCurrent.getValue().`in`(Amps)
-        inputs.leftStatorCurrent = leftLeaderStatorCurrent.getValue().`in`(Amps)
-        inputs.leftTemperature = leftLeaderTemperature.getValue().`in`(Celsius)
-        inputs.leftMotorIsConnected = leftLeaderMotorConnected
-        inputs.leftFollowerMotorIsConnected = leftFollowerMotorConnected
+        inputs.leftLeaderVelocityRadPerSec = leftLeaderVelocity.value.`in`(RadiansPerSecond)
+        inputs.leftLeaderAppliedVolts = leftLeaderMotorVoltage.value.`in`(Volts)
+        inputs.leftLeaderSupplyCurrentAmps = leftLeaderSupplyCurrent.value.`in`(Amps)
+        inputs.leftLeaderStatorCurrentAmps = leftLeaderStatorCurrent.value.`in`(Amps)
+        inputs.leftLeaderTempCelsius = leftLeaderTemperature.value.`in`(Celsius)
 
-        inputs.rightVoltage = rightLeaderMotorVoltage.getValue().`in`(Volts)
-        inputs.rightSupplyCurrent = rightLeaderSupplyCurrent.getValue().`in`(Amps)
-        inputs.rightStatorCurrent = rightLeaderStatorCurrent.getValue().`in`(Amps)
-        inputs.rightTemperature = rightLeaderTemperature.getValue().`in`(Celsius)
-        inputs.rightMotorIsConnected = rightLeaderMotorConnected
-        inputs.rightFollowerMotorIsConneted = rightFollowerMotorConnected
+        inputs.leftFollowerAppliedVolts = leftFollowerMotorVoltage.value.`in`(Volts)
+        inputs.leftFollowerSupplyCurrentAmps = leftFollowerSupplyCurrent.value.`in`(Amps)
+        inputs.leftFollowerStatorCurrentAmps = leftFollowerStatorCurrent.value.`in`(Amps)
+        inputs.leftFollowerTempCelsius = leftFollowerTemperature.value.`in`(Celsius)
 
-        inputs.hoodVoltage = hoodMotorVoltage.getValue().`in`(Volts)
-        inputs.hoodSupplyCurrent = hoodSupplyCurrent.getValue().`in`(Amps)
-        inputs.hoodStatorCurrent = hoodStatorCurrent.getValue().`in`(Amps)
-        inputs.hoodTemperature = hoodTemperature.getValue().`in`(Celsius)
-        inputs.hoodMotorIsConnected = hoodMotorConnected
-        inputs.hoodCurrentPos = hoodCurrentPos.getValue().`in`(Radians)
-        inputs.hoodTargetPos = hoodTargetPos.value
-        inputs.leftFlywheelVelocity = leftLeaderMotor.velocity.value.`in`(RadiansPerSecond)
-        inputs.rightFlywheelVelocity = rightLeaderMotor.velocity.value.`in`(RadiansPerSecond)
+        inputs.rightLeaderVelocityRadPerSec = rightLeaderVelocity.value.`in`(RadiansPerSecond)
+        inputs.rightLeaderAppliedVolts = rightLeaderMotorVoltage.value.`in`(Volts)
+        inputs.rightLeaderSupplyCurrentAmps = rightLeaderSupplyCurrent.value.`in`(Amps)
+        inputs.rightLeaderStatorCurrentAmps = rightLeaderStatorCurrent.value.`in`(Amps)
+        inputs.rightLeaderTempCelsius = rightLeaderTemperature.value.`in`(Celsius)
+
+        inputs.rightFollowerAppliedVolts = rightFollowerMotorVoltage.value.`in`(Volts)
+        inputs.rightFollowerSupplyCurrentAmps = rightFollowerSupplyCurrent.value.`in`(Amps)
+        inputs.rightFollowerStatorCurrentAmps = rightFollowerStatorCurrent.value.`in`(Amps)
+        inputs.rightFollowerTempCelsius = rightFollowerTemperature.value.`in`(Celsius)
+
+        inputs.hoodPositionRad = hoodPosition.value.`in`(Radians)
+        inputs.hoodTargetPositionRad = Units.rotationsToRadians(hoodTargetPosition.value)
+        inputs.hoodAppliedVolts = hoodMotorVoltage.value.`in`(Volts)
+        inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
+        inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
+        inputs.hoodTempCelsius = hoodTemperature.value.`in`(Celsius)
+
+        inputs.hoodAtGoal = abs(inputs.hoodPositionRad - inputs.hoodTargetPositionRad) < ShooterConstants.HOOD_TOLERANCE_RAD
     }
 
     override fun setFlywheelVelocity(velocity: AngularVelocity) {
-        leftLeaderMotor.setControl(VelocityVoltage(velocity).withSlot(0))
-        rightLeaderMotor.setControl(VelocityVoltage(velocity).withSlot(0))
+        leftLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
+        rightLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
     }
 
-    override fun setHoodPosition(angle: Angle) {
-        hoodMotor.setControl(PositionVoltage(angle).withSlot(0))
+    // probably used for characterization
+    override fun setFlywheelVoltage(volts: Double) {
+        leftLeaderMotor.setVoltage(volts)
+        rightLeaderMotor.setVoltage(volts)
     }
 
-    override fun inTolerance(): Boolean {
-        return toleranceDebouncer.calculate(abs(hoodMotor.closedLoopError.value) < HOOD_TOLERANCE.`in`(Radians))
-    }
-
-    override fun getHoodPosition(): Angle {
-        return hoodMotor.position.value
+    override fun setHoodAngle(angle: Angle) {
+        hoodMotor.setControl(PositionVoltage(angle))
     }
 
     override fun setHoodVoltage(voltage: Double) {
         hoodMotor.setVoltage(voltage)
     }
 
-    override fun stopHoodVoltage() {
-        hoodMotor.setVoltage(0.0)
-    }
-
-    override fun getHoodStatorCurrent(): Current {
-        return hoodMotor.statorCurrent.value
-    }
-
     override fun resetHoodPosition(angle: Angle) {
         hoodMotor.setPosition(angle)
     }
 
-    override fun setFlywheelVoltage(voltage: Double) {
-        leftLeaderMotor.setVoltage(voltage)
-        rightLeaderMotor.setVoltage(voltage)
+    companion object {
+        val flywheelConfig = TalonFXConfiguration().apply {
+            CurrentLimits.apply {
+                SupplyCurrentLimit = FLYWHEEL_SUPPLY_LIM
+                StatorCurrentLimit = FLYWHEEL_STATOR_LIM
+            }
+
+            MotorOutput.apply {
+                NeutralMode = NeutralModeValue.Coast
+                Inverted = InvertedValue.CounterClockwise_Positive
+            }
+
+            Feedback.SensorToMechanismRatio = FLYWHEEL_GEARING
+
+            Slot0.apply {
+                kP = FLYWHEEL_KP
+                kI = FLYWHEEL_KI
+                kD = FLYWHEEL_KD
+                kS = FLYWHEEL_KS
+                kV = FLYWHEEL_KV
+            }
+        }
+
+        val hoodConfig = TalonFXConfiguration().apply {
+            CurrentLimits.apply {
+                SupplyCurrentLimit = HOOD_SUPPLY_LIM
+                StatorCurrentLimit = HOOD_STATOR_LIM
+            }
+
+            MotorOutput.apply {
+                NeutralMode = NeutralModeValue.Brake
+                Inverted = InvertedValue.CounterClockwise_Positive
+            }
+
+            Feedback.SensorToMechanismRatio = HOOD_GEARING
+
+            Slot0.apply {
+                kP = HOOD_KP
+                kI = HOOD_KI
+                kD = HOOD_KD
+                kS = HOOD_KS
+                kG = HOOD_KG
+                kV = HOOD_KV
+            }
+        }
     }
 }
