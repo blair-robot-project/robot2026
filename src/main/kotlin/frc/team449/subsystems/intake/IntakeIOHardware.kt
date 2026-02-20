@@ -128,8 +128,8 @@ open class IntakeIOHardware : IntakeIO {
             }
 
             MotorOutput.apply {
-                NeutralMode = NeutralModeValue.Brake
-                Inverted = InvertedValue.Clockwise_Positive
+                NeutralMode = IntakeConstants.LEFT_PIVOT_NEUTRAL_MODE
+                Inverted = IntakeConstants.LEFT_PIVOT_INVERSION
             }
 
             Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
@@ -149,8 +149,8 @@ open class IntakeIOHardware : IntakeIO {
             }
 
             MotorOutput.apply {
-                NeutralMode = NeutralModeValue.Coast
-                Inverted = InvertedValue.CounterClockwise_Positive
+                NeutralMode = IntakeConstants.LEFT_ROLLER_NEUTRAL_MODE
+                Inverted = IntakeConstants.LEFT_ROLLER_INVERSION
             }
 
             Slot0.apply {

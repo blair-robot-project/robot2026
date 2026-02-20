@@ -135,8 +135,15 @@ object Constants {
         const val LEFT_ROLLER_MOTOR_ID = 42
         const val RIGHT_ROLLER_FOLLOWER_ID = 43
 
+        val LEFT_PIVOT_NEUTRAL_MODE = NeutralModeValue.Brake
+        val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
+
+        val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
+
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+
 
         const val STOW_POS_RADS = 0.0 // TODO: fix positions
         const val DEPLOY_POS_RADS = 2.0
