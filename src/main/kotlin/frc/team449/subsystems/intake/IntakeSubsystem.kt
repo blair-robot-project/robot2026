@@ -1,15 +1,18 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.RotationsPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
 import frc.team449.Constants.IntakeConstants.DEPLOY_POS_RADS
+import frc.team449.Constants.IntakeConstants.INTAKE_VELOCITY
 import org.littletonrobotics.junction.Logger
+import java.util.function.BooleanSupplier
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO
+    private val io: IntakeIO,
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -23,7 +26,7 @@ class IntakeSubsystem(
     // roller commands
     fun intake(): Command =
         runEnd(
-            { io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY) },
+            { io.setRollerVelocity(INTAKE_VELOCITY) },
             { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
         ).withName("Intake")
 
@@ -53,7 +56,7 @@ class IntakeSubsystem(
 
     private fun slamHoming(
         moveVolts: Double,
-        holdVolts: Double
+        holdVolts: Double,
     ): Command {
         val hardstopDebouncer =
             Debouncer(
@@ -73,7 +76,7 @@ class IntakeSubsystem(
         )
     }
 
-    fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2
+    fun intakeIsDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2
 
     override fun simulationPeriodic() {
         if (io is IntakeIOSim) {
@@ -81,4 +84,10 @@ class IntakeSubsystem(
             intakeSimAngle = io.pivotSim.angleRads
         }
     }
+
+    fun isSimIntaking(): BooleanSupplier =
+        {
+            intakeIsDeployed() &&
+                abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.rollerVelocityRadPerSec) <= 10.0
+        }
 }

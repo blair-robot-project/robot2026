@@ -89,7 +89,6 @@ object RobotContainer {
                 Mode.SIM -> ShooterIOSim()
                 Mode.REPLAY -> object : ShooterIO {}
             },
-            fuelSim,
         )
 
     val bindings = Bindings(this)

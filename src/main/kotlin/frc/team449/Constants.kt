@@ -21,7 +21,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY
+        REPLAY,
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -166,7 +166,7 @@ object Constants {
         const val PIVOT_MOI = 0.1549510896
         const val ARM_LENGTH_METERS = 0.2996692
         const val VIZ_OFFSET_DEG = 33.873
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
+        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(40.0)
 
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
         const val ROLLER_MOI = 0.0001411489

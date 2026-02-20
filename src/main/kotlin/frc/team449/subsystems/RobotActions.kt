@@ -12,14 +12,14 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 class RobotActions(
     private val intake: IntakeSubsystem,
     private val indexer: IndexerSubsystem,
-    private val shooter: ShooterSubsystem
+    private val shooter: ShooterSubsystem,
 ) {
     fun intake(): Command =
         Commands.sequence(
             ConditionalCommand(
                 Commands.none(),
                 intake.deploy(),
-            ) { intake.isIntakeDeployed() },
+            ) { intake.intakeIsDeployed() },
             intake.intake(),
 // should we run side and floor indexer at low volt here?
         )
