@@ -144,7 +144,6 @@ object Constants {
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
-
         const val STOW_POS_RADS = 0.0 // TODO: fix positions
         const val DEPLOY_POS_RADS = 2.0
         const val DEPLOY_VOLTS = 8.0
