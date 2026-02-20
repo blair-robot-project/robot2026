@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
@@ -19,6 +20,8 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
+import frc.team449.Constants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
@@ -42,6 +45,7 @@ import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
 import frc.team449.util.PhoenixUtil
+import kotlin.math.abs
 
 open class ShooterIOHardware : ShooterIO {
     // TODO: a little constants
@@ -54,6 +58,8 @@ open class ShooterIOHardware : ShooterIO {
     val hoodMotor = TalonFX(HOOD_MOTOR_ID)
 
     private val flywheelVelocityRequest = VelocityVoltage(0.0)
+        .withEnableFOC(false)
+        .withSlot(0)
     private val flywheelVoltageRequest = VoltageOut(0.0)
     private val hoodPositionRequest = PositionVoltage(0.0)
     private val hoodVoltageRequest = VoltageOut(0.0)
@@ -183,11 +189,13 @@ open class ShooterIOHardware : ShooterIO {
         inputs.rightFollowerTempCelsius = rightFollowerTemperature.value.`in`(Celsius)
 
         inputs.hoodPositionRad = hoodPosition.value.`in`(Radians)
-        inputs.hoodTargetPositionRad = hoodTargetPosition.value
+        inputs.hoodTargetPositionRad = Units.rotationsToRadians(hoodTargetPosition.value)
         inputs.hoodAppliedVolts = hoodMotorVoltage.value.`in`(Volts)
         inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
         inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
         inputs.hoodTempCelsius = hoodTemperature.value.`in`(Celsius)
+
+        inputs.hoodAtGoal = abs(inputs.hoodPositionRad - inputs.hoodTargetPositionRad) < ShooterConstants.HOOD_TOLERANCE_RAD
     }
 
     override fun setFlywheelVelocity(velocity: AngularVelocity) {
