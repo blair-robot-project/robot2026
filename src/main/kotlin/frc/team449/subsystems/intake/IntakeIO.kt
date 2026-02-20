@@ -7,41 +7,41 @@ import org.littletonrobotics.junction.AutoLog
 interface IntakeIO {
     @AutoLog
     open class IntakeIOInputs {
-        @JvmField var leftPivotAppliedVolts: Double = 0.0
+        @JvmField var leftPivotLeaderAppliedVolts: Double = 0.0
 
-        @JvmField var leftPivotCurrentState: String = "None" // "STOW", "DEPLOY", etc.
+        @JvmField var leftPivotLeaderCurrentState: String = "None" // "STOW", "DEPLOY", etc.
 
-        @JvmField var leftPivotPositionRad: Double = 0.0
+        @JvmField var leftPivotLeaderPositionRad: Double = 0.0
 
-        @JvmField var leftPivotVelocityRadPerSec: Double = 0.0
+        @JvmField var leftPivotLeaderVelocityRadPerSec: Double = 0.0
 
-        @JvmField var leftPivotSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftPivotLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var leftPivotStatorCurrentAmps: Double = 0.0
+        @JvmField var leftPivotLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField var leftPivotTempCelsius: Double = 0.0
+        @JvmField var leftPivotLeaderTempCelsius: Double = 0.0
 
-        @JvmField var rightPivotAppliedVolts: Double = 0.0
+        @JvmField var rightPivotFollowerAppliedVolts: Double = 0.0
 
-        @JvmField var rightPivotSupplyCurrentAmps: Double = 0.0
+        @JvmField var rightPivotFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var rightPivotStatorCurrentAmps: Double = 0.0
+        @JvmField var rightPivotFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField var rightPivotTempCelsius: Double = 0.0
+        @JvmField var rightPivotFollowerTempCelsius: Double = 0.0
 
-        // leftRollers
+        // Rollers
 
-        @JvmField var leftRollerAppliedVolts: Double = 0.0
+        @JvmField var leftRollerLeaderAppliedVolts: Double = 0.0
 
-        @JvmField var leftRollerControlMode: String = "None"
+        @JvmField var leftRollerLeaderControlMode: String = "None"
 
-        @JvmField var leftRollerVelocityRadPerSec: Double = 0.0
+        @JvmField var leftRollerLeaderVelocityRadPerSec: Double = 0.0
 
-        @JvmField var leftRollerSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftRollerLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var leftRollerStatorCurrentAmps: Double = 0.0
+        @JvmField var leftRollerLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField var leftRollerTempCelsius: Double = 0.0
+        @JvmField var leftRollerLeaderTempCelsius: Double = 0.0
 
         @JvmField var rightRollerFollowerAppliedVolts: Double = 0.0
 
