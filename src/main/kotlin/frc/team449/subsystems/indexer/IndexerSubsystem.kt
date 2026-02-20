@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.Logger
  * @author Sean Zhang
 */
 
-class Indexer(
+class IndexerSubsystem(
     private val io: IndexerIO
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()

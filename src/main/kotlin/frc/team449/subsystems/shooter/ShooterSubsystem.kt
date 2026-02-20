@@ -1,6 +1,7 @@
 package frc.team449.subsystems.shooter
 
 import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
@@ -36,37 +37,32 @@ class ShooterSubsystem(
         }
     }
 
-    fun setFlywheelVelocity(velocity: AngularVelocity): Command {
-        return runOnce {
+    fun setFlywheelVelocity(velocity: AngularVelocity): Command =
+        runOnce {
             flywheelTargetVelocity = velocity
             io.setFlywheelVelocity(velocity)
         }
-    }
 
-    fun stopFlywheel(): Command {
-        return runOnce {
+    fun stopFlywheel(): Command =
+        runOnce {
             flywheelTargetVelocity = RadiansPerSecond.of(0.0)
             io.setFlywheelVoltage(0.0)
         }
-    }
 
-    fun setHoodAngle(angle: Angle): Command {
-        return runOnce {
+    fun setHoodAngle(angle: Angle): Command =
+        runOnce {
             io.setHoodAngle(angle)
         }
-    }
 
-    fun setHoodVoltage(volts: Double): Command {
-        return runOnce {
+    fun setHoodVoltage(volts: Double): Command =
+        runOnce {
             io.setHoodVoltage(volts)
         }
-    }
 
-    fun resetHoodPosition(angle: Angle): Command {
-        return runOnce {
+    fun resetHoodPosition(angle: Angle): Command =
+        runOnce {
             io.resetHoodPosition(angle)
         }
-    }
 
     fun isFlywheelAtTolerance(): Boolean {
         val target = flywheelTargetVelocity.`in`(RadiansPerSecond)
@@ -83,8 +79,8 @@ class ShooterSubsystem(
         return hoodDebouncer.calculate(error < ShooterConstants.HOOD_TOLERANCE_RAD)
     }
 
-    fun homeHood(): Command {
-        return Commands.sequence(
+    fun homeHood(): Command =
+        Commands.sequence(
             runOnce {
                 io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)
             },
@@ -92,7 +88,8 @@ class ShooterSubsystem(
             runOnce {
                 setHoodVoltage(0.0)
                 resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
-            }
+            },
         )
-    }
+
+    fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
 }

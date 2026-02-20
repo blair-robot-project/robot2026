@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
+import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
 import kotlin.math.pow
@@ -57,10 +58,11 @@ object Constants {
         val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
         val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
 
-        val BLUE_TRENCH_POSES: List<Pose2d> = listOf(
-            Pose2d(4.35, 0.45, Rotation2d(1.5)),
-            Pose2d(4.35, 7.60, Rotation2d(-1.5))
-        )
+        val BLUE_TRENCH_POSES: List<Pose2d> =
+            listOf(
+                Pose2d(4.35, 0.45, Rotation2d(1.5)),
+                Pose2d(4.35, 7.60, Rotation2d(-1.5)),
+            )
     }
 
     object VisionConstants {
@@ -84,6 +86,8 @@ object Constants {
         const val FLYWHEEL_KD = 0.0
         const val FLYWHEEL_KS = 0.05
         const val FLYWHEEL_KV = 0.1
+
+        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
 
         val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
         val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
