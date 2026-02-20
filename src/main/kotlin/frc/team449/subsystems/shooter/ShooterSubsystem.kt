@@ -28,6 +28,7 @@ class ShooterSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Shooter", inputs)
+        Logger.recordOutput("FlyWheel at Tolerance ", isFlywheelAtTolerance())
     }
 
     override fun simulationPeriodic() {

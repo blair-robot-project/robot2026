@@ -1,12 +1,9 @@
 package frc.team449
 
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.ShooterConstants
-import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.util.Field
 
 class Bindings(
     val robotContainer: RobotContainer
@@ -53,24 +50,24 @@ class Bindings(
                 robotContainer.shooter.stopFlywheel(),
                 // coast hopper
             )
-
-        driver
-            .x()
-            .onTrue(
-                SequentialCommandGroup(
-                    ParallelCommandGroup(
-                        PoseAlignCommand(
-                            robotContainer.drive,
-                            { Field.getClosestTrenchPose(robotContainer.drive.pose) },
-                            { -driver.leftY },
-                            { -driver.leftX },
-                            { driver.rightX },
-                        ),
-                        robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
-                    ),
-                ),
-                // feed
-            )
+//
+//        driver
+//            .x()
+//            .onTrue(
+//                SequentialCommandGroup(
+//                    ParallelCommandGroup(
+//                        PoseAlignCommand(
+//                            robotContainer.drive,
+//                            { Field.getClosestTrenchPose(robotContainer.drive.pose) },
+//                            { -driver.leftY },
+//                            { -driver.leftX },
+//                            { driver.rightX },
+//                        ),
+//                        robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
+//                    ),
+//                ),
+//                // feed
+//            )
 
 //        driver
 //            .a()
@@ -112,5 +109,11 @@ class Bindings(
             ).onFalse(
                 robotContainer.indexer.stop(),
             )
+
+        driver
+            .x()
+            .onTrue(
+                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
+            ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

@@ -21,58 +21,64 @@ import frc.team449.Constants.ShooterConstants.MAX_HOOD_ANGLE
 import frc.team449.Constants.ShooterConstants.MIN_HOOD_ANGLE
 
 class ShooterIOSim : ShooterIOHardware() {
-
-    private val flywheelSim: FlywheelSim = FlywheelSim(
-        LinearSystemId.createFlywheelSystem(
+    private val flywheelSim: FlywheelSim =
+        FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60(2),
+                FLYWHEEL_MOI,
+                FLYWHEEL_GEARING,
+            ),
             DCMotor.getKrakenX60(2),
-            FLYWHEEL_MOI,
-            FLYWHEEL_GEARING
-        ),
-        DCMotor.getKrakenX60(2)
-    )
+        )
     // two flywheel sims will have the exact same behavior -- unnecessary
 
-    val hoodSim: SingleJointedArmSim = SingleJointedArmSim(
-        DCMotor.getKrakenX60(1),
-        HOOD_GEARING,
-        HOOD_MOI,
-        HOOD_LENGTH,
-        MIN_HOOD_ANGLE.`in`(Radians),
-        MAX_HOOD_ANGLE.`in`(Radians),
-        true,
-        MIN_HOOD_ANGLE.`in`(Radians),
-        0.0,
-        0.0
-    )
+    val hoodSim: SingleJointedArmSim =
+        SingleJointedArmSim(
+            DCMotor.getKrakenX60(1),
+            HOOD_GEARING,
+            HOOD_MOI,
+            HOOD_LENGTH,
+            MIN_HOOD_ANGLE.`in`(Radians),
+            MAX_HOOD_ANGLE.`in`(Radians),
+            true,
+            MIN_HOOD_ANGLE.`in`(Radians),
+            0.0,
+            0.0,
+        )
 
     private val mech: Mechanism2d = Mechanism2d(3.0, 3.0)
     private val mechRoot: MechanismRoot2d = mech.getRoot("Hood", 1.5, 0.5)
-    private val hoodMechanism: MechanismLigament2d = mechRoot.append(
-        MechanismLigament2d(
-            "Hood",
-            0.5,
-            MIN_HOOD_ANGLE.`in`(Radians),
-            6.0,
-            Color8Bit(Color.kCyan)
+    private val hoodMechanism: MechanismLigament2d =
+        mechRoot.append(
+            MechanismLigament2d(
+                "Hood",
+                0.5,
+                MIN_HOOD_ANGLE.`in`(Radians),
+                6.0,
+                Color8Bit(Color.kCyan),
+            ),
         )
-    )
 
     private val hoodSimState = hoodMotor.simState
     private val leftLeaderSimState = leftLeaderMotor.simState
     private val leftFollowerSimState = leftFollowerMotor.simState
+    private val rightLeaderSimState = rightLeaderMotor.simState
+    private val rightFollowerSimState = rightFollowerMotor.simState
 
     init {
         SmartDashboard.putData("Hood", mech)
     }
 
     fun simulationPeriodic() {
-        val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps * 2 // simulating two flywheels
+        val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
         val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
         RoboRioSim.setVInVoltage(loadedVoltage)
 
         hoodSimState.setSupplyVoltage(loadedVoltage)
         leftLeaderSimState.setSupplyVoltage(loadedVoltage)
         leftFollowerSimState.setSupplyVoltage(loadedVoltage)
+        rightLeaderSimState.setSupplyVoltage(loadedVoltage)
+        rightFollowerSimState.setSupplyVoltage(loadedVoltage)
 
         hoodSim.setInput(hoodSimState.motorVoltage)
         hoodSim.update(Constants.LOOP_TIME)
@@ -88,10 +94,12 @@ class ShooterIOSim : ShooterIOHardware() {
         flywheelSim.setInput(leftLeaderSimState.motorVoltage)
         flywheelSim.update(Constants.LOOP_TIME)
 
-        val leftRotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * FLYWHEEL_GEARING
+        val rotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * FLYWHEEL_GEARING
 
-        leftLeaderSimState.setRotorVelocity(leftRotorVel)
-        leftFollowerSimState.setRotorVelocity(leftRotorVel)
+        leftLeaderSimState.setRotorVelocity(rotorVel)
+        leftFollowerSimState.setRotorVelocity(rotorVel)
+        rightLeaderSimState.setRotorVelocity(rotorVel)
+        rightFollowerSimState.setRotorVelocity(rotorVel)
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
