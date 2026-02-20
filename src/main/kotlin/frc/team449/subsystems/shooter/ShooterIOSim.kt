@@ -4,7 +4,6 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.*
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
