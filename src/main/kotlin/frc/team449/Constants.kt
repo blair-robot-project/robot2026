@@ -207,7 +207,7 @@ object Constants {
         const val TOP_GEARING = 31.0 / 11.0
 
         val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
-        val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
+        val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         const val TOP_KP = 0.5
         const val TOP_KI = 0.0
