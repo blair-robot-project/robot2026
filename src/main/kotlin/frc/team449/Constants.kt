@@ -1,6 +1,8 @@
 package frc.team449
 
+import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
+import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.geometry.Pose2d
@@ -160,12 +162,55 @@ object Constants {
     }
 
     object IndexerConstants {
-        const val LEFT_INDEXER_ID = 21
+        const val WEDGE_INDEXER_ID = 21
+        const val WEDGE_STATOR_LIMIT = 30.0
+        const val WEDGE_SUPPLY_LIMIT = 30.0
+        const val WEDGE_GEARING = 1.5
 
-        const val RIGHT_INDEXER_ID = 22
-        const val INDEXER_STATOR_LIMIT = 60.0
-        const val INDEXER_SUPPLY_LIMIT = 30.0
-        // add more indexers as needed
+        val WEDGE_NEUTRAL_MODE = NeutralModeValue.Coast
+        val WEDGE_INVERSION = InvertedValue.Clockwise_Positive
+
+        const val WEDGE_KP = 0.5
+        const val WEDGE_KI = 0.0
+        const val WEDGE_KD = 0.0
+        const val WEDGE_KS = 0.05
+        const val WEDGE_KV = 0.12
+
+        const val WEDGE_MOI = .001
+
+        const val FLOOR_INDEXER_ID = 22
+        const val FLOOR_STATOR_LIMIT = 50.0
+        const val FLOOR_SUPPLY_LIMIT = 30.0
+        const val FLOOR_GEARING = 27.0 / 14.0
+
+        val FLOOR_NEUTRAL_MODE = NeutralModeValue.Coast
+        val FLOOR_INVERSION = InvertedValue.CounterClockwise_Positive
+
+        const val FLOOR_KP = 0.5
+        const val FLOOR_KI = 0.0
+        const val FLOOR_KD = 0.0
+        const val FLOOR_KS = 0.05
+        const val FLOOR_KV = 0.1
+
+        const val FLOOR_MOI = .005
+
+        const val TOP_INDEXER_ID = 23
+        const val TOP_STATOR_LIMIT = 60.0
+        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_GEARING = 31.0 / 11.0
+
+        val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
+        val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
+
+        const val TOP_KP = 0.5
+        const val TOP_KI = 0.0
+        const val TOP_KD = 0.0
+        const val TOP_KS = 0.05
+        const val TOP_KV = 0.1
+
+        const val TOP_MOI = .000000008 // TODO: Find
+
+        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
     }
 
     object LEDConstants {

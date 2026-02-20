@@ -3,7 +3,8 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
-import frc.team449.Constants
+import frc.team449.Constants.IndexerConstants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
@@ -27,8 +28,8 @@ class RobotActions(
 
     fun prepTrenchShooter(): Command =
         Commands.parallel(
-            shooter.setHoodAngle(Constants.ShooterConstants.TRENCH_HOOD_ANGLE),
-            shooter.setFlywheelVelocity(Constants.ShooterConstants.TRENCH_FLYWHEEL_VEL),
+            shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
+            shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
         )
 
     fun shoot(): Command =
@@ -37,7 +38,7 @@ class RobotActions(
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
             shooter.holdHood(),
-            // run indexer
+            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
             // hopper jank stuff here
         )
 
