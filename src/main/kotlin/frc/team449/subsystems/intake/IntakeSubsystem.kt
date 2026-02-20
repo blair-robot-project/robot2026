@@ -56,7 +56,7 @@ class IntakeSubsystem(
         moveVolts: Double,
         holdVolts: Double
     ): Command {
-        return this.defer({
+        return this.defer {
             val hardstopDebouncer = Debouncer(0.5)
 
             this.run {
@@ -70,7 +70,7 @@ class IntakeSubsystem(
                     io.setPivotVoltage(holdVolts)
                 },
             )
-        })
+        }
     }
 
     fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2

@@ -8,7 +8,6 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants.IntakeConstants
 import frc.team449.Constants.ShooterConstants
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
@@ -80,7 +79,7 @@ class ShooterSubsystem(
     }
 
     fun homeHood(): Command {
-        return this.defer({
+        return this.defer {
             val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
 
             Commands.sequence(
@@ -95,7 +94,7 @@ class ShooterSubsystem(
                     io.resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
                 }
             )
-        }).withName("Home Hood")
+        }.withName("Home Hood")
     }
 
     fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
