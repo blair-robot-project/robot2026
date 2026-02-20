@@ -13,7 +13,8 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
-    var intakeSimAngle: Double = 0.0
+    val intakeSimAngle: Double
+        get() = inputs.pivotPositionRad
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -22,19 +23,19 @@ class IntakeSubsystem(
 
     // roller commands
     fun intake(): Command =
-        runEnd(
+        this.runEnd(
             { io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY) },
             { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
         ).withName("Intake")
 
     fun outtake(): Command =
-        runEnd(
+        this.runEnd(
             { io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY) },
             { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
         ).withName("Outtake")
 
     fun stopRollers(): Command =
-        runOnce {
+        this.runOnce {
             io.setRollerVelocity(RotationsPerSecond.of(0.0))
         }.withName("Stop Rollers")
 
@@ -55,30 +56,22 @@ class IntakeSubsystem(
         moveVolts: Double,
         holdVolts: Double
     ): Command {
-        val hardstopDebouncer =
-            Debouncer(
-                0.5, // s
-            )
+        return this.defer({
+            val hardstopDebouncer = Debouncer(0.5)
 
-        return run {
-            io.setPivotVoltage(moveVolts)
-        }.until {
-            val highCurrent = abs(inputs.pivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
-            val lowVelocity = abs(inputs.pivotVelocityRadPerSec) > IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
-            hardstopDebouncer.calculate(highCurrent && lowVelocity)
-        }.andThen(
-            run {
-                io.setPivotVoltage(holdVolts)
-            },
-        )
+            this.run {
+                io.setPivotVoltage(moveVolts)
+            }.until {
+                val highCurrent = abs(inputs.pivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+                val lowVelocity = abs(inputs.pivotVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
+                hardstopDebouncer.calculate(highCurrent && lowVelocity)
+            }.andThen(
+                runOnce {
+                    io.setPivotVoltage(holdVolts)
+                },
+            )
+        })
     }
 
     fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2
-
-    override fun simulationPeriodic() {
-        if (io is IntakeIOSim) {
-            io.simulationPeriodic()
-            intakeSimAngle = io.pivotSim.angleRads
-        }
-    }
 }

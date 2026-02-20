@@ -28,7 +28,7 @@ class IndexerIOSim : IndexerIOHardware() {
     var floorSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX44(1),
+                DCMotor.getKrakenX60(1),
                 FLOOR_MOI,
                 FLOOR_GEARING,
             ),

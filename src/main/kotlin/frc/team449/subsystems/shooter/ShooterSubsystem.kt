@@ -8,9 +8,10 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand
+import frc.team449.Constants.IntakeConstants
 import frc.team449.Constants.ShooterConstants
 import org.littletonrobotics.junction.Logger
+import kotlin.math.abs
 
 class ShooterSubsystem(
     private val io: ShooterIO
@@ -19,23 +20,18 @@ class ShooterSubsystem(
     private val inputs: ShooterIOInputsAutoLogged = ShooterIOInputsAutoLogged()
     private var flywheelTargetVelocity: AngularVelocity = RadiansPerSecond.of(0.0)
 
-    var hoodSimAngle: Double = 0.0
+    val hoodSimAngle: Double
+        get() = inputs.hoodPositionRad
 
-    private val currentHomingDebouncer: Debouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
     private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
     private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Shooter", inputs)
-        Logger.recordOutput("FlyWheel at Tolerance ", isFlywheelAtTolerance())
-    }
 
-    override fun simulationPeriodic() {
-        if (io is ShooterIOSim) {
-            io.simulationPeriodic()
-            hoodSimAngle = io.hoodSim.angleRads
-        }
+        Logger.recordOutput("Shooter/FlywheelAtTolerance", isFlywheelAtTolerance())
+        Logger.recordOutput("Shooter/HoodAtTolerance", isHoodAtTolerance())
     }
 
     fun setFlywheelVelocity(velocity: AngularVelocity): Command =
@@ -67,12 +63,15 @@ class ShooterSubsystem(
 
     fun isFlywheelAtTolerance(): Boolean {
         val target = flywheelTargetVelocity.`in`(RadiansPerSecond)
+        if (target == 0.0) return false
 
         val leftError = kotlin.math.abs(inputs.leftLeaderVelocityRadPerSec - target)
         val rightError = kotlin.math.abs(inputs.rightLeaderVelocityRadPerSec - target)
 
-        return leftError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC &&
+        val isAtSpeed = leftError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC &&
             rightError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC
+
+        return flywheelDebouncer.calculate(isAtSpeed)
     }
 
     fun isHoodAtTolerance(): Boolean {
@@ -80,17 +79,24 @@ class ShooterSubsystem(
         return hoodDebouncer.calculate(error < ShooterConstants.HOOD_TOLERANCE_RAD)
     }
 
-    fun homeHood(): Command =
-        Commands.sequence(
-            runOnce {
-                io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)
-            },
-            WaitUntilCommand { currentHomingDebouncer.calculate(inputs.hoodStatorCurrentAmps > ShooterConstants.HOMING_STATOR_AMPS) },
-            runOnce {
-                setHoodVoltage(0.0)
-                resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
-            },
-        )
+    fun homeHood(): Command {
+        return this.defer({
+            val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
+
+            Commands.sequence(
+                this.runOnce { io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE) },
+                Commands.waitUntil {
+                    val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
+                    val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
+                    homingDebouncer.calculate(highCurrent && lowVelocity)
+                },
+                this.runOnce {
+                    io.setHoodVoltage(0.0)
+                    io.resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
+                }
+            )
+        }).withName("Home Hood")
+    }
 
     fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
 }

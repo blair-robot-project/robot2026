@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
 import frc.team449.generated.TunerConstants
+import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
@@ -86,6 +87,8 @@ object RobotContainer {
                 Mode.REPLAY -> object : ShooterIO {}
             },
         )
+
+    val actions = RobotActions(this)
 
     val bindings = Bindings(this)
 }

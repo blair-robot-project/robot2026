@@ -20,6 +20,7 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
+import frc.team449.Constants
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
@@ -33,7 +34,7 @@ open class DriveIOHardware(
     ::TalonFXS,
     ::CANcoder,
     driveConstants,
-    100.0,
+    Constants.DriveConstants.ODOMETRY_LOOP_TIME,
     *moduleConstants,
 ),
     DriveIO {
@@ -63,18 +64,10 @@ open class DriveIOHardware(
     )
 
     init {
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0,
-            angularPitchVelocity,
-            angularRollVelocity,
-            angularYawVelocity,
-            roll,
-            pitch,
-            accelX,
-            accelY,
-        )
-
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
+        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *gyroSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, angularYawVelocity)
+
         PhoenixUtil.registerSignals(*gyroSignals)
 
         this.odometryThread.setThreadPriority(99)
@@ -87,16 +80,6 @@ open class DriveIOHardware(
         inputs.fromSwerveDriveState(telemetryCache.get())
 
         inputs.gyroAngle = inputs.Pose.rotation.degrees
-
-        BaseStatusSignal.refreshAll(
-            angularRollVelocity,
-            angularPitchVelocity,
-            angularYawVelocity,
-            pitch,
-            roll,
-            accelX,
-            accelY,
-        )
     }
 
     override fun resetOdometry(pose: Pose2d) {

@@ -18,7 +18,7 @@ import kotlin.math.abs
 class IntakeIOSim : IntakeIOHardware() {
     val pivotSim = SingleJointedArmSim(
         DCMotor.getKrakenX44(2),
-        IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
+        IntakeConstants.PIVOT_SENSOR_TO_MECH,
         IntakeConstants.PIVOT_MOI,
         IntakeConstants.ARM_LENGTH_METERS,
         IntakeConstants.STOW_POS_RADS,
@@ -59,10 +59,6 @@ class IntakeIOSim : IntakeIOHardware() {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        super.updateInputs(inputs)
-    }
-
-    fun simulationPeriodic() {
         pivotLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         rollerLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
@@ -71,8 +67,8 @@ class IntakeIOSim : IntakeIOHardware() {
         pivotSim.setInput(pivotLeaderSim.motorVoltage)
         pivotSim.update(Constants.LOOP_TIME)
 
-        val pivotRotorPos = Units.radiansToRotations(pivotSim.angleRads) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
-        val pivotRotorVel = Units.radiansToRotations(pivotSim.velocityRadPerSec) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+        val pivotRotorPos = Units.radiansToRotations(pivotSim.angleRads) * IntakeConstants.PIVOT_SENSOR_TO_MECH
+        val pivotRotorVel = Units.radiansToRotations(pivotSim.velocityRadPerSec) * IntakeConstants.PIVOT_SENSOR_TO_MECH
 
         pivotLeaderSim.setRawRotorPosition(pivotRotorPos)
         pivotLeaderSim.setRotorVelocity(pivotRotorVel)
@@ -95,5 +91,7 @@ class IntakeIOSim : IntakeIOHardware() {
         } else {
             pivotMechanism.color = Color8Bit(Color.kRed)
         }
+
+        super.updateInputs(inputs)
     }
 }

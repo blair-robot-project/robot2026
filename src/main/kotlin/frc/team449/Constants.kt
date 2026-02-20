@@ -34,9 +34,10 @@ object Constants {
 
     object DriveConstants {
         const val SIM_LOOP_TIME = 0.01 // 100 Hz
+        const val ODOMETRY_LOOP_TIME = 0.01
 
         const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
-        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1.26767 * PI
+        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
 
         const val TRACKWIDTH_INCHES = 27.0 // front to rear
         const val WHEELBASE_INCHES = 27.0 // left to right
@@ -90,9 +91,10 @@ object Constants {
         const val FLYWHEEL_KV = 0.12
 
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
-
-        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
         val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
+
+        val HUB_HOOD_ANGLE: Angle = Degrees.of(30.0) // todo: find
+        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
 
         // HOOD
         const val HOOD_MOTOR_ID = 15
@@ -113,8 +115,9 @@ object Constants {
         const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
         const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
 
-        const val HOMING_VOLTAGE = 2.0
-        const val HOMING_STATOR_AMPS = 45.0 // amps
+        const val HOMING_VOLTAGE = -2.0 // todo: SHOULD BE NEGATIVE
+        const val HOMING_CURRENT_AMPS = 45.0 // amps
+        const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
 
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
         const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
@@ -132,33 +135,43 @@ object Constants {
         // config constants
         const val PIVOT_MOTOR_ID = 40
         const val PIVOT_FOLLOWER_ID = 41
-        const val ROLLER_MOTOR_ID = 42
-        const val ROLLER_FOLLOWER_ID = 43
 
-        val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+
+        const val PIVOT_SENSOR_TO_MECH = 50.0
+
+        const val PIVOT_SUPPLY_LIMIT = 20.0
+        const val PIVOT_STATOR_LIMIT = 40.0
 
         const val STOW_POS_RADS = 0.0 // TODO: fix positions
         const val DEPLOY_POS_RADS = 2.0
-        const val DEPLOY_VOLTS = 8.0
 
-        const val DEPLOY_HOLD_VOLTS = 2.0
+        const val DEPLOY_VOLTS = 8.0
+        const val DEPLOY_HOLD_VOLTS = 0.0
         const val STOW_VOLTS = -8.0
-        const val STOW_HOLD_VOLTS = -2.0
-        const val PIVOT_GEARING_SENSOR_TO_MECH = 50.0
+        const val STOW_HOLD_VOLTS = -0.5
+
+        const val HOMING_CURRENT_AMPS = 20.0
+        const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
 
         const val PIVOT_MOI = 0.1549510896
         const val ARM_LENGTH_METERS = 0.2996692
-        const val VIZ_OFFSET_DEG = 33.873
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
 
+        const val VIZ_OFFSET_DEG = 33.873
+
+        const val ROLLER_MOTOR_ID = 42
+        const val ROLLER_FOLLOWER_ID = 43
+
+        const val ROLLER_SUPPLY_LIMIT = 40.0
+        const val ROLLER_STATOR_LIMIT = 80.0
+
+        val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+
+        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
         const val ROLLER_MOI = 0.0001411489
 
         const val ROLLER_GEARING = 4.0 / 3
-        val HOMING_CURRENT_AMPS = 20.0
-
-        val HOMING_VELOCITY_RAD_PER_SEC = 0.5
     }
 
     object IndexerConstants {

@@ -20,7 +20,6 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
-import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
@@ -44,7 +43,6 @@ import frc.team449.Constants.ShooterConstants.LEFT_FLYWHEEL_LEADER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID
 import frc.team449.Constants.ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID
 import frc.team449.util.PhoenixUtil
-import kotlin.math.abs
 
 open class ShooterIOHardware : ShooterIO {
     // TODO: a little constants
@@ -86,6 +84,7 @@ open class ShooterIOHardware : ShooterIO {
     private val rightFollowerTemperature = rightFollowerMotor.deviceTemp
 
     private val hoodPosition = hoodMotor.position
+    private val hoodVelocity = hoodMotor.velocity
     private val hoodTargetPosition = hoodMotor.closedLoopReference
     private val hoodMotorVoltage = hoodMotor.motorVoltage
     private val hoodSupplyCurrent = hoodMotor.supplyCurrent
@@ -107,6 +106,7 @@ open class ShooterIOHardware : ShooterIO {
         rightFollowerStatorCurrent,
         rightFollowerTemperature,
 
+        hoodVelocity,
         hoodTargetPosition,
         hoodMotorVoltage,
         hoodSupplyCurrent,
@@ -126,11 +126,11 @@ open class ShooterIOHardware : ShooterIO {
         hoodStatorCurrent,
     )
 
-    private val leftLeaderMotorDisconnectedAlert = Alert("left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
-    private val rightLeaderMotorDisconnectedAlert = Alert("right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
-    private val leftFollowerMotorDisconnectedAlert = Alert("left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
-    private val rightFollowerMotorDisconnectedAlert = Alert("right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
-    private val hoodMotorDisconnectedAlert = Alert("hood motor disconnected (ID $HOOD_MOTOR_ID)", Alert.AlertType.kError)
+    private val leftLeaderDisconnectedAlert = Alert("left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val rightLeaderDisconnectedAlert = Alert("right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val leftFollowerDisconnectedAlert = Alert("left leader shooter flywheel motor disconnected (ID $LEFT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val rightFollowerDisconnectedAlert = Alert("right leader shooter flywheel motor disconnected (ID $RIGHT_FLYWHEEL_LEADER_ID)", Alert.AlertType.kError)
+    private val hoodDisconnectedAlert = Alert("hood motor disconnected (ID $HOOD_MOTOR_ID)", Alert.AlertType.kError)
 
     init {
         leftLeaderMotor.configurator.apply(flywheelConfig)
@@ -150,20 +150,10 @@ open class ShooterIOHardware : ShooterIO {
         PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
     }
 
+    private var isAliveCounter = 0
+
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
-
-        val leftLeaderMotorConnected = leftLeaderMotor.isAlive
-        val leftFollowerMotorConnected = leftFollowerMotor.isAlive
-        val rightLeaderMotorConnected = rightLeaderMotor.isAlive
-        val rightFollowerMotorConnected = rightFollowerMotor.isAlive
-        val hoodMotorConnected = hoodMotor.isAlive
-
-        leftLeaderMotorDisconnectedAlert.set(!leftLeaderMotorConnected)
-        rightLeaderMotorDisconnectedAlert.set(!rightLeaderMotorConnected)
-        leftFollowerMotorDisconnectedAlert.set(!leftFollowerMotorConnected)
-        rightFollowerMotorDisconnectedAlert.set(!rightFollowerMotorConnected)
-        hoodMotorDisconnectedAlert.set(!hoodMotorConnected)
 
         inputs.leftLeaderVelocityRadPerSec = leftLeaderVelocity.value.`in`(RadiansPerSecond)
         inputs.leftLeaderAppliedVolts = leftLeaderMotorVoltage.value.`in`(Volts)
@@ -188,13 +178,21 @@ open class ShooterIOHardware : ShooterIO {
         inputs.rightFollowerTempCelsius = rightFollowerTemperature.value.`in`(Celsius)
 
         inputs.hoodPositionRad = hoodPosition.value.`in`(Radians)
+        inputs.hoodVelocityRadPerSec = hoodVelocity.value.`in`(RadiansPerSecond)
         inputs.hoodTargetPositionRad = Units.rotationsToRadians(hoodTargetPosition.value)
         inputs.hoodAppliedVolts = hoodMotorVoltage.value.`in`(Volts)
         inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
         inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
         inputs.hoodTempCelsius = hoodTemperature.value.`in`(Celsius)
 
-        inputs.hoodAtGoal = abs(inputs.hoodPositionRad - inputs.hoodTargetPositionRad) < ShooterConstants.HOOD_TOLERANCE_RAD
+        if (isAliveCounter++ >= 50) {
+            isAliveCounter = 0
+            hoodDisconnectedAlert.set(!hoodMotor.isAlive)
+            leftLeaderDisconnectedAlert.set(!leftLeaderMotor.isAlive)
+            rightLeaderDisconnectedAlert.set(!rightLeaderMotor.isAlive)
+            leftFollowerDisconnectedAlert.set(!leftFollowerMotor.isAlive)
+            rightFollowerDisconnectedAlert.set(!rightFollowerMotor.isAlive)
+        }
     }
 
     override fun setFlywheelVelocity(velocity: AngularVelocity) {

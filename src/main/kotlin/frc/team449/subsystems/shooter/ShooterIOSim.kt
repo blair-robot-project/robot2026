@@ -69,7 +69,7 @@ class ShooterIOSim : ShooterIOHardware() {
         SmartDashboard.putData("Hood", mech)
     }
 
-    fun simulationPeriodic() {
+    override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
         val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
         RoboRioSim.setVInVoltage(loadedVoltage)
@@ -100,9 +100,7 @@ class ShooterIOSim : ShooterIOHardware() {
         leftFollowerSimState.setRotorVelocity(rotorVel)
         rightLeaderSimState.setRotorVelocity(rotorVel)
         rightFollowerSimState.setRotorVelocity(rotorVel)
-    }
 
-    override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         super.updateInputs(inputs)
     }
 }

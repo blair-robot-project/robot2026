@@ -45,10 +45,10 @@ open class IntakeIOHardware : IntakeIO {
     private val rollerFollowerStatorCurrent = rollerFollower.statorCurrent
     private val rollerFollowerTemp = rollerFollower.deviceTemp
 
-    val pivotLeaderDisconnectedAlert = Alert("pivot leader disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID})", Alert.AlertType.kError)
-    val pivotFollowerDisconnectedAlert = Alert("pivot follower disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
-    val rollerLeaderDisconnectedAlert = Alert("right roller motor disconnected (ID ${IntakeConstants.ROLLER_MOTOR_ID})", Alert.AlertType.kError)
-    val rollerFollowerDisconnectedAlert = Alert("left roller motor disconnected (ID ${IntakeConstants.ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
+    val pivotLeaderDisconnectedAlert = Alert("Pivot Leader Disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID}).", Alert.AlertType.kError)
+    val pivotFollowerDisconnectedAlert = Alert("Pivot Follower Disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID}).", Alert.AlertType.kError)
+    val rollerLeaderDisconnectedAlert = Alert("Right Roller Motor disconnected (ID ${IntakeConstants.ROLLER_MOTOR_ID}).", Alert.AlertType.kError)
+    val rollerFollowerDisconnectedAlert = Alert("Left Roller Motor disconnected (ID ${IntakeConstants.ROLLER_FOLLOWER_ID}).", Alert.AlertType.kError)
 
     private val allSignals = arrayOf(
         pivotVoltage, pivotSupplyCurrent, pivotStatorCurrent, pivotPosition, pivotVelocity, pivotTemp,
@@ -76,11 +76,12 @@ open class IntakeIOHardware : IntakeIO {
         PhoenixUtil.registerSignals(*allSignals)
     }
 
+    private var isAliveCounter = 0
+
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         BaseStatusSignal.refreshAll(*allSignals)
 
         inputs.pivotAppliedVolts = pivotVoltage.value.`in`(Volts)
-        inputs.pivotCurrentState = pivotLeader.controlMode.toString() // Or use custom logic
         inputs.pivotPositionRad = pivotPosition.value.`in`(Radians)
         inputs.pivotVelocityRadPerSec = pivotVelocity.value.`in`(RadiansPerSecond)
         inputs.pivotSupplyCurrentAmps = pivotSupplyCurrent.value.`in`(Amps)
@@ -93,7 +94,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.pivotFollowerTempCelsius = pivotFollowerTemp.value.`in`(Celsius)
 
         inputs.rollerAppliedVolts = rollerVoltage.value.`in`(Volts)
-        inputs.rollerControlMode = rollerLeader.controlMode.toString()
         inputs.rollerVelocityRadPerSec = rollerVelocity.value.`in`(RadiansPerSecond)
         inputs.rollerSupplyCurrentAmps = rollerSupplyCurrent.value.`in`(Amps)
         inputs.rollerStatorCurrentAmps = rollerStatorCurrent.value.`in`(Amps)
@@ -104,10 +104,13 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rollerFollowerStatorCurrentAmps = rollerFollowerStatorCurrent.value.`in`(Amps)
         inputs.rollerFollowerTempCelsius = rollerFollowerTemp.value.`in`(Celsius)
 
-        pivotLeaderDisconnectedAlert.set(!pivotLeader.isAlive)
-        pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
-        rollerLeaderDisconnectedAlert.set(!rollerLeader.isAlive)
-        rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
+        if (isAliveCounter++ >= 50) {
+            isAliveCounter = 0
+            pivotLeaderDisconnectedAlert.set(!pivotLeader.isAlive)
+            pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
+            rollerLeaderDisconnectedAlert.set(!rollerLeader.isAlive)
+            rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
+        }
     }
 
     override fun setPivotVoltage(volts: Double) {
@@ -121,10 +124,8 @@ open class IntakeIOHardware : IntakeIO {
     companion object {
         val pivotConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
-                SupplyCurrentLimitEnable = true
-                SupplyCurrentLimit = 40.0
-                StatorCurrentLimitEnable = true
-                StatorCurrentLimit = 80.0
+                SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
+                StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
             }
 
             MotorOutput.apply {
@@ -132,7 +133,7 @@ open class IntakeIOHardware : IntakeIO {
                 Inverted = InvertedValue.CounterClockwise_Positive // TODO: verify direction
             }
 
-            Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+            Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_SENSOR_TO_MECH
 
             Slot0.apply {
                 kP = 5.0
@@ -142,10 +143,8 @@ open class IntakeIOHardware : IntakeIO {
 
         val rollerConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
-                SupplyCurrentLimitEnable = true
-                SupplyCurrentLimit = 40.0
-                StatorCurrentLimitEnable = true
-                StatorCurrentLimit = 80.0
+                SupplyCurrentLimit = IntakeConstants.ROLLER_SUPPLY_LIMIT
+                StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
             }
 
             MotorOutput.apply {
