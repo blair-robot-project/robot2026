@@ -119,6 +119,10 @@ open class IntakeIOHardware : IntakeIO {
         leftRollerLeader.setControl(rollerVelocityRequest.withVelocity(velocity))
     }
 
+    override fun setRollerVoltage(volts: Double) {
+        leftRollerLeader.setControl(pivotVoltageRequest.withOutput(volts))
+    }
+
     companion object {
         val pivotConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {

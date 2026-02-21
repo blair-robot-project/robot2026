@@ -53,4 +53,6 @@ interface IntakeIO {
     fun setPivotVoltage(volts: Double) {}
 
     fun setRollerVelocity(velocity: AngularVelocity) {}
+
+    fun setRollerVoltage(volts: Double) {}
 }
