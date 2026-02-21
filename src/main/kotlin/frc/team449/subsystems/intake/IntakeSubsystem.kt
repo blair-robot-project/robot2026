@@ -1,5 +1,6 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.RotationsPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -13,7 +14,9 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
-
+    // boolean over position logging increases speed and is easier to read
+    private var pivotDeployedState: Boolean = false
+    private var rollerTargetVelocityRadPerSec: Double = 0.0
 
     val intakeSimAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
@@ -21,41 +24,50 @@ class IntakeSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
+
+        Logger.recordOutput("Intake/PivotDeployedState", pivotDeployedState)
+        Logger.recordOutput("Intake/RollerTargetVelocityRadPerSec", rollerTargetVelocityRadPerSec)
     }
 
     // roller commands
     fun intake(): Command =
-        this
-            .runEnd(
-                { io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY) },
-                { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
-            ).withName("Intake")
+        this.runOnce {
+            rollerTargetVelocityRadPerSec = IntakeConstants.INTAKE_VELOCITY.`in`(RadiansPerSecond)
+            io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY)
+        }
+            .withName("Intake")
 
     fun outtake(): Command =
-        this
-            .runEnd(
-                { io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY) },
-                { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
-            ).withName("Outtake")
+        this.runOnce {
+            rollerTargetVelocityRadPerSec = IntakeConstants.OUTTAKE_VELOCITY.`in`(RadiansPerSecond)
+            io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY)
+        }
+            .withName("Outtake")
 
     fun stopRollers(): Command =
-        this
-            .runOnce {
-                io.setRollerVelocity(RotationsPerSecond.of(0.0))
-            }.withName("Stop Rollers")
+        this.runOnce {
+            rollerTargetVelocityRadPerSec = 0.0
+            io.setRollerVelocity(RotationsPerSecond.of(0.0))
+        }.withName("Stop Rollers")
 
     // slam commands
-    fun deploy(): Command =
-        slamHoming(
+    fun deploy(): Command {
+        pivotDeployedState = true
+
+        return slamHoming(
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy")
+    }
 
-    fun stow(): Command =
-        slamHoming(
+    fun stow(): Command {
+        pivotDeployedState = false
+
+        return slamHoming(
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
         ).withName("Stow")
+    }
 
     private fun slamHoming(
         moveVolts: Double,

@@ -99,7 +99,6 @@ open class IntakeIOHardware : IntakeIO {
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         BaseStatusSignal.refreshAll(*allSignals)
         inputs.leftPivotLeaderAppliedVolts = leftPivotLeaderVoltage.value.`in`(Volts)
-        inputs.leftPivotLeaderCurrentState = leftPivotLeader.controlMode.toString() // Or use custom logic
         inputs.leftPivotLeaderPositionRad = leftPivotLeaderPosition.value.`in`(Radians)
         inputs.leftPivotLeaderVelocityRadPerSec = leftPivotLeaderVelocity.value.`in`(RadiansPerSecond)
         inputs.leftPivotLeaderSupplyCurrentAmps = leftPivotLeaderSupplyCurrent.value.`in`(Amps)
@@ -112,7 +111,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rightPivotFollowerTempCelsius = rightPivotFollowerTemp.value.`in`(Celsius)
 
         inputs.leftRollerLeaderAppliedVolts = leftRollerLeaderVoltage.value.`in`(Volts)
-        inputs.leftRollerLeaderControlMode = leftRollerLeader.controlMode.toString()
         inputs.leftRollerLeaderVelocityRadPerSec = leftRollerLeaderVelocity.value.`in`(RadiansPerSecond)
         inputs.leftRollerLeaderSupplyCurrentAmps = leftRollerLeaderSupplyCurrent.value.`in`(Amps)
         inputs.leftRollerLeaderStatorCurrentAmps = leftRollerLeaderStatorCurrent.value.`in`(Amps)
@@ -123,10 +121,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Amps)
         inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Celsius)
 
-        leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)
-        rightPivotFollowerDisconnectedAlert.set(!rightPivotFollower.isAlive)
-        leftRollerLeaderDisconnectedAlert.set(!leftRollerLeader.isAlive)
-        rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
         if (isAliveCounter++ >= 50) {
             isAliveCounter = 0
             leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)
