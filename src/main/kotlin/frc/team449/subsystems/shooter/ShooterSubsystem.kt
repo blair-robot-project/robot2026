@@ -41,18 +41,20 @@ class ShooterSubsystem(
 
             if (isFlywheelAtTolerance() && flywheelTargetVelocity >= ShooterConstants.HUB_FLYWHEEL_VEL && shootCooldown <= 0) {
                 shootCooldown = 30
+                println("Shooting a ball at ${inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS} m/s")
                 fuelSim.launchFuel(
                     MetersPerSecond.of(
                         (
                             inputs.rightLeaderVelocityRadPerSec *
-                                ShooterConstants.FLYWHEEL_RADIUS * 2 * Math.PI
+                                ShooterConstants.FLYWHEEL_RADIUS
                             ),
                     ),
                     Radians.of(inputs.hoodPositionRad),
                     Radians.of(0.0),
                     ShooterConstants.SHOOTER_HEIGHT,
                 )
-            } else {
+            }
+            if (shootCooldown > 0) {
                 shootCooldown -= 1
             }
         }

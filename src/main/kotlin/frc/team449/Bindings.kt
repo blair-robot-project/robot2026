@@ -91,9 +91,9 @@ class Bindings(
             .onTrue(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
             )
-//            .onFalse(
-//                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
-//            )
+            .onFalse(
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
+            )
 
         driver
             .a()
