@@ -9,11 +9,6 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.vision.Vision
-import frc.team449.subsystems.vision.VisionConstants
-import frc.team449.subsystems.vision.VisionIO
-import frc.team449.subsystems.vision.VisionIOLimelight
-import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
@@ -26,6 +21,11 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionConstants
+import frc.team449.subsystems.vision.VisionIO
+import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 
 object RobotContainer {
     // driver/op controllers
