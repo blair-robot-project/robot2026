@@ -59,10 +59,6 @@ class IntakeIOSim : IntakeIOHardware() {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        super.updateInputs(inputs)
-    }
-
-    fun simulationPeriodic() {
         pivotLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         rollerLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
@@ -95,5 +91,7 @@ class IntakeIOSim : IntakeIOHardware() {
         } else {
             pivotMechanism.color = Color8Bit(Color.kRed)
         }
+
+        super.updateInputs(inputs)
     }
 }

@@ -9,8 +9,6 @@ interface IntakeIO {
     open class IntakeIOInputs {
         @JvmField var leftPivotLeaderAppliedVolts: Double = 0.0
 
-        @JvmField var leftPivotLeaderCurrentState: String = "None" // "STOW", "DEPLOY", etc.
-
         @JvmField var leftPivotLeaderPositionRad: Double = 0.0
 
         @JvmField var leftPivotLeaderVelocityRadPerSec: Double = 0.0
@@ -32,8 +30,6 @@ interface IntakeIO {
         // Rollers
 
         @JvmField var leftRollerLeaderAppliedVolts: Double = 0.0
-
-        @JvmField var leftRollerLeaderControlMode: String = "None"
 
         @JvmField var leftRollerLeaderVelocityRadPerSec: Double = 0.0
 
