@@ -104,10 +104,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Amps)
         inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Celsius)
 
-        leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)
-        rightPivotFollowerDisconnectedAlert.set(!rightPivotFollower.isAlive)
-        leftRollerLeaderDisconnectedAlert.set(!leftRollerLeader.isAlive)
-        rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
         if (isAliveCounter++ >= 50) {
             isAliveCounter = 0
             leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)

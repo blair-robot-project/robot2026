@@ -147,7 +147,7 @@ object Constants {
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
-        const val PIVOT_GEARING_SENSOR_TO_MECH = 48.75
+        const val PIVOT_GEARING_SENSOR_TO_MECH = 52.0
 
         const val PIVOT_SUPPLY_LIMIT = 20.0
         const val PIVOT_STATOR_LIMIT = 40.0

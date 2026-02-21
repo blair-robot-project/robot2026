@@ -23,16 +23,12 @@ class IntakeSubsystem(
 
     // roller commands
     fun intake(): Command =
-        this.runEnd(
-            { io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY) },
-            { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
-        ).withName("Intake")
+        this.runOnce { io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY) }
+            .withName("Intake")
 
     fun outtake(): Command =
-        this.runEnd(
-            { io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY) },
-            { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
-        ).withName("Outtake")
+        this.runOnce { io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY) }
+            .withName("Outtake")
 
     fun stopRollers(): Command =
         this.runOnce {
