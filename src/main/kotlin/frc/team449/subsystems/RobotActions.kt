@@ -19,7 +19,7 @@ class RobotActions(
             ConditionalCommand(
                 Commands.none(),
                 intake.deploy(),
-            ) { intake.intakeIsDeployed() },
+            ) { intake.isIntakeDeployed() },
             intake.intake(),
 // should we run side and floor indexer at low volt here?
         )

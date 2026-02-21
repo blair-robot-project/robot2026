@@ -1,7 +1,6 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
-import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.units.Units.RotationsPerSecond
+import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
@@ -56,7 +55,7 @@ class IntakeSubsystem(
 
     private fun slamHoming(
         moveVolts: Double,
-        holdVolts: Double,
+        holdVolts: Double
     ): Command {
         val hardstopDebouncer =
             Debouncer(
@@ -66,8 +65,8 @@ class IntakeSubsystem(
         return run {
             io.setPivotVoltage(moveVolts)
         }.until {
-            val highCurrent = abs(inputs.pivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
-            val lowVelocity = abs(inputs.pivotVelocityRadPerSec) > IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
+            val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+            val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) > IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
             hardstopDebouncer.calculate(highCurrent && lowVelocity)
         }.andThen(
             run {
@@ -76,7 +75,7 @@ class IntakeSubsystem(
         )
     }
 
-    fun intakeIsDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2
+    fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.leftPivotLeaderPositionRad) <= 0.2
 
     override fun simulationPeriodic() {
         if (io is IntakeIOSim) {
@@ -87,7 +86,7 @@ class IntakeSubsystem(
 
     fun isSimIntaking(): BooleanSupplier =
         {
-            intakeIsDeployed() &&
-                abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.rollerVelocityRadPerSec) <= 10.0
+            isIntakeDeployed() &&
+                    abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.rollerVelocityRadPerSec) <= 10.0
         }
 }

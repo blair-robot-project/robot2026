@@ -42,5 +42,13 @@ interface IndexerIO {
 
     fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {}
 
+    fun setIndexerVelocity(
+        topVel: AngularVelocity,
+        sideVel: AngularVelocity,
+        bottomVel: AngularVelocity
+    ) {}
+
+    fun simPeriodic() {}
+
     fun updateInputs(inputs: IndexerInputs) {}
 }

@@ -90,8 +90,7 @@ class Bindings(
             .b()
             .onTrue(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-            )
-            .onFalse(
+            ).onFalse(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
             )
 
@@ -99,13 +98,9 @@ class Bindings(
             .a()
             .onTrue(
                 robotContainer.intake.deploy(),
+            ).onFalse(
+                robotContainer.intake.stow(),
             )
-
-//        driver
-//            .x()
-//            .onTrue(
-//                robotContainer.intake.intake(),
-//            )
 
         driver
             .y()
@@ -118,7 +113,7 @@ class Bindings(
         driver
             .x()
             .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(100.0)),
+                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
             ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

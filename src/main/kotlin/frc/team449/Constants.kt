@@ -91,8 +91,8 @@ object Constants {
 
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
 
-        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(70.0)
-        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(130.0)
+        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
+        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
 
         // HOOD
         const val HOOD_MOTOR_ID = 15
@@ -146,13 +146,19 @@ object Constants {
 
     object IntakeConstants {
         // config constants
-        const val PIVOT_MOTOR_ID = 40
-        const val PIVOT_FOLLOWER_ID = 41
-        const val ROLLER_MOTOR_ID = 42
-        const val ROLLER_FOLLOWER_ID = 43
+        const val LEFT_PIVOT_MOTOR_ID = 40
+        const val RIGHT_PIVOT_FOLLOWER_ID = 41
+        const val LEFT_ROLLER_MOTOR_ID = 42
+        const val RIGHT_ROLLER_FOLLOWER_ID = 43
 
-        val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
-        val PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+        val LEFT_PIVOT_NEUTRAL_MODE = NeutralModeValue.Brake
+        val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
+
+        val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
+
+        val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+        val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
         const val STOW_POS_RADS = 0.0 // TODO: fix positions
         const val DEPLOY_POS_RADS = 2.0
@@ -166,7 +172,7 @@ object Constants {
         const val PIVOT_MOI = 0.1549510896
         const val ARM_LENGTH_METERS = 0.2996692
         const val VIZ_OFFSET_DEG = 33.873
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(40.0)
+        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
 
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
         const val ROLLER_MOI = 0.0001411489
@@ -216,7 +222,7 @@ object Constants {
         const val TOP_GEARING = 31.0 / 11.0
 
         val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
-        val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
+        val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         const val TOP_KP = 0.5
         const val TOP_KI = 0.0

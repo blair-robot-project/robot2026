@@ -6,8 +6,7 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.units.Units.Inches
-import edu.wpi.first.units.Units.Meters
+import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -86,8 +85,7 @@ class Robot : LoggedRobot() {
 
     override fun teleopPeriodic() {}
 
-    override fun disabledInit() {
-    }
+    override fun disabledInit() {}
 
     override fun disabledPeriodic() {}
 
@@ -135,13 +133,11 @@ class Robot : LoggedRobot() {
                 ).withName("Reset Fuel")
                 .ignoringDisable(true),
         )
+
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
     }
 
     override fun simulationPeriodic() {
-        fuelSim.updateSim()
-        Logger.recordOutput("isSimintaking", robotContainer.intake.isSimIntaking())
-
-        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
@@ -150,19 +146,19 @@ class Robot : LoggedRobot() {
                     MathUtil.inverseInterpolate(
                         Constants.IntakeConstants.STOW_POS_RADS,
                         Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle,
+                        robotContainer.intake.intakeSimAngle
                     ) * 0.3,
                     0.0,
                     0.0,
-                    Rotation3d(),
+                    Rotation3d()
                 ),
                 Pose3d(
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0),
-                ),
-            ),
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
+                )
+            )
         )
     }
 }

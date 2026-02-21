@@ -60,63 +60,6 @@ class DriveSubsystem(
             }
         }
 
-    private val xController: PIDController
-        get() = PIDController(5.0, 0.0, 0.0)
-    private val yController: PIDController
-        get() = PIDController(5.0, 0.0, 0.0)
-    private val headingController: PIDController
-        get() = PIDController(5.0, 0.0, 0.0)
-
-    var desiredAngle = 0.0
-    var desiredOmega = 0.0
-
-    init {
-        headingController.enableContinuousInput(-Math.PI, Math.PI)
-    }
-
-    fun followTrajectory(
-        robot: Robot,
-        sample: SwerveSample
-    ) {
-        desiredAngle = MathUtil.angleModulus(sample.heading)
-        desiredOmega = sample.omega
-
-        val speeds =
-            ChassisSpeeds(
-                sample.vx + xController.calculate(pose.x, sample.x),
-                sample.vy + yController.calculate(pose.y, sample.y),
-                sample.omega +
-                    headingController.calculate(
-                        pose.rotation.minus(Rotation2d.fromRadians(MathUtil.angleModulus(sample.heading))).radians,
-                    ),
-            )
-
-        val newSpeeds =
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                speeds,
-                heading,
-            )
-
-        println("desiredAngle: $desiredAngle ")
-        println("Angle: $heading ")
-        println("desiredOmega: $desiredOmega ")
-        println("Omega: ${speeds.omegaRadiansPerSecond} ")
-        // Apply generated speeds
-        setControl(
-            SwerveRequest
-                .RobotCentric()
-                .withVelocityX(newSpeeds.vxMetersPerSecond)
-                .withVelocityY(newSpeeds.vyMetersPerSecond)
-                .withRotationalRate(newSpeeds.omegaRadiansPerSecond),
-        )
-    }
-
-    var heading: Rotation2d
-        get() = Rotation2d(MathUtil.angleModulus(pose.rotation.radians))
-        set(value) {
-            inputs.Pose = Pose2d(Translation2d(pose.x, pose.y), value)
-        }
-
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
         if (io is DriveIOHardware) {
