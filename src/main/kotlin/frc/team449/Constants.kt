@@ -83,11 +83,11 @@ object Constants {
 
         const val FLYWHEEL_GEARING = 32.0 / 18
 
-        const val FLYWHEEL_KP = 0.5
+        const val FLYWHEEL_KP = 0.01
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.05
-        const val FLYWHEEL_KV = 0.12
+        const val FLYWHEEL_KS = 0.0
+        const val FLYWHEEL_KV = 0.213
 
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
 
