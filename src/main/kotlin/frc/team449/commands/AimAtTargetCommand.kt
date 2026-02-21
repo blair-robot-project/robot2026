@@ -16,6 +16,7 @@ import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants.AIMBOT_KD
 import frc.team449.Constants.AimbotConstants.AIMBOT_KI
 import frc.team449.Constants.AimbotConstants.AIMBOT_KP
+import frc.team449.Constants.AimbotConstants.JOYSTICK_POWER
 import frc.team449.Constants.AimbotConstants.PERIODIC_TIME
 import frc.team449.Constants.AimbotConstants.VELOCITY_COEFFICIENT
 import frc.team449.Constants.DriveConstants
@@ -44,12 +45,8 @@ class AimAtTargetCommand(
                     * DriveConstants.ANGULAR_DEADBAND,
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
-    private var robotYVelocity : Double = 0.0
     private var expectedYVelocityContribution : Double = 0.0
-    private var expectedRobotY : Double = 0.0
-    private var robotXVelocity : Double = 0.0
     private var expectedXVelocityContribution : Double = 0.0
-    private var expectedRobotX : Double = 0.0
 
     init {
         addRequirements(drive)
@@ -73,24 +70,26 @@ class AimAtTargetCommand(
         AIMBOT_KD,
     )
 
+    fun throttleAtPower(power: Double) : Double {
+        return abs(throttleSupplier.asDouble).pow(power) * sign(throttleSupplier.asDouble) *
+                DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+    }
+
+    fun strafeAtPower(power: Double) : Double {
+        return abs(strafeSupplier.asDouble).pow(power) * sign(strafeSupplier.asDouble) *
+                DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+    }
+
     override fun execute() {
         val target = targetSupplier.get()
-        throttle =
-            abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
-                    DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-        strafe =
-            abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
-                    DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+        throttle = throttleAtPower(2.0)
+        strafe = strafeAtPower(2.0)
 
-        robotYVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(drive.getRobotRelativeSpeeds(), drive.pose.rotation).vyMetersPerSecond
-        expectedYVelocityContribution = robotYVelocity * PERIODIC_TIME * VELOCITY_COEFFICIENT
-        expectedRobotY = drive.pose.y + expectedYVelocityContribution
+        expectedYVelocityContribution = throttleAtPower(JOYSTICK_POWER) * PERIODIC_TIME * VELOCITY_COEFFICIENT
 
-        robotXVelocity = ChassisSpeeds.fromRobotRelativeSpeeds(drive.getRobotRelativeSpeeds(), drive.pose.rotation).vxMetersPerSecond
-        expectedXVelocityContribution = robotXVelocity * PERIODIC_TIME * VELOCITY_COEFFICIENT
-        expectedRobotX = drive.pose.x + expectedXVelocityContribution
+        expectedXVelocityContribution = throttleAtPower(JOYSTICK_POWER) * PERIODIC_TIME * VELOCITY_COEFFICIENT
 
-        val targetHeading = Rotation2d(atan2(target.y - expectedRobotY, target.x - expectedRobotX))
+        val targetHeading = Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
         val delta = targetHeading.minus(drive.pose.rotation).radians
         turn = turnController.calculate(
             0.0,
