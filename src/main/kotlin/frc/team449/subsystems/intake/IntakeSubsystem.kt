@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO,
+    private val io: IntakeIO
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -71,7 +71,7 @@ class IntakeSubsystem(
 
     private fun slamHoming(
         moveVolts: Double,
-        holdVolts: Double,
+        holdVolts: Double
     ): Command =
         this.defer {
             val hardstopDebouncer = Debouncer(0.5)
