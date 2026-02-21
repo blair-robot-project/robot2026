@@ -48,8 +48,6 @@ interface ShooterIO {
 
         @JvmField var hoodVelocityRadPerSec: Double = 0.0
 
-        @JvmField var hoodTargetPositionRad: Double = 0.0
-
         @JvmField var hoodAppliedVolts: Double = 0.0
 
         @JvmField var hoodSupplyCurrentAmps: Double = 0.0

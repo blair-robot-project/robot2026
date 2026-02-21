@@ -34,7 +34,8 @@ class DriveSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         io.logModules(inputs)
-        Logger.processInputs("DriveInputs", inputs)
+
+        Logger.processInputs("Drive", inputs)
     }
 
     fun setControl(request: SwerveRequest) {

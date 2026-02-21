@@ -12,7 +12,6 @@ import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.InvertedValue
 import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
-import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
@@ -180,7 +179,6 @@ open class ShooterIOHardware : ShooterIO {
 
         inputs.hoodPositionRad = hoodPosition.value.`in`(Radians)
         inputs.hoodVelocityRadPerSec = hoodVelocity.value.`in`(RadiansPerSecond)
-        inputs.hoodTargetPositionRad = Units.rotationsToRadians(hoodTargetPosition.value)
         inputs.hoodAppliedVolts = hoodMotorVoltage.value.`in`(Volts)
         inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
         inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
