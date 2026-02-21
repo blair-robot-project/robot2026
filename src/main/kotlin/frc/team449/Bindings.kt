@@ -1,7 +1,6 @@
 package frc.team449
 
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
@@ -29,13 +28,13 @@ class Bindings(
         driver
             .rightTrigger()
             .onTrue(
-                actions.deployAndIntake()
+                actions.deployAndIntake(),
             )
 
         driver
             .leftTrigger()
             .onTrue(
-                actions.stopAndStow()
+                actions.stopAndStow(),
             )
 
 //
@@ -65,7 +64,7 @@ class Bindings(
                     { -driver.leftY },
                     { -driver.leftX },
                     { driver.rightX },
-                )
+                ),
             )
 
         driver
@@ -88,8 +87,7 @@ class Bindings(
             .x()
             .onTrue(
                 robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
-            )
-            .onFalse(robotContainer.shooter.stopFlywheel())
+            ).onFalse(robotContainer.shooter.stopFlywheel())
 
         driver
             .start()
