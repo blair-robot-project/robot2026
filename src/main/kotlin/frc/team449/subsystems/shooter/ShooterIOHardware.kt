@@ -255,7 +255,7 @@ open class ShooterIOHardware : ShooterIO {
 
             MotorOutput.apply {
                 NeutralMode = NeutralModeValue.Brake
-                Inverted = InvertedValue.CounterClockwise_Positive
+                Inverted = InvertedValue.Clockwise_Positive
             }
 
             Feedback.SensorToMechanismRatio = HOOD_GEARING

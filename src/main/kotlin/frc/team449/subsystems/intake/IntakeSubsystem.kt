@@ -14,7 +14,7 @@ class IntakeSubsystem(
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
     val intakeSimAngle: Double
-        get() = inputs.pivotPositionRad
+        get() = inputs.leftPivotLeaderPositionRad
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -62,8 +62,8 @@ class IntakeSubsystem(
             this.run {
                 io.setPivotVoltage(moveVolts)
             }.until {
-                val highCurrent = abs(inputs.pivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
-                val lowVelocity = abs(inputs.pivotVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
+                val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+                val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
                 hardstopDebouncer.calculate(highCurrent && lowVelocity)
             }.andThen(
                 runOnce {
@@ -73,5 +73,5 @@ class IntakeSubsystem(
         }
     }
 
-    fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.pivotPositionRad) <= 0.2
+    fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.leftPivotLeaderPositionRad) <= 0.2
 }

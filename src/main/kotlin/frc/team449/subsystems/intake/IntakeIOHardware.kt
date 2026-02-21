@@ -110,10 +110,10 @@ open class IntakeIOHardware : IntakeIO {
         rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
         if (isAliveCounter++ >= 50) {
             isAliveCounter = 0
-            pivotLeaderDisconnectedAlert.set(!pivotLeader.isAlive)
-            pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
-            rollerLeaderDisconnectedAlert.set(!rollerLeader.isAlive)
-            rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
+            leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)
+            rightPivotFollowerDisconnectedAlert.set(!rightPivotFollower.isAlive)
+            leftRollerLeaderDisconnectedAlert.set(!leftRollerLeader.isAlive)
+            rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
         }
     }
 
