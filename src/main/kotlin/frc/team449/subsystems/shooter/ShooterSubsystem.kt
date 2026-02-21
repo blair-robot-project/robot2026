@@ -40,6 +40,8 @@ class ShooterSubsystem(
 
         Logger.recordOutput("Shooter/FlywheelAtTolerance", isFlywheelAtTolerance())
         Logger.recordOutput("Shooter/HoodAtTolerance", isHoodAtTolerance())
+
+        Logger.recordOutput("Shooter/Balls", ballCount)
     }
 
     override fun simulationPeriodic() {
