@@ -1,6 +1,5 @@
 package frc.team449.subsystems
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -22,8 +21,8 @@ class RobotActions(
 
     fun deployAndIntake(): Command =
         SequentialCommandGroup(
+            intake.intake(),
             intake.deploy(),
-            intake.intake()
         )
 
     fun stopAndStow(): Command =
@@ -36,17 +35,17 @@ class RobotActions(
 
     fun prepTrenchShot(): Command =
         ParallelCommandGroup(
-            shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
             shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
+            shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
         )
 
     fun prepHubShot(): Command =
         ParallelCommandGroup(
-            shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
             shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
+            shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
         )
 
-    fun shoot(): Command =
+    fun feed(): Command =
         SequentialCommandGroup(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
@@ -64,11 +63,4 @@ class RobotActions(
 
     fun homeHood(): Command =
         shooter.homeHood()
-
-    fun stopAll(): Command =
-        Commands.parallel(
-            indexer.stop(),
-            intake.stopRollers(),
-            shooter.stopFlywheel(),
-        )
 }

@@ -65,8 +65,7 @@ open class DriveIOHardware(
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
-        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *gyroSignals)
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, angularYawVelocity)
+        BaseStatusSignal.setUpdateFrequencyForAll(100.0, angularYawVelocity)
 
         PhoenixUtil.registerSignals(*gyroSignals)
 
