@@ -133,13 +133,19 @@ object Constants {
 
     object IntakeConstants {
         // config constants
-        const val PIVOT_MOTOR_ID = 40
-        const val PIVOT_FOLLOWER_ID = 41
-        const val ROLLER_MOTOR_ID = 42
-        const val ROLLER_FOLLOWER_ID = 43
+        const val LEFT_PIVOT_MOTOR_ID = 40
+        const val RIGHT_PIVOT_FOLLOWER_ID = 41
+        const val LEFT_ROLLER_MOTOR_ID = 42
+        const val RIGHT_ROLLER_FOLLOWER_ID = 43
 
-        val ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
-        val PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+        val LEFT_PIVOT_NEUTRAL_MODE = NeutralModeValue.Brake
+        val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
+
+        val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
+
+        val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+        val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
         const val STOW_POS_RADS = 0.0 // TODO: fix positions
         const val DEPLOY_POS_RADS = 2.0
@@ -203,7 +209,7 @@ object Constants {
         const val TOP_GEARING = 31.0 / 11.0
 
         val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
-        val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
+        val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         const val TOP_KP = 0.5
         const val TOP_KI = 0.0

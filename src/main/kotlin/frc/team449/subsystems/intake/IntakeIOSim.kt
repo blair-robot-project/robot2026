@@ -49,10 +49,10 @@ class IntakeIOSim : IntakeIOHardware() {
         )
     )
 
-    private val pivotLeaderSim = pivotLeader.simState
-    private val pivotFollowerSim = pivotFollower.simState
-    private val rollerLeaderSim = rollerLeader.simState
-    private val rollerFollowerSim = rollerFollower.simState
+    private val pivotLeaderSim = leftPivotLeader.simState
+    private val pivotFollowerSim = rightPivotFollower.simState
+    private val rollerLeaderSim = leftRollerLeader.simState
+    private val rollerFollowerSim = rightRollerFollower.simState
 
     init {
         SmartDashboard.putData("Intake", mech)

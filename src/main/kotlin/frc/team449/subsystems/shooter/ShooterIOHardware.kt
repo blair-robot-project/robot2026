@@ -1,6 +1,7 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
+import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.PositionVoltage
@@ -133,10 +134,10 @@ open class ShooterIOHardware : ShooterIO {
     private val hoodMotorDisconnectedAlert = Alert("hood motor disconnected (ID $HOOD_MOTOR_ID)", Alert.AlertType.kError)
 
     init {
-        leftLeaderMotor.configurator.apply(flywheelConfig)
-        leftFollowerMotor.configurator.apply(flywheelConfig)
-        rightLeaderMotor.configurator.apply(flywheelConfig)
-        rightFollowerMotor.configurator.apply(flywheelConfig)
+        leftLeaderMotor.configurator.apply(leftFlywheelConfig)
+        leftFollowerMotor.configurator.apply(leftFlywheelConfig)
+        rightLeaderMotor.configurator.apply(rightFlywheelConfig)
+        rightFollowerMotor.configurator.apply(rightFlywheelConfig)
         hoodMotor.configurator.apply(hoodConfig)
 
         leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
@@ -221,7 +222,7 @@ open class ShooterIOHardware : ShooterIO {
     }
 
     companion object {
-        val flywheelConfig = TalonFXConfiguration().apply {
+        val leftFlywheelConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
                 SupplyCurrentLimit = FLYWHEEL_SUPPLY_LIM
                 StatorCurrentLimit = FLYWHEEL_STATOR_LIM
@@ -242,6 +243,11 @@ open class ShooterIOHardware : ShooterIO {
                 kV = FLYWHEEL_KV
             }
         }
+        val rightFlywheelConfig: TalonFXConfiguration? = leftFlywheelConfig.withMotorOutput(
+            MotorOutputConfigs().withNeutralMode(
+                NeutralModeValue.Coast
+            ).withInverted(InvertedValue.Clockwise_Positive)
+        )
 
         val hoodConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
