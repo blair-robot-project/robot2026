@@ -1,17 +1,20 @@
 package frc.team449
 
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.ShooterConstants
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.RobotContainer.drive
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
+import java.util.function.Supplier
 import kotlin.jvm.optionals.getOrDefault
 
 class Bindings(
@@ -21,7 +24,9 @@ class Bindings(
     val operator = robotContainer.opController
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
-    val aimbotting = false
+    var aimbotting = false
+    val HUB_POSITION = if (DriverStation.getAlliance().getOrDefault(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) Constants.RED_GOAL_POSE else Constants.BLUE_GOAL_POSE
+    val ROBOT_DISTANCE_FROM_HUB : Supplier<Double> = { (robotContainer.drive.pose.translation - HUB_POSITION.translation).norm }
 
     fun setDefaultCommands() {
         // set default commands for systems here
@@ -32,23 +37,24 @@ class Bindings(
                 { -driver.leftX },
                 { driver.rightX },
             )
-        toggleAimbot()
+        shootFromAnywhere()
         // controls for simulation
-
     }
 
-    fun toggleAimbot() {
+    fun shootFromAnywhere() {
         driveController.a().onTrue (
             runOnce ({
                 if (aimbotting) {
+                    aimbotting = false
                     CommandScheduler.getInstance().schedule(drive.defaultCommand)
                 } else {
+                    aimbotting = true
                     CommandScheduler.getInstance().schedule(
                         AimAtTargetCommand(
                             robotContainer.drive,
                             { -robotContainer.driveController.leftY },
                             { -robotContainer.driveController.leftX },
-                            {if (DriverStation.getAlliance().getOrDefault(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) Constants.RED_GOAL_POSE else Constants.BLUE_GOAL_POSE},
+                            {HUB_POSITION},
                         )
                     )
                 }
@@ -147,7 +153,28 @@ class Bindings(
         driver
             .x()
             .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
+                ConditionalCommand(
+                    Commands.sequence(
+                        robotContainer.shooter.setHoodAngle(
+                            Degrees.of(
+                                ShooterConstants.HOOD_ANGLE_MAP.get(
+                                    ROBOT_DISTANCE_FROM_HUB.get()
+                                )
+                            )
+                        ),
+                        robotContainer.shooter.setFlywheelVelocity(
+                            RadiansPerSecond.of(
+                                ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(
+                                    ROBOT_DISTANCE_FROM_HUB.get()
+                                )
+                            )
+                        )
+                    ),
+                    robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
+                    { aimbotting }
+                )
+
+
             ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

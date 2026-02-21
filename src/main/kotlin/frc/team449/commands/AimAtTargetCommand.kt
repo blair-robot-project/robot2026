@@ -45,9 +45,6 @@ class AimAtTargetCommand(
                     * DriveConstants.ANGULAR_DEADBAND,
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
-    private var expectedYVelocityContribution : Double = 0.0
-    private var expectedXVelocityContribution : Double = 0.0
-
     init {
         addRequirements(drive)
     }
@@ -75,6 +72,7 @@ class AimAtTargetCommand(
                 DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
     }
 
+    //i know this seems super redundant, i made this just in case it might be used in sotf later
     fun strafeAtPower(power: Double) : Double {
         return abs(strafeSupplier.asDouble).pow(power) * sign(strafeSupplier.asDouble) *
                 DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
@@ -84,10 +82,6 @@ class AimAtTargetCommand(
         val target = targetSupplier.get()
         throttle = throttleAtPower(2.0)
         strafe = strafeAtPower(2.0)
-
-        expectedYVelocityContribution = throttleAtPower(JOYSTICK_POWER) * PERIODIC_TIME * VELOCITY_COEFFICIENT
-
-        expectedXVelocityContribution = throttleAtPower(JOYSTICK_POWER) * PERIODIC_TIME * VELOCITY_COEFFICIENT
 
         val targetHeading = Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
         val delta = targetHeading.minus(drive.pose.rotation).radians
