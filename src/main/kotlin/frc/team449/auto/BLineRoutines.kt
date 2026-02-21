@@ -136,12 +136,12 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
-                WaitCommand(6.0),
-                PrintCommand("Stop Shooting"),
                 pathBuilder.build(path3),
                 pathBuilder.build(path4),
+                WaitCommand(6.0),
+                PrintCommand("Stop Shooting"),
+                pathBuilder.build(path1),
+                pathBuilder.build(path2),
                 WaitCommand(6.0),
                 PrintCommand("Stop Shooting")
             )
@@ -247,62 +247,6 @@ class BLineRoutines(
         return routine
     }
 
-    fun trenchSameR(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path1 = Path("R_trench_start")
-        val path2 = Path("R_trench_beyond")
-
-        eventTriggerCommands()
-
-        routine.active().onTrue(
-            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
-        )
-
-        return routine
-    }
-
-    fun trenchSameL(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path1 = Path("L_trench_start")
-        val path2 = Path("L_trench_beyond")
-
-        eventTriggerCommands()
-
-        routine.active().onTrue(
-            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
-        )
-
-        return routine
-    }
-
-    fun trenchDifferentR(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path1 = Path("R_trench_start")
-        val path2 = Path("R_trench_across")
-
-       eventTriggerCommands()
-
-        routine.active().onTrue(
-            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
-        )
-
-        return routine
-    }
-
-    fun trenchDifferentL(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("auto")
-        val path1 = Path("L_trench_start")
-        val path2 = Path("L_trench_across")
-
-        eventTriggerCommands()
-
-        routine.active().onTrue(
-            Commands.sequence(pathBuilder.build(path1), pathBuilder.build(path2))
-        )
-
-        return routine
-    }
-
     fun addOptions(autoChooser: AutoChooser) {
         autoChooser.addRoutine("B-Line R half close", this::R_half_close)
         autoChooser.addRoutine("B-Line R half far", this::R_half_far)
@@ -310,10 +254,5 @@ class BLineRoutines(
         autoChooser.addRoutine("B-Line L half close", this::L_half_close)
         autoChooser.addRoutine("B-Line L half far", this::L_half_far)
         autoChooser.addRoutine("B-Line L half then reg loop", this::L_half_thenregloop)
-
-        autoChooser.addRoutine("B-Line 2 cycle same trench auto (R)", this::trenchSameR)
-        autoChooser.addRoutine("B-Line 2 cycle same trench auto (L)", this::trenchSameL)
-        autoChooser.addRoutine("B-Line 2 cycle different trench auto (R)", this::trenchDifferentR)
-        autoChooser.addRoutine("B-Line 2 cycle different trench auto (L)", this::trenchDifferentL)
     }
 }
