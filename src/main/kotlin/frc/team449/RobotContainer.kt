@@ -4,11 +4,28 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
 import frc.team449.generated.TunerConstants
+import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.vision.*
+import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionConstants
+import frc.team449.subsystems.vision.VisionIO
+import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
+import frc.team449.subsystems.indexer.IndexerIO
+import frc.team449.subsystems.indexer.IndexerIOHardware
+import frc.team449.subsystems.indexer.IndexerIOSim
+import frc.team449.subsystems.indexer.IndexerSubsystem
+import frc.team449.subsystems.intake.IntakeIO
+import frc.team449.subsystems.intake.IntakeIOHardware
+import frc.team449.subsystems.intake.IntakeIOSim
+import frc.team449.subsystems.intake.IntakeSubsystem
+import frc.team449.subsystems.shooter.ShooterIO
+import frc.team449.subsystems.shooter.ShooterIOHardware
+import frc.team449.subsystems.shooter.ShooterIOSim
+import frc.team449.subsystems.shooter.ShooterSubsystem
 
 object RobotContainer {
     // driver/op controllers
@@ -17,19 +34,38 @@ object RobotContainer {
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
 
-    val drive: DriveSubsystem = DriveSubsystem(
-        when (Constants.CURRENT_MODE) {
-            Mode.REAL -> DriveIOHardware(
-                TunerConstants.DrivetrainConstants,
-                arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
-            )
-            Mode.SIM -> DriveIOSim(
-                TunerConstants.DrivetrainConstants,
-                arrayOf(TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight)
-            )
-            Mode.REPLAY -> object : DriveIO {}
-        }
-    )
+    val drive: DriveSubsystem =
+        DriveSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> {
+                    DriveIOHardware(
+                        TunerConstants.DrivetrainConstants,
+                        arrayOf(
+                            TunerConstants.FrontLeft,
+                            TunerConstants.FrontRight,
+                            TunerConstants.BackLeft,
+                            TunerConstants.BackRight,
+                        ),
+                    )
+                }
+
+                Mode.SIM -> {
+                    DriveIOSim(
+                        TunerConstants.DrivetrainConstants,
+                        arrayOf(
+                            TunerConstants.FrontLeft,
+                            TunerConstants.FrontRight,
+                            TunerConstants.BackLeft,
+                            TunerConstants.BackRight,
+                        ),
+                    )
+                }
+
+                Mode.REPLAY -> {
+                    object : DriveIO {}
+                }
+            },
+        )
     val vision: Vision =
         when (Constants.CURRENT_MODE) {
             Mode.REAL ->
@@ -50,6 +86,33 @@ object RobotContainer {
                 object : VisionIO {}
             ).also { vision = it }
         }
+    val intake: IntakeSubsystem =
+        IntakeSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> IntakeIOHardware()
+                Mode.SIM -> IntakeIOSim()
+                Mode.REPLAY -> object : IntakeIO {}
+            },
+        )
+
+    val indexer: IndexerSubsystem =
+        IndexerSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> IndexerIOHardware()
+                Mode.SIM -> IndexerIOSim()
+                Mode.REPLAY -> object : IndexerIO {}
+            },
+        )
+    val shooter: ShooterSubsystem =
+        ShooterSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> ShooterIOHardware()
+                Mode.SIM -> ShooterIOSim()
+                Mode.REPLAY -> object : ShooterIO {}
+            },
+        )
+
+    val actions = RobotActions(this)
 
     val bindings = Bindings(this)
 }

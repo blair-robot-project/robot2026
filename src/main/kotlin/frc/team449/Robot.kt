@@ -3,9 +3,13 @@ package frc.team449
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
+import edu.wpi.first.math.MathUtil
+import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.util.PhoenixUtil
 import frc.team449.subsystems.vision.LimelightHelpers
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
@@ -80,9 +84,10 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotPeriodic() {
+        PhoenixUtil.refreshAll()
+
         // high priority (real-time) thread for loop timing
         Threads.setCurrentThreadPriority(true, 99)
-
         CommandScheduler.getInstance().run()
 
         // return thread to low priority (standard)
@@ -154,7 +159,32 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
+    }
 
-    override fun simulationPeriodic() {}
+    override fun simulationPeriodic() {
+        Logger.recordOutput(
+            "FinalComponentPoses",
+            *arrayOf(
+                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
+                Pose3d(
+                    MathUtil.inverseInterpolate(
+                        Constants.IntakeConstants.STOW_POS_RADS,
+                        Constants.IntakeConstants.DEPLOY_POS_RADS,
+                        robotContainer.intake.intakeSimAngle
+                    ) * 0.3,
+                    0.0,
+                    0.0,
+                    Rotation3d()
+                ),
+                Pose3d(
+                    -0.1,
+                    0.0,
+                    0.4,
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
+                )
+            )
+        )
+    }
 }

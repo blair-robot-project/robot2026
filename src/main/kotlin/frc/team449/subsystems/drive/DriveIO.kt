@@ -36,7 +36,11 @@ interface DriveIO {
 
     fun setControl(request: SwerveRequest) {}
 
-    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {}
+    fun addVisionMeasurement(
+        visionRobotPoseMeters: Pose2d,
+        timestampSeconds: Double,
+        visionMeasurementStdDevs: Matrix<N3, N1>
+    ) {}
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}
 }
