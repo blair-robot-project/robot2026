@@ -34,7 +34,7 @@ open class DriveIOHardware(
     ::TalonFXS,
     ::CANcoder,
     driveConstants,
-    Constants.DriveConstants.ODOMETRY_LOOP_TIME,
+    Constants.DriveConstants.ODOMETRY_LOOP_HZ,
     *moduleConstants,
 ),
     DriveIO {
