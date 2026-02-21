@@ -1,8 +1,8 @@
 package frc.team449
 
 import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.ShooterConstants
-import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
 
 class Bindings(
@@ -10,8 +10,6 @@ class Bindings(
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
-
-    val actions = robotContainer.actions
 
     fun setDefaultCommands() {
         // set default commands for systems here
@@ -28,15 +26,30 @@ class Bindings(
         driver
             .rightTrigger()
             .onTrue(
-                actions.deployAndIntake(),
+                SequentialCommandGroup(
+                    robotContainer.intake.deploy(),
+                    robotContainer.intake.intake(),
+                ),
             )
 
         driver
             .leftTrigger()
             .onTrue(
-                actions.stopAndStow(),
+                SequentialCommandGroup(
+                    robotContainer.intake.stopRollers(),
+                    robotContainer.intake.stow(),
+                ),
             )
 
+        driver
+            .rightBumper()
+            .whileTrue(
+                robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
+                // check tol and feed
+            ).onFalse(
+                robotContainer.shooter.stopFlywheel(),
+                // coast hopper
+            )
 //
 //        driver
 //            .x()
@@ -56,15 +69,21 @@ class Bindings(
 //                // feed
 //            )
 
+//        driver
+//            .a()
+//            .onTrue(
+//                SmartXLockCommand(
+//                    robotContainer.drive,
+//                    { -driver.leftY },
+//                    { -driver.leftX },
+//                    { driver.rightX },
+//                )
+//            )
+
         driver
-            .a()
+            .start()
             .onTrue(
-                SmartXLockCommand(
-                    robotContainer.drive,
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { driver.rightX },
-                ),
+                robotContainer.drive.seedFieldCentric(),
             )
 
         driver
@@ -73,6 +92,14 @@ class Bindings(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
             ).onFalse(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
+            )
+
+        driver
+            .a()
+            .onTrue(
+                robotContainer.intake.deploy(),
+            ).onFalse(
+                robotContainer.intake.stow(),
             )
 
         driver
@@ -88,11 +115,5 @@ class Bindings(
             .onTrue(
                 robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
             ).onFalse(robotContainer.shooter.stopFlywheel())
-
-        driver
-            .start()
-            .onTrue(
-                robotContainer.drive.seedFieldCentric(),
-            )
     }
 }
