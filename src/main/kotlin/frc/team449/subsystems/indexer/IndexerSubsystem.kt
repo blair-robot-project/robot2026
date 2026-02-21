@@ -22,18 +22,12 @@ class IndexerSubsystem(
         Logger.processInputs("Indexer", inputs)
     }
 
-    override fun simulationPeriodic() {
-        if (io is IndexerIOSim) {
-            io.simulationPeriodic()
-        }
-    }
-
     fun index(
         wedgeSpeed: AngularVelocity,
         floorSpeed: AngularVelocity,
         topSpeed: AngularVelocity
     ): Command =
-        run {
+        this.run {
             io.setFloorSpeed(floorSpeed)
             io.setWedgeSpeed(wedgeSpeed)
             io.setTopSpeed(topSpeed)

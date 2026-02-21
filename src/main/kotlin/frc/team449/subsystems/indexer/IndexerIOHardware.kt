@@ -47,12 +47,9 @@ open class IndexerIOHardware : IndexerIO {
     private val lowPrioritySignals =
         arrayOf(
             wedgeSupplyCurrent,
-            wedgeStatorCurrent,
             wedgeTemperature,
             floorSupplyCurrent,
-            floorStatorCurrent,
             floorTemperature,
-            topStatorCurrent,
             topTemperature,
             topSupplyCurrent,
         )
@@ -60,68 +57,69 @@ open class IndexerIOHardware : IndexerIO {
         arrayOf(
             wedgeVelocity,
             wedgeVoltage,
+            wedgeStatorCurrent,
             floorVelocity,
             floorVoltage,
+            floorStatorCurrent,
             topVelocity,
             topVoltage,
+            topStatorCurrent,
         )
 
     private val wedgeIndexerDisconnectedAlert =
-        Alert("Wedge indexing motor disconnected (ID $WEDGE_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Wedge Indexing Motor Disconnected (ID $WEDGE_INDEXER_ID).", Alert.AlertType.kError)
     private val floorIndexerDisconnectedAlert =
-        Alert("Floor indexing motor disconnected (ID $FLOOR_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Floor Indexing Motor Disconnected (ID $FLOOR_INDEXER_ID).", Alert.AlertType.kError)
 
     private val topIndexerDisconnectedAlert =
-        Alert("Top indexing motor disconnected (ID $TOP_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Top Indexing Motor Disconnected (ID $TOP_INDEXER_ID)", Alert.AlertType.kError)
 
     init {
-        ParentDevice.optimizeBusUtilizationForAll(wedgeIndexer, floorIndexer)
+        ParentDevice.optimizeBusUtilizationForAll(wedgeIndexer, floorIndexer, topIndexer)
 
-        tryUntilOk(5) {
-            wedgeIndexer.configurator.apply(leftWedgeConfig)
-        }
+        tryUntilOk(5) { wedgeIndexer.configurator.apply(leftWedgeConfig) }
+        tryUntilOk(5) { floorIndexer.configurator.apply(rightFloorConfig) }
 
-        tryUntilOk(5) {
-            floorIndexer.configurator.apply(rightFloorConfig)
-        }
+        tryUntilOk(5) { topIndexer.configurator.apply(topFloorConfig) }
 
-        tryUntilOk(5) {
-            topIndexer.configurator.apply(topFloorConfig)
-        }
         BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioritySignals)
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioritySignals)
 
         PhoenixUtil.registerSignals(*lowPrioritySignals, *highPrioritySignals)
     }
 
+    private var isAliveCounter = 0
+
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        inputs.wedgeVelocityRadPerSec = wedgeIndexer.velocity.value.`in`(Units.RadiansPerSecond)
-        inputs.wedgeAppliedVolts = wedgeIndexer.motorVoltage.valueAsDouble
-        inputs.wedgeStatorCurrentAmps = wedgeIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.wedgeSupplyCurrentAmps = wedgeIndexer.supplyCurrent.value.`in`(Units.Amps)
-        inputs.wedgeTempCelsius = wedgeIndexer.deviceTemp.value.`in`(Units.Celsius)
-        wedgeIndexerDisconnectedAlert.set(!wedgeIndexer.isAlive)
+        inputs.wedgeVelocityRadPerSec = wedgeVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.wedgeAppliedVolts = wedgeVoltage.valueAsDouble
+        inputs.wedgeStatorCurrentAmps = wedgeStatorCurrent.value.`in`(Units.Amps)
+        inputs.wedgeSupplyCurrentAmps = wedgeSupplyCurrent.value.`in`(Units.Amps)
+        inputs.wedgeTempCelsius = wedgeTemperature.value.`in`(Units.Celsius)
 
-        inputs.floorVelocityRadPerSec = floorIndexer.velocity.value.`in`(Units.RadiansPerSecond)
-        inputs.floorAppliedVolts = floorIndexer.motorVoltage.valueAsDouble
-        inputs.floorStatorCurrentAmps = floorIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.floorSupplyCurrentAmps = floorIndexer.supplyCurrent.value.`in`(Units.Amps)
-        inputs.floorTempCelsius = floorIndexer.deviceTemp.value.`in`(Units.Celsius)
-        floorIndexerDisconnectedAlert.set(!floorIndexer.isAlive)
+        inputs.floorVelocityRadPerSec = floorVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.floorAppliedVolts = floorVoltage.valueAsDouble
+        inputs.floorStatorCurrentAmps = floorStatorCurrent.value.`in`(Units.Amps)
+        inputs.floorSupplyCurrentAmps = floorSupplyCurrent.value.`in`(Units.Amps)
+        inputs.floorTempCelsius = floorTemperature.value.`in`(Units.Celsius)
 
-        inputs.topVelocityRadPerSec = topIndexer.velocity.value.`in`(Units.RadiansPerSecond)
-        inputs.topAppliedVolts = topIndexer.motorVoltage.valueAsDouble
-        inputs.topStatorCurrentAmps = topIndexer.statorCurrent.value.`in`(Units.Amps)
-        inputs.topSupplyCurrentAmps = topIndexer.supplyCurrent.value.`in`(Units.Amps)
-        inputs.topTempCelsius = topIndexer.deviceTemp.value.`in`(Units.Celsius)
-        topIndexerDisconnectedAlert.set(!topIndexer.isAlive)
+        inputs.topVelocityRadPerSec = topVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.topAppliedVolts = topVoltage.valueAsDouble
+        inputs.topStatorCurrentAmps = topStatorCurrent.value.`in`(Units.Amps)
+        inputs.topSupplyCurrentAmps = topSupplyCurrent.value.`in`(Units.Amps)
+        inputs.topTempCelsius = topTemperature.value.`in`(Units.Celsius)
+
+        if (isAliveCounter++ >= 50) {
+            isAliveCounter = 0
+            wedgeIndexerDisconnectedAlert.set(!wedgeIndexer.isAlive)
+            floorIndexerDisconnectedAlert.set(!floorIndexer.isAlive)
+            topIndexerDisconnectedAlert.set(!topIndexer.isAlive)
+        }
     }
 
     override fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {
         floorIndexer.setControl(
-            floorControlRequest.withVelocity(
-                (floorSurfaceSpeed.`in`(RotationsPerSecond)),
-            ),
+            floorControlRequest.withVelocity(floorSurfaceSpeed.`in`(RotationsPerSecond))
         )
     }
 
@@ -133,7 +131,7 @@ open class IndexerIOHardware : IndexerIO {
 
     override fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {
         topIndexer.setControl(
-            topControlRequest.withVelocity(topSurfaceSpeed.`in`(RotationsPerSecond)),
+            topControlRequest.withVelocity(topSurfaceSpeed.`in`(RotationsPerSecond))
         )
     }
 

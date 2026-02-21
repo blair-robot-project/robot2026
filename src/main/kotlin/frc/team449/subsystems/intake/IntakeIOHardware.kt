@@ -74,6 +74,8 @@ open class IntakeIOHardware : IntakeIO {
         PhoenixUtil.registerSignals(*allSignals)
     }
 
+    private var isAliveCounter = 0
+
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         BaseStatusSignal.refreshAll(*allSignals)
 
@@ -106,6 +108,13 @@ open class IntakeIOHardware : IntakeIO {
         rightPivotFollowerDisconnectedAlert.set(!rightPivotFollower.isAlive)
         leftRollerLeaderDisconnectedAlert.set(!leftRollerLeader.isAlive)
         rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
+        if (isAliveCounter++ >= 50) {
+            isAliveCounter = 0
+            leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)
+            rightPivotFollowerDisconnectedAlert.set(!rightPivotFollower.isAlive)
+            leftRollerLeaderDisconnectedAlert.set(!leftRollerLeader.isAlive)
+            rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
+        }
     }
 
     override fun setPivotVoltage(volts: Double) {
@@ -119,10 +128,8 @@ open class IntakeIOHardware : IntakeIO {
     companion object {
         val pivotConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
-                SupplyCurrentLimitEnable = true
-                SupplyCurrentLimit = 40.0
-                StatorCurrentLimitEnable = true
-                StatorCurrentLimit = 80.0
+                SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
+                StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
             }
 
             MotorOutput.apply {
@@ -140,10 +147,8 @@ open class IntakeIOHardware : IntakeIO {
 
         val rollerConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
-                SupplyCurrentLimitEnable = true
-                SupplyCurrentLimit = 40.0
-                StatorCurrentLimitEnable = true
-                StatorCurrentLimit = 80.0
+                SupplyCurrentLimit = IntakeConstants.ROLLER_SUPPLY_LIMIT
+                StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
             }
 
             MotorOutput.apply {
