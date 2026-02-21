@@ -1,7 +1,6 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.units.Units.RotationsPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
@@ -47,34 +46,32 @@ class IntakeSubsystem(
     fun stopRollers(): Command =
         this.runOnce {
             rollerTargetVelocityRadPerSec = 0.0
-            io.setRollerVelocity(RotationsPerSecond.of(0.0))
+            io.setRollerVoltage(0.0)
         }.withName("Stop Rollers")
 
     // slam commands
-    fun deploy(): Command {
-        pivotDeployedState = true
-
-        return slamHoming(
+    fun deploy(): Command =
+        slamHoming(
+            true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy")
-    }
 
-    fun stow(): Command {
-        pivotDeployedState = false
-
-        return slamHoming(
+    fun stow(): Command =
+        slamHoming(
+            false,
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
         ).withName("Stow")
-    }
 
     private fun slamHoming(
+        deployedState: Boolean,
         moveVolts: Double,
         holdVolts: Double
     ): Command {
         return this.defer {
-            val hardstopDebouncer = Debouncer(0.5)
+            pivotDeployedState = deployedState
+            val hardstopDebouncer = Debouncer(0.25)
 
             this.run {
                 io.setPivotVoltage(moveVolts)
