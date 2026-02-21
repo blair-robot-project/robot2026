@@ -157,7 +157,7 @@ object Constants {
         const val DEPLOY_VOLTS = 8.0
         const val DEPLOY_HOLD_VOLTS = 0.0
         const val STOW_VOLTS = -8.0
-        const val STOW_HOLD_VOLTS = -0.5
+        const val STOW_HOLD_VOLTS = -0.0
 
         const val HOMING_CURRENT_AMPS = 20.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
