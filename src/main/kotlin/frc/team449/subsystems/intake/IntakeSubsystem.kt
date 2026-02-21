@@ -87,6 +87,6 @@ class IntakeSubsystem(
     fun isSimIntaking(): BooleanSupplier =
         {
             isIntakeDeployed() &&
-                    abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.rollerVelocityRadPerSec) <= 10.0
+                    abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 10.0
         }
 }

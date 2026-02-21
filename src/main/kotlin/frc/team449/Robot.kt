@@ -138,6 +138,8 @@ class Robot : LoggedRobot() {
     }
 
     override fun simulationPeriodic() {
+        fuelSim.updateSim()
+
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
