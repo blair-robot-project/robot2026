@@ -34,13 +34,13 @@ class RobotActions(
     fun stopIntake(): Command = intake.stopRollers()
 
     fun prepTrenchShot(): Command =
-        ParallelCommandGroup(
+        SequentialCommandGroup(
             shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
             shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
         )
 
     fun prepHubShot(): Command =
-        ParallelCommandGroup(
+        SequentialCommandGroup(
             shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
             shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
         )

@@ -1,4 +1,6 @@
 package frc.team449.subsystems.intake
+import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
@@ -55,6 +57,12 @@ class IntakeIOSim : IntakeIOHardware() {
     private val rollerFollowerSim = rightRollerFollower.simState
 
     init {
+        leftPivotLeader.configurator.apply(
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+        )
+        rightPivotFollower.configurator.apply(
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+        )
         SmartDashboard.putData("Intake", mech)
     }
 
