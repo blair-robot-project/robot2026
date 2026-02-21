@@ -58,15 +58,14 @@ class Robot : LoggedRobot() {
 
     private val robotContainer = RobotContainer
 
-    //override fun driverStationConnected() {
-     //   robotContainer.drive.setOperatorPerspectiveForward()
-    //}
+    override fun driverStationConnected() {
+        robotContainer.drive.setOperatorPerspectiveForward()
+    }
 
     override fun robotInit() {
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
 
-        //choreoRoutines.addOptions(autoChooser)
         bLineRoutines.addOptions(autoChooser)
         SmartDashboard.putData("Auto Chooser", autoChooser)
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler())
@@ -93,8 +92,7 @@ class Robot : LoggedRobot() {
 
     override fun teleopPeriodic() {}
 
-    override fun disabledInit() {
-    }
+    override fun disabledInit() {}
 
     override fun disabledPeriodic() {}
 
@@ -103,11 +101,11 @@ class Robot : LoggedRobot() {
     override fun testPeriodic() {}
 
     override fun simulationInit() {
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
     }
 
     override fun simulationPeriodic() {
         bLineRoutines.logBLineAuto()
-        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(

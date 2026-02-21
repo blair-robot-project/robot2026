@@ -59,7 +59,7 @@ class DriveIOSim(
                 ),
             )
 
-    private val startingPose = Pose2d(0.0, 0.0, Rotation2d())
+    private val startingPose = Pose2d(4.35, 0.45, Rotation2d(1.5))
     val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier =
@@ -125,17 +125,6 @@ class DriveIOSim(
     override fun resetOdometry(pose: Pose2d) {
         mapleSimDrive.setSimulationWorldPose(pose)
         super.resetPose(pose)
-    }
-
-    override fun resetGyro() {
-        mapleSimDrive.gyroSimulation.setRotation(
-            if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
-                Rotation2d.kZero
-            } else {
-                Rotation2d.k180deg
-            },
-        )
-        super.resetGyro()
     }
 
     companion object {

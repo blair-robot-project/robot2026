@@ -2,52 +2,71 @@ package frc.team449.subsystems.indexer
 
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
-import edu.wpi.first.units.Units
-import edu.wpi.first.wpilibj.simulation.DCMotorSim
+import edu.wpi.first.math.util.Units
+import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.wpilibj.RobotController
+import edu.wpi.first.wpilibj.simulation.FlywheelSim
+import frc.team449.Constants
+import frc.team449.Constants.IndexerConstants.FLOOR_GEARING
+import frc.team449.Constants.IndexerConstants.FLOOR_MOI
+import frc.team449.Constants.IndexerConstants.TOP_GEARING
+import frc.team449.Constants.IndexerConstants.TOP_MOI
+import frc.team449.Constants.IndexerConstants.WEDGE_GEARING
+import frc.team449.Constants.IndexerConstants.WEDGE_MOI
 
-class IndexerIOSim : IndexerIO {
-    private val leftGearbox = DCMotor.getKrakenX44(1)
-    private val rightGearbox = DCMotor.getKrakenX60(1)
-
-    // TODO: MOI and gearing
-    private val leftPlant =
-        LinearSystemId.createDCMotorSystem(
-            leftGearbox,
-            0.001,
-            1.0,
+class IndexerIOSim : IndexerIOHardware() {
+    var wedgeSim =
+        FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60(1),
+                WEDGE_MOI,
+                WEDGE_GEARING,
+            ),
+            DCMotor.getKrakenX60(1),
         )
-    private val rightPlant =
-        LinearSystemId.createDCMotorSystem(
-            leftGearbox,
-            0.001,
-            1.0,
+
+    var floorSim =
+        FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60(1),
+                FLOOR_MOI,
+                FLOOR_GEARING,
+            ),
+            DCMotor.getKrakenX60(1),
         )
 
-    var leftMotorSim = DCMotorSim(leftPlant, leftGearbox)
-    var rightMotorSim = DCMotorSim(rightPlant, rightGearbox)
+    var topSim =
+        FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60(1),
+                TOP_MOI,
+                TOP_GEARING,
+            ),
+            DCMotor.getKrakenX60(1),
+        )
 
-    private var leftVoltSim: Double = 0.0
-    private var rightVoltSim: Double = 0.0
+    private val wedgeMotorSim = wedgeIndexer.simState
+    private val floorMotorSim = floorIndexer.simState
+    private val topMotorSim = topIndexer.simState
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        leftMotorSim.update(0.02)
-        rightMotorSim.update(0.02)
-
-        leftMotorSim.setInput(leftVoltSim)
-        rightMotorSim.setInput(rightVoltSim)
-
-        inputs.leftVoltage = leftMotorSim.inputVoltage
-        inputs.rightVoltage = rightMotorSim.inputVoltage
-
-        inputs.leftVelocity = leftMotorSim.angularVelocity.`in`(Units.RotationsPerSecond)
-        inputs.rightVelocity = rightMotorSim.angularVelocity.`in`(Units.RotationsPerSecond)
+        super.updateInputs(inputs)
     }
 
-    override fun setVoltage(
-        leftVoltage: Double,
-        rightVoltage: Double
-    ) {
-        leftVoltSim = leftVoltage
-        rightVoltSim = rightVoltage
+    fun simulationPeriodic() {
+        wedgeMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        wedgeSim.setInput(wedgeMotorSim.motorVoltage)
+        wedgeSim.update(Constants.LOOP_TIME)
+        wedgeMotorSim.setRotorVelocity(Units.radiansToRotations(wedgeSim.angularVelocity.`in`(RadiansPerSecond)) * WEDGE_GEARING)
+
+        floorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        floorSim.setInput(floorMotorSim.motorVoltage)
+        floorSim.update(Constants.LOOP_TIME)
+        floorMotorSim.setRotorVelocity(Units.radiansToRotations(floorSim.angularVelocity.`in`(RadiansPerSecond)) * FLOOR_GEARING)
+
+        topMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        topSim.setInput(topMotorSim.motorVoltage)
+        topSim.update(Constants.LOOP_TIME)
+        topMotorSim.setRotorVelocity(Units.radiansToRotations(topSim.angularVelocity.`in`(RadiansPerSecond)) * TOP_GEARING)
     }
 }

@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
 import edu.wpi.first.wpilibj.DriverStation
 import frc.team449.util.PhoenixUtil
+import frc.team449.Constants
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
@@ -36,7 +37,7 @@ open class DriveIOHardware(
     ::TalonFXS,
     ::CANcoder,
     driveConstants,
-    100.0,
+    Constants.DriveConstants.ODOMETRY_LOOP_HZ,
     *moduleConstants,
 ),
     DriveIO {
@@ -66,18 +67,10 @@ open class DriveIOHardware(
     )
 
     init {
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0,
-            angularPitchVelocity,
-            angularRollVelocity,
-            angularYawVelocity,
-            roll,
-            pitch,
-            accelX,
-            accelY,
-        )
-
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
+        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *gyroSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, angularYawVelocity)
+
         PhoenixUtil.registerSignals(*gyroSignals)
 
         this.odometryThread.setThreadPriority(99)
@@ -90,21 +83,6 @@ open class DriveIOHardware(
         inputs.fromSwerveDriveState(telemetryCache.get())
 
         inputs.gyroAngle = inputs.Pose.rotation.degrees
-
-        inputs.frontLeftDrivePosition = modules[0].driveMotor.position.value
-        inputs.frontRightDrivePosition = modules[1].driveMotor.position.value
-        inputs.backLeftDrivePosition = modules[2].driveMotor.position.value
-        inputs.backRightDrivePosition = modules[3].driveMotor.position.value
-
-        BaseStatusSignal.refreshAll(
-            angularRollVelocity,
-            angularPitchVelocity,
-            angularYawVelocity,
-            pitch,
-            roll,
-            accelX,
-            accelY,
-        )
     }
 
     override fun resetOdometry(pose: Pose2d) {

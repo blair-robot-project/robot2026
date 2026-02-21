@@ -1,31 +1,54 @@
 package frc.team449.subsystems.indexer
+import edu.wpi.first.units.measure.AngularVelocity
 import org.littletonrobotics.junction.AutoLog
 
 interface IndexerIO {
     @AutoLog
     open class IndexerInputs {
-        @JvmField var leftVoltage: Double = 0.0
+        @JvmField var wedgeVelocityRadPerSec: Double = 0.0
 
-        @JvmField var rightVoltage: Double = 0.0
+        @JvmField var wedgeAppliedVolts: Double = 0.0
 
-        // add to indexer sim or hardware later
-        @JvmField var leftSupplyCurrent: Double = 0.0
+        @JvmField var wedgeSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var leftStatorCurrent: Double = 0.0
+        @JvmField var wedgeStatorCurrentAmps: Double = 0.0
 
-        @JvmField var rightSupplyCurrent: Double = 0.0
+        @JvmField var wedgeTempCelsius: Double = 0.0
 
-        @JvmField var rightStatorCurrent: Double = 0.0
+        @JvmField var floorVelocityRadPerSec: Double = 0.0
 
-        @JvmField var leftVelocity: Double = 0.0
+        @JvmField var floorAppliedVolts: Double = 0.0
 
-        @JvmField var rightVelocity: Double = 0.0
+        @JvmField var floorSupplyCurrentAmps: Double = 0.0
+
+        @JvmField var floorStatorCurrentAmps: Double = 0.0
+
+        @JvmField var floorTempCelsius: Double = 0.0
+
+        @JvmField var topVelocityRadPerSec: Double = 0.0
+
+        @JvmField var topAppliedVolts: Double = 0.0
+
+        @JvmField var topSupplyCurrentAmps: Double = 0.0
+
+        @JvmField var topStatorCurrentAmps: Double = 0.0
+
+        @JvmField var topTempCelsius: Double = 0.0
     }
 
-    fun setVoltage(
-        leftVoltage: Double,
-        rightVoltage: Double
+    fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {}
+
+    fun setWedgeSpeed(wedgeSurfaceSpeed: AngularVelocity) {}
+
+    fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {}
+
+    fun setIndexerVelocity(
+        topVel: AngularVelocity,
+        sideVel: AngularVelocity,
+        bottomVel: AngularVelocity
     ) {}
+
+    fun simPeriodic() {}
 
     fun updateInputs(inputs: IndexerInputs) {}
 }
