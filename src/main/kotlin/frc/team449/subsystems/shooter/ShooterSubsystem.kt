@@ -21,6 +21,8 @@ class ShooterSubsystem(
 
     var hoodSimAngle: Double = 0.0
 
+    var shootCooldown = 0
+
     private val currentHomingDebouncer: Debouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
     private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
     private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
@@ -36,7 +38,9 @@ class ShooterSubsystem(
             io.simulationPeriodic()
             hoodSimAngle = io.hoodSim.angleRads
 
-            if (isFlywheelAtTolerance() && flywheelTargetVelocity >= ShooterConstants.HUB_FLYWHEEL_VEL) {
+
+            if (isFlywheelAtTolerance() && flywheelTargetVelocity >= ShooterConstants.HUB_FLYWHEEL_VEL && shootCooldown <= 0) {
+                shootCooldown = 30
                 fuelSim.launchFuel(
                     MetersPerSecond.of(
                         (
@@ -48,6 +52,8 @@ class ShooterSubsystem(
                     Radians.of(0.0),
                     ShooterConstants.SHOOTER_HEIGHT,
                 )
+            } else {
+                shootCooldown -= 1
             }
         }
     }
