@@ -26,8 +26,8 @@ class ShooterSubsystem(
 
     var shootCooldown = 0
 
-    private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
-    private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kBoth)
+    private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
+    private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -43,16 +43,17 @@ class ShooterSubsystem(
     override fun simulationPeriodic() {
         if (io is ShooterIOSim) {
 
-            if (isFlywheelAtTolerance() && flywheelTargetVelocityRadPerSec >= ShooterConstants.HUB_FLYWHEEL_VEL.`in`(RadiansPerSecond) && shootCooldown <= 0) {
+            if (isFlywheelAtTolerance() && flywheelTargetVelocityRadPerSec >= 10 && shootCooldown <= 0) {
                 shootCooldown = 30
-                println("Shooting a ball at ${inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS} m/s")
+
+                val flywheelSurfaceSpeed = inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS
+                val hoodRollerSurfaceSpeed = inputs.rightLeaderVelocityRadPerSec * 1 / ShooterConstants.HOOD_ROLLER_GEARING * ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
+                val effectiveShootSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2 * ShooterConstants.EFFICIENCY
+
+                println("Shooting a ball at $effectiveShootSpeed m/s")
+
                 fuelSim.launchFuel(
-                    MetersPerSecond.of(
-                        (
-                            inputs.rightLeaderVelocityRadPerSec *
-                                ShooterConstants.FLYWHEEL_RADIUS
-                            ),
-                    ),
+                    MetersPerSecond.of(effectiveShootSpeed),
                     Radians.of(inputs.hoodPositionRad),
                     Radians.of(0.0),
                     ShooterConstants.SHOOTER_HEIGHT,

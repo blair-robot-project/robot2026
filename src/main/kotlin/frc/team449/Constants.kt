@@ -96,6 +96,8 @@ object Constants {
         val HUB_HOOD_ANGLE: Angle = Degrees.of(30.0) // todo: find
         val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
 
+        const val EFFICIENCY = 0.95 // fake value for sim
+
         // HOOD
         const val HOOD_MOTOR_ID = 15
 
@@ -104,6 +106,8 @@ object Constants {
 
         const val HOOD_GEARING = 106.0
         const val HOOD_ROLLER_GEARING = 64.0 / 27.0
+        val HOOD_ROLLER_RADIUS = Inches.of(0.5)
+
 
         const val HOOD_KP = 100.0
         const val HOOD_KI = 0.0
