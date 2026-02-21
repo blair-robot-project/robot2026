@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO,
+    private val io: IntakeIO
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -87,6 +87,6 @@ class IntakeSubsystem(
     fun isSimIntaking(): BooleanSupplier =
         {
             isIntakeDeployed() &&
-                    abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 10.0
+                abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 10.0
         }
 }

@@ -38,7 +38,6 @@ class ShooterSubsystem(
             io.simulationPeriodic()
             hoodSimAngle = io.hoodSim.angleRads
 
-
             if (isFlywheelAtTolerance() && flywheelTargetVelocity >= ShooterConstants.HUB_FLYWHEEL_VEL && shootCooldown <= 0) {
                 shootCooldown = 30
                 println("Shooting a ball at ${inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS} m/s")
