@@ -22,10 +22,10 @@ class IntakeIOSim : IntakeIOHardware() {
             DCMotor.getKrakenX44(2),
             IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
             IntakeConstants.PIVOT_MOI,
-            IntakeConstants.ARM_LENGTH_METERS,
-            IntakeConstants.STOW_POS_RADS,
+            0.1,
             IntakeConstants.DEPLOY_POS_RADS,
-            true,
+            IntakeConstants.STOW_POS_RADS,
+            false,
             IntakeConstants.STOW_POS_RADS,
         )
 
@@ -47,7 +47,7 @@ class IntakeIOSim : IntakeIOHardware() {
             MechanismLigament2d(
                 "Intake Pivot Ligament",
                 1.0,
-                Units.radiansToDegrees(IntakeConstants.STOW_POS_RADS) + 90 - IntakeConstants.VIZ_OFFSET_DEG,
+                Units.radiansToDegrees(IntakeConstants.STOW_POS_RADS),
                 4.0,
                 Color8Bit(Color.kRed),
             ),
@@ -74,10 +74,10 @@ class IntakeIOSim : IntakeIOHardware() {
         val pivotRotorPos = Units.radiansToRotations(pivotSim.angleRads) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
         val pivotRotorVel = Units.radiansToRotations(pivotSim.velocityRadPerSec) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
 
-//        pivotLeaderSim.setRawRotorPosition(pivotRotorPos)
-//        pivotLeaderSim.setRotorVelocity(pivotRotorVel)
-//        pivotFollowerSim.setRawRotorPosition(pivotRotorPos)
-//        pivotFollowerSim.setRotorVelocity(pivotRotorVel)
+        pivotLeaderSim.setRawRotorPosition(pivotRotorPos)
+        pivotLeaderSim.setRotorVelocity(pivotRotorVel)
+        pivotFollowerSim.setRawRotorPosition(pivotRotorPos)
+        pivotFollowerSim.setRotorVelocity(pivotRotorVel)
 
         rollerSim.setInput(rollerLeaderSim.motorVoltage)
         rollerSim.update(0.020)

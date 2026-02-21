@@ -139,7 +139,7 @@ object Constants {
         const val RIGHT_ROLLER_FOLLOWER_ID = 43
 
         val LEFT_PIVOT_NEUTRAL_MODE = NeutralModeValue.Brake
-        val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
+        val LEFT_PIVOT_INVERSION = InvertedValue.CounterClockwise_Positive
 
         val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Coast
         val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
@@ -152,12 +152,12 @@ object Constants {
         const val PIVOT_SUPPLY_LIMIT = 20.0
         const val PIVOT_STATOR_LIMIT = 40.0
 
-        const val STOW_POS_RADS = 0.0
-        const val DEPLOY_POS_RADS = 2.269
-        const val DEPLOY_VOLTS = 8.0
+        const val STOW_POS_RADS = 2.269
+        const val DEPLOY_POS_RADS = 0.0
+        const val DEPLOY_VOLTS = -8.0
         const val DEPLOY_HOLD_VOLTS = 0.0
-        const val STOW_VOLTS = -8.0
-        const val STOW_HOLD_VOLTS = -0.5
+        const val STOW_VOLTS = 8.0
+        const val STOW_HOLD_VOLTS = 0.0
 
         const val HOMING_CURRENT_AMPS = 20.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5

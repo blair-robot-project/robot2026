@@ -87,7 +87,7 @@ open class IntakeIOHardware : IntakeIO {
         tryUntilOk(5) { rightRollerFollower.configurator.apply(rollerConfig, 0.25) }
 
         rightRollerFollower.setControl(Follower(leftRollerLeader.deviceID, IntakeConstants.RIGHT_ROLLER_FOLLOWER_ALIGNMENT))
-        //  rightPivotFollower.setControl(Follower(leftPivotLeader.deviceID, IntakeConstants.RIGHT_PIVOT_FOLLOWER_ALIGNMENT))
+        rightPivotFollower.setControl(Follower(leftPivotLeader.deviceID, IntakeConstants.RIGHT_PIVOT_FOLLOWER_ALIGNMENT))
 
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *allSignals)
 
@@ -137,7 +137,7 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     override fun setPivotVoltage(volts: Double) {
-        leftPivotLeader.setControl(pivotVoltageRequest.withOutput(0.0))
+        leftPivotLeader.setControl(pivotVoltageRequest.withOutput(volts))
     }
 
     override fun setRollerVelocity(velocity: AngularVelocity) {

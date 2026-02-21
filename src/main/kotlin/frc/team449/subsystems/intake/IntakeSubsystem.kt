@@ -13,6 +13,8 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
+
+
     val intakeSimAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
 
