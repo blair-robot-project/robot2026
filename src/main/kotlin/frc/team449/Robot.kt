@@ -119,8 +119,8 @@ class Robot : LoggedRobot() {
                 .div(2.0)
                 .minus(Inches.of(5.0))
                 .`in`(Meters),
-            { robotContainer.intake.isSimIntaking().asBoolean && robotContainer.shooter.ballCount < 50 },
-            { robotContainer.shooter.ballCount += 1 }
+            robotContainer.intake.isSimIntaking(robotContainer.shooter::simBallCount),
+            { robotContainer.shooter.simBallCount += 1 }
         )
 
         fuelSim.start()
@@ -140,6 +140,7 @@ class Robot : LoggedRobot() {
 
     override fun simulationPeriodic() {
         fuelSim.updateSim()
+        Logger.recordOutput("Sim Intaking", robotContainer.intake.isSimIntaking(robotContainer.shooter::simBallCount))
 
         Logger.recordOutput(
             "FinalComponentPoses",

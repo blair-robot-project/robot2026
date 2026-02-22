@@ -41,7 +41,7 @@ public class FuelSim {
     protected static final double TRENCH_HEIGHT = 0.565;
     protected static final double TRENCH_BAR_HEIGHT = 0.102;
     protected static final double TRENCH_BAR_WIDTH = 0.152;
-    protected static final double FRICTION = 0.5; // proportion of horizontal vel to lose per sec while on ground
+    protected static final double FRICTION = 0.67; // proportion of horizontal vel to lose per sec while on ground
     protected static final double FUEL_MASS = 0.448 * 0.45392; // kgs
     protected static final double FUEL_CROSS_AREA = Math.PI * FUEL_RADIUS * FUEL_RADIUS;
     // Drag coefficient of smooth sphere: https://en.wikipedia.org/wiki/Drag_coefficient#/media/File:14ilf1l.svg
