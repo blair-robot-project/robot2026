@@ -1,13 +1,12 @@
 package frc.team449.auto
-import choreo.auto.AutoChooser
-import choreo.auto.AutoFactory
-import choreo.auto.AutoRoutine
-import choreo.trajectory.SwerveSample
+
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Pair
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
@@ -31,15 +30,6 @@ import java.util.function.Consumer
 class BLineRoutines(
     robot: Robot
 ) {
-    val autoFactory =
-        AutoFactory(
-            drive::pose,
-            drive::resetOdometry,
-            { sample: SwerveSample -> drive.followTrajectory(robot, sample) },
-            true,
-            drive,
-        )
-
     private val transP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val transI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
     private val transD = LoggedNetworkNumber("Auto/Translation/D", TRANSLATION_D)
@@ -63,7 +53,7 @@ class BLineRoutines(
 
         FollowPath.setTranslationListLoggingConsumer(
             Consumer { pair: Pair<String, Array<Translation2d>> ->
-                Logger.recordOutput<Translation2d>(pair.getFirst(), *pair.getSecond())
+                Logger.recordOutput(pair.first, *pair.second)
             },
         )
 
@@ -72,9 +62,9 @@ class BLineRoutines(
         }
     }
 
-    val translationController: PIDController = PIDController(TRANSLATION_P, TRANSLATION_I, TRANSLATION_D)
-    val rotationController: PIDController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
-    val crossTrackController: PIDController = PIDController(CTC_P, CTC_I, CTC_D)
+    val translationController = PIDController(TRANSLATION_P, TRANSLATION_I, TRANSLATION_D)
+    val rotationController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
+    val crossTrackController = PIDController(CTC_P, CTC_I, CTC_D)
 
     var pathBuilderWithReset: FollowPath.Builder =
         FollowPath
@@ -124,8 +114,7 @@ class BLineRoutines(
         )
     }
 
-    fun rHalfClose(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("R_half_close")
+    fun rHalfClose(): Command {
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_half_close_pt1")
@@ -133,22 +122,17 @@ class BLineRoutines(
 
         eventTriggerCommands()
 
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilderWithReset.build(path1),
-                pathBuilderWithReset.build(path2),
-                WaitCommand(6.0),
-                pathBuilderWithReset.build(path3),
-                pathBuilderWithReset.build(path4),
-                WaitCommand(6.0),
-            ),
+        return Commands.sequence(
+            pathBuilderWithReset.build(path1),
+            pathBuilderWithReset.build(path2),
+            WaitCommand(6.0),
+            pathBuilderWithReset.build(path3),
+            pathBuilderWithReset.build(path4),
+            WaitCommand(6.0),
         )
-
-        return routine
     }
 
-    fun rHalfFar(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("R_half_far")
+    fun rHalfFar(): Command {
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_half_far_pt1")
@@ -156,43 +140,33 @@ class BLineRoutines(
 
         eventTriggerCommands()
 
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilderWithReset.build(path3),
-                pathBuilderWithReset.build(path4),
-                WaitCommand(6.0),
-                pathBuilderWithReset.build(path1),
-                pathBuilderWithReset.build(path2),
-                WaitCommand(6.0),
-            ),
+        return Commands.sequence(
+            pathBuilderWithReset.build(path3),
+            pathBuilderWithReset.build(path4),
+            WaitCommand(6.0),
+            pathBuilderWithReset.build(path1),
+            pathBuilderWithReset.build(path2),
+            WaitCommand(6.0),
         )
-
-        return routine
     }
 
-    fun rHalfAndLoop(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("R_half_thenregloop")
+    fun rHalfAndLoop(): Command {
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_loop_reg")
 
         eventTriggerCommands()
 
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilderWithReset.build(path1),
-                pathBuilderWithReset.build(path2),
-                WaitCommand(6.0),
-                pathBuilderWithReset.build(path3),
-                WaitCommand(6.0),
-            ),
+        return Commands.sequence(
+            pathBuilderWithReset.build(path1),
+            pathBuilderWithReset.build(path2),
+            WaitCommand(6.0),
+            pathBuilderWithReset.build(path3),
+            WaitCommand(6.0),
         )
-
-        return routine
     }
 
-    fun lHalfClose(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("L_half_close")
+    fun lHalfClose(): Command {
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
         val path3 = Path("L_half_close_pt1")
@@ -200,22 +174,17 @@ class BLineRoutines(
 
         eventTriggerCommands()
 
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilderWithReset.build(path1),
-                pathBuilderWithReset.build(path2),
-                WaitCommand(6.0),
-                pathBuilderWithReset.build(path3),
-                pathBuilderWithReset.build(path4),
-                WaitCommand(6.0),
-            ),
+        return Commands.sequence(
+            pathBuilderWithReset.build(path1),
+            pathBuilderWithReset.build(path2),
+            WaitCommand(6.0),
+            pathBuilderWithReset.build(path3),
+            pathBuilderWithReset.build(path4),
+            WaitCommand(6.0),
         )
-
-        return routine
     }
 
-    fun lHalfFar(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("L_half_far")
+    fun lHalfFar(): Command {
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
         val path3 = Path("L_half_far_pt1")
@@ -223,47 +192,41 @@ class BLineRoutines(
 
         eventTriggerCommands()
 
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilderWithReset.build(path3),
-                pathBuilderWithReset.build(path4),
-                WaitCommand(6.0),
-                pathBuilderWithReset.build(path1),
-                pathBuilderWithReset.build(path2),
-                WaitCommand(6.0),
-            ),
+        return Commands.sequence(
+            pathBuilderWithReset.build(path3),
+            pathBuilderWithReset.build(path4),
+            WaitCommand(6.0),
+            pathBuilderWithReset.build(path1),
+            pathBuilderWithReset.build(path2),
+            WaitCommand(6.0),
         )
-
-        return routine
     }
 
-    fun lHalfAndLoop(): AutoRoutine {
-        val routine: AutoRoutine = autoFactory.newRoutine("L_half_thenregloop")
+    fun lHalfAndLoop(): Command {
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
         val path3 = Path("L_loop_reg")
 
         eventTriggerCommands()
 
-        routine.active().onTrue(
-            Commands.sequence(
-                pathBuilderWithReset.build(path1),
-                pathBuilderWithReset.build(path2),
-                WaitCommand(6.0),
-                pathBuilderWithReset.build(path3),
-                WaitCommand(6.0),
-            ),
+        return Commands.sequence(
+            pathBuilderWithReset.build(path1),
+            pathBuilderWithReset.build(path2),
+            WaitCommand(6.0),
+            pathBuilderWithReset.build(path3),
+            WaitCommand(6.0),
         )
-
-        return routine
     }
 
-    fun addOptions(autoChooser: AutoChooser) {
-        autoChooser.addRoutine(" R half close", this::rHalfClose)
-        autoChooser.addRoutine(" R half far", this::rHalfFar)
-        autoChooser.addRoutine(" R half,loop around", this::rHalfAndLoop)
-        autoChooser.addRoutine(" L half close", this::lHalfClose)
-        autoChooser.addRoutine(" L half far", this::lHalfFar)
-        autoChooser.addRoutine(" L half,loop around", this::lHalfAndLoop)
+    fun nothing(): Command = Commands.none()
+
+    fun addAutoOptions(autoChooser: SendableChooser<Command>) {
+        autoChooser.setDefaultOption("Do Nothing", nothing())
+        autoChooser.addOption("R Half Close", rHalfClose())
+        autoChooser.addOption("R Half Far", rHalfFar())
+        autoChooser.addOption("R Half Loop", rHalfAndLoop())
+        autoChooser.addOption("L Half Close", lHalfClose())
+        autoChooser.addOption("L Half Far", lHalfFar())
+        autoChooser.addOption("L Half Loop", lHalfAndLoop())
     }
 }

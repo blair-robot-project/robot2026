@@ -1,6 +1,5 @@
 package frc.team449
 
-import choreo.auto.AutoChooser
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
@@ -9,9 +8,10 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers
 import frc.team449.auto.BLineRoutines
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
@@ -24,12 +24,12 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-    // val choreoRoutines = ChoreoRoutines(this)
-    val autoChooser = AutoChooser()
     val bLineRoutines = BLineRoutines(this)
+    private val autoChooser = SendableChooser<Command>()
 
     init {
         println("Initializing Robot!")
+        bLineRoutines.addAutoOptions(autoChooser)
 
         HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Kotlin)
         DriverStation.silenceJoystickConnectionWarning(true)
@@ -66,9 +66,7 @@ class Robot : LoggedRobot() {
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
 
-        bLineRoutines.addOptions(autoChooser)
         SmartDashboard.putData("Auto Chooser", autoChooser)
-        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler())
     }
 
     override fun robotPeriodic() {
@@ -83,7 +81,7 @@ class Robot : LoggedRobot() {
     }
 
     override fun autonomousInit() {
-        CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
+        CommandScheduler.getInstance().schedule(autoChooser.selected)
     }
 
     override fun autonomousPeriodic() {}
@@ -114,19 +112,19 @@ class Robot : LoggedRobot() {
                     MathUtil.inverseInterpolate(
                         Constants.IntakeConstants.STOW_POS_RADS,
                         Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle
+                        robotContainer.intake.intakeSimAngle,
                     ) * 0.3,
                     0.0,
                     0.0,
-                    Rotation3d()
+                    Rotation3d(),
                 ),
                 Pose3d(
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
-                )
-            )
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0),
+                ),
+            ),
         )
     }
 }
