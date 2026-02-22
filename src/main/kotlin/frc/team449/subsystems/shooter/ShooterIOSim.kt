@@ -1,10 +1,11 @@
 package frc.team449.subsystems.shooter
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.simulation.*
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -68,9 +69,9 @@ class ShooterIOSim : ShooterIOHardware() {
     init {
         SmartDashboard.putData("Hood", mech)
 
-
-        leftLeaderSimState.setRawRotorPosition(hoodSim.angleRads)
-        println(hoodSim.angleRads)
+        hoodMotor.configurator.apply(
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+        )
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
@@ -89,7 +90,7 @@ class ShooterIOSim : ShooterIOHardware() {
         hoodSim.setInput(hoodMotor.motorVoltage.valueAsDouble)
         hoodSim.update(Constants.LOOP_TIME)
 
-        val hoodRotorPos = Units.radiansToRotations(-hoodSim.angleRads) * HOOD_GEARING // TODO: SHOULD NOT BE NEGATIVE?
+        val hoodRotorPos = Units.radiansToRotations(hoodSim.angleRads) * HOOD_GEARING
         val hoodRotorVel = Units.radiansToRotations(hoodSim.velocityRadPerSec) * HOOD_GEARING
 
         // modifies data
