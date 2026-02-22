@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.units.Units.*
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Notifier
 import frc.team449.Constants
 import frc.team449.Constants.DriveConstants.SIM_LOOP_TIME
@@ -21,7 +20,6 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig
 import org.ironmaple.simulation.motorsims.SimulatedBattery
 import org.ironmaple.simulation.motorsims.SimulatedMotorController
 import java.util.function.Consumer
-import kotlin.jvm.optionals.getOrNull
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,

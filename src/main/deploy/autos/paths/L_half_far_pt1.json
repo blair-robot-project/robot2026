@@ -13,15 +13,15 @@
       }
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 0.6107758875570699,
+      "lib_key": "start_intake"
+    },
+    {
       "type": "translation",
       "x_meters": 6.783298131600327,
       "y_meters": 7.491542648253452,
       "intermediate_handoff_radius_meters": 0.3
-    },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.6107758875570699,
-      "lib_key": "start_intake"
     },
     {
       "type": "waypoint",

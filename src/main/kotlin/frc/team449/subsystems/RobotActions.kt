@@ -28,7 +28,7 @@ class RobotActions(
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
-            intake.stow()
+            intake.stow(),
         )
 
     fun stopIntake(): Command = intake.stopRollers()
@@ -51,8 +51,7 @@ class RobotActions(
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
             shooter.holdHood(),
-            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
-
+            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
         )
 
     fun stopShooter(): Command =
@@ -61,6 +60,5 @@ class RobotActions(
             indexer.stop(),
         )
 
-    fun homeHood(): Command =
-        shooter.homeHood()
+    fun homeHood(): Command = shooter.homeHood()
 }

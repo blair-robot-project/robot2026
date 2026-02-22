@@ -48,12 +48,60 @@ class DriveSubsystem(
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
-    fun seedFieldCentric(): Command {
-        return this.runOnce {
+    fun seedFieldCentric(): Command =
+        this.runOnce {
             if (io is DriveIOHardware) {
                 io.seedFieldCentric()
             }
         }
+
+    private val xController: PIDController
+        get() = PIDController(5.0, 0.0, 0.0)
+    private val yController: PIDController
+        get() = PIDController(5.0, 0.0, 0.0)
+    private val headingController: PIDController
+        get() = PIDController(5.0, 0.0, 0.0)
+
+    var desiredAngle = 0.0
+    var desiredOmega = 0.0
+
+    init {
+        headingController.enableContinuousInput(-Math.PI, Math.PI)
+    }
+
+    var heading: Rotation2d
+        get() = Rotation2d(MathUtil.angleModulus(pose.rotation.radians))
+        set(value) {
+            inputs.Pose = Pose2d(Translation2d(pose.x, pose.y), value)
+        }
+
+    fun followTrajectory(
+        robot: Robot,
+        sample: SwerveSample
+    ) {
+        desiredAngle = MathUtil.angleModulus(sample.heading)
+        desiredOmega = sample.omega
+
+        val speeds =
+            ChassisSpeeds(
+                sample.vx + xController.calculate(pose.x, sample.x),
+                sample.vy + yController.calculate(pose.y, sample.y),
+                sample.omega +
+                    headingController.calculate(
+                        pose.rotation.minus(Rotation2d.fromRadians(MathUtil.angleModulus(sample.heading))).radians,
+                    ),
+            )
+
+        val newSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, heading)
+
+        // Apply generated speeds
+        setControl(
+            SwerveRequest
+                .RobotCentric()
+                .withVelocityX(newSpeeds.vxMetersPerSecond)
+                .withVelocityY(newSpeeds.vyMetersPerSecond)
+                .withRotationalRate(newSpeeds.omegaRadiansPerSecond),
+        )
     }
 
     // should only be called in driverStationConnected() to prevent null alliance

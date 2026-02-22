@@ -132,8 +132,8 @@ object Constants {
         const val HOMING_CURRENT_AMPS = 45.0 // amps
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
 
-        const val FLYWHEEL_GEARING = 32.0 / 18 //
-        const val HOOD_GEARING = 6.0 * 15 // TODO: rough estimate
+        const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
+        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
         val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
         val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify

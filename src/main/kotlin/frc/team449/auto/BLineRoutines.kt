@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
@@ -23,6 +22,7 @@ import frc.team449.Constants.AutoConstants.TRANSLATION_D
 import frc.team449.Constants.AutoConstants.TRANSLATION_I
 import frc.team449.Constants.AutoConstants.TRANSLATION_P
 import frc.team449.Robot
+import frc.team449.RobotContainer.actions
 import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
@@ -76,14 +76,13 @@ class BLineRoutines(
     val rotationController: PIDController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
     val crossTrackController: PIDController = PIDController(CTC_P, CTC_I, CTC_D)
 
-    var pathBuilder: FollowPath.Builder =
+    var pathBuilderWithReset: FollowPath.Builder =
         FollowPath
             .Builder(
                 drive,
                 drive::pose,
                 drive::getRobotRelativeSpeeds,
                 { speeds: ChassisSpeeds ->
-                    Logger.recordOutput("Bline speed", speeds)
                     drive.setControl(
                         SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
                     )
@@ -94,13 +93,38 @@ class BLineRoutines(
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
 
+    var pathBuilder: FollowPath.Builder =
+        FollowPath
+            .Builder(
+                drive,
+                drive::pose,
+                drive::getRobotRelativeSpeeds,
+                { speeds: ChassisSpeeds ->
+                    drive.setControl(
+                        SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
+                    )
+                },
+                translationController,
+                rotationController,
+                crossTrackController,
+            ).withDefaultShouldFlip()
+
     fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger("start_intake", PrintCommand("Starting intake"))
-        FollowPath.registerEventTrigger("end_intake", PrintCommand("Ending intake"))
-        FollowPath.registerEventTrigger("start_shooting", PrintCommand("Start shooting"))
+        FollowPath.registerEventTrigger(
+            "start_intake",
+            Commands.parallel(
+                actions.stopShooter(),
+                actions.deployAndIntake(),
+            ),
+        )
+        FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
+        FollowPath.registerEventTrigger(
+            "start_shooting",
+            actions.prepTrenchShot().andThen(actions.feed()),
+        )
     }
 
-    fun R_half_close(): AutoRoutine {
+    fun rHalfClose(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("R_half_close")
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
@@ -111,21 +135,19 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
+                pathBuilderWithReset.build(path1),
+                pathBuilderWithReset.build(path2),
                 WaitCommand(6.0),
-                PrintCommand("Stop shooting"),
-                pathBuilder.build(path3),
-                pathBuilder.build(path4),
+                pathBuilderWithReset.build(path3),
+                pathBuilderWithReset.build(path4),
                 WaitCommand(6.0),
-                PrintCommand("Stop shooting"),
             ),
         )
 
         return routine
     }
 
-    fun R_half_far(): AutoRoutine {
+    fun rHalfFar(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("R_half_far")
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
@@ -136,21 +158,19 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path3),
-                pathBuilder.build(path4),
+                pathBuilderWithReset.build(path3),
+                pathBuilderWithReset.build(path4),
                 WaitCommand(6.0),
-                PrintCommand("Stop Shooting"),
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
+                pathBuilderWithReset.build(path1),
+                pathBuilderWithReset.build(path2),
                 WaitCommand(6.0),
-                PrintCommand("Stop Shooting")
-            )
+            ),
         )
 
         return routine
     }
 
-    fun R_half_thenregloop(): AutoRoutine {
+    fun rHalfAndLoop(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("R_half_thenregloop")
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
@@ -160,21 +180,18 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
+                pathBuilderWithReset.build(path1),
+                pathBuilderWithReset.build(path2),
                 WaitCommand(6.0),
-                PrintCommand("Stop Shooting"),
-                pathBuilder.build(path3),
+                pathBuilderWithReset.build(path3),
                 WaitCommand(6.0),
-                PrintCommand("Stop Shooting")
-            )
+            ),
         )
-
 
         return routine
     }
 
-    fun L_half_close(): AutoRoutine {
+    fun lHalfClose(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("L_half_close")
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
@@ -185,21 +202,19 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
+                pathBuilderWithReset.build(path1),
+                pathBuilderWithReset.build(path2),
                 WaitCommand(6.0),
-                PrintCommand("Stop shooting"),
-                pathBuilder.build(path3),
-                pathBuilder.build(path4),
+                pathBuilderWithReset.build(path3),
+                pathBuilderWithReset.build(path4),
                 WaitCommand(6.0),
-                PrintCommand("Stop shooting")
-            )
+            ),
         )
 
         return routine
     }
 
-    fun L_half_far(): AutoRoutine {
+    fun lHalfFar(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("L_half_far")
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
@@ -210,21 +225,19 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path3),
-                pathBuilder.build(path4),
+                pathBuilderWithReset.build(path3),
+                pathBuilderWithReset.build(path4),
                 WaitCommand(6.0),
-                PrintCommand("Stop shooting"),
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
+                pathBuilderWithReset.build(path1),
+                pathBuilderWithReset.build(path2),
                 WaitCommand(6.0),
-                PrintCommand("Stop shooting")
-            )
+            ),
         )
 
         return routine
     }
 
-    fun L_half_thenregloop(): AutoRoutine {
+    fun lHalfAndLoop(): AutoRoutine {
         val routine: AutoRoutine = autoFactory.newRoutine("L_half_thenregloop")
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
@@ -234,25 +247,23 @@ class BLineRoutines(
 
         routine.active().onTrue(
             Commands.sequence(
-                pathBuilder.build(path1),
-                pathBuilder.build(path2),
+                pathBuilderWithReset.build(path1),
+                pathBuilderWithReset.build(path2),
                 WaitCommand(6.0),
-                PrintCommand("Stop Shooting"),
-                pathBuilder.build(path3),
+                pathBuilderWithReset.build(path3),
                 WaitCommand(6.0),
-                PrintCommand("Stop Shooting")
-            )
+            ),
         )
 
         return routine
     }
 
     fun addOptions(autoChooser: AutoChooser) {
-        autoChooser.addRoutine("B-Line R half close", this::R_half_close)
-        autoChooser.addRoutine("B-Line R half far", this::R_half_far)
-        autoChooser.addRoutine("B-Line R half then reg loop", this::R_half_thenregloop)
-        autoChooser.addRoutine("B-Line L half close", this::L_half_close)
-        autoChooser.addRoutine("B-Line L half far", this::L_half_far)
-        autoChooser.addRoutine("B-Line L half then reg loop", this::L_half_thenregloop)
+        autoChooser.addRoutine(" R half close", this::rHalfClose)
+        autoChooser.addRoutine(" R half far", this::rHalfFar)
+        autoChooser.addRoutine(" R half,loop around", this::rHalfAndLoop)
+        autoChooser.addRoutine(" L half close", this::lHalfClose)
+        autoChooser.addRoutine(" L half far", this::lHalfFar)
+        autoChooser.addRoutine(" L half,loop around", this::lHalfAndLoop)
     }
 }

@@ -4,8 +4,8 @@
   "default_max_velocity_meters_per_sec": 4.7,
   "default_max_acceleration_meters_per_sec2": 10.0,
   "default_intermediate_handoff_radius_meters": 0.2,
-  "default_max_velocity_deg_per_sec": 688.0,
-  "default_max_acceleration_deg_per_sec2": 2317.0,
+  "default_max_velocity_deg_per_sec": 130,
+  "default_max_acceleration_deg_per_sec2": 180.0,
   "default_end_translation_tolerance_meters": 0.02,
   "default_end_rotation_tolerance_deg": 3.0
 }

@@ -15,19 +15,16 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
-import edu.wpi.first.wpilibj.DriverStation
-import frc.team449.util.PhoenixUtil
 import frc.team449.Constants
+import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
-import kotlin.jvm.optionals.getOrNull
 
 open class DriveIOHardware(
     driveConstants: SwerveDrivetrainConstants,
