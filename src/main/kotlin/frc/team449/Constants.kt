@@ -13,7 +13,6 @@ import edu.wpi.first.units.measure.*
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
-import kotlin.math.pow
 
 object Constants {
     const val LOOP_TIME = 0.02
@@ -108,7 +107,6 @@ object Constants {
         const val HOOD_ROLLER_GEARING = 64.0 / 27.0
         val HOOD_ROLLER_RADIUS = Inches.of(0.5)
 
-
         const val HOOD_KP = 100.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
@@ -138,6 +136,8 @@ object Constants {
         // fuel sim
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT = Inches.of(18.0)
+        const val SIMULATED_BPS = 2
+        const val BPS_RATE_LIMIT = LOOP_TIME/SIMULATED_BPS
     }
 
     object Dimensions {

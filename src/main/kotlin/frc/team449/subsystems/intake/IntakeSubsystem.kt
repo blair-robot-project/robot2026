@@ -1,6 +1,7 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.units.Units.RotationsPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
@@ -94,7 +95,7 @@ class IntakeSubsystem(
 
     fun isSimIntaking(): BooleanSupplier =
         {
-            isIntakeDeployed() &&
-                abs(INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 10.0
+            isIntakeDeployed()
+//                && abs(IntakeConstants.INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 25.0
         }
 }
