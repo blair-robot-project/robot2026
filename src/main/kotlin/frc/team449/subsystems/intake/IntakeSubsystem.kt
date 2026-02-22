@@ -1,6 +1,6 @@
 package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
-import edu.wpi.first.units.Units.RotationsPerSecond
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
@@ -13,72 +13,79 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
-    var intakeSimAngle: Double = 0.0
+    // boolean over position logging increases speed and is easier to read
+    private var pivotDeployedState: Boolean = false
+    private var rollerTargetVelocityRadPerSec: Double = 0.0
+
+    val intakeSimAngle: Double
+        get() = inputs.leftPivotLeaderPositionRad
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
+
+        Logger.recordOutput("Intake/PivotDeployedState", pivotDeployedState)
+        Logger.recordOutput("Intake/RollerTargetVelocityRadPerSec", rollerTargetVelocityRadPerSec)
     }
 
     // roller commands
     fun intake(): Command =
-        runEnd(
-            { io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY) },
-            { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
-        ).withName("Intake")
+        this.runOnce {
+            rollerTargetVelocityRadPerSec = IntakeConstants.INTAKE_VELOCITY.`in`(RadiansPerSecond)
+            io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY)
+        }
+            .withName("Intake")
 
     fun outtake(): Command =
-        runEnd(
-            { io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY) },
-            { io.setRollerVelocity(RotationsPerSecond.of(0.0)) },
-        ).withName("Outtake")
+        this.runOnce {
+            rollerTargetVelocityRadPerSec = IntakeConstants.OUTTAKE_VELOCITY.`in`(RadiansPerSecond)
+            io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY)
+        }
+            .withName("Outtake")
 
     fun stopRollers(): Command =
-        runOnce {
-            io.setRollerVelocity(RotationsPerSecond.of(0.0))
+        this.runOnce {
+            rollerTargetVelocityRadPerSec = 0.0
+            io.setRollerVoltage(0.0)
         }.withName("Stop Rollers")
 
     // slam commands
     fun deploy(): Command =
         slamHoming(
+            true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy")
 
     fun stow(): Command =
         slamHoming(
+            false,
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
         ).withName("Stow")
 
     private fun slamHoming(
+        deployedState: Boolean,
         moveVolts: Double,
         holdVolts: Double
     ): Command {
-        val hardstopDebouncer =
-            Debouncer(
-                0.5, // s
-            )
+        return this.defer {
+            pivotDeployedState = deployedState
+            val hardstopDebouncer = Debouncer(0.25)
 
-        return run {
-            io.setPivotVoltage(moveVolts)
-        }.until {
-            val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
-            val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) > IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
-            hardstopDebouncer.calculate(highCurrent && lowVelocity)
-        }.andThen(
-            run {
-                io.setPivotVoltage(holdVolts)
-            },
-        )
+            this.run {
+                io.setPivotVoltage(moveVolts)
+            }.until {
+                val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+                val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
+                hardstopDebouncer.calculate(highCurrent && lowVelocity)
+            }.andThen(
+                runOnce {
+                    io.setPivotVoltage(holdVolts)
+                },
+            )
+        }
     }
 
     fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.leftPivotLeaderPositionRad) <= 0.2
-
-    override fun simulationPeriodic() {
-        if (io is IntakeIOSim) {
-            io.simulationPeriodic()
-            intakeSimAngle = io.pivotSim.angleRads
-        }
-    }
 }

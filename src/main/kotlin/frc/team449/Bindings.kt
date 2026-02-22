@@ -31,7 +31,7 @@ class Bindings(
                 robotContainer.drive,
                 { -driver.leftY },
                 { -driver.leftX },
-                { driver.rightX },
+                { -driver.rightX },
             )
         // controls for simulation
     }
@@ -109,7 +109,7 @@ class Bindings(
 //                            { Field.getClosestTrenchPose(robotContainer.drive.pose) },
 //                            { -driver.leftY },
 //                            { -driver.leftX },
-//                            { driver.rightX },
+//                            { -driver.rightX },
 //                        ),
 //                        robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
 //                    ),

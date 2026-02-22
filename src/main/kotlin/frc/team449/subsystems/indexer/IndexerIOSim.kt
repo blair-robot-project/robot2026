@@ -28,7 +28,7 @@ class IndexerIOSim : IndexerIOHardware() {
     var floorSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX44(1),
+                DCMotor.getKrakenX60(1),
                 FLOOR_MOI,
                 FLOOR_GEARING,
             ),
@@ -50,10 +50,6 @@ class IndexerIOSim : IndexerIOHardware() {
     private val topMotorSim = topIndexer.simState
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        super.updateInputs(inputs)
-    }
-
-    fun simulationPeriodic() {
         wedgeMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         wedgeSim.setInput(wedgeMotorSim.motorVoltage)
         wedgeSim.update(Constants.LOOP_TIME)
@@ -68,5 +64,7 @@ class IndexerIOSim : IndexerIOHardware() {
         topSim.setInput(topMotorSim.motorVoltage)
         topSim.update(Constants.LOOP_TIME)
         topMotorSim.setRotorVelocity(Units.radiansToRotations(topSim.angularVelocity.`in`(RadiansPerSecond)) * TOP_GEARING)
+
+        super.updateInputs(inputs)
     }
 }

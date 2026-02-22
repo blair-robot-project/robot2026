@@ -46,7 +46,7 @@ interface ShooterIO {
 
         @JvmField var hoodPositionRad: Double = 0.0
 
-        @JvmField var hoodTargetPositionRad: Double = 0.0
+        @JvmField var hoodVelocityRadPerSec: Double = 0.0
 
         @JvmField var hoodAppliedVolts: Double = 0.0
 
@@ -55,10 +55,6 @@ interface ShooterIO {
         @JvmField var hoodStatorCurrentAmps: Double = 0.0
 
         @JvmField var hoodTempCelsius: Double = 0.0
-
-        @JvmField var hoodConnected: Boolean = true
-
-        @JvmField var hoodAtGoal: Boolean = false
     }
 
     fun updateInputs(inputs: ShooterIOInputs) {}
