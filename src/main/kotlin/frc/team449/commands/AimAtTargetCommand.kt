@@ -5,10 +5,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.units.Units
-import edu.wpi.first.units.Units.MetersPerSecond
-import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Velocity
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -16,9 +12,6 @@ import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants.AIMBOT_KD
 import frc.team449.Constants.AimbotConstants.AIMBOT_KI
 import frc.team449.Constants.AimbotConstants.AIMBOT_KP
-import frc.team449.Constants.AimbotConstants.JOYSTICK_POWER
-import frc.team449.Constants.AimbotConstants.PERIODIC_TIME
-import frc.team449.Constants.AimbotConstants.VELOCITY_COEFFICIENT
 import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.DoubleSupplier
@@ -39,10 +32,10 @@ class AimAtTargetCommand(
         .FieldCentric()
         .withDeadband(
             DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-                    * DriveConstants.TRANSLATION_DEADBAND,
+                * DriveConstants.TRANSLATION_DEADBAND,
         ).withRotationalDeadband(
             DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
-                    * DriveConstants.ANGULAR_DEADBAND,
+                * DriveConstants.ANGULAR_DEADBAND,
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     init {
@@ -67,15 +60,15 @@ class AimAtTargetCommand(
         AIMBOT_KD,
     )
 
-    fun throttleAtPower(power: Double) : Double {
+    fun throttleAtPower(power: Double): Double {
         return abs(throttleSupplier.asDouble).pow(power) * sign(throttleSupplier.asDouble) *
-                DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+            DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
     }
 
-    //i know this seems super redundant, i made this just in case it might be used in sotf later
-    fun strafeAtPower(power: Double) : Double {
+    // i know this seems super redundant, i made this just in case it might be used in sotf later
+    fun strafeAtPower(power: Double): Double {
         return abs(strafeSupplier.asDouble).pow(power) * sign(strafeSupplier.asDouble) *
-                DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+            DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
     }
 
     override fun execute() {

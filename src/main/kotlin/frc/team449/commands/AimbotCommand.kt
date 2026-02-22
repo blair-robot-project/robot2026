@@ -7,9 +7,8 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 class AimbotCommand(
     drive: DriveSubsystem,
     shooter: ShooterSubsystem
-): Command() {
+) : Command() {
     init {
         addRequirements(drive, shooter)
     }
-
 }

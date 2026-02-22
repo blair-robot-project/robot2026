@@ -1,16 +1,13 @@
 package frc.team449
 
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import frc.team449.Constants.ShooterConstants
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
-import edu.wpi.first.wpilibj2.command.ConditionalCommand
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer.drive
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
@@ -24,9 +21,8 @@ class Bindings(
     val operator = robotContainer.opController
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
-    var aimbotting = false
     val HUB_POSITION = if (DriverStation.getAlliance().getOrDefault(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) Constants.RED_GOAL_POSE else Constants.BLUE_GOAL_POSE
-    val ROBOT_DISTANCE_FROM_HUB : Supplier<Double> = { (robotContainer.drive.pose.translation - HUB_POSITION.translation).norm }
+    val ROBOT_DISTANCE_FROM_HUB: Supplier<Double> = { (robotContainer.drive.pose.translation - HUB_POSITION.translation).norm }
 
     fun setDefaultCommands() {
         // set default commands for systems here
@@ -37,29 +33,7 @@ class Bindings(
                 { -driver.leftX },
                 { driver.rightX },
             )
-        shootFromAnywhere()
         // controls for simulation
-    }
-
-    fun shootFromAnywhere() {
-        driveController.a().onTrue (
-            runOnce ({
-                if (aimbotting) {
-                    aimbotting = false
-                    CommandScheduler.getInstance().schedule(drive.defaultCommand)
-                } else {
-                    aimbotting = true
-                    CommandScheduler.getInstance().schedule(
-                        AimAtTargetCommand(
-                            robotContainer.drive,
-                            { -robotContainer.driveController.leftY },
-                            { -robotContainer.driveController.leftX },
-                            {HUB_POSITION},
-                        )
-                    )
-                }
-            })
-        )
     }
 
     fun bindControls() {
@@ -81,15 +55,49 @@ class Bindings(
                 ),
             )
 
-        driver
-            .rightBumper()
-            .whileTrue(
-                robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
-                // check tol and feed
-            ).onFalse(
-                robotContainer.shooter.stopFlywheel(),
-                // coast hopper
+//        driver
+//            .rightBumper()
+//            .whileTrue(
+//                robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
+//                // check tol and feed
+//            ).onFalse(
+//                robotContainer.shooter.stopFlywheel(),
+//                // coast hopper
+//            )
+
+        // shoot from anywhere
+        driveController.rightBumper().onTrue(
+            Commands.sequence(
+                runOnce({
+                    CommandScheduler.getInstance().schedule(
+                        AimAtTargetCommand(
+                            robotContainer.drive,
+                            { -robotContainer.driveController.leftY },
+                            { -robotContainer.driveController.leftX },
+                            { HUB_POSITION },
+                        )
+                    )
+                }),
+                robotContainer.shooter.setHoodAngle(
+                    Degrees.of(
+                        ShooterConstants.HOOD_ANGLE_MAP.get(
+                            ROBOT_DISTANCE_FROM_HUB.get()
+                        )
+                    )
+                ),
+                robotContainer.shooter.setFlywheelVelocity(
+                    RadiansPerSecond.of(
+                        ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(
+                            ROBOT_DISTANCE_FROM_HUB.get()
+                        )
+                    )
+                )
             )
+        ).onFalse(
+            runOnce({
+                CommandScheduler.getInstance().schedule(drive.defaultCommand)
+            })
+        )
 //
 //        driver
 //            .x()
@@ -153,28 +161,7 @@ class Bindings(
         driver
             .x()
             .onTrue(
-                ConditionalCommand(
-                    Commands.sequence(
-                        robotContainer.shooter.setHoodAngle(
-                            Degrees.of(
-                                ShooterConstants.HOOD_ANGLE_MAP.get(
-                                    ROBOT_DISTANCE_FROM_HUB.get()
-                                )
-                            )
-                        ),
-                        robotContainer.shooter.setFlywheelVelocity(
-                            RadiansPerSecond.of(
-                                ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(
-                                    ROBOT_DISTANCE_FROM_HUB.get()
-                                )
-                            )
-                        )
-                    ),
-                    robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
-                    { aimbotting }
-                )
-
-
+                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0))
             ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

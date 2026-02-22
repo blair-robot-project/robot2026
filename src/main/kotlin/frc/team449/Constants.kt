@@ -13,9 +13,9 @@ import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
+import java.util.Map
 import kotlin.math.PI
 import kotlin.math.pow
-import java.util.Map
 
 object Constants {
     const val LOOP_TIME = 0.02
@@ -132,21 +132,23 @@ object Constants {
         const val HOOD_MOI = 0.0694270649
         val HOOD_LENGTH = Units.inchesToMeters(5.91)
 
-        //the x is the distance from the hub in meters, the y is the shot time in seconds
+        // the x is the distance from the hub in meters, the y is the shot time in seconds
         val SHOT_TIME_MAP = InterpolatingDoubleTreeMap.ofEntries(
             Map.entry(1.0, 0.75),
             Map.entry(2.0, 0.97),
             Map.entry(3.0, 1.10),
             Map.entry(5.0, 1.35)
         )
-        //the x is the distance from the hub in meters, the y is the flywheel velocity in radians per second
+
+        // the x is the distance from the hub in meters, the y is the flywheel velocity in radians per second
         val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap.ofEntries(
             Map.entry(1.0, 142.0),
             Map.entry(2.0, 181.0),
             Map.entry(3.0, 192.0),
             Map.entry(5.0, 211.0)
         )
-        //the x is the distance from the hub in meters, the y is the hood angle in degrees
+
+        // the x is the distance from the hub in meters, the y is the hood angle in degrees
         val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap.ofEntries(
             Map.entry(1.0, 46.2),
             Map.entry(2.0, 46.2),
@@ -154,7 +156,7 @@ object Constants {
             Map.entry(5.0, 31.2)
         )
 
-        //chat gpt's estimates
+        // chat gpt's estimates
         /*hoodMap.put(1.0, 46.2)
         hoodMap.put(2.0, 46.2)
         hoodMap.put(3.0, 40.8)
