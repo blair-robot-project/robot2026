@@ -1,6 +1,6 @@
 package frc.team449.subsystems.drive
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.AutoLog
 
 interface DriveIO {
     @AutoLog
-    open class DriveIOInputs : SwerveDrivetrain.SwerveDriveState() {
+    open class DriveIOInputs : SwerveDriveState() {
         @JvmField var gyroAngle: Double = 0.0
 
         @JvmField var frontLeftDrivePosition: Angle = Degrees.of(0.0)
@@ -27,7 +27,7 @@ interface DriveIO {
             this.Pose = Pose2d()
         }
 
-        fun fromSwerveDriveState(stateIn: SwerveDrivetrain.SwerveDriveState) {
+        fun fromSwerveDriveState(stateIn: SwerveDriveState) {
             this.Pose = stateIn.Pose
             this.SuccessfulDaqs = stateIn.SuccessfulDaqs
             this.FailedDaqs = stateIn.FailedDaqs
@@ -40,7 +40,7 @@ interface DriveIO {
 
     fun updateInputs(inputs: DriveIOInputs) {}
 
-    fun logModules(driveState: SwerveDrivetrain.SwerveDriveState) {}
+    fun logModules(driveState: SwerveDriveState) {}
 
     fun resetOdometry(pose: Pose2d) {}
 

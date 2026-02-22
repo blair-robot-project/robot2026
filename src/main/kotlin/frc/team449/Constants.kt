@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.*
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
+import kotlin.math.round
 
 object Constants {
     const val LOOP_TIME = 0.02
@@ -96,17 +97,19 @@ object Constants {
 
         const val FLYWHEEL_GEARING = 16.0 / 9.0
 
-        const val FLYWHEEL_KP = 0.5
+        const val FLYWHEEL_KP = 0.0
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.05
-        const val FLYWHEEL_KV = 0.12
+        const val FLYWHEEL_KS = 0.0
+        const val FLYWHEEL_KV = 0.21
 
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
         val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
 
         val HUB_HOOD_ANGLE: Angle = Degrees.of(30.0) // todo: find
         val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
+
+        const val EFFICIENCY = 0.95 // fake value for sim
 
         // HOOD
         const val HOOD_MOTOR_ID = 15
@@ -116,6 +119,7 @@ object Constants {
 
         const val HOOD_GEARING = 106.0
         const val HOOD_ROLLER_GEARING = 64.0 / 27.0
+        val HOOD_ROLLER_RADIUS = Inches.of(0.5)
 
         const val HOOD_KP = 100.0
         const val HOOD_KI = 0.0
@@ -142,7 +146,26 @@ object Constants {
 
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
+
+        // fuel sim
+        val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
+        val SHOOTER_HEIGHT = Inches.of(18.0)
+        const val SIMULATED_BPS = 11
+        val BPS_RATE_LIMIT = round((1 / LOOP_TIME) / SIMULATED_BPS)
+        const val SIMULATED_BALL_INDEXING_MISS_CHANCE = .6
     }
+
+    object Dimensions {
+        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
+        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
+        val FRAME_WIDTH: Distance = Inches.of(33.0) // i think? // left to right (y-axis)
+        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
+
+        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
+        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
+    }
+
+    // other subsystem constants when applicable
 
     object IntakeConstants {
         // config constants
@@ -188,6 +211,11 @@ object Constants {
         const val ROLLER_MOI = 0.0001411489
 
         const val ROLLER_GEARING = 4.0 / 3
+
+        const val SIMULATED_BPS = 20
+        val BPS_RATE_LIMIT = round((1 / LOOP_TIME) / SIMULATED_BPS)
+        const val SIMULATED_BALL_INTAKING_MISS_CHANCE = .6
+        const val SIMULATED_BALL_INTAKE_LIMIT = 50
     }
 
     // INDEXER CONSTANTS STILL SLIGHTLY OFF

@@ -113,7 +113,8 @@ class Bindings(
         driver
             .x()
             .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
+                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(200.0))
+                    .andThen(robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)),
             ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

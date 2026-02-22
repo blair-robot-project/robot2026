@@ -2,6 +2,7 @@ package frc.team449
 
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
+import frc.robot.FuelSim
 import frc.team449.Constants.Mode
 import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.RobotActions
@@ -28,6 +29,8 @@ object RobotContainer {
     val opController: CommandXboxController = CommandXboxController(1)
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
+
+    val fuelSim = FuelSim("test")
 
     val drive: DriveSubsystem =
         DriveSubsystem(

@@ -81,9 +81,6 @@ class DriveIOSim(
     }
 
     private fun initializeSimulation() {
-        // ONLY FOR CONFIG
-        SimulatedArena.getInstance()
-
         SimulatedArena.overrideSimulationTimings(Seconds.of(SIM_LOOP_TIME), 1)
         SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive)
 

@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
 import frc.team449.Constants.IntakeConstants.DEPLOY_POS_RADS
 import org.littletonrobotics.junction.Logger
+import java.util.function.BooleanSupplier
+import java.util.function.IntSupplier
 import kotlin.math.abs
 
 class IntakeSubsystem(
@@ -19,6 +21,8 @@ class IntakeSubsystem(
 
     val intakeSimAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
+
+    private var simIntakeThrottle = 0
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -88,4 +92,13 @@ class IntakeSubsystem(
     }
 
     fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.leftPivotLeaderPositionRad) <= 0.2
+
+    fun isSimIntaking(ballCount: IntSupplier): BooleanSupplier =
+        {
+            if (simIntakeThrottle < IntakeConstants.BPS_RATE_LIMIT && Math.random() > IntakeConstants.SIMULATED_BALL_INTAKING_MISS_CHANCE) {
+                simIntakeThrottle += 1
+            }
+            simIntakeThrottle >= IntakeConstants.BPS_RATE_LIMIT && isIntakeDeployed() && ballCount.asInt < IntakeConstants.SIMULATED_BALL_INTAKE_LIMIT
+            //                && abs(IntakeConstants.INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 25.0
+        }
 }
