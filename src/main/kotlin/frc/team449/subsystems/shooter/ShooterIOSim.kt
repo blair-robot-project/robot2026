@@ -4,6 +4,7 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.simulation.*
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d
@@ -66,6 +67,10 @@ class ShooterIOSim : ShooterIOHardware() {
 
     init {
         SmartDashboard.putData("Hood", mech)
+
+
+        leftLeaderSimState.setRawRotorPosition(hoodSim.angleRads)
+        println(hoodSim.angleRads)
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
@@ -81,15 +86,17 @@ class ShooterIOSim : ShooterIOHardware() {
         rightLeaderSimState.setSupplyVoltage(loadedVoltage)
         rightFollowerSimState.setSupplyVoltage(loadedVoltage)
 
-        hoodSim.setInput(hoodSimState.motorVoltage)
+        hoodSim.setInput(hoodMotor.motorVoltage.valueAsDouble)
         hoodSim.update(Constants.LOOP_TIME)
 
-        val hoodRotorPos = Units.radiansToRotations(hoodSim.angleRads) * HOOD_GEARING
+        val hoodRotorPos = Units.radiansToRotations(-hoodSim.angleRads) * HOOD_GEARING // TODO: SHOULD NOT BE NEGATIVE?
         val hoodRotorVel = Units.radiansToRotations(hoodSim.velocityRadPerSec) * HOOD_GEARING
 
+        // modifies data
         hoodSimState.setRawRotorPosition(hoodRotorPos)
         hoodSimState.setRotorVelocity(hoodRotorVel)
 
+        // updating vis, should not change data
         hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
 
         flywheelSim.setInput(leftLeaderSimState.motorVoltage)
