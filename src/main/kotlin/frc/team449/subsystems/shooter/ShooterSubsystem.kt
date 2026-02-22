@@ -53,7 +53,7 @@ class ShooterSubsystem(
                 fuelSim.launchFuel(
                     MetersPerSecond.of(effectiveShootSpeed),
                     Radians.of((PI / 2) - inputs.hoodPositionRad),
-                    Radians.of(PI),
+                    Radians.of(0.0),
                     ShooterConstants.SHOOTER_HEIGHT,
                 )
                 simBallCount -= 1
