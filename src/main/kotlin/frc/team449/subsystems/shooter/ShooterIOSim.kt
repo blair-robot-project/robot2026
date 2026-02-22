@@ -1,5 +1,7 @@
 package frc.team449.subsystems.shooter
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
@@ -66,6 +68,10 @@ class ShooterIOSim : ShooterIOHardware() {
 
     init {
         SmartDashboard.putData("Hood", mech)
+
+        hoodMotor.configurator.apply(
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+        )
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
