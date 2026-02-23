@@ -90,7 +90,7 @@ object Constants {
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
         const val FLYWHEEL_KS = 0.05
-        const val FLYWHEEL_KV = 0.12
+        const val FLYWHEEL_KV = 0.21
 
         // HOOD
         const val HOOD_MOTOR_ID = 15
@@ -125,18 +125,20 @@ object Constants {
         val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
         val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify
 
-        val FLYWHEEL_MOI = 0.0033537
+        const val FLYWHEEL_MOI = 0.0033537
 
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
         // setpoints
-
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(46.0) // estimate
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(284.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
-        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(221.5)
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(221.5)
+
+        val TOWER_HOOD_ANGLE: Angle = Degrees.of(23.0)
+        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(280.0)
 
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT = Inches.of(18.0)

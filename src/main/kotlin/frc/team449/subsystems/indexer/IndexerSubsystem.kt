@@ -38,17 +38,18 @@ class IndexerSubsystem(
         }
 
     fun index(surfaceSpeed: AngularVelocity): Command {
-        indexerTargetVelocityRadPerSec = surfaceSpeed.`in`(RadiansPerSecond)
-
         return index(
             surfaceSpeed,
             surfaceSpeed,
             surfaceSpeed,
-        )
+        ).beforeStarting({
+            indexerTargetVelocityRadPerSec = surfaceSpeed.`in`(RadiansPerSecond)
+        })
     }
 
     fun stop(): Command =
         this.runOnce {
+            indexerTargetVelocityRadPerSec = 0.0
             io.setIndexerVoltage(0.0, 0.0, 0.0)
         }
 }

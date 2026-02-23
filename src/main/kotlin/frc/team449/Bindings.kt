@@ -31,7 +31,7 @@ class Bindings(
         driver
             .rightTrigger()
             .onTrue(
-                actions.deployAndIntake()
+                actions.toggleDeployAndIntake()
             )
 
         driver
@@ -83,7 +83,11 @@ class Bindings(
                 )
             )
 
-        // no tower shot yet (b)
+        driver
+            .b()
+            .onTrue(
+                actions.prepTowerShot()
+            )
 
         driver
             .x()

@@ -1,5 +1,6 @@
 package frc.team449.subsystems
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -33,6 +34,12 @@ class RobotActions(
 
     fun stopIntake(): Command = intake.stopRollers()
 
+    fun toggleDeployAndIntake(): Command =
+        ConditionalCommand(
+            deployAndIntake(),
+            stopIntake()
+        ) { !intake.pivotDeployedState }
+
     fun prepTrenchShot(): Command =
         SequentialCommandGroup(
             shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
@@ -43,6 +50,12 @@ class RobotActions(
         SequentialCommandGroup(
             shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
             shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
+        )
+
+    fun prepTowerShot(): Command =
+        SequentialCommandGroup(
+            shooter.setFlywheelVelocity(ShooterConstants.TOWER_FLYWHEEL_VEL),
+            shooter.setHoodAngle(ShooterConstants.TOWER_HOOD_ANGLE),
         )
 
     fun checkAndFeed(): Command =

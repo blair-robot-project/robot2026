@@ -50,7 +50,7 @@ class FuelSimulationSubsystem(
             -Units.inchesToMeters(26.5) / 2,
             Units.inchesToMeters(26.5) / 2,
             this::pollIntakeAcceptBall
-        ) { ballCount -= 1 }
+        ) { ballCount += 1 }
     }
 
     override fun simulationPeriodic() {
@@ -62,7 +62,7 @@ class FuelSimulationSubsystem(
     }
 
     fun pollFuelLaunch() {
-        if (simBallThrottle < flywheelSimulatedBPS) {
+        if (simBallThrottle < flywheelBPSRateLimit) {
             if (Math.random() > simulatedIndexingMissChance) {
                 simBallThrottle++
             }
