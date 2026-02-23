@@ -1,6 +1,7 @@
 package frc.team449
 
 import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.SwerveRequestCommand
@@ -29,7 +30,7 @@ class Bindings(
                 SequentialCommandGroup(
                     robotContainer.intake.deploy(),
                     robotContainer.intake.intake(),
-                ),
+                )
             )
 
         driver

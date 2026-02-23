@@ -13,7 +13,7 @@ class IntakeSubsystem(
     val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
 
     // boolean over position logging increases speed and is easier to read
-    private var pivotDeployedState: Boolean = false
+    var pivotDeployedState: Boolean = false
     private var rollerTargetVelocityRadPerSec: Double = 0.0
 
     val intakeSimAngle: Double

@@ -138,16 +138,6 @@ object Constants {
         val SHOOTER_HEIGHT = Inches.of(18.0)
     }
 
-    object Dimensions {
-        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
-        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
-        val FRAME_WIDTH: Distance = Inches.of(33.0) // i think? // left to right (y-axis)
-        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
-
-        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
-        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
-    }
-
     // other subsystem constants when applicable
 
     object IntakeConstants {
@@ -247,17 +237,6 @@ object Constants {
         const val TOP_MOI = .000000008 // TODO: Find
 
         val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
-    }
-
-    object FuelSimulationConstants {
-        const val FLYWHEEL_SIMULATED_BPS = 11
-        val FLYWHEEL_BPS_RATE_LIMIT = round((1 / LOOP_TIME) / FLYWHEEL_SIMULATED_BPS)
-        const val SIMULATED_BALL_INDEXING_MISS_CHANCE = .6
-
-        const val INTAKE_SIMULATED_BPS = 20
-        val INTAKE_BPS_RATE_LIMIT = round((1 / LOOP_TIME) / INTAKE_SIMULATED_BPS)
-        const val SIMULATED_BALL_INTAKING_MISS_CHANCE = .6
-        const val SIMULATED_BALL_INTAKE_LIMIT = 50
     }
 
     object LEDConstants {
