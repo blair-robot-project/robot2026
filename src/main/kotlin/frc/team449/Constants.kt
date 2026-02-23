@@ -125,12 +125,13 @@ object Constants {
         val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
         val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify
 
-        const val FLYWHEEL_MOI = 0.0033537
+        val FLYWHEEL_MOI = 0.0033537
 
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
         // setpoints
+
         val TRENCH_HOOD_ANGLE: Angle = Degrees.of(46.0) // estimate
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(284.0) // estimate
 
