@@ -7,6 +7,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
@@ -25,8 +26,8 @@ object Constants {
         REPLAY
     }
 
-    val BLUE_GOAL_POSE = Pose2d(4.625594, 4.034536, Rotation2d(0.0))
-    val RED_GOAL_POSE = Pose2d(11.915394, 4.034536, Rotation2d(0.0))
+    val BLUE_GOAL_TRANSLATION = Translation2d(4.625594, 4.034536)
+    val RED_GOAL_TRANSLATION = Translation2d(11.915394, 4.034536)
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
 

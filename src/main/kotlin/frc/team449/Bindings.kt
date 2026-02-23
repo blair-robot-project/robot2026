@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import frc.team449.Constants.BLUE_GOAL_TRANSLATION
+import frc.team449.Constants.RED_GOAL_TRANSLATION
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer.drive
 import frc.team449.commands.AimAtTargetCommand
@@ -21,9 +23,10 @@ class Bindings(
     val operator = robotContainer.opController
     val driveController = robotContainer.driveController
     val opController = robotContainer.opController
-    val HUB_POSITION = if (DriverStation.getAlliance().getOrDefault(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) Constants.RED_GOAL_POSE else Constants.BLUE_GOAL_POSE
-    val ROBOT_DISTANCE_FROM_HUB: Supplier<Double> = { (robotContainer.drive.pose.translation - HUB_POSITION.translation).norm }
+    var hubPosition = RED_GOAL_TRANSLATION
+    var robotHubDistanceSupplier: Supplier<Double> = { (robotContainer.drive.pose.translation - hubPosition).norm }
 
+    // driver station connected here
     fun setDefaultCommands() {
         // set default commands for systems here
         robotContainer.drive.defaultCommand =
@@ -34,6 +37,7 @@ class Bindings(
                 { -driver.rightX },
             )
         // controls for simulation
+        hubPosition = if (DriverStation.getAlliance().getOrDefault(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) RED_GOAL_TRANSLATION else BLUE_GOAL_TRANSLATION
     }
 
     fun bindControls() {
@@ -74,29 +78,34 @@ class Bindings(
                             robotContainer.drive,
                             { -robotContainer.driveController.leftY },
                             { -robotContainer.driveController.leftX },
-                            { HUB_POSITION },
+                            { hubPosition },
                         )
                     )
                 }),
                 robotContainer.shooter.setHoodAngle(
                     Degrees.of(
                         ShooterConstants.HOOD_ANGLE_MAP.get(
-                            ROBOT_DISTANCE_FROM_HUB.get()
+                            robotHubDistanceSupplier.get()
                         )
                     )
                 ),
                 robotContainer.shooter.setFlywheelVelocity(
                     RadiansPerSecond.of(
                         ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(
-                            ROBOT_DISTANCE_FROM_HUB.get()
+                            robotHubDistanceSupplier.get()
                         )
                     )
                 )
             )
         ).onFalse(
-            runOnce({
-                CommandScheduler.getInstance().schedule(drive.defaultCommand)
-            })
+            Commands.sequence(
+                runOnce({
+                    CommandScheduler.getInstance().schedule(drive.defaultCommand)
+                }),
+                robotContainer.shooter.stopFlywheel(),
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+            )
+
         )
 //
 //        driver

@@ -3,8 +3,8 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.PIDController
-import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.units.measure.Velocity
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -25,7 +25,7 @@ class AimAtTargetCommand(
     private val drive: DriveSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
-    private val targetSupplier: Supplier<Pose2d>
+    private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
 
     private val request = SwerveRequest
