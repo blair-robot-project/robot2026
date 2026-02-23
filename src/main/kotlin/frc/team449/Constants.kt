@@ -132,17 +132,17 @@ object Constants {
 
         // setpoints
 
-        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(46.0) // estimate
-        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(284.0) // estimate
+        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate
+        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
-        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(221.5)
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(150.5)
 
         val TOWER_HOOD_ANGLE: Angle = Degrees.of(23.0)
-        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(280.0)
+        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(180.0)
 
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
-        val SHOOTER_HEIGHT = Inches.of(18.0)
+        val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
     }
 
     object IntakeConstants {

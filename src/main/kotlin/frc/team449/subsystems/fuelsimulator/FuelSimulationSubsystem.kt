@@ -1,5 +1,8 @@
 package frc.team449.subsystems.fuelsimulator
 
+import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Transform2d
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Meters
 import edu.wpi.first.units.Units.MetersPerSecond
@@ -27,11 +30,18 @@ class FuelSimulationSubsystem(
     val simulatedHopperLimit = 50
 
     val fuelSim = FuelSim()
-    var ballCount = 0
-    var simIntaking = false
+
+    var ballCount: Int = 0
+    var simIntaking: Boolean = false
+    var effectiveShotSpeed: Double = 0.0
 
     private var simBallThrottle = 0
     private var simIntakeThrottle = 0
+
+    private val shooterTransform = Transform2d(
+        Translation2d(-Units.inchesToMeters(26.5) / 2 * 0.75, 0.0),
+        Rotation2d()
+    )
 
     init {
         fuelSim.enableAirResistance()
@@ -40,7 +50,7 @@ class FuelSimulationSubsystem(
             Units.inchesToMeters(Constants.ROBOT_WIDTH_INCHES),
             Units.inchesToMeters(Constants.ROBOT_LENGTH_INCHES),
             Units.inchesToMeters(5.0),
-            robotContainer.drive::pose,
+            { robotContainer.drive.pose.plus(shooterTransform) },
             robotContainer.drive::getFieldRelativeSpeeds
         )
 
@@ -58,7 +68,10 @@ class FuelSimulationSubsystem(
         simIntaking = pollIntakeAcceptBall()
         fuelSim.updateSim()
 
-        Logger.recordOutput("Fuels", *fuelSim.fuels)
+        Logger.recordOutput("FuelSim/Fuels", *fuelSim.fuels)
+        Logger.recordOutput("FuelSim/BallCount", ballCount)
+        Logger.recordOutput("FuelSim/ShotSpeedMetersPerSec", effectiveShotSpeed)
+        Logger.recordOutput("FuelSim/SimIntaking", simIntaking)
     }
 
     fun pollFuelLaunch() {
