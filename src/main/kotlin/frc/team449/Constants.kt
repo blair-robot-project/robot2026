@@ -102,6 +102,8 @@ object Constants {
         const val HOOD_ROLLER_GEARING = 1.0 / 3.0
         val HOOD_ROLLER_RADIUS: Distance = Inches.of(0.5)
 
+        const val EFFICIENCY = 0.97
+
         const val HOOD_KP = 100.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0

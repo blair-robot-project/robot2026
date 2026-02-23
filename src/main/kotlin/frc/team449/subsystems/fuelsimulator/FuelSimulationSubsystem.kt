@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.FuelSim
 import frc.team449.Constants
 import frc.team449.RobotContainer
+import org.littletonrobotics.junction.Logger
 import kotlin.math.PI
 import kotlin.math.round
 
@@ -56,6 +57,8 @@ class FuelSimulationSubsystem(
         pollFuelLaunch()
         simIntaking = pollIntakeAcceptBall()
         fuelSim.updateSim()
+
+        Logger.recordOutput("Fuels", *fuelSim.fuels)
     }
 
     fun pollFuelLaunch() {
