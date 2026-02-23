@@ -9,6 +9,7 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.fuelsimulator.FuelSimulationSubsystem
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
@@ -87,6 +88,14 @@ object RobotContainer {
                 Mode.REPLAY -> object : ShooterIO {}
             },
         )
+
+    val fuelSimulator: FuelSimulationSubsystem? = if (Constants.CURRENT_MODE == Mode.SIM) {
+        FuelSimulationSubsystem(
+            this
+        )
+    } else {
+        null
+    }
 
     val actions = RobotActions(this)
 

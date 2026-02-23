@@ -99,7 +99,8 @@ object Constants {
         const val HOOD_STATOR_LIM = 50.0
 
         const val HOOD_GEARING = 106.0
-        const val HOOD_ROLLER_GEARING = 64.0 / 27.0
+        const val HOOD_ROLLER_GEARING = 1.0 / 3.0
+        val HOOD_ROLLER_RADIUS: Distance = Inches.of(0.5)
 
         const val HOOD_KP = 100.0
         const val HOOD_KI = 0.0
@@ -119,8 +120,8 @@ object Constants {
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
         const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
-        val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // angle of fuel EJECTED from hood at its minimum angle
-        val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // angle of fuel EJECTED from hood at its maximum angle
+        val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
+        val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify
 
         val FLYWHEEL_MOI = 0.0033537
 
@@ -134,6 +135,9 @@ object Constants {
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
         val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(221.5)
+
+        val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
+        val SHOOTER_HEIGHT = Inches.of(18.0)
     }
 
     object IntakeConstants {

@@ -4,17 +4,16 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
-import frc.team449.Constants.IntakeConstants.DEPLOY_POS_RADS
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class IntakeSubsystem(
     private val io: IntakeIO
 ) : SubsystemBase() {
-    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
+    val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
 
     // boolean over position logging increases speed and is easier to read
-    private var pivotDeployedState: Boolean = false
+    var pivotDeployedState: Boolean = false
     private var rollerTargetVelocityRadPerSec: Double = 0.0
 
     val intakeSimAngle: Double
@@ -86,6 +85,4 @@ class IntakeSubsystem(
             )
         }
     }
-
-    fun isIntakeDeployed(): Boolean = abs(DEPLOY_POS_RADS - inputs.leftPivotLeaderPositionRad) <= 0.2
 }

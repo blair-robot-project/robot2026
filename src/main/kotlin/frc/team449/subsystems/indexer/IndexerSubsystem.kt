@@ -17,7 +17,7 @@ class IndexerSubsystem(
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
-    private var indexerTargetVelocityRadPerSec: Double = 0.0
+    var indexerTargetVelocityRadPerSec: Double = 0.0
 
     override fun periodic() {
         io.updateInputs(inputs)
