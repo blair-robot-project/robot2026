@@ -114,6 +114,5 @@ class Bindings(
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
             )
-
     }
 }
