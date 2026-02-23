@@ -67,7 +67,7 @@ object RobotContainer {
         IntakeSubsystem(
             when (Constants.CURRENT_MODE) {
                 Mode.REAL -> IntakeIOHardware()
-                Mode.SIM -> IntakeIOSim()
+                Mode.SIM -> IntakeIOSim(drive.driveSimulation!!)
                 Mode.REPLAY -> object : IntakeIO {}
             },
         )
@@ -89,13 +89,14 @@ object RobotContainer {
             },
         )
 
-    val fuelSimulator: FuelSimulationSubsystem? = if (Constants.CURRENT_MODE == Mode.SIM) {
-        FuelSimulationSubsystem(
-            this
-        )
-    } else {
-        null
-    }
+    val fuelSimulator: FuelSimulationSubsystem? =
+        if (Constants.CURRENT_MODE == Mode.SIM) {
+            FuelSimulationSubsystem(
+                this,
+            )
+        } else {
+            null
+        }
 
     val actions = RobotActions(this)
 

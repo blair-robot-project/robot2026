@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation
 import org.littletonrobotics.junction.Logger
 
 class DriveSubsystem(
@@ -68,6 +69,9 @@ class DriveSubsystem(
             )
         }
     }
+
+    val driveSimulation: AbstractDriveTrainSimulation?
+        get() = io.getDriveSim()
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
