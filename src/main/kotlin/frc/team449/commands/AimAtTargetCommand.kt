@@ -14,6 +14,7 @@ import frc.team449.Constants.AimbotConstants.AIMBOT_KI
 import frc.team449.Constants.AimbotConstants.AIMBOT_KP
 import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.shooter.ShooterSubsystem
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
 import kotlin.math.abs
@@ -23,9 +24,11 @@ import kotlin.math.sign
 
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
+    private val shooter: ShooterSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
-    private val targetSupplier: Supplier<Translation2d>
+    private val targetSupplier: Supplier<Translation2d>,
+    private val distanceSupplier: Supplier<Double>
 ) : Command() {
 
     private val request = SwerveRequest
@@ -39,7 +42,7 @@ class AimAtTargetCommand(
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     init {
-        addRequirements(drive)
+        addRequirements(drive, shooter)
     }
 
     override fun initialize() {
@@ -48,6 +51,10 @@ class AimAtTargetCommand(
         if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
             request.withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
         }
+
+        // not doing this in execute because this is just for shooting from anywhere
+        shooter.setHoodAngleFromDistance(distanceSupplier)
+        shooter.setFlywheelVelocityFromDistance(distanceSupplier)
     }
 
     private var throttle: Double = 0.0
@@ -92,5 +99,8 @@ class AimAtTargetCommand(
 
         val headingErrorDegrees = targetHeading.minus(drive.pose.rotation).degrees
         SmartDashboard.putNumber("aimbot degree error", headingErrorDegrees)
+
+        shooter.setHoodAngleFromDistance(distanceSupplier)
+        shooter.setFlywheelVelocityFromDistance(distanceSupplier)
     }
 }

@@ -264,7 +264,7 @@ object Constants {
         // Aimbot PID Constants
         const val AIMBOT_KP = 10.0
         const val AIMBOT_KI = 0.0
-        const val AIMBOT_KD = 0.0
+        const val AIMBOT_KD = 0.5
         const val VELOCITY_COEFFICIENT = 10.0
         const val PERIODIC_TIME = 0.02
         const val JOYSTICK_POWER = 0.5
