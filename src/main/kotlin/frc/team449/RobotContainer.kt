@@ -90,15 +90,15 @@ object RobotContainer {
             },
         )
 
-    val fuelSimulator: FuelSimulationSubsystem = FuelSimulationSubsystem(
-        when (Constants.CURRENT_MODE) {
-            Mode.SIM -> FuelIO()
-            else -> null
-        },
-        drive,
-        intake,
-        shooter
-    )
+    val fuelSimulator: FuelSimulationSubsystem? = when (Constants.CURRENT_MODE) {
+        Mode.SIM -> FuelSimulationSubsystem(
+            FuelIO(),
+            drive,
+            intake,
+            shooter
+        )
+        else -> null
+    }
 
     val actions = RobotActions(this)
 

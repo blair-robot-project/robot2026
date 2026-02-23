@@ -12,11 +12,12 @@ import frc.team449.Constants.ShooterConstants
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import org.littletonrobotics.junction.Logger
 import kotlin.math.PI
 import kotlin.math.abs
 
 class FuelSimulationSubsystem(
-    private val io: FuelIO?,
+    private val io: FuelIO,
     driveSubsystem: DriveSubsystem,
     intakeSubsystem: IntakeSubsystem,
     shooterSubsystem: ShooterSubsystem
@@ -29,54 +30,52 @@ class FuelSimulationSubsystem(
     private val shooter = shooterSubsystem
 
     init {
-        if (io != null) {
-            io.fuelSim.enableAirResistance()
-            io.fuelSim.spawnStartingFuel()
-            io.fuelSim.registerRobot(
-                Constants.Dimensions.FULL_WIDTH.`in`(Meters),
-                Constants.Dimensions.FULL_LENGTH.`in`(Meters),
-                Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
-                driveSubsystem::pose,
-                driveSubsystem::getFieldRelativeSpeeds,
-            )
+        io.fuelSim.enableAirResistance()
+        io.fuelSim.spawnStartingFuel()
+        io.fuelSim.registerRobot(
+            Constants.Dimensions.FULL_WIDTH.`in`(Meters),
+            Constants.Dimensions.FULL_LENGTH.`in`(Meters),
+            Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
+            driveSubsystem::pose,
+            driveSubsystem::getFieldRelativeSpeeds,
+        )
 
-            io.fuelSim.registerIntake(
-                (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
-                    .div(2.0)
-                    .`in`(Meters),
-                (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
-                    .div(2.0)
-                    .plus(Inches.of(3.0))
-                    .`in`(Meters),
-                -Constants.Dimensions.FULL_WIDTH
-                    .div(2.0)
-                    .minus(Inches.of(2.0))
-                    .`in`(Meters),
-                Constants.Dimensions.FULL_WIDTH
-                    .div(2.0)
-                    .minus(Inches.of(5.0))
-                    .`in`(Meters),
-                this::pollIntakeAcceptBall,
-                { io.ballCount + -1 }
-            )
-        }
+        io.fuelSim.registerIntake(
+            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
+                .div(2.0)
+                .`in`(Meters),
+            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
+                .div(2.0)
+                .plus(Inches.of(3.0))
+                .`in`(Meters),
+            -Constants.Dimensions.FULL_WIDTH
+                .div(2.0)
+                .minus(Inches.of(2.0))
+                .`in`(Meters),
+            Constants.Dimensions.FULL_WIDTH
+                .div(2.0)
+                .minus(Inches.of(5.0))
+                .`in`(Meters),
+            this::pollIntakeAcceptBall,
+            { io.ballCount += 1 }
+        )
     }
 
     override fun simulationPeriodic() {
-        if (io != null) {
-            pollFuelLaunch()
-            io.simIntaking = pollIntakeAcceptBall()
-            io.fuelSim.updateSim()
-            io.updateInputs(inputs)
-        }
+        pollFuelLaunch()
+        io.simIntaking = pollIntakeAcceptBall()
+        io.fuelSim.updateSim()
+        io.updateInputs(inputs)
+        Logger.processInputs("Fuel Simulation", inputs)
     }
 
     fun pollFuelLaunch() {
-        if (simBallThrottle >= FuelSimulationConstants.FLYWHEEL_BPS_RATE_LIMIT && io!!.ballCount > 0 && shooter.isFlywheelAtTolerance() && shooter.flywheelTargetVelocityRadPerSec >= 10) {
-            val flywheelSurfaceSpeed = shooter.inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS
-            val hoodRollerSurfaceSpeed = shooter.inputs.rightLeaderVelocityRadPerSec * 1 / ShooterConstants.HOOD_ROLLER_GEARING * ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
-            val effectiveShootSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2 * ShooterConstants.EFFICIENCY
+        val flywheelSurfaceSpeed = shooter.inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS
+        val hoodRollerSurfaceSpeed = shooter.inputs.rightLeaderVelocityRadPerSec * 1 / ShooterConstants.HOOD_ROLLER_GEARING * ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
+        val effectiveShootSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2 * ShooterConstants.EFFICIENCY
+        io.ballLinearLaunchSpeed = effectiveShootSpeed
 
+        if (simBallThrottle >= FuelSimulationConstants.FLYWHEEL_BPS_RATE_LIMIT && io.ballCount > 0 && shooter.isFlywheelAtTolerance() && shooter.flywheelTargetVelocityRadPerSec >= 10) {
             io.fuelSim.launchFuel(
                 MetersPerSecond.of(effectiveShootSpeed),
                 Radians.of((PI / 2) - shooter.inputs.hoodPositionRad),
@@ -97,7 +96,7 @@ class FuelSimulationSubsystem(
         if (simIntakeThrottle < FuelSimulationConstants.INTAKE_BPS_RATE_LIMIT && Math.random() > FuelSimulationConstants.SIMULATED_BALL_INTAKING_MISS_CHANCE) {
             simIntakeThrottle += 1
         }
-        return simIntakeThrottle >= FuelSimulationConstants.INTAKE_BPS_RATE_LIMIT && intakeDeployed && io!!.ballCount < FuelSimulationConstants.SIMULATED_BALL_INTAKE_LIMIT
+        return simIntakeThrottle >= FuelSimulationConstants.INTAKE_BPS_RATE_LIMIT && intakeDeployed && io.ballCount < FuelSimulationConstants.SIMULATED_BALL_INTAKE_LIMIT
         //                && abs(IntakeConstants.INTAKE_VELOCITY.`in`(RotationsPerSecond) - inputs.leftRollerLeaderVelocityRadPerSec) <= 25.0
     }
 }
