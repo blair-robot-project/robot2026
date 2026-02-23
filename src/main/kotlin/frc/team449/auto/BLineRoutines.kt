@@ -28,7 +28,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.function.Consumer
 
 class BLineRoutines(
-    robot: Robot,
+    robot: Robot
 ) {
     private val transP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val transI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)

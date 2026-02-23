@@ -56,7 +56,6 @@ class DriveSubsystem(
             }
         }
 
-
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
         if (io is DriveIOHardware) {

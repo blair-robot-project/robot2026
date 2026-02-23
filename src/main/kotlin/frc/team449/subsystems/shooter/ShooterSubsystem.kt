@@ -45,9 +45,13 @@ class ShooterSubsystem(
     override fun simulationPeriodic() {
         Logger.recordOutput("Simulated ball count", simBallCount)
         if (io is ShooterIOSim) {
-            if (simBallThrottle >= ShooterConstants.BPS_RATE_LIMIT && simBallCount > 0 && isFlywheelAtTolerance() && flywheelTargetVelocityRadPerSec >= 10) {
+            if (simBallThrottle >= ShooterConstants.BPS_RATE_LIMIT && simBallCount > 0 && isFlywheelAtTolerance() &&
+                flywheelTargetVelocityRadPerSec >= 10
+            ) {
                 val flywheelSurfaceSpeed = inputs.rightLeaderVelocityRadPerSec * ShooterConstants.FLYWHEEL_RADIUS
-                val hoodRollerSurfaceSpeed = inputs.rightLeaderVelocityRadPerSec * 1 / ShooterConstants.HOOD_ROLLER_GEARING * ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
+                val hoodRollerSurfaceSpeed =
+                    inputs.rightLeaderVelocityRadPerSec * 1 / ShooterConstants.HOOD_ROLLER_GEARING *
+                        ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
                 val effectiveShootSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2 * ShooterConstants.EFFICIENCY
 
                 fuelSim.launchFuel(
@@ -59,7 +63,9 @@ class ShooterSubsystem(
                 simBallCount -= 1
                 simBallThrottle = 0
             } else {
-                if (simBallThrottle < ShooterConstants.BPS_RATE_LIMIT && Math.random() > ShooterConstants.SIMULATED_BALL_INDEXING_MISS_CHANCE) { // randomness to modulate ball timing
+                if (simBallThrottle < ShooterConstants.BPS_RATE_LIMIT && Math.random() >
+                    ShooterConstants.SIMULATED_BALL_INDEXING_MISS_CHANCE
+                ) { // randomness to modulate ball timing
                     simBallThrottle += 1
                 }
             }
@@ -99,8 +105,9 @@ class ShooterSubsystem(
         val leftError = abs(inputs.leftLeaderVelocityRadPerSec - flywheelTargetVelocityRadPerSec)
         val rightError = abs(inputs.rightLeaderVelocityRadPerSec - flywheelTargetVelocityRadPerSec)
 
-        val isAtSpeed = leftError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC &&
-            rightError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC
+        val isAtSpeed =
+            leftError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC &&
+                rightError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC
 
         return flywheelDebouncer.calculate(isAtSpeed)
     }
@@ -113,27 +120,28 @@ class ShooterSubsystem(
         return hoodDebouncer.calculate(isAtPos)
     }
 
-    fun homeHood(): Command {
-        return this.defer {
-            val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
+    fun homeHood(): Command =
+        this
+            .defer {
+                val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
 
-            Commands.sequence(
-                this.runOnce { io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE) },
-                Commands.waitUntil {
-                    val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
-                    val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
-                    homingDebouncer.calculate(highCurrent && lowVelocity)
-                },
-                this.runOnce {
-                    io.setHoodVoltage(0.0)
-                    io.resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
-                    io.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
-                }
-            )
-        }.withName("Home Hood")
-    }
+                Commands.sequence(
+                    this.runOnce { io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE) },
+                    Commands.waitUntil {
+                        val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
+                        val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
+                        homingDebouncer.calculate(highCurrent && lowVelocity)
+                    },
+                    this.runOnce {
+                        io.setHoodVoltage(0.0)
+                        io.resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
+                        io.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+                    },
+                )
+            }.withName("Home Hood")
 
-    fun holdHood(): Command = runOnce {
-        setHoodAngle(Radians.of(inputs.hoodPositionRad))
-    }
+    fun holdHood(): Command =
+        runOnce {
+            setHoodAngle(Radians.of(inputs.hoodPositionRad))
+        }
 }
