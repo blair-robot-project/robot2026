@@ -31,7 +31,7 @@ class IndexerSubsystem(
         floorSpeed: AngularVelocity,
         topSpeed: AngularVelocity
     ): Command =
-        this.run {
+        this.runOnce {
             io.setFloorSpeed(floorSpeed)
             io.setWedgeSpeed(wedgeSpeed)
             io.setTopSpeed(topSpeed)

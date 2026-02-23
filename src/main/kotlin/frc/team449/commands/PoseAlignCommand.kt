@@ -77,9 +77,5 @@ class PoseAlignCommand(
             abs(turnSupplier.asDouble) > xLockDeadband
     }
 
-    override fun end(interrupted: Boolean) {
-        CommandScheduler.getInstance().schedule(
-            SmartXLockCommand(drive, throttleSupplier, strafeSupplier, turnSupplier)
-        )
-    }
+    override fun end(interrupted: Boolean) {}
 }

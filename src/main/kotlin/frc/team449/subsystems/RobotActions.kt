@@ -2,6 +2,7 @@ package frc.team449.subsystems
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.team449.Constants.IndexerConstants
@@ -20,10 +21,13 @@ class RobotActions(
     val indexer: IndexerSubsystem = robotContainer.indexer
     val shooter: ShooterSubsystem = robotContainer.shooter
 
-    fun deployAndIntake(): Command =
+    fun deployAndToggleIntake(): Command =
         SequentialCommandGroup(
-            intake.intake(),
-            intake.deploy(),
+            ConditionalCommand(
+                intake.stopRollers(),
+                intake.intake()
+            ) { intake.rollerTargetVelocityRadPerSec != 0.0 },
+            intake.deploy()
         )
 
     fun stopAndStow(): Command =
@@ -33,12 +37,6 @@ class RobotActions(
         )
 
     fun stopIntake(): Command = intake.stopRollers()
-
-    fun toggleDeployAndIntake(): Command =
-        ConditionalCommand(
-            deployAndIntake(),
-            stopIntake()
-        ) { !intake.pivotDeployedState }
 
     fun prepTrenchShot(): Command =
         SequentialCommandGroup(
@@ -63,9 +61,7 @@ class RobotActions(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
-            shooter.holdHood(),
             indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
-
         )
 
     fun stopFeed(): Command =

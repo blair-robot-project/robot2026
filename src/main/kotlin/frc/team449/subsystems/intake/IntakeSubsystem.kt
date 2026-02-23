@@ -14,7 +14,7 @@ class IntakeSubsystem(
 
     // boolean over position logging increases speed and is easier to read
     var pivotDeployedState: Boolean = false
-    private var rollerTargetVelocityRadPerSec: Double = 0.0
+    var rollerTargetVelocityRadPerSec: Double = 0.0
 
     val intakeSimAngle: Double
         get() = inputs.leftPivotLeaderPositionRad

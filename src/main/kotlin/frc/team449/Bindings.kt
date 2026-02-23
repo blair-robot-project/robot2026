@@ -1,6 +1,8 @@
 package frc.team449
 
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SmartXLockCommand
@@ -31,7 +33,7 @@ class Bindings(
         driver
             .rightTrigger()
             .onTrue(
-                actions.toggleDeployAndIntake()
+                actions.deployAndToggleIntake()
             )
 
         driver
@@ -103,7 +105,13 @@ class Bindings(
                         ),
                         actions.prepTrenchShot()
                     ),
-                    actions.checkAndFeed()
+                    actions.checkAndFeed(),
+                    SmartXLockCommand(
+                        robotContainer.drive,
+                        { -driver.leftY },
+                        { -driver.leftX },
+                        { driver.rightX },
+                    )
                 )
             )
 
