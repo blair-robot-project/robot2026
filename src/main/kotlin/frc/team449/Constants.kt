@@ -105,7 +105,7 @@ object Constants {
         const val HOOD_STATOR_LIM = 50.0
 
         const val HOOD_GEARING = 106.0
-        const val HOOD_ROLLER_GEARING = 64.0 / 27.0
+        const val HOOD_ROLLER_GEARING = 1.0 / 3.0
         val HOOD_ROLLER_RADIUS = Inches.of(0.5)
 
         const val HOOD_KP = 100.0
@@ -134,12 +134,8 @@ object Constants {
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
-        // fuel sim
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT = Inches.of(18.0)
-        const val SIMULATED_BPS = 11
-        val BPS_RATE_LIMIT = round((1 / LOOP_TIME) / SIMULATED_BPS)
-        const val SIMULATED_BALL_INDEXING_MISS_CHANCE = .6
     }
 
     object Dimensions {
@@ -198,11 +194,6 @@ object Constants {
         const val ROLLER_MOI = 0.0001411489
 
         const val ROLLER_GEARING = 4.0 / 3
-
-        const val SIMULATED_BPS = 20
-        val BPS_RATE_LIMIT = round((1 / LOOP_TIME) / SIMULATED_BPS)
-        const val SIMULATED_BALL_INTAKING_MISS_CHANCE = .6
-        const val SIMULATED_BALL_INTAKE_LIMIT = 50
     }
 
     // INDEXER CONSTANTS STILL SLIGHTLY OFF
@@ -256,6 +247,17 @@ object Constants {
         const val TOP_MOI = .000000008 // TODO: Find
 
         val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
+    }
+
+    object FuelSimulationConstants {
+        const val FLYWHEEL_SIMULATED_BPS = 11
+        val FLYWHEEL_BPS_RATE_LIMIT = round((1 / LOOP_TIME) / FLYWHEEL_SIMULATED_BPS)
+        const val SIMULATED_BALL_INDEXING_MISS_CHANCE = .6
+
+        const val INTAKE_SIMULATED_BPS = 20
+        val INTAKE_BPS_RATE_LIMIT = round((1 / LOOP_TIME) / INTAKE_SIMULATED_BPS)
+        const val SIMULATED_BALL_INTAKING_MISS_CHANCE = .6
+        const val SIMULATED_BALL_INTAKE_LIMIT = 50
     }
 
     object LEDConstants {

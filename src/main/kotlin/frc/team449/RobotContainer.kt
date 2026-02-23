@@ -2,7 +2,6 @@ package frc.team449
 
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
-import frc.robot.FuelSim
 import frc.team449.Constants.Mode
 import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.RobotActions
@@ -10,6 +9,8 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.fuelsimulator.FuelIO
+import frc.team449.subsystems.fuelsimulator.FuelSimulationSubsystem
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
 import frc.team449.subsystems.indexer.IndexerIOSim
@@ -29,8 +30,6 @@ object RobotContainer {
     val opController: CommandXboxController = CommandXboxController(1)
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
-
-    val fuelSim = FuelSim("test")
 
     val drive: DriveSubsystem =
         DriveSubsystem(
@@ -90,6 +89,16 @@ object RobotContainer {
                 Mode.REPLAY -> object : ShooterIO {}
             },
         )
+
+    val fuelSimulator: FuelSimulationSubsystem = FuelSimulationSubsystem(
+        when (Constants.CURRENT_MODE) {
+            Mode.SIM -> FuelIO()
+            else -> null
+        },
+        drive,
+        intake,
+        shooter
+    )
 
     val actions = RobotActions(this)
 

@@ -6,14 +6,9 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.Commands
-import frc.team449.RobotContainer.drive
-import frc.team449.RobotContainer.fuelSim
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
@@ -94,54 +89,10 @@ class Robot : LoggedRobot() {
     override fun testPeriodic() {}
 
     override fun simulationInit() {
-        fuelSim.spawnStartingFuel()
-        fuelSim.registerRobot(
-            Constants.Dimensions.FULL_WIDTH.`in`(Meters),
-            Constants.Dimensions.FULL_LENGTH.`in`(Meters),
-            Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
-            { drive.pose },
-            drive::getFieldRelativeSpeeds,
-        )
-
-        fuelSim.registerIntake(
-            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
-                .div(2.0)
-                .`in`(Meters),
-            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
-                .div(2.0)
-                .plus(Inches.of(3.0))
-                .`in`(Meters),
-            -Constants.Dimensions.FULL_WIDTH
-                .div(2.0)
-                .minus(Inches.of(2.0))
-                .`in`(Meters),
-            Constants.Dimensions.FULL_WIDTH
-                .div(2.0)
-                .minus(Inches.of(5.0))
-                .`in`(Meters),
-            robotContainer.intake.isSimIntaking(robotContainer.shooter::simBallCount),
-            { robotContainer.shooter.simBallCount += 1 }
-        )
-
-        fuelSim.start()
-        SmartDashboard.putData(
-            Commands
-                .runOnce(
-                    {
-                        fuelSim.clearFuel()
-                        fuelSim.spawnStartingFuel()
-                    },
-                ).withName("Reset Fuel")
-                .ignoringDisable(true),
-        )
-
         Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
     }
 
     override fun simulationPeriodic() {
-        fuelSim.updateSim()
-        Logger.recordOutput("Sim Intaking", robotContainer.intake.isSimIntaking(robotContainer.shooter::simBallCount))
-
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
