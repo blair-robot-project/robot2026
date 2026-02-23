@@ -59,6 +59,5 @@ class RobotActions(
             shooter.stopFlywheel(),
             indexer.stop(),
         )
-
     fun homeHood(): Command = shooter.homeHood()
 }

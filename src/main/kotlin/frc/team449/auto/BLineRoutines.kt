@@ -103,15 +103,16 @@ class BLineRoutines(
         FollowPath.registerEventTrigger(
             "start_intake",
             Commands.parallel(
-                actions.stopShooter(),
                 actions.deployAndIntake(),
-            ),
+                actions.stopShooter()
+            )
         )
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
         FollowPath.registerEventTrigger(
             "start_shooting",
             actions.prepTrenchShot().andThen(actions.feed()),
         )
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopShooter())
     }
 
     fun rHalfClose(): Command {
@@ -119,6 +120,7 @@ class BLineRoutines(
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_half_closer_pt1")
         val path4 = Path("R_half_closer_pt2")
+        val path5 = Path("r_nothing")
 
         eventTriggerCommands()
 
@@ -169,8 +171,8 @@ class BLineRoutines(
     fun lHalfClose(): Command {
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
-        val path3 = Path("L_half_close_pt1")
-        val path4 = Path("L_half_close_pt2")
+        val path3 = Path("L_half_closer_pt1")
+        val path4 = Path("L_half_closer_pt2")
 
         eventTriggerCommands()
 
@@ -185,8 +187,8 @@ class BLineRoutines(
     }
 
     fun lHalfFar(): Command {
-        val path1 = Path("L_half_reg_pt1")
-        val path2 = Path("L_half_reg_pt2")
+        val path1 = Path("L_half_close_pt1")
+        val path2 = Path("L_half_close_pt2")
         val path3 = Path("L_half_far_pt1")
         val path4 = Path("L_half_far_pt2")
 

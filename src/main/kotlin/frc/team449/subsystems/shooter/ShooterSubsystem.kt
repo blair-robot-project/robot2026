@@ -133,5 +133,7 @@ class ShooterSubsystem(
         }.withName("Home Hood")
     }
 
-    fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
+    fun holdHood(): Command = runOnce {
+        setHoodAngle(Radians.of(inputs.hoodPositionRad))
+    }
 }
