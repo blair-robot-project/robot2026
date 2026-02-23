@@ -26,8 +26,8 @@ class PoseAlignCommand(
 ) : Command() {
     private val xLockDeadband = Constants.DriveConstants.X_LOCK_DEADBAND
 
-    private val xController = PIDController(2.0, 0.0, 0.0)
-    private val yController = PIDController(2.0, 0.0, 0.0)
+    private val xController = PIDController(5.0, 0.0, 0.1)
+    private val yController = PIDController(5.0, 0.0, 0.1)
     private val thetaController = ProfiledPIDController(
         4.0,
         0.0,
