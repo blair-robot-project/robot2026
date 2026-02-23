@@ -60,16 +60,11 @@ class PoseAlignCommand(
         val currentPose = drive.pose
         val targetPose = targetPoseSupplier.get()
 
-        val fieldSpeeds: ChassisSpeeds = driveController.calculate(
+        val robotSpeeds: ChassisSpeeds = driveController.calculate(
             currentPose,
             targetPose,
             0.0,
             targetPose.rotation
-        )
-
-        val robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            fieldSpeeds,
-            currentPose.rotation
         )
 
         drive.setControl(applyChassisSpeeds.withSpeeds(robotSpeeds))

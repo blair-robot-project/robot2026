@@ -45,7 +45,7 @@ class RobotActions(
             shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
         )
 
-    fun feed(): Command =
+    fun checkAndFeed(): Command =
         SequentialCommandGroup(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
@@ -54,6 +54,9 @@ class RobotActions(
             indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
 
         )
+
+    fun stopFeed(): Command =
+        indexer.stop()
 
     fun stopShooter(): Command =
         ParallelCommandGroup(

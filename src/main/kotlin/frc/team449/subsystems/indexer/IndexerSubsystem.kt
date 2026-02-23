@@ -47,5 +47,8 @@ class IndexerSubsystem(
         )
     }
 
-    fun stop(): Command = index(RadiansPerSecond.of(0.0))
+    fun stop(): Command =
+        this.runOnce {
+            io.setIndexerVoltage(0.0, 0.0, 0.0)
+        }
 }

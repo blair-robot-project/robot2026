@@ -38,6 +38,9 @@ object Constants {
         const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
         const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
 
+        const val SLOW_LINEAR_SPEED_METERS_PER_SECOND = 1.5
+        const val SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 0.5804
+
         const val TRACKWIDTH_INCHES = 21.75 // front to rear
         const val WHEELBASE_INCHES = 21.75 // left to right
 
@@ -89,12 +92,6 @@ object Constants {
         const val FLYWHEEL_KS = 0.05
         const val FLYWHEEL_KV = 0.12
 
-        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
-        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
-
-        val HUB_HOOD_ANGLE: Angle = Degrees.of(30.0) // todo: find
-        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
-
         // HOOD
         const val HOOD_MOTOR_ID = 15
 
@@ -122,13 +119,21 @@ object Constants {
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
         const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
-        val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
-        val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify
+        val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // angle of fuel EJECTED from hood at its minimum angle
+        val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // angle of fuel EJECTED from hood at its maximum angle
 
         val FLYWHEEL_MOI = 0.0033537
 
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
+
+        // setpoints
+
+        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(46.0) // estimate
+        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(284.0) // estimate
+
+        val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
+        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(221.5)
     }
 
     object IntakeConstants {
