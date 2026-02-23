@@ -28,7 +28,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.function.Consumer
 
 class BLineRoutines(
-    robot: Robot
+    robot: Robot,
 ) {
     private val transP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val transI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
@@ -104,8 +104,8 @@ class BLineRoutines(
             "start_intake",
             Commands.parallel(
                 actions.deployAndIntake(),
-                actions.stopShooter()
-            )
+                actions.stopShooter(),
+            ),
         )
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
         FollowPath.registerEventTrigger(
@@ -120,7 +120,7 @@ class BLineRoutines(
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_half_closer_pt1")
         val path4 = Path("R_half_closer_pt2")
-        val path5 = Path("r_nothing")
+        val path5 = Path("r_end")
 
         eventTriggerCommands()
 
@@ -131,6 +131,7 @@ class BLineRoutines(
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
             WaitCommand(6.0),
+            pathBuilderWithReset.build(path5),
         )
     }
 
@@ -139,6 +140,7 @@ class BLineRoutines(
         val path2 = Path("R_half_close_pt2")
         val path3 = Path("R_half_far_pt1")
         val path4 = Path("R_half_far_pt2")
+        val path5 = Path("r_end")
 
         eventTriggerCommands()
 
@@ -149,6 +151,7 @@ class BLineRoutines(
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(6.0),
+            pathBuilderWithReset.build(path5),
         )
     }
 
@@ -156,6 +159,7 @@ class BLineRoutines(
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_loop_reg")
+        val path4 = Path("l_end")
 
         eventTriggerCommands()
 
@@ -165,6 +169,7 @@ class BLineRoutines(
             WaitCommand(6.0),
             pathBuilderWithReset.build(path3),
             WaitCommand(6.0),
+            pathBuilderWithReset.build(path4),
         )
     }
 
@@ -173,6 +178,7 @@ class BLineRoutines(
         val path2 = Path("L_half_reg_pt2")
         val path3 = Path("L_half_closer_pt1")
         val path4 = Path("L_half_closer_pt2")
+        val path5 = Path("l_end")
 
         eventTriggerCommands()
 
@@ -183,6 +189,7 @@ class BLineRoutines(
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
             WaitCommand(6.0),
+            pathBuilderWithReset.build(path5),
         )
     }
 
@@ -191,6 +198,7 @@ class BLineRoutines(
         val path2 = Path("L_half_close_pt2")
         val path3 = Path("L_half_far_pt1")
         val path4 = Path("L_half_far_pt2")
+        val path5 = Path("l_end")
 
         eventTriggerCommands()
 
@@ -201,6 +209,7 @@ class BLineRoutines(
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(6.0),
+            pathBuilderWithReset.build(path5),
         )
     }
 
@@ -208,6 +217,7 @@ class BLineRoutines(
         val path1 = Path("L_half_reg_pt1")
         val path2 = Path("L_half_reg_pt2")
         val path3 = Path("L_loop_reg")
+        val path4 = Path("r_end")
 
         eventTriggerCommands()
 
@@ -217,6 +227,7 @@ class BLineRoutines(
             WaitCommand(6.0),
             pathBuilderWithReset.build(path3),
             WaitCommand(6.0),
+            pathBuilderWithReset.build(path4),
         )
     }
 
