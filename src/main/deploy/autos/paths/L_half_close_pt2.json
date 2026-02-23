@@ -37,7 +37,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 1.0,
+      "t_ratio": 0.9396976730708212,
       "lib_key": "start_shooting"
     },
     {

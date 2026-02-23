@@ -103,8 +103,8 @@ object Constants {
         const val FLYWHEEL_KS = 0.0
         const val FLYWHEEL_KV = 0.21
 
-        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(30.0) // TODO:FIND
-        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(200.0)
+        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(10.0) // TODO:FIND
+        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(325.0)
 
         val HUB_HOOD_ANGLE: Angle = Degrees.of(30.0) // todo: find
         val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)

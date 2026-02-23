@@ -117,8 +117,8 @@ class BLineRoutines(
     fun rHalfClose(): Command {
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
-        val path3 = Path("R_half_close_pt1")
-        val path4 = Path("R_half_close_pt2")
+        val path3 = Path("R_half_closer_pt1")
+        val path4 = Path("R_half_closer_pt2")
 
         eventTriggerCommands()
 
@@ -133,8 +133,8 @@ class BLineRoutines(
     }
 
     fun rHalfFar(): Command {
-        val path1 = Path("R_half_reg_pt1")
-        val path2 = Path("R_half_reg_pt2")
+        val path1 = Path("R_half_close_pt1")
+        val path2 = Path("R_half_close_pt2")
         val path3 = Path("R_half_far_pt1")
         val path4 = Path("R_half_far_pt2")
 
