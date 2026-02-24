@@ -50,7 +50,6 @@ class RobotActions(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
-            shooter.holdHood(),
             indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
         )
 
@@ -59,5 +58,6 @@ class RobotActions(
             shooter.stopFlywheel(),
             indexer.stop(),
         )
+
     fun homeHood(): Command = shooter.homeHood()
 }
