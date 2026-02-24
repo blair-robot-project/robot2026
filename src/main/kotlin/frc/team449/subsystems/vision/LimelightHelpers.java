@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -613,8 +614,8 @@ public class LimelightHelpers {
      */
     static boolean profileJSON = false;
 
-    static final String sanitizeName(String name) {
-        if (name == "" || name == null) {
+    static String sanitizeName(String name) {
+        if (Objects.equals(name, "") || name == null) {
             return "limelight";
         }
         return name;

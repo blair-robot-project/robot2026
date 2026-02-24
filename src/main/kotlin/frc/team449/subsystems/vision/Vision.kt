@@ -9,6 +9,7 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.Alert.AlertType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.team449.Constants
 import org.littletonrobotics.junction.Logger
 import java.util.*
 import kotlin.math.abs
@@ -30,7 +31,6 @@ class Vision(
 
         for (i in 1..io.size) {
             disconnectedAlerts.add(Alert("Vision camera ${inputs[i - 1]} is disconnected.", AlertType.kWarning))
-            println("womp womp disconnected $i")
         }
     }
 
@@ -62,7 +62,7 @@ class Vision(
         for (cameraIndex in io.indices) {
             // Update disconnected alert
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected)
-            println("camera $cameraIndex connected ${inputs[cameraIndex].connected}")
+//            println("camera $cameraIndex connected ${inputs[cameraIndex].connected}")
 
             // Initialize logging values
             val tagPoses: MutableList<Pose3d> = LinkedList()
@@ -204,5 +204,10 @@ class Vision(
             "Vision/Summary/RobotPosesRejected",
             *allRobotPosesRejected.toTypedArray<Pose3d>()
         )
+
+        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
+            Logger.recordOutput("Vision/Summary/RightYaw", LimelightHelpers.getIMUData("limelight-right").robotYaw)
+            Logger.recordOutput("Vision/Summary/LeftYaw", LimelightHelpers.getIMUData("limelight-left").robotYaw)
+        }
     }
 }

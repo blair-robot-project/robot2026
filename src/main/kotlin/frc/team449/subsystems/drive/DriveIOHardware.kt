@@ -74,6 +74,10 @@ open class DriveIOHardware(
         registerTelemetry(telemetryConsumer)
     }
 
+    fun getPitchVelocity(): Double = angularPitchVelocity.value.magnitude()
+    fun getRollVelocity(): Double = angularPitchVelocity.value.magnitude()
+    fun getYawVelocity(): Double = angularPitchVelocity.value.magnitude()
+
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
         if (telemetryCache.get() == null) return
         inputs.fromSwerveDriveState(telemetryCache.get())

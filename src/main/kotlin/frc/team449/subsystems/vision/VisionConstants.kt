@@ -8,8 +8,8 @@ package frc.team449.subsystems.vision
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.math.geometry.Transform3d
 
 object VisionConstants {
     var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
@@ -18,9 +18,9 @@ object VisionConstants {
     var camera1Name: String = "limelight-left"
 
     // Robot to camera transforms
-    // (Not used by Limelight, configure in web UI instead) <--- TODO
-    var robotToCamera0: Transform3d = Transform3d(0.2, 0.0, 0.2, Rotation3d(0.0, 0.0, 0.0))
-    var robotToCamera1: Transform3d = Transform3d(-0.2, 0.0, 0.2, Rotation3d(0.0, 0.0, Math.PI))
+    // TODO: idt these are actually right, will prolly havta look at it again after it's mounted
+    var robotToCameraRight: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, 30.0, -25.0))
+    var robotToCameraLeft: Pose3d = Pose3d(-0.2, -0.2, 0.53, Rotation3d(0.0, 30.0, -25.0))
 
     // Basic filtering thresholds
     var maxAmbiguity: Double = 0.3

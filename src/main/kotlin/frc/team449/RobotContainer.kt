@@ -7,7 +7,6 @@ import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
-import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
@@ -21,11 +20,7 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import frc.team449.subsystems.vision.Vision
-import frc.team449.subsystems.vision.VisionConstants
-import frc.team449.subsystems.vision.VisionIO
-import frc.team449.subsystems.vision.VisionIOLimelight
-import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
+import limelight.Limelight
 
 object RobotContainer {
     // driver/op controllers
@@ -34,58 +29,65 @@ object RobotContainer {
 
     val autonomousCommand = PrintCommand("This is the autonomous command!")
 
+    val driveIOHardware: DriveIOHardware = DriveIOHardware(
+        TunerConstants.DrivetrainConstants,
+        arrayOf(
+            TunerConstants.FrontLeft,
+            TunerConstants.FrontRight,
+            TunerConstants.BackLeft,
+            TunerConstants.BackRight,
+        ),
+    )
+
     val drive: DriveSubsystem =
         DriveSubsystem(
             when (Constants.CURRENT_MODE) {
-                Mode.REAL -> {
-                    DriveIOHardware(
-                        TunerConstants.DrivetrainConstants,
-                        arrayOf(
-                            TunerConstants.FrontLeft,
-                            TunerConstants.FrontRight,
-                            TunerConstants.BackLeft,
-                            TunerConstants.BackRight,
-                        ),
-                    )
-                }
+                Mode.REAL -> driveIOHardware
 
-                Mode.SIM -> {
-                    DriveIOSim(
-                        TunerConstants.DrivetrainConstants,
-                        arrayOf(
-                            TunerConstants.FrontLeft,
-                            TunerConstants.FrontRight,
-                            TunerConstants.BackLeft,
-                            TunerConstants.BackRight,
-                        ),
-                    )
-                }
+                Mode.SIM -> driveIOHardware
 
                 Mode.REPLAY -> {
                     object : DriveIO {}
                 }
             },
         )
-    val vision: Vision =
-        when (Constants.CURRENT_MODE) {
-            Mode.REAL ->
-                Vision(
-                    drive::addVisionMeasurement,
-                    VisionIOLimelight("limelight-right", drive.rotation),
-                    VisionIOLimelight("limelight-left", drive.rotation)
-                )
-            Mode.SIM ->
-                Vision(
-                    drive::addVisionMeasurement,
-                    VisionIOPhotonVisionSim("camera1", VisionConstants.robotToCamera0, drive.pose),
-                    VisionIOPhotonVisionSim("camera2", VisionConstants.robotToCamera1, drive.pose),
-                )
-            Mode.REPLAY -> Vision(
-                drive::addVisionMeasurement,
-                object : VisionIO {},
-                object : VisionIO {}
-            ).also { vision = it }
-        }
+
+//    val vision: Vision =
+//        when (Constants.CURRENT_MODE) {
+//            Mode.REAL ->
+//                Vision(
+//                    drive::addVisionMeasurement,
+//                    VisionIOLimelight("limelight-right", drive.rotation),
+//                    VisionIOLimelight("limelight-left", drive.rotation)
+//                )
+//            Mode.SIM ->
+//                Vision(
+//                    drive::addVisionMeasurement,
+//                    VisionIOPhotonVisionSim("camera1", VisionConstants.robotToCamera0, drive.pose),
+//                    VisionIOPhotonVisionSim("camera2", VisionConstants.robotToCamera1, drive.pose),
+//                )
+//            Mode.REPLAY -> Vision(
+//                drive::addVisionMeasurement,
+//                object : VisionIO {},
+//                object : VisionIO {}
+//            ).also { vision = it }
+//        }
+//    val limelightr: Limelight? =
+//        when (Constants.CURRENT_MODE) {
+//            Mode.REAL -> Limelight("limelight-right")
+//            Mode.SIM -> null
+//            Mode.REPLAY -> null
+//        }
+//
+//    val limelightl: Limelight? =
+//        when (Constants.CURRENT_MODE) {
+//            Mode.REAL -> Limelight("limelight-left")
+//            Mode.SIM -> null
+//            Mode.REPLAY -> null
+//        }
+    val limelightr: Limelight = Limelight("limelight-right")
+    val limelightl: Limelight = Limelight("limelight-left")
+
     val intake: IntakeSubsystem =
         IntakeSubsystem(
             when (Constants.CURRENT_MODE) {

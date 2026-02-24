@@ -3,20 +3,25 @@ package frc.team449
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
-import edu.wpi.first.math.MathUtil
-import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.RobotContainer.limelightl
+import frc.team449.RobotContainer.limelightr
 import frc.team449.subsystems.vision.LimelightHelpers
+import frc.team449.subsystems.vision.VisionConstants
 import frc.team449.util.PhoenixUtil
+import limelight.networktables.*
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
+import java.util.*
 
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
@@ -60,24 +65,41 @@ class Robot : LoggedRobot() {
         robotContainer.bindings.bindControls()
 
         if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
-            LimelightHelpers.SetRobotOrientation(
-                "limelight-right",
-                robotContainer.drive.inputs.gyroAngle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-            LimelightHelpers.SetRobotOrientation(
-                "limelight-left",
-                robotContainer.drive.inputs.gyroAngle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
+            limelightr!!.settings
+                .withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
+                .withCameraOffset(VisionConstants.robotToCameraRight)
+                .save()
+
+            limelightl!!.settings
+                .withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
+                .withCameraOffset(VisionConstants.robotToCameraLeft)
+                .save()
+
+            limelightr.settings
+                .withRobotOrientation(
+                    Orientation3d(
+                        Rotation3d(Rotation2d(robotContainer.drive.inputs.gyroAngle)),
+                        AngularVelocity3d(
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getPitchVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getRollVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getYawVelocity())
+                        )
+                    )
+                )
+                .save()
+            limelightl.settings
+                .withRobotOrientation(
+                    Orientation3d(
+                        Rotation3d(Rotation2d(robotContainer.drive.inputs.gyroAngle)),
+                        AngularVelocity3d(
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getPitchVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getRollVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getYawVelocity())
+                        )
+                    )
+                )
+                .save()
+
             LimelightHelpers.SetIMUMode("limelight-right", 1)
             LimelightHelpers.SetIMUMode("limelight-left", 1)
         }
@@ -92,6 +114,53 @@ class Robot : LoggedRobot() {
 
         // return thread to low priority (standard)
         Threads.setCurrentThreadPriority(false, 10)
+
+        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
+            limelightr!!.settings
+                .withRobotOrientation(
+                    Orientation3d(
+                        Rotation3d(Rotation2d(robotContainer.drive.inputs.gyroAngle)),
+                        AngularVelocity3d(
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getPitchVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getRollVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getYawVelocity())
+                        )
+                    )
+                )
+                .save()
+            limelightl!!.settings
+                .withRobotOrientation(
+                    Orientation3d(
+                        Rotation3d(Rotation2d(robotContainer.drive.inputs.gyroAngle)),
+                        AngularVelocity3d(
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getPitchVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getRollVelocity()),
+                            DegreesPerSecond.of(robotContainer.driveIOHardware.getYawVelocity())
+                        )
+                    )
+                )
+                .save()
+
+            val visionEstimateRight: Optional<PoseEstimate> =
+                limelightr.createPoseEstimator(LimelightPoseEstimator.EstimationMode.MEGATAG2).poseEstimate
+
+            visionEstimateRight.ifPresent { poseEstimate: PoseEstimate ->
+                robotContainer.drive.estimator.addVisionMeasurement(
+                    poseEstimate.pose.toPose2d(),
+                    poseEstimate.timestampSeconds
+                )
+            }
+
+            val visionEstimateLeft: Optional<PoseEstimate> =
+                limelightl.createPoseEstimator(LimelightPoseEstimator.EstimationMode.MEGATAG2).poseEstimate
+
+            visionEstimateLeft.ifPresent { poseEstimate: PoseEstimate ->
+                robotContainer.drive.estimator.addVisionMeasurement(
+                    poseEstimate.pose.toPose2d(),
+                    poseEstimate.timestampSeconds
+                )
+            }
+        }
     }
 
     override fun autonomousInit() {
@@ -103,53 +172,11 @@ class Robot : LoggedRobot() {
         }
     }
 
-    override fun autonomousPeriodic() {
-        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
-            LimelightHelpers.SetRobotOrientation(
-                "limelight-right",
-                robotContainer.drive.inputs.gyroAngle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-            LimelightHelpers.SetRobotOrientation(
-                "limelight-left",
-                robotContainer.drive.inputs.gyroAngle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
+    override fun autonomousPeriodic() {}
 
     override fun teleopInit() {}
 
-    override fun teleopPeriodic() {
-        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
-            LimelightHelpers.SetRobotOrientation(
-                "limelight-right",
-                robotContainer.drive.inputs.gyroAngle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-            LimelightHelpers.SetRobotOrientation(
-                "limelight-left",
-                robotContainer.drive.inputs.gyroAngle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
+    override fun teleopPeriodic() {}
 
     override fun disabledInit() {}
 
@@ -159,32 +186,7 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {
-        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
-    }
+    override fun simulationInit() {}
 
-    override fun simulationPeriodic() {
-        Logger.recordOutput(
-            "FinalComponentPoses",
-            *arrayOf(
-                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
-                Pose3d(
-                    MathUtil.inverseInterpolate(
-                        Constants.IntakeConstants.STOW_POS_RADS,
-                        Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle
-                    ) * 0.3,
-                    0.0,
-                    0.0,
-                    Rotation3d()
-                ),
-                Pose3d(
-                    -0.1,
-                    0.0,
-                    0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
-                )
-            )
-        )
-    }
+    override fun simulationPeriodic() {}
 }
