@@ -22,6 +22,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import java.util.*
+import kotlin.math.pow
 
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
@@ -116,7 +117,7 @@ class Robot : LoggedRobot() {
         Threads.setCurrentThreadPriority(false, 10)
 
         if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
-            limelightr!!.settings
+            limelightr.settings
                 .withRobotOrientation(
                     Orientation3d(
                         Rotation3d(Rotation2d(robotContainer.drive.inputs.gyroAngle)),
@@ -128,7 +129,7 @@ class Robot : LoggedRobot() {
                     )
                 )
                 .save()
-            limelightl!!.settings
+            limelightl.settings
                 .withRobotOrientation(
                     Orientation3d(
                         Rotation3d(Rotation2d(robotContainer.drive.inputs.gyroAngle)),
@@ -145,20 +146,64 @@ class Robot : LoggedRobot() {
                 limelightr.createPoseEstimator(LimelightPoseEstimator.EstimationMode.MEGATAG2).poseEstimate
 
             visionEstimateRight.ifPresent { poseEstimate: PoseEstimate ->
-                robotContainer.drive.estimator.addVisionMeasurement(
-                    poseEstimate.pose.toPose2d(),
-                    poseEstimate.timestampSeconds
+
+                if (poseEstimate.tagCount > 0 && poseEstimate.maxTagAmbiguity < VisionConstants.maxAmbiguity) {
+                    robotContainer.drive.estimator.addVisionMeasurement(
+                        poseEstimate.pose.toPose2d(),
+                        poseEstimate.timestampSeconds
+                    )
+                }
+
+                Logger.recordOutput(
+                    "Vision/CameraRight/NewestPoseEstimate/Accepted",
+                    (poseEstimate.tagCount > 0 && poseEstimate.maxTagAmbiguity < VisionConstants.maxAmbiguity)
                 )
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/Pose", poseEstimate.pose.toPose2d())
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/TagCount", poseEstimate.tagCount)
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/AverageTagDistance", poseEstimate.avgTagDist)
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/AverageTagAmbiguity", poseEstimate.avgTagAmbiguity)
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/MaxiumumTagAmbiguity", poseEstimate.maxTagAmbiguity)
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/MinimumTagAmbiguity", poseEstimate.minTagAmbiguity)
+                val stdDevFactor: Double =
+                    poseEstimate.avgTagDist.pow(2.0) / poseEstimate.tagCount
+                var linearStdDev = VisionConstants.linearStdDevBaseline * stdDevFactor
+                var angularStdDev = VisionConstants.angularStdDevBaseline * stdDevFactor
+                linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
+                angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/StandardDeviationFactor", stdDevFactor)
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/LinearStandardDeviation", linearStdDev)
+                Logger.recordOutput("Vision/CameraRight/NewestPoseEstimate/AngularStandardDeviation", angularStdDev)
             }
 
             val visionEstimateLeft: Optional<PoseEstimate> =
                 limelightl.createPoseEstimator(LimelightPoseEstimator.EstimationMode.MEGATAG2).poseEstimate
 
             visionEstimateLeft.ifPresent { poseEstimate: PoseEstimate ->
-                robotContainer.drive.estimator.addVisionMeasurement(
-                    poseEstimate.pose.toPose2d(),
-                    poseEstimate.timestampSeconds
+                if (poseEstimate.tagCount > 0 && poseEstimate.maxTagAmbiguity < VisionConstants.maxAmbiguity) {
+                    robotContainer.drive.estimator.addVisionMeasurement(
+                        poseEstimate.pose.toPose2d(),
+                        poseEstimate.timestampSeconds
+                    )
+                }
+                Logger.recordOutput(
+                    "Vision/CameraLeft/NewestPoseEstimate/Accepted",
+                    (poseEstimate.tagCount > 0 && poseEstimate.maxTagAmbiguity < VisionConstants.maxAmbiguity)
                 )
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/Pose", poseEstimate.pose.toPose2d())
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/TagCount", poseEstimate.tagCount)
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/AverageTagDistance", poseEstimate.avgTagDist)
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/AverageTagAmbiguity", poseEstimate.avgTagAmbiguity)
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/MaxiumumTagAmbiguity", poseEstimate.maxTagAmbiguity)
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/MinimumTagAmbiguity", poseEstimate.minTagAmbiguity)
+                val stdDevFactor: Double =
+                    poseEstimate.avgTagDist.pow(2.0) / poseEstimate.tagCount
+                var linearStdDev = VisionConstants.linearStdDevBaseline * stdDevFactor
+                var angularStdDev = VisionConstants.angularStdDevBaseline * stdDevFactor
+                linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
+                angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/StandardDeviationFactor", stdDevFactor)
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/LinearStandardDeviation", linearStdDev)
+                Logger.recordOutput("Vision/CameraLeft/NewestPoseEstimate/AngularStandardDeviation", angularStdDev)
             }
         }
     }
