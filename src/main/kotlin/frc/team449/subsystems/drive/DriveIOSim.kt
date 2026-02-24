@@ -12,8 +12,10 @@ import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.Notifier
 import frc.team449.Constants
 import frc.team449.Constants.DriveConstants.SIM_LOOP_TIME
+import frc.team449.Constants.ROBOT_WIDTH_INCHES
+import frc.team449.subsystems.intake.IntakeIOSim
+import org.ironmaple.simulation.IntakeSimulation
 import org.ironmaple.simulation.SimulatedArena
-import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation
 import org.ironmaple.simulation.drivesims.COTS
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig
@@ -114,7 +116,23 @@ class DriveIOSim(
         }
     }
 
+    private val intakeSimulation =
+        IntakeSimulation.OverTheBumperIntake(
+            "fuel",
+            this.mapleSimDrive,
+            Inches.of(ROBOT_WIDTH_INCHES),
+            Inches.of(9.198),
+            IntakeSimulation.IntakeSide.FRONT,
+            0,
+        )
+
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
+        if (IntakeIOSim.isDeployed) {
+            intakeSimulation.startIntake()
+        } else {
+            intakeSimulation.stopIntake()
+        }
+
         super.updateInputs(inputs)
     }
 
@@ -122,8 +140,6 @@ class DriveIOSim(
         mapleSimDrive.setSimulationWorldPose(pose)
         super.resetPose(pose)
     }
-
-    override fun getDriveSim(): AbstractDriveTrainSimulation = mapleSimDrive
 
     companion object {
         private fun sanitizeConstantsForSim(

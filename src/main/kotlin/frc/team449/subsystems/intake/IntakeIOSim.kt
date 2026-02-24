@@ -4,7 +4,6 @@ import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
-import edu.wpi.first.units.Units.Inches
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
@@ -16,15 +15,9 @@ import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants
 import frc.team449.Constants.IntakeConstants
-import frc.team449.Constants.ROBOT_WIDTH_INCHES
-import frc.team449.RobotContainer.drive
-import org.ironmaple.simulation.IntakeSimulation
-import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation
 import kotlin.math.abs
 
-class IntakeIOSim(
-    private var driveSim: AbstractDriveTrainSimulation
-) : IntakeIOHardware() {
+class IntakeIOSim : IntakeIOHardware() {
     val pivotSim =
         SingleJointedArmSim(
             DCMotor.getKrakenX44(2),
@@ -76,16 +69,6 @@ class IntakeIOSim(
         SmartDashboard.putData("Intake", mech)
     }
 
-    private val intakeSimulation =
-        IntakeSimulation.OverTheBumperIntake(
-            "fuel",
-            drive.driveSimulation,
-            Inches.of(ROBOT_WIDTH_INCHES),
-            Inches.of(9.198),
-            IntakeSimulation.IntakeSide.FRONT,
-            0,
-        )
-
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         pivotLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
         pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
@@ -120,12 +103,17 @@ class IntakeIOSim(
             pivotMechanism.color = Color8Bit(Color.kRed)
         }
 
-        if (inputs.leftPivotLeaderPositionRad >= 1.13) { // v arbitrary but if the pivot is halfway down, activate
-            intakeSimulation.startIntake()
-        } else {
-            intakeSimulation.stopIntake()
-        }
+        isDeployed =
+            if (inputs.leftPivotLeaderPositionRad >= 1.13) {
+                true
+            } else {
+                false
+            }
 
         super.updateInputs(inputs)
+    }
+
+    companion object {
+        var isDeployed: Boolean = false
     }
 }
