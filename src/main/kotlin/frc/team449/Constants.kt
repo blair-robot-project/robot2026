@@ -21,7 +21,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY
+        REPLAY,
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -52,11 +52,11 @@ object Constants {
     object AutoConstants {
         // auto constants
 // TODO: tune
-        const val TRANSLATION_P = 3.0
+        const val TRANSLATION_P = 3.4
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.0
 
-        const val ROTATION_P = 2.0
+        const val ROTATION_P = 2.8
         const val ROTATION_I = 0.0
         const val ROTATION_D = 0.0
 
