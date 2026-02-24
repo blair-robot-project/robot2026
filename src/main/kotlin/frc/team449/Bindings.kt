@@ -60,18 +60,8 @@ class Bindings(
                 ),
             )
 
-//        driver
-//            .rightBumper()
-//            .whileTrue(
-//                robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
-//                // check tol and feed
-//            ).onFalse(
-//                robotContainer.shooter.stopFlywheel(),
-//                // coast hopper
-//            )
-
         // shoot from anywhere
-        driveController.a().onTrue(
+        driveController.rightBumper().onTrue(
             Commands.sequence(
                 runOnce({
                     CommandScheduler.getInstance().schedule(
@@ -140,13 +130,13 @@ class Bindings(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
             )
 
-//        driver
-//            .a()
-//            .onTrue(
-//                robotContainer.intake.deploy(),
-//            ).onFalse(
-//                robotContainer.intake.stow(),
-//            )
+        driver
+            .a()
+            .onTrue(
+                robotContainer.intake.deploy(),
+            ).onFalse(
+                robotContainer.intake.stow(),
+            )
 
         driver
             .y()

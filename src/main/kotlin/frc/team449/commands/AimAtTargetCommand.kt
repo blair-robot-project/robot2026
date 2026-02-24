@@ -6,12 +6,12 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.units.measure.Velocity
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants.AIMBOT_KD
 import frc.team449.Constants.AimbotConstants.AIMBOT_KI
 import frc.team449.Constants.AimbotConstants.AIMBOT_KP
+import org.littletonrobotics.junction.Logger
 import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
@@ -51,10 +51,6 @@ class AimAtTargetCommand(
         if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
             request.withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
         }
-
-        // not doing this in execute because this is just for shooting from anywhere
-        shooter.setHoodAngleFromDistance(distanceSupplier)
-        shooter.setFlywheelVelocityFromDistance(distanceSupplier)
     }
 
     private var throttle: Double = 0.0
@@ -98,7 +94,7 @@ class AimAtTargetCommand(
         )
 
         val headingErrorDegrees = targetHeading.minus(drive.pose.rotation).degrees
-        SmartDashboard.putNumber("aimbot degree error", headingErrorDegrees)
+        Logger.recordOutput("aimbot degree error", headingErrorDegrees)
 
         shooter.setHoodAngleFromDistance(distanceSupplier)
         shooter.setFlywheelVelocityFromDistance(distanceSupplier)
