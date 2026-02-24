@@ -43,13 +43,12 @@ class DriveSubsystem(
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
-    fun seedFieldCentric(): Command {
-        return this.runOnce {
+    fun seedFieldCentric(): Command =
+        this.runOnce {
             if (io is DriveIOHardware) {
                 io.seedFieldCentric()
             }
         }
-    }
 
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
