@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Notifier
 import frc.team449.Constants
 import frc.team449.Constants.DriveConstants.SIM_LOOP_TIME
 import org.ironmaple.simulation.SimulatedArena
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation
 import org.ironmaple.simulation.drivesims.COTS
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig
@@ -121,6 +122,8 @@ class DriveIOSim(
         mapleSimDrive.setSimulationWorldPose(pose)
         super.resetPose(pose)
     }
+
+    override fun getDriveSim(): AbstractDriveTrainSimulation = mapleSimDrive
 
     companion object {
         private fun sanitizeConstantsForSim(

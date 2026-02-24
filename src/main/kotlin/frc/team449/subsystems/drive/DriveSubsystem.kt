@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation
 import org.littletonrobotics.junction.Logger
 
 class DriveSubsystem(
@@ -43,13 +44,12 @@ class DriveSubsystem(
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
-    fun seedFieldCentric(): Command {
-        return this.runOnce {
+    fun seedFieldCentric(): Command =
+        this.runOnce {
             if (io is DriveIOHardware) {
                 io.seedFieldCentric()
             }
         }
-    }
 
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
@@ -75,6 +75,8 @@ class DriveSubsystem(
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
+
+    val driveSimulation: AbstractDriveTrainSimulation? = io.getDriveSim()
 
     // swerve requests to apply during SysId characterization
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()

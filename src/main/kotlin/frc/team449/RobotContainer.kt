@@ -66,7 +66,7 @@ object RobotContainer {
         IntakeSubsystem(
             when (Constants.CURRENT_MODE) {
                 Mode.REAL -> IntakeIOHardware()
-                Mode.SIM -> IntakeIOSim()
+                Mode.SIM -> IntakeIOSim(drive.driveSimulation!!)
                 Mode.REPLAY -> object : IntakeIO {}
             },
         )

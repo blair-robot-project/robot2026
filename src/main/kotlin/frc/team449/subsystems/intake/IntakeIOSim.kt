@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
+import edu.wpi.first.units.Units.Inches
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
@@ -15,41 +16,50 @@ import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants
 import frc.team449.Constants.IntakeConstants
+import frc.team449.Constants.ROBOT_WIDTH_INCHES
+import frc.team449.RobotContainer.drive
+import org.ironmaple.simulation.IntakeSimulation
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation
 import kotlin.math.abs
 
-class IntakeIOSim : IntakeIOHardware() {
-    val pivotSim = SingleJointedArmSim(
-        DCMotor.getKrakenX44(2),
-        IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
-        IntakeConstants.PIVOT_MOI,
-        IntakeConstants.ARM_LENGTH_METERS,
-        IntakeConstants.STOW_POS_RADS,
-        IntakeConstants.DEPLOY_POS_RADS,
-        true,
-        IntakeConstants.STOW_POS_RADS,
-    )
+class IntakeIOSim(
+    private var driveSim: AbstractDriveTrainSimulation
+) : IntakeIOHardware() {
+    val pivotSim =
+        SingleJointedArmSim(
+            DCMotor.getKrakenX44(2),
+            IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
+            IntakeConstants.PIVOT_MOI,
+            IntakeConstants.ARM_LENGTH_METERS,
+            IntakeConstants.STOW_POS_RADS,
+            IntakeConstants.DEPLOY_POS_RADS,
+            true,
+            IntakeConstants.STOW_POS_RADS,
+        )
 
-    private val rollerSim = FlywheelSim(
-        LinearSystemId.createFlywheelSystem(
+    private val rollerSim =
+        FlywheelSim(
+            LinearSystemId.createFlywheelSystem(
+                DCMotor.getKrakenX60(2),
+                IntakeConstants.ROLLER_MOI,
+                IntakeConstants.ROLLER_GEARING,
+            ),
             DCMotor.getKrakenX60(2),
-            IntakeConstants.ROLLER_MOI,
-            IntakeConstants.ROLLER_GEARING
-        ),
-        DCMotor.getKrakenX60(2)
-    )
+        )
 
     // mech2d stuff
     val mech = Mechanism2d(3.0, 3.0)
     val mechRoot: MechanismRoot2d = mech.getRoot("Intake Pivot", 1.0, 1.0)
-    val pivotMechanism: MechanismLigament2d = mechRoot.append(
-        MechanismLigament2d(
-            "Intake Pivot Ligament",
-            1.0,
-            Units.radiansToDegrees(IntakeConstants.STOW_POS_RADS) + 90 - IntakeConstants.VIZ_OFFSET_DEG,
-            4.0,
-            Color8Bit(Color.kRed)
+    val pivotMechanism: MechanismLigament2d =
+        mechRoot.append(
+            MechanismLigament2d(
+                "Intake Pivot Ligament",
+                1.0,
+                Units.radiansToDegrees(IntakeConstants.STOW_POS_RADS) + 90 - IntakeConstants.VIZ_OFFSET_DEG,
+                4.0,
+                Color8Bit(Color.kRed),
+            ),
         )
-    )
 
     private val pivotLeaderSim = leftPivotLeader.simState
     private val pivotFollowerSim = rightPivotFollower.simState
@@ -58,13 +68,23 @@ class IntakeIOSim : IntakeIOHardware() {
 
     init {
         leftPivotLeader.configurator.apply(
-            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive),
         )
         rightPivotFollower.configurator.apply(
-            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive),
         )
         SmartDashboard.putData("Intake", mech)
     }
+
+    private val intakeSimulation =
+        IntakeSimulation.OverTheBumperIntake(
+            "fuel",
+            drive.driveSimulation,
+            Inches.of(ROBOT_WIDTH_INCHES),
+            Inches.of(9.198),
+            IntakeSimulation.IntakeSide.FRONT,
+            0,
+        )
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         pivotLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
@@ -98,6 +118,12 @@ class IntakeIOSim : IntakeIOHardware() {
             pivotMechanism.color = Color8Bit(Color.kGreen)
         } else {
             pivotMechanism.color = Color8Bit(Color.kRed)
+        }
+
+        if (inputs.leftPivotLeaderPositionRad >= 1.13) { // v arbitrary but if the pivot is halfway down, activate
+            intakeSimulation.startIntake()
+        } else {
+            intakeSimulation.stopIntake()
         }
 
         super.updateInputs(inputs)
