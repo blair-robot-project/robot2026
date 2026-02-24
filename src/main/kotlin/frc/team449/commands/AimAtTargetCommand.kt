@@ -5,18 +5,13 @@ import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.units.Units.Degrees
-import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.units.measure.Velocity
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants.AIMBOT_KD
 import frc.team449.Constants.AimbotConstants.AIMBOT_KI
 import frc.team449.Constants.AimbotConstants.AIMBOT_KP
 import frc.team449.Constants.DriveConstants
-import frc.team449.Constants.ShooterConstants
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.shooter.ShooterSubsystem
 import org.littletonrobotics.junction.Logger
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
@@ -27,11 +22,9 @@ import kotlin.math.sign
 
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
-    private val shooter: ShooterSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
-    private val targetSupplier: Supplier<Translation2d>,
-    private val distanceSupplier: Supplier<Double>
+    private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
 
     private val request = SwerveRequest
@@ -45,7 +38,7 @@ class AimAtTargetCommand(
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     init {
-        addRequirements(drive, shooter)
+        addRequirements(drive)
     }
 
     override fun initialize() {
@@ -66,21 +59,12 @@ class AimAtTargetCommand(
         AIMBOT_KD,
     )
 
-    fun throttleAtPower(power: Double): Double {
-        return abs(throttleSupplier.asDouble).pow(power) * sign(throttleSupplier.asDouble) *
-            DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-    }
-
-    // i know this seems super redundant, i made this just in case it might be used in sotf later
-    fun strafeAtPower(power: Double): Double {
-        return abs(strafeSupplier.asDouble).pow(power) * sign(strafeSupplier.asDouble) *
-            DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-    }
-
     override fun execute() {
         val target = targetSupplier.get()
-        throttle = throttleAtPower(2.0)
-        strafe = strafeAtPower(2.0)
+        throttle = abs(throttleSupplier.asDouble).pow(2.0) * sign(throttleSupplier.asDouble) *
+            DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+        strafe = abs(strafeSupplier.asDouble).pow(2.0) * sign(strafeSupplier.asDouble) *
+            DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
 
         val targetHeading = Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
         val delta = targetHeading.minus(drive.pose.rotation).radians
@@ -98,10 +82,5 @@ class AimAtTargetCommand(
 
         val headingErrorDegrees = targetHeading.minus(drive.pose.rotation).degrees
         Logger.recordOutput("aimbot degree error", headingErrorDegrees)
-
-        val angle = Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get()))
-        shooter.setHoodAngle(angle)
-        val velocity = RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()))
-        shooter.setFlywheelVelocity(velocity)
     }
 }

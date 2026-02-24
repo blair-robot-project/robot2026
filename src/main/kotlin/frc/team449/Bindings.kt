@@ -11,6 +11,7 @@ import frc.team449.Constants.RED_GOAL_TRANSLATION
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer.drive
 import frc.team449.commands.AimAtTargetCommand
+import frc.team449.commands.AimbotShooterCommand
 import frc.team449.commands.SwerveRequestCommand
 import java.util.function.Supplier
 
@@ -67,10 +68,12 @@ class Bindings(
                     CommandScheduler.getInstance().schedule(
                         AimAtTargetCommand(
                             robotContainer.drive,
-                            robotContainer.shooter,
                             { -robotContainer.driveController.leftY },
                             { -robotContainer.driveController.leftX },
                             { hubPosition },
+                        ),
+                        AimbotShooterCommand(
+                            robotContainer.shooter,
                             robotHubDistanceSupplier
                         )
                     )
