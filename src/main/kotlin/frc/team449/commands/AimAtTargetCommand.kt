@@ -5,16 +5,19 @@ import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.units.Units.Degrees
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Velocity
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants.AIMBOT_KD
 import frc.team449.Constants.AimbotConstants.AIMBOT_KI
 import frc.team449.Constants.AimbotConstants.AIMBOT_KP
-import org.littletonrobotics.junction.Logger
 import frc.team449.Constants.DriveConstants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import org.littletonrobotics.junction.Logger
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
 import kotlin.math.abs
@@ -96,7 +99,9 @@ class AimAtTargetCommand(
         val headingErrorDegrees = targetHeading.minus(drive.pose.rotation).degrees
         Logger.recordOutput("aimbot degree error", headingErrorDegrees)
 
-        shooter.setHoodAngleFromDistance(distanceSupplier)
-        shooter.setFlywheelVelocityFromDistance(distanceSupplier)
+        val angle = Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get()))
+        shooter.setHoodAngle(angle)
+        val velocity = RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()))
+        shooter.setFlywheelVelocity(velocity)
     }
 }

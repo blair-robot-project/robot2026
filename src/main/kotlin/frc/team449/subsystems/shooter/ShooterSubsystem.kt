@@ -1,7 +1,6 @@
 package frc.team449.subsystems.shooter
 
 import edu.wpi.first.math.filter.Debouncer
-import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.measure.Angle
@@ -11,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.ShooterConstants
 import org.littletonrobotics.junction.Logger
-import java.util.function.Supplier
 import kotlin.math.abs
 
 class ShooterSubsystem(
@@ -46,12 +44,6 @@ class ShooterSubsystem(
             io.setFlywheelVelocity(velocity)
         }
 
-    fun setFlywheelVelocityFromDistance(distanceSupplier: Supplier<Double>) {
-        flywheelTargetVelocityRadPerSec = ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())
-        val velocity = RadiansPerSecond.of(flywheelTargetVelocityRadPerSec)
-        io.setFlywheelVelocity(velocity)
-    }
-
     fun stopFlywheel(): Command =
         runOnce {
             flywheelTargetVelocityRadPerSec = 0.0
@@ -63,12 +55,6 @@ class ShooterSubsystem(
             hoodTargetPositionRad = angle.`in`(Radians)
             io.setHoodAngle(angle)
         }
-
-    fun setHoodAngleFromDistance(distanceSupplier: Supplier<Double>) {
-        val angle = Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get()))
-        hoodTargetPositionRad = angle.`in`(Radians)
-        io.setHoodAngle(angle)
-    }
 
     fun setHoodVoltage(volts: Double): Command =
         runOnce {
