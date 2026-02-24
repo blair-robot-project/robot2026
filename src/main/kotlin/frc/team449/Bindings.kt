@@ -62,23 +62,21 @@ class Bindings(
             )
 
         // shoot from anywhere
-        driveController.rightBumper().onTrue(
-            Commands.sequence(
-                runOnce({
-                    CommandScheduler.getInstance().schedule(
-                        AimAtTargetCommand(
-                            robotContainer.drive,
-                            { -robotContainer.driveController.leftY },
-                            { -robotContainer.driveController.leftX },
-                            { hubPosition },
-                        ),
-                        AimbotShooterCommand(
-                            robotContainer.shooter,
-                            robotHubDistanceSupplier
-                        )
+        driveController.a().onTrue(
+            runOnce({
+                CommandScheduler.getInstance().schedule(
+                    AimAtTargetCommand(
+                        robotContainer.drive,
+                        { -robotContainer.driveController.leftY },
+                        { -robotContainer.driveController.leftX },
+                        { hubPosition }
+                    ),
+                    AimbotShooterCommand(
+                        robotContainer.shooter,
+                        robotHubDistanceSupplier
                     )
-                })
-            )
+                )
+            })
         ).onFalse(
             Commands.sequence(
                 runOnce({
@@ -133,13 +131,13 @@ class Bindings(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
             )
 
-        driver
-            .a()
-            .onTrue(
-                robotContainer.intake.deploy(),
-            ).onFalse(
-                robotContainer.intake.stow(),
-            )
+//        driver
+//            .a()
+//            .onTrue(
+//                robotContainer.intake.deploy(),
+//            ).onFalse(
+//                robotContainer.intake.stow(),
+//            )
 
         driver
             .y()

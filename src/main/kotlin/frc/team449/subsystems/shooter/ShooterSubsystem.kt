@@ -36,6 +36,12 @@ class ShooterSubsystem(
 
         Logger.recordOutput("Shooter/FlywheelAtTolerance", isFlywheelAtTolerance())
         Logger.recordOutput("Shooter/HoodAtTolerance", isHoodAtTolerance())
+
+        // couldn't find a good way to do it in the io, so just sticking it on here
+        Logger.recordOutput(
+            "Shooter/ActiveCommand",
+            currentCommand?.name ?: "None"
+        )
     }
 
     fun setFlywheelVelocity(velocity: AngularVelocity): Command =
