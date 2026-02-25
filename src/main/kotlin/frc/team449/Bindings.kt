@@ -110,7 +110,7 @@ class Bindings(
 
         // shoot from anywhere
         driver.a().onTrue(
-            Commands.sequence(
+            Commands.parallel(
                 AimAtTargetCommand(
                     robotContainer.drive,
                     { -robotContainer.driveController.leftY },
@@ -122,14 +122,14 @@ class Bindings(
                 ),
                 actions.checkAndFeed()
             )
-        ).onFalse(
-            Commands.sequence(
-                drive.defaultCommand,
-                robotContainer.shooter.stopFlywheel(),
-
-            )
-
         )
+//        ).onFalse(
+//            Commands.sequence(
+//                runOnce({drive.currentCommand.cancel()}),
+//                robotContainer.shooter.stopFlywheel(),
+//                robotContainer.indexer.stop()
+//            )
+//        )
 
         driver
             .x()
