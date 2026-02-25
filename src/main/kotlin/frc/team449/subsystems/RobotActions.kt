@@ -2,7 +2,6 @@ package frc.team449.subsystems
 import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
@@ -55,8 +54,8 @@ class RobotActions(
 
     fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
         shooter.setFlywheelAndHoodFromSuppliers(
-            {RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()))},
-            {Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get()))}
+            { RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())) },
+            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) }
         )
 
     fun prepTowerShot(): Command =
@@ -81,8 +80,6 @@ class RobotActions(
             shooter.stopFlywheel(),
             indexer.stop(),
         )
-
-
 
     fun homeHood(): Command =
         shooter.homeHood()

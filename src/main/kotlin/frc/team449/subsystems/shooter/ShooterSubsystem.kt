@@ -64,7 +64,6 @@ class ShooterSubsystem(
             io.setHoodAngle(angle)
         }
 
-
     fun stopFlywheel(): Command =
         runOnce {
             flywheelTargetVelocityRadPerSec = 0.0

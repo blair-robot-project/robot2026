@@ -73,8 +73,6 @@ class AimAtTargetCommand(
             delta
         )
 
-
-
         drive.setControl(
             request
                 .withVelocityX(throttle)
