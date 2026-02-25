@@ -112,7 +112,7 @@ class Robot : LoggedRobot() {
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle - 0.2591940418, 0.0)
                 )
             )
         )

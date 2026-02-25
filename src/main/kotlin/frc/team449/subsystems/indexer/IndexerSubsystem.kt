@@ -17,7 +17,7 @@ class IndexerSubsystem(
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
-    private var indexerTargetVelocityRadPerSec: Double = 0.0
+    var indexerTargetVelocityRadPerSec: Double = 0.0
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -31,21 +31,25 @@ class IndexerSubsystem(
         floorSpeed: AngularVelocity,
         topSpeed: AngularVelocity
     ): Command =
-        this.run {
+        this.runOnce {
             io.setFloorSpeed(floorSpeed)
             io.setWedgeSpeed(wedgeSpeed)
             io.setTopSpeed(topSpeed)
         }
 
     fun index(surfaceSpeed: AngularVelocity): Command {
-        indexerTargetVelocityRadPerSec = surfaceSpeed.`in`(RadiansPerSecond)
-
         return index(
             surfaceSpeed,
             surfaceSpeed,
             surfaceSpeed,
-        )
+        ).beforeStarting({
+            indexerTargetVelocityRadPerSec = surfaceSpeed.`in`(RadiansPerSecond)
+        })
     }
 
-    fun stop(): Command = index(RadiansPerSecond.of(0.0))
+    fun stop(): Command =
+        this.runOnce {
+            indexerTargetVelocityRadPerSec = 0.0
+            io.setIndexerVoltage(0.0, 0.0, 0.0)
+        }
 }
