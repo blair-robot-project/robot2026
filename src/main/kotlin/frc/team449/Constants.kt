@@ -144,25 +144,8 @@ object Constants {
             Map.entry(5.0, 1.35)
         )
 
-        // the x is the distance from the hub in meters, the y is the flywheel velocity in radians per second
-        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap.ofEntries(
-            Map.entry(1.0, 142.0),
-            Map.entry(2.0, 181.0),
-            Map.entry(3.0, 192.0),
-            Map.entry(5.0, 211.0)
-        )
-
-        // the x is the distance from the hub in meters, the y is the hood angle in degrees
-        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap.ofEntries(
-            Map.entry(1.0, 46.2),
-            Map.entry(2.0, 46.2),
-            Map.entry(3.0, 40.8),
-            Map.entry(5.0, 31.2)
-        )
-
         // setpoints
-
-        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate
+        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate // ngl this actually works really well
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
@@ -173,6 +156,21 @@ object Constants {
 
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
+
+        // the x is the distance from the hub in meters, the y is the flywheel velocity in radians per second
+        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap.ofEntries(
+            Map.entry(2.0, 181.0),
+            Map.entry(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond)),
+            Map.entry(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+        )
+
+        // the x is the distance from the hub in meters, the y is the hood angle in degrees
+        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap.ofEntries(
+            Map.entry(2.0, MIN_HOOD_ANGLE.`in`(Degrees)),
+            Map.entry(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees)),
+            Map.entry(5.0, 25.2)
+        )
+
     }
 
     object IntakeConstants {

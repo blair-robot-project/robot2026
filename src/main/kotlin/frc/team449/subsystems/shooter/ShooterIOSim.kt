@@ -75,7 +75,7 @@ class ShooterIOSim : ShooterIOHardware() {
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
-        val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
+       // val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
 //        val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
 //        RoboRioSim.setVInVoltage(loadedVoltage)
 
@@ -100,9 +100,7 @@ class ShooterIOSim : ShooterIOHardware() {
 
         flywheelSim.setInput(leftLeaderSimState.motorVoltage)
         flywheelSim.update(Constants.LOOP_TIME)
-
         val rotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * FLYWHEEL_GEARING
-
         leftLeaderSimState.setRotorVelocity(rotorVel)
         leftFollowerSimState.setRotorVelocity(rotorVel)
         rightLeaderSimState.setRotorVelocity(rotorVel)

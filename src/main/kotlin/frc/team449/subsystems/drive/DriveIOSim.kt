@@ -23,6 +23,7 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig
 import org.ironmaple.simulation.motorsims.SimulatedBattery
 import org.ironmaple.simulation.motorsims.SimulatedMotorController
 import java.util.function.Consumer
+import kotlin.math.PI
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,
@@ -60,7 +61,7 @@ class DriveIOSim(
                 ),
             )
 
-    private val startingPose = Pose2d(4.35, 0.45, Rotation2d(1.5))
+    private val startingPose = Pose2d(11.915394 + 4.0, 4.034536 + 3.0, Rotation2d(PI))
     val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier =

@@ -49,7 +49,7 @@ class FuelSimulationSubsystem(
 
     init {
         fuelSim.enableAirResistance()
-        fuelSim.spawnStartingFuel()
+        //fuelSim.spawnStartingFuel()
         fuelSim.registerRobot(
             Units.inchesToMeters(Constants.ROBOT_WIDTH_INCHES),
             Units.inchesToMeters(Constants.ROBOT_LENGTH_INCHES),
