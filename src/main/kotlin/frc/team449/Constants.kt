@@ -170,7 +170,6 @@ object Constants {
             Map.entry(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees)),
             Map.entry(5.0, 25.2)
         )
-
     }
 
     object IntakeConstants {

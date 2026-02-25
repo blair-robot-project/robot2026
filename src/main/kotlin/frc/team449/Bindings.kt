@@ -1,11 +1,8 @@
 package frc.team449
 
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.BLUE_GOAL_TRANSLATION
@@ -17,7 +14,6 @@ import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
 import java.util.function.Supplier
-import kotlin.math.PI
 
 class Bindings(
     val robotContainer: RobotContainer

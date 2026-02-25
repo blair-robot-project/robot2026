@@ -75,7 +75,7 @@ class ShooterIOSim : ShooterIOHardware() {
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
-       // val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
+        // val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
 //        val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
 //        RoboRioSim.setVInVoltage(loadedVoltage)
 
