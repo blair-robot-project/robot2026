@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.DoubleSupplier
@@ -26,8 +25,8 @@ class PoseAlignCommand(
 ) : Command() {
     private val xLockDeadband = Constants.DriveConstants.X_LOCK_DEADBAND
 
-    private val xController = PIDController(2.0, 0.0, 0.0)
-    private val yController = PIDController(2.0, 0.0, 0.0)
+    private val xController = PIDController(5.0, 0.0, 0.15)
+    private val yController = PIDController(5.0, 0.0, 0.15)
     private val thetaController = ProfiledPIDController(
         4.0,
         0.0,
@@ -60,16 +59,11 @@ class PoseAlignCommand(
         val currentPose = drive.pose
         val targetPose = targetPoseSupplier.get()
 
-        val fieldSpeeds: ChassisSpeeds = driveController.calculate(
+        val robotSpeeds: ChassisSpeeds = driveController.calculate(
             currentPose,
             targetPose,
             0.0,
             targetPose.rotation
-        )
-
-        val robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            fieldSpeeds,
-            currentPose.rotation
         )
 
         drive.setControl(applyChassisSpeeds.withSpeeds(robotSpeeds))
@@ -82,9 +76,5 @@ class PoseAlignCommand(
             abs(turnSupplier.asDouble) > xLockDeadband
     }
 
-    override fun end(interrupted: Boolean) {
-        CommandScheduler.getInstance().schedule(
-            SmartXLockCommand(drive, throttleSupplier, strafeSupplier, turnSupplier)
-        )
-    }
+    override fun end(interrupted: Boolean) {}
 }

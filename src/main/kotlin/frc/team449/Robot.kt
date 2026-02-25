@@ -104,55 +104,12 @@ class Robot : LoggedRobot() {
     override fun testPeriodic() {}
 
     override fun simulationInit() {
-        fuelSim.spawnStartingFuel()
-        fuelSim.registerRobot(
-            Constants.Dimensions.FULL_WIDTH.`in`(Meters),
-            Constants.Dimensions.FULL_LENGTH.`in`(Meters),
-            Constants.Dimensions.BUMPER_HEIGHT.`in`(Meters),
-            { drive.pose },
-            drive::getFieldRelativeSpeeds,
-        )
-
-        fuelSim.registerIntake(
-            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
-                .div(2.0)
-                .`in`(Meters),
-            (Constants.Dimensions.FULL_LENGTH + Inches.of(12.0))
-                .div(2.0)
-                .plus(Inches.of(3.0))
-                .`in`(Meters),
-            -Constants.Dimensions.FULL_WIDTH
-                .div(2.0)
-                .minus(Inches.of(2.0))
-                .`in`(Meters),
-            Constants.Dimensions.FULL_WIDTH
-                .div(2.0)
-                .minus(Inches.of(5.0))
-                .`in`(Meters),
-            robotContainer.intake.isSimIntaking(robotContainer.shooter::simBallCount),
-            { robotContainer.shooter.simBallCount += 1 }
-        )
-
-        fuelSim.start()
-        SmartDashboard.putData(
-            Commands
-                .runOnce(
-                    {
-                        fuelSim.clearFuel()
-                        fuelSim.spawnStartingFuel()
-                    },
-                ).withName("Reset Fuel")
-                .ignoringDisable(true),
-        )
-
         Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
     }
 
     override fun simulationPeriodic() {
-        fuelSim.updateSim()
-        Logger.recordOutput("Sim Intaking", robotContainer.intake.isSimIntaking(robotContainer.shooter::simBallCount))
-
         bLineRoutines.logBLineAuto()
+
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
@@ -171,9 +128,9 @@ class Robot : LoggedRobot() {
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0),
-                ),
-            ),
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle - 0.2591940418, 0.0)
+                )
+            )
         )
     }
 }

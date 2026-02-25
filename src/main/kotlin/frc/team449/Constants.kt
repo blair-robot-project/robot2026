@@ -39,6 +39,9 @@ object Constants {
         const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
         const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
 
+        const val SLOW_LINEAR_SPEED_METERS_PER_SECOND = 1.5
+        const val SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 0.5804
+
         const val TRACKWIDTH_INCHES = 21.75 // front to rear
         const val WHEELBASE_INCHES = 21.75 // left to right
 
@@ -97,19 +100,11 @@ object Constants {
 
         const val FLYWHEEL_GEARING = 16.0 / 9.0
 
-        const val FLYWHEEL_KP = 0.0
+        const val FLYWHEEL_KP = 0.5
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.0
+        const val FLYWHEEL_KS = 0.05
         const val FLYWHEEL_KV = 0.21
-
-        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(35.0) // TODO:FIND
-        val TRENCH_FLYWHEEL_VEL = RadiansPerSecond.of(275.0)
-
-        val HUB_HOOD_ANGLE: Angle = Degrees.of(30.0) // todo: find
-        val HUB_FLYWHEEL_VEL = RadiansPerSecond.of(100.0)
-
-        const val EFFICIENCY = 0.95 // fake value for sim
 
         // HOOD
         const val HOOD_MOTOR_ID = 15
@@ -118,8 +113,10 @@ object Constants {
         const val HOOD_STATOR_LIM = 50.0
 
         const val HOOD_GEARING = 106.0
-        const val HOOD_ROLLER_GEARING = 64.0 / 27.0
-        val HOOD_ROLLER_RADIUS = Inches.of(0.5)
+        const val HOOD_ROLLER_GEARING = 1.0 / 3.0
+        val HOOD_ROLLER_RADIUS: Distance = Inches.of(0.5)
+
+        const val EFFICIENCY = 0.97
 
         const val HOOD_KP = 100.0
         const val HOOD_KI = 0.0
@@ -147,25 +144,20 @@ object Constants {
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
-        // fuel sim
+        // setpoints
+
+        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate
+        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
+
+        val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(150.5)
+
+        val TOWER_HOOD_ANGLE: Angle = Degrees.of(23.0)
+        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(180.0)
+
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
-        val SHOOTER_HEIGHT = Inches.of(18.0)
-        const val SIMULATED_BPS = 11
-        val BPS_RATE_LIMIT = round((1 / LOOP_TIME) / SIMULATED_BPS)
-        const val SIMULATED_BALL_INDEXING_MISS_CHANCE = .6
+        val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
     }
-
-    object Dimensions {
-        val BUMPER_THICKNESS: Distance = Inches.of(3.0) // frame to edge of bumper
-        val BUMPER_HEIGHT: Distance = Inches.of(7.0) // height from floor to top of bumper
-        val FRAME_WIDTH: Distance = Inches.of(33.0) // i think? // left to right (y-axis)
-        val FRAME_LENGTH: Distance = Inches.of(27.0) // front to back (x-axis)
-
-        val FULL_WIDTH: Distance = FRAME_WIDTH.plus(BUMPER_THICKNESS.times(2.0))
-        val FULL_LENGTH: Distance = FRAME_LENGTH.plus(BUMPER_THICKNESS.times(2.0))
-    }
-
-    // other subsystem constants when applicable
 
     object IntakeConstants {
         // config constants
@@ -211,11 +203,6 @@ object Constants {
         const val ROLLER_MOI = 0.0001411489
 
         const val ROLLER_GEARING = 4.0 / 3
-
-        const val SIMULATED_BPS = 20
-        val BPS_RATE_LIMIT = round((1 / LOOP_TIME) / SIMULATED_BPS)
-        const val SIMULATED_BALL_INTAKING_MISS_CHANCE = .6
-        const val SIMULATED_BALL_INTAKE_LIMIT = 50
     }
 
     // INDEXER CONSTANTS STILL SLIGHTLY OFF

@@ -1,5 +1,6 @@
 package frc.team449.subsystems
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -12,23 +13,26 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    robotContainer: RobotContainer
 ) {
-    val drive: DriveSubsystem = robotContainer.drive
-    val intake: IntakeSubsystem = robotContainer.intake
-    val indexer: IndexerSubsystem = robotContainer.indexer
-    val shooter: ShooterSubsystem = robotContainer.shooter
+    private val drive: DriveSubsystem = robotContainer.drive
+    private val intake: IntakeSubsystem = robotContainer.intake
+    private val indexer: IndexerSubsystem = robotContainer.indexer
+    private val shooter: ShooterSubsystem = robotContainer.shooter
 
-    fun deployAndIntake(): Command =
+    fun deployAndToggleIntake(): Command =
         SequentialCommandGroup(
-            intake.intake(),
-            intake.deploy(),
+            ConditionalCommand(
+                intake.stopRollers(),
+                intake.intake()
+            ) { intake.rollerTargetVelocityRadPerSec != 0.0 },
+            intake.deploy()
         )
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
-            intake.stow(),
+            intake.stow()
         )
 
     fun stopIntake(): Command = intake.stopRollers()
@@ -45,13 +49,22 @@ class RobotActions(
             shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
         )
 
-    fun feed(): Command =
+    fun prepTowerShot(): Command =
+        SequentialCommandGroup(
+            shooter.setFlywheelVelocity(ShooterConstants.TOWER_FLYWHEEL_VEL),
+            shooter.setHoodAngle(ShooterConstants.TOWER_HOOD_ANGLE),
+        )
+
+    fun checkAndFeed(): Command =
         SequentialCommandGroup(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
-            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
         )
+
+    fun stopFeed(): Command =
+        indexer.stop()
 
     fun stopShooter(): Command =
         ParallelCommandGroup(
@@ -59,5 +72,6 @@ class RobotActions(
             indexer.stop(),
         )
 
-    fun homeHood(): Command = shooter.homeHood()
+    fun homeHood(): Command =
+        shooter.homeHood()
 }

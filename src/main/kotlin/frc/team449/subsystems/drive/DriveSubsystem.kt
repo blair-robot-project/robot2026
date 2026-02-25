@@ -50,7 +50,7 @@ class DriveSubsystem(
         )
 
     fun seedFieldCentric(): Command =
-        this.runOnce {
+        runOnce {
             if (io is DriveIOHardware) {
                 io.seedFieldCentric()
             }

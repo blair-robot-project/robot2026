@@ -13,12 +13,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
@@ -30,7 +27,7 @@ public class FuelSim {
     // Room temperature dry air density: https://en.wikipedia.org/wiki/Density_of_air#Dry_air
     protected static final double AIR_DENSITY = 1.2041; // kg/m^3
     protected static final double FIELD_COR = Math.sqrt(22 / 51.5); // coefficient of restitution with the field
-    protected static final double FUEL_COR = 0.5; // coefficient of restitution with another fuel
+    protected static final double FUEL_COR = 0.5; // cocefficient of restitution with another fuel
     protected static final double NET_COR = 0.2; // coefficient of restitution with the net
     protected static final double ROBOT_COR = 0.1; // coefficient of restitution with a robot
     protected static final double FUEL_RADIUS = 0.075;
@@ -312,7 +309,6 @@ public class FuelSim {
     }
 
     protected ArrayList<Fuel> fuels = new ArrayList<>();
-    protected boolean running = false;
     protected boolean simulateAirResistance = false;
     protected Supplier<Pose2d> robotPoseSupplier = null;
     protected Supplier<ChassisSpeeds> robotFieldSpeedsSupplier = null;
@@ -333,10 +329,6 @@ public class FuelSim {
                 grid[i][j] = new ArrayList<Fuel>();
             }
         }
-
-        fuelPublisher = NetworkTableInstance.getDefault()
-                .getStructArrayTopic(tableKey + "/Fuels", Translation3d.struct)
-                .publish();
     }
 
     /**
@@ -390,31 +382,11 @@ public class FuelSim {
         // Logger.recordOutput("Fuel Simulation/Lines (debug)", lines);
     }
 
-    protected StructArrayPublisher<Translation3d> fuelPublisher;
-
     /**
      * Adds array of `Translation3d`'s to NetworkTables at tableKey + "/Fuels"
      */
-    public void logFuels() {
-        Logger.recordOutput(
-                "FuelSimulation/Fuels",
-                fuels.stream().map((fuel) -> fuel.pos).toArray(Translation3d[]::new)
-        );
-        fuelPublisher.set(fuels.stream().map((fuel) -> fuel.pos).toArray(Translation3d[]::new));
-    }
-
-    /**
-     * Start the simulation. `updateSim` must still be called every loop
-     */
-    public void start() {
-        running = true;
-    }
-
-    /**
-     * Pause the simulation.
-     */
-    public void stop() {
-        running = false;
+    public Translation3d[] getFuels() {
+        return fuels.stream().map((fuel) -> fuel.pos).toArray(Translation3d[]::new);
     }
 
     /** Enables accounting for drag force in physics step **/
@@ -477,8 +449,6 @@ public class FuelSim {
      * Will do nothing if sim is not running
      */
     public void updateSim() {
-        if (!running) return;
-
         stepSim();
     }
 
@@ -498,8 +468,6 @@ public class FuelSim {
                 handleIntakes(fuels);
             }
         }
-
-        logFuels();
     }
 
     /**
