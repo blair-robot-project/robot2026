@@ -2,7 +2,6 @@ package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.Command
@@ -16,7 +15,6 @@ import org.littletonrobotics.junction.Logger
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
 import kotlin.math.abs
-import kotlin.math.atan2
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -65,9 +63,9 @@ class AimAtTargetCommand(
             DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
 
         val targetHeading = if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-            Rotation2d(atan2(-target.y + drive.pose.y, -target.x + drive.pose.x))
+            drive.pose.translation.minus(target).angle
         } else {
-            Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
+            target.minus(drive.pose.translation).angle
         }
 
         drive.setControl(
