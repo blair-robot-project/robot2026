@@ -42,10 +42,10 @@ interface IndexerIO {
 
     fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {}
 
-    fun setIndexerVelocity(
-        topVel: AngularVelocity,
-        sideVel: AngularVelocity,
-        bottomVel: AngularVelocity
+    fun setIndexerVoltage(
+        floorVolts: Double,
+        wedgeVolts: Double,
+        topVolts: Double
     ) {}
 
     fun simPeriodic() {}

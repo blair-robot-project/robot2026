@@ -7,7 +7,7 @@ import frc.team449.Constants
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
-object Field {
+object FieldUtil {
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
 

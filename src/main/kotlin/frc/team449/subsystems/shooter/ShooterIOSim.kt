@@ -26,13 +26,12 @@ class ShooterIOSim : ShooterIOHardware() {
     private val flywheelSim: FlywheelSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX60(2),
+                DCMotor.getKrakenX60(4),
                 FLYWHEEL_MOI,
                 FLYWHEEL_GEARING,
             ),
-            DCMotor.getKrakenX60(2),
+            DCMotor.getKrakenX60(4),
         )
-    // two flywheel sims will have the exact same behavior -- unnecessary
 
     val hoodSim: SingleJointedArmSim =
         SingleJointedArmSim(
@@ -77,8 +76,10 @@ class ShooterIOSim : ShooterIOHardware() {
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
-        val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
-        RoboRioSim.setVInVoltage(loadedVoltage)
+//        val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
+//        RoboRioSim.setVInVoltage(loadedVoltage)
+
+        val loadedVoltage = 12.0 // TODO: fix the loaded voltage calculation, drawing too much because flywheelsim.currentDrawAmps returns stator not supply
 
         hoodSimState.setSupplyVoltage(loadedVoltage)
         leftLeaderSimState.setSupplyVoltage(loadedVoltage)
