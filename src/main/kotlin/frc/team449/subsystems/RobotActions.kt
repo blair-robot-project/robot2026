@@ -13,12 +13,12 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    robotContainer: RobotContainer
 ) {
-    val drive: DriveSubsystem = robotContainer.drive
-    val intake: IntakeSubsystem = robotContainer.intake
-    val indexer: IndexerSubsystem = robotContainer.indexer
-    val shooter: ShooterSubsystem = robotContainer.shooter
+    private val drive: DriveSubsystem = robotContainer.drive
+    private val intake: IntakeSubsystem = robotContainer.intake
+    private val indexer: IndexerSubsystem = robotContainer.indexer
+    private val shooter: ShooterSubsystem = robotContainer.shooter
 
     fun deployAndToggleIntake(): Command =
         SequentialCommandGroup(

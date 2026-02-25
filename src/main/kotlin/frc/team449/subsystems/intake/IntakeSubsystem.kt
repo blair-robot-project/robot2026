@@ -10,7 +10,7 @@ import kotlin.math.abs
 class IntakeSubsystem(
     private val io: IntakeIO
 ) : SubsystemBase() {
-    val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
+    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
     // boolean over position logging increases speed and is easier to read
     var pivotDeployedState: Boolean = false

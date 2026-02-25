@@ -15,8 +15,8 @@ class SwerveRequestCommand(
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val turnSupplier: DoubleSupplier,
-    private val maxLinearSpeedMetersPerSecond: Double,
-    private val maxAngularSpeedRadiansPerSecond: Double
+    private val maxLinearSpeedMetersPerSecond: Double = Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND,
+    private val maxAngularSpeedRadiansPerSecond: Double = Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
 ) : Command() {
     private val driveNoHeading: SwerveRequest.FieldCentric =
         SwerveRequest
