@@ -8,7 +8,7 @@ package frc.team449.subsystems.vision
 
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Transform3d
-import frc.team449.subsystems.vision.VisionConstants.aprilTagLayout
+import frc.team449.Constants.VisionConstants.aprilTagLayout
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import org.photonvision.simulation.PhotonCameraSim
 import org.photonvision.simulation.SimCameraProperties

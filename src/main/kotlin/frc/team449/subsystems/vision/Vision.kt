@@ -4,12 +4,14 @@ import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.Alert.AlertType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants
+import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
 import java.util.*
 import kotlin.math.abs
@@ -34,9 +36,13 @@ class Vision(
         }
     }
 
-//    fun getTargetX(cameraIndex: Int): Rotation2d {
-//        return inputs[cameraIndex]!!.latestTargetObservation.tx
-//    }
+    fun getLatestTargetX(cameraIndex: Int): Rotation2d {
+        return Rotation2d(inputs[cameraIndex].tx[inputs[cameraIndex].numFiducials - 1] * Math.PI / 180)
+    }
+
+    fun getLatestTargetY(cameraIndex: Int): Rotation2d {
+        return Rotation2d(inputs[cameraIndex].ty[inputs[cameraIndex].numFiducials - 1] * Math.PI / 180)
+    }
 
     fun interface VisionConsumer {
         fun accept(
@@ -77,7 +83,7 @@ class Vision(
 
             // Add tag poses
             for (tagId in inputs[cameraIndex].tagIds) {
-                val tagPose = VisionConstants.aprilTagLayout.getTagPose(tagId)
+                val tagPose = Constants.VisionConstants.aprilTagLayout.getTagPose(tagId.toInt())
                 if (tagPose.isPresent) {
                     tagPoses.add(tagPose.get())
                 }
@@ -90,15 +96,15 @@ class Vision(
                     observation.tagCount == 0 || // Must have at least one tag
                         (
                             observation.tagCount == 1 &&
-                                observation.ambiguity > VisionConstants.maxAmbiguity
+                                observation.ambiguity > Constants.VisionConstants.maxAmbiguity
                             ) || // Cannot be high ambiguity
                         (
                             abs(observation.pose.z)
-                            > VisionConstants.maxZError
+                            > Constants.VisionConstants.maxZError
                             ) || // Must have realistic Z coordinate
                         // Must be within the field boundaries
-                        observation.pose.x < 0.0 || observation.pose.x > VisionConstants.aprilTagLayout.fieldLength ||
-                        observation.pose.y < 0.0 || observation.pose.y > VisionConstants.aprilTagLayout.fieldWidth
+                        observation.pose.x < 0.0 || observation.pose.x > Constants.VisionConstants.aprilTagLayout.fieldLength ||
+                        observation.pose.y < 0.0 || observation.pose.y > Constants.VisionConstants.aprilTagLayout.fieldWidth
 
                 robotPoses.add(observation.pose)
                 if (rejectPose) {
@@ -112,15 +118,15 @@ class Vision(
                 // Calculate standard deviations
                 val stdDevFactor: Double =
                     observation.averageTagDistance.pow(2.0) / observation.tagCount
-                var linearStdDev = VisionConstants.linearStdDevBaseline * stdDevFactor
-                var angularStdDev = VisionConstants.angularStdDevBaseline * stdDevFactor
+                var linearStdDev = Constants.VisionConstants.linearStdDevBaseline * stdDevFactor
+                var angularStdDev = Constants.VisionConstants.angularStdDevBaseline * stdDevFactor
                 if (observation.type == VisionIO.PoseObservationType.MEGATAG_2) {
-                    linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
-                    angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
+                    linearStdDev *= Constants.VisionConstants.linearStdDevMegatag2Factor
+                    angularStdDev *= Constants.VisionConstants.angularStdDevMegatag2Factor
                 }
-                if (cameraIndex < VisionConstants.cameraStdDevFactors.size) {
-                    linearStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
-                    angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
+                if (cameraIndex < Constants.VisionConstants.cameraStdDevFactors.size) {
+                    linearStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
+                    angularStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
                 }
 
                 sumAngDev += angularStdDev
@@ -132,6 +138,11 @@ class Vision(
                     observation.pose.toPose2d(),
                     observation.timestamp,
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
+                )
+
+                drive.estimator.addVisionMeasurement(
+                    observation.pose.toPose2d(),
+                    observation.timestamp
                 )
 
                 Logger.recordOutput(
@@ -154,6 +165,8 @@ class Vision(
                     "Vision/Camera$cameraIndex/Observation$observationID/AngularStandardDeviation",
                     angularStdDev
                 )
+
+                Logger.recordOutput("Vision/Camera$cameraIndex/Yaw", inputs[cameraIndex].orientation)
 
                 observationID++
             }
@@ -204,10 +217,5 @@ class Vision(
             "Vision/Summary/RobotPosesRejected",
             *allRobotPosesRejected.toTypedArray<Pose3d>()
         )
-
-        if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
-            Logger.recordOutput("Vision/Summary/RightYaw", LimelightHelpers.getIMUData("limelight-right").robotYaw)
-            Logger.recordOutput("Vision/Summary/LeftYaw", LimelightHelpers.getIMUData("limelight-left").robotYaw)
-        }
     }
 }

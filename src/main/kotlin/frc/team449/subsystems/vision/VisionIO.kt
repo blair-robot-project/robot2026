@@ -13,11 +13,45 @@ interface VisionIO {
     open class VisionIOInputs {
         @JvmField var connected: Boolean = false
 
-        @JvmField var latestTargetObservation: TargetObservation = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
-
         @JvmField var poseObservations: Array<PoseObservation> = emptyArray()
 
-        @JvmField var tagIds = IntArray(0)
+        @JvmField var tagIds = DoubleArray(0)
+
+        @JvmField var targetObservations: Array<Pose3d> = emptyArray()
+
+        @JvmField var tx = DoubleArray(0)
+
+        @JvmField var ty = DoubleArray(0)
+
+        @JvmField var numFiducials = 0
+
+        @JvmField var latestLatency = 0.0
+
+        @JvmField var latestTimestamp = 0.0
+
+        @JvmField var latestPose = Pose3d()
+
+        @JvmField var latestAverageTagAmbiguity = 0.0
+
+        @JvmField var latestMinTagAmbiguity = 0.0
+
+        @JvmField var latestMaxTagAmbiguity = 0.0
+
+        @JvmField var latestTagCount = 0
+
+        @JvmField var latestAverageTagDist = 0.0
+
+        @JvmField var orientation = 0.0
+
+        @JvmField var stdDevFactor = 0.0
+
+        @JvmField var linearStdDev = 0.0
+
+        @JvmField var angularStdDev = 0.0
+
+        /** for photonvision sim - this is a v lazy fix, will clean up later when fixing sim **/
+
+        @JvmField var latestTargetObservationPhoton = TargetObservation(Rotation2d(), Rotation2d())
     }
 
     data class TargetObservation(

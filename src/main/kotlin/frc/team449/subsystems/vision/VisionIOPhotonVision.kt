@@ -9,7 +9,7 @@ package frc.team449.subsystems.vision
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform3d
-import frc.team449.subsystems.vision.VisionConstants.aprilTagLayout
+import frc.team449.Constants.VisionConstants.aprilTagLayout
 import frc.team449.subsystems.vision.VisionIO.*
 import org.photonvision.PhotonCamera
 import java.util.*
@@ -33,13 +33,13 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
         for (result in camera.allUnreadResults) {
             // Update latest target observation
             if (result.hasTargets()) {
-                inputs.latestTargetObservation =
+                inputs.latestTargetObservationPhoton =
                     TargetObservation(
                         Rotation2d.fromDegrees(result.bestTarget.getYaw()),
                         Rotation2d.fromDegrees(result.bestTarget.getPitch())
                     )
             } else {
-                inputs.latestTargetObservation = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
+                inputs.latestTargetObservationPhoton = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
             }
 
             // Add pose observation
@@ -105,10 +105,10 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
         inputs.poseObservations = poseObservations.toTypedArray()
 
         // Save tag IDs to inputs objects
-        inputs.tagIds = IntArray(tagIds.size)
+        inputs.tagIds = DoubleArray(tagIds.size)
         var i = 0
         for (id in tagIds) {
-            inputs.tagIds[i++] = id.toInt()
+            inputs.tagIds[i++] = id.toDouble()
         }
     }
 }

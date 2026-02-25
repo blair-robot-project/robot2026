@@ -20,7 +20,9 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import limelight.Limelight
+import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 
 object RobotContainer {
     // driver/op controllers
@@ -52,41 +54,28 @@ object RobotContainer {
             },
         )
 
-//    val vision: Vision =
-//        when (Constants.CURRENT_MODE) {
-//            Mode.REAL ->
-//                Vision(
-//                    drive::addVisionMeasurement,
-//                    VisionIOLimelight("limelight-right", drive.rotation),
-//                    VisionIOLimelight("limelight-left", drive.rotation)
-//                )
-//            Mode.SIM ->
-//                Vision(
-//                    drive::addVisionMeasurement,
-//                    VisionIOPhotonVisionSim("camera1", VisionConstants.robotToCamera0, drive.pose),
-//                    VisionIOPhotonVisionSim("camera2", VisionConstants.robotToCamera1, drive.pose),
-//                )
-//            Mode.REPLAY -> Vision(
-//                drive::addVisionMeasurement,
-//                object : VisionIO {},
-//                object : VisionIO {}
-//            ).also { vision = it }
-//        }
-//    val limelightr: Limelight? =
-//        when (Constants.CURRENT_MODE) {
-//            Mode.REAL -> Limelight("limelight-right")
-//            Mode.SIM -> null
-//            Mode.REPLAY -> null
-//        }
-//
-//    val limelightl: Limelight? =
-//        when (Constants.CURRENT_MODE) {
-//            Mode.REAL -> Limelight("limelight-left")
-//            Mode.SIM -> null
-//            Mode.REPLAY -> null
-//        }
-    val limelightr: Limelight = Limelight("limelight-right")
-    val limelightl: Limelight = Limelight("limelight-left")
+    val vision: Vision =
+        when (Constants.CURRENT_MODE) {
+            Mode.REAL ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation)
+                )
+            Mode.SIM ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.robotToCamera0) { drive.pose },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.robotToCamera1) { drive.pose },
+                )
+            Mode.REPLAY ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation)
+                )
+                    .also { vision = it }
+        }
 
     val intake: IntakeSubsystem =
         IntakeSubsystem(

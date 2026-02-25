@@ -5,8 +5,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.*
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -65,10 +64,6 @@ object Constants {
                 Pose2d(4.35, 0.45, Rotation2d(1.5)),
                 Pose2d(4.35, 7.60, Rotation2d(-1.5)),
             )
-    }
-
-    object VisionConstants {
-        // vision constants
     }
 
     object ShooterConstants {
@@ -232,5 +227,41 @@ object Constants {
 
     object LEDConstants {
         // led constants
+        // leds on a non working robot lfg
+    }
+
+    object VisionConstants {
+        var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
+
+        var cameraRightName: String = "limelight-right"
+        var cameraLeftName: String = "limelight-left"
+
+        // Robot to camera transforms
+        // TODO: idt these are actually right, will prolly havta look at it again after it's mounted
+        var robotToCameraRight: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, 30.0, -25.0))
+        var robotToCameraLeft: Pose3d = Pose3d(-0.2, -0.2, 0.53, Rotation3d(0.0, 30.0, -25.0))
+
+        var robotToCamera0: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, 30.0, -25.0))
+        var robotToCamera1: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, 30.0, -25.0))
+
+        // Basic filtering thresholds
+        var maxAmbiguity: Double = 0.3
+        var maxZError: Double = 0.75
+
+        // Standard deviation baselines, for 1 meter distance and 1 tag
+        // (Adjusted automatically based on distance and # of tags)
+        var linearStdDevBaseline: Double = 0.02 // Meters
+        var angularStdDevBaseline: Double = 0.06 // Radians
+
+        // Standard deviation multipliers for each camera
+        // (Adjust to trust some cameras more than others)
+        var cameraStdDevFactors: DoubleArray = doubleArrayOf(
+            1.0, // Camera 0
+            1.0 // Camera 1
+        )
+
+        // Multipliers to apply for MegaTag 2 observations
+        var linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
+        var angularStdDevMegatag2Factor: Double = Double.POSITIVE_INFINITY // No rotation data available
     }
 }
