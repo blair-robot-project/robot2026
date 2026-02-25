@@ -61,7 +61,7 @@ class DriveIOSim(
                 ),
             )
 
-    private val startingPose = Pose2d(11.915394 + 4.0, 4.034536 + 3.0, Rotation2d(PI))
+    private val startingPose = Pose2d(11.915394 + 2.0, 4.034536, Rotation2d(PI))
     val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier =
