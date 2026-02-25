@@ -129,9 +129,9 @@ object TunerConstants {
             .withDriveFrictionVoltage(kDriveFrictionVoltage)
 
     // Front Left
-    private const val kFrontLeftDriveMotorId: Int = 3
-    private const val kFrontLeftSteerMotorId: Int = 8
-    private const val kFrontLeftEncoderId: Int = 8
+    private const val kFrontLeftDriveMotorId: Int = 1
+    private const val kFrontLeftSteerMotorId: Int = 2
+    private const val kFrontLeftEncoderId: Int = 2
     private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-139.83)
     private const val kFrontLeftSteerMotorInverted: Boolean = true
     private const val kFrontLeftEncoderInverted: Boolean = true
@@ -140,9 +140,9 @@ object TunerConstants {
     private val kFrontLeftYPos: Distance = Units.Inches.of(10.875)
 
     // Front Right
-    private const val kFrontRightDriveMotorId: Int = 1
-    private const val kFrontRightSteerMotorId: Int = 6
-    private const val kFrontRightEncoderId: Int = 6
+    private const val kFrontRightDriveMotorId: Int = 3
+    private const val kFrontRightSteerMotorId: Int = 4
+    private const val kFrontRightEncoderId: Int = 4
     private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(102.66)
     private const val kFrontRightSteerMotorInverted: Boolean = true
     private const val kFrontRightEncoderInverted: Boolean = true
@@ -151,9 +151,9 @@ object TunerConstants {
     private val kFrontRightYPos: Distance = Units.Inches.of(-10.875)
 
     // Back Left
-    private const val kBackLeftDriveMotorId: Int = 4
-    private const val kBackLeftSteerMotorId: Int = 5
-    private const val kBackLeftEncoderId: Int = 5
+    private const val kBackLeftDriveMotorId: Int = 5
+    private const val kBackLeftSteerMotorId: Int = 6
+    private const val kBackLeftEncoderId: Int = 6
     private val kBackLeftEncoderOffset: Angle = Units.Degrees.of(-106.87)
     private const val kBackLeftSteerMotorInverted: Boolean = true
     private const val kBackLeftEncoderInverted: Boolean = true
@@ -162,9 +162,9 @@ object TunerConstants {
     private val kBackLeftYPos: Distance = Units.Inches.of(10.875)
 
     // Back Right
-    private const val kBackRightDriveMotorId: Int = 2
-    private const val kBackRightSteerMotorId: Int = 7
-    private const val kBackRightEncoderId: Int = 7
+    private const val kBackRightDriveMotorId: Int = 7
+    private const val kBackRightSteerMotorId: Int = 8
+    private const val kBackRightEncoderId: Int = 8
     private val kBackRightEncoderOffset: Angle = Units.Degrees.of(111.36)
     private const val kBackRightSteerMotorInverted: Boolean = true
     private const val kBackRightEncoderInverted: Boolean = true

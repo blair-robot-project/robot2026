@@ -80,7 +80,6 @@ open class IntakeIOHardware : IntakeIO {
         BaseStatusSignal.refreshAll(*allSignals)
 
         inputs.leftPivotLeaderAppliedVolts = leftPivotLeaderVoltage.value.`in`(Volts)
-        inputs.leftPivotLeaderCurrentState = leftPivotLeader.controlMode.toString() // Or use custom logic
         inputs.leftPivotLeaderPositionRad = leftPivotLeaderPosition.value.`in`(Radians)
         inputs.leftPivotLeaderVelocityRadPerSec = leftPivotLeaderVelocity.value.`in`(RadiansPerSecond)
         inputs.leftPivotLeaderSupplyCurrentAmps = leftPivotLeaderSupplyCurrent.value.`in`(Amps)
@@ -93,7 +92,6 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rightPivotFollowerTempCelsius = rightPivotFollowerTemp.value.`in`(Celsius)
 
         inputs.leftRollerLeaderAppliedVolts = leftRollerLeaderVoltage.value.`in`(Volts)
-        inputs.leftRollerLeaderControlMode = leftRollerLeader.controlMode.toString()
         inputs.leftRollerLeaderVelocityRadPerSec = leftRollerLeaderVelocity.value.`in`(RadiansPerSecond)
         inputs.leftRollerLeaderSupplyCurrentAmps = leftRollerLeaderSupplyCurrent.value.`in`(Amps)
         inputs.leftRollerLeaderStatorCurrentAmps = leftRollerLeaderStatorCurrent.value.`in`(Amps)
@@ -119,6 +117,10 @@ open class IntakeIOHardware : IntakeIO {
 
     override fun setRollerVelocity(velocity: AngularVelocity) {
         leftRollerLeader.setControl(rollerVelocityRequest.withVelocity(velocity))
+    }
+
+    override fun setRollerVoltage(volts: Double) {
+        leftRollerLeader.setControl(pivotVoltageRequest.withOutput(volts))
     }
 
     companion object {

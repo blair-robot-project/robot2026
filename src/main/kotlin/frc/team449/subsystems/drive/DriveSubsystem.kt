@@ -30,7 +30,8 @@ class DriveSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         io.logModules(inputs)
-        Logger.processInputs("DriveInputs", inputs)
+
+        Logger.processInputs("Drive", inputs)
     }
 
     fun setControl(request: SwerveRequest) {
@@ -44,13 +45,18 @@ class DriveSubsystem(
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
-    fun seedFieldCentric(): Command {
-        return this.runOnce {
+    fun getFieldRelativeSpeeds(): ChassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(
+            inputs.Speeds,
+            inputs.Pose.rotation,
+        )
+
+    fun seedFieldCentric(): Command =
+        runOnce {
             if (io is DriveIOHardware) {
                 io.seedFieldCentric()
             }
         }
-    }
 
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
