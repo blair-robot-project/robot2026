@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.BLUE_GOAL_TRANSLATION
@@ -91,25 +92,25 @@ class Bindings(
                 )
             )
 
-//        driver
-//            .a()
-//            .onTrue(
-//                SmartXLockCommand(
-//                    robotContainer.drive,
-//                    { -driver.leftY },
-//                    { -driver.leftX },
-//                    { driver.rightX },
-//                )
-//            )
+        driver
+            .a()
+            .onTrue(
+                SmartXLockCommand(
+                    robotContainer.drive,
+                    { -driver.leftY },
+                    { -driver.leftX },
+                    { driver.rightX },
+                )
+            )
 
-//        driver
-//            .b()
-//            .onTrue(
-//                actions.prepTowerShot()
-//            )
+        driver
+            .b()
+            .onTrue(
+                actions.prepTowerShot()
+            )
 
-        // shoot from anywhere
-        driver.a().onTrue(
+        // shoot from anywhere (not sure yet how this will get binded)
+        operator.a().onTrue(
             Commands.parallel(
                 AimAtTargetCommand(
                     robotContainer.drive,
@@ -122,14 +123,12 @@ class Bindings(
                 ),
                 actions.checkAndFeed()
             )
+        ).onFalse(
+            Commands.sequence(
+                robotContainer.shooter.stopFlywheel(),
+                robotContainer.indexer.stop()
+            )
         )
-//        .onFalse(
-//            Commands.sequence(
-//                runOnce({drive.currentCommand.cancel()}),
-//                robotContainer.shooter.stopFlywheel(),
-//                robotContainer.indexer.stop()
-//            )
-//        )
 
         driver
             .x()
