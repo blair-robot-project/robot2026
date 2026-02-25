@@ -13,7 +13,6 @@ import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.wpilibj.RobotController
 import frc.team449.Constants
 import frc.team449.RobotContainer.drive
-import frc.team449.RobotContainer.driveIOHardware
 import frc.team449.subsystems.vision.VisionIO.*
 import limelight.Limelight
 import limelight.networktables.*
@@ -37,26 +36,22 @@ class VisionIOLimelight(
     private var estimationMode = EstimationMode.MEGATAG2 // can change this if wanna run both megatag1 and 2
     private var poseObservationType = PoseObservationType.MEGATAG_2 // TODO() this is lowk stupid
 
+    fun configure(offset: Pose3d): VisionIOLimelight {
+        limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
+            .withCameraOffset(offset)
+            .save()
+        return this
+    }
+
     init {
-        if (name == Constants.VisionConstants.cameraRightName) {
-            limelight.settings
-                .withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
-                .withCameraOffset(Constants.VisionConstants.robotToCameraRight)
-                .save()
-        } else if (name == Constants.VisionConstants.cameraLeftName) {
-            limelight.settings
-                .withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
-                .withCameraOffset(Constants.VisionConstants.robotToCameraLeft)
-                .save()
-        }
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
                     Rotation3d(Rotation2d(drive.inputs.gyroAngle)),
                     AngularVelocity3d(
-                        DegreesPerSecond.of(driveIOHardware.getPitchVelocity()),
-                        DegreesPerSecond.of(driveIOHardware.getRollVelocity()),
-                        DegreesPerSecond.of(driveIOHardware.getYawVelocity())
+                        DegreesPerSecond.of(drive.inputs.pitchVel),
+                        DegreesPerSecond.of(drive.inputs.rollVel),
+                        DegreesPerSecond.of(drive.inputs.yawVel),
                     )
                 )
             )
@@ -125,9 +120,9 @@ class VisionIOLimelight(
                 Orientation3d(
                     Rotation3d(Rotation2d(drive.inputs.gyroAngle)),
                     AngularVelocity3d(
-                        DegreesPerSecond.of(driveIOHardware.getPitchVelocity()),
-                        DegreesPerSecond.of(driveIOHardware.getRollVelocity()),
-                        DegreesPerSecond.of(driveIOHardware.getYawVelocity())
+                        DegreesPerSecond.of(drive.inputs.pitchVel),
+                        DegreesPerSecond.of(drive.inputs.rollVel),
+                        DegreesPerSecond.of(drive.inputs.yawVel),
                     )
                 )
             )

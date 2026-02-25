@@ -13,6 +13,12 @@ interface DriveIO {
     open class DriveIOInputs : SwerveDriveState() {
         @JvmField var gyroAngle: Double = 0.0
 
+        @JvmField var pitchVel: Double = 0.0
+
+        @JvmField var rollVel: Double = 0.0
+
+        @JvmField var yawVel: Double = 0.0
+
         init {
             this.Pose = Pose2d()
         }

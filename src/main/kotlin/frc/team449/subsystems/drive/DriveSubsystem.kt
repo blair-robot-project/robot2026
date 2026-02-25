@@ -2,13 +2,9 @@ package frc.team449.subsystems.drive
 
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics
-import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.Units.Second
@@ -35,8 +31,6 @@ class DriveSubsystem(
         io.updateInputs(inputs)
         io.logModules(inputs)
         Logger.processInputs("DriveInputs", inputs)
-
-        Logger.recordOutput("Vision/Summary/PoseCombined", estimator.estimatedPosition)
     }
 
     fun setControl(request: SwerveRequest) {
@@ -46,26 +40,7 @@ class DriveSubsystem(
     fun resetOdometry(pose: Pose2d) {
         io.resetOdometry(pose)
     }
-    val rotation: Supplier<Rotation2d> = Supplier { Rotation2d(inputs.gyroAngle * Math.PI / 180) } // TODO !!! this got changed hopefully good now
-
-//    val pose: Supplier<Pose2d> = Supplier { inputs.Pose }
-
-    val estimator = SwerveDrivePoseEstimator(
-        SwerveDriveKinematics(
-            Translation2d(0.3429, 0.3429),
-            Translation2d(-0.3429, 0.3429),
-            Translation2d(-0.3429, -0.3429),
-            Translation2d(0.3429, -0.3429)
-        ),
-        inputs.Pose.rotation,
-        arrayOf(
-            SwerveModulePosition(),
-            SwerveModulePosition(),
-            SwerveModulePosition(),
-            SwerveModulePosition()
-        ),
-        Pose2d()
-    )
+    val rotation: Supplier<Rotation2d> = Supplier { Rotation2d(inputs.gyroAngle * Math.PI / 180) }
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 

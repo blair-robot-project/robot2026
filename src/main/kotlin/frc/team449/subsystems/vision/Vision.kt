@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.Alert.AlertType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants
-import frc.team449.RobotContainer.drive
 import org.littletonrobotics.junction.Logger
 import java.util.*
 import kotlin.math.abs
@@ -138,11 +137,6 @@ class Vision(
                     observation.pose.toPose2d(),
                     observation.timestamp,
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
-                )
-
-                drive.estimator.addVisionMeasurement(
-                    observation.pose.toPose2d(),
-                    observation.timestamp
                 )
 
                 Logger.recordOutput(
