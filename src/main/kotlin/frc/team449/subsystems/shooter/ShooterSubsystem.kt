@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.ShooterConstants
 import org.littletonrobotics.junction.Logger
+import java.util.function.Supplier
 import kotlin.math.abs
 
 class ShooterSubsystem(
@@ -49,6 +50,20 @@ class ShooterSubsystem(
             flywheelTargetVelocityRadPerSec = velocity.`in`(RadiansPerSecond)
             io.setFlywheelVelocity(velocity)
         }
+
+    fun setFlywheelAndHoodFromSuppliers(
+        flywheelVelocitySupplier: Supplier<AngularVelocity>,
+        hoodAngleSupplier: Supplier<Angle>
+    ): Command =
+        run {
+            val velocity = flywheelVelocitySupplier.get()
+            flywheelTargetVelocityRadPerSec = velocity.`in`(RadiansPerSecond)
+            io.setFlywheelVelocity(velocity)
+            val angle = hoodAngleSupplier.get()
+            hoodTargetPositionRad = angle.`in`(Radians)
+            io.setHoodAngle(angle)
+        }
+
 
     fun stopFlywheel(): Command =
         runOnce {

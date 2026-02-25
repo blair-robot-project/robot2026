@@ -14,7 +14,6 @@ import frc.team449.Constants.RED_GOAL_TRANSLATION
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer.drive
 import frc.team449.commands.AimAtTargetCommand
-import frc.team449.commands.AimbotShooterCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
 import java.util.function.Supplier
@@ -92,16 +91,16 @@ class Bindings(
                 )
             )
 
-        driver
-            .a()
-            .onTrue(
-                SmartXLockCommand(
-                    robotContainer.drive,
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { driver.rightX },
-                )
-            )
+//        driver
+//            .a()
+//            .onTrue(
+//                SmartXLockCommand(
+//                    robotContainer.drive,
+//                    { -driver.leftY },
+//                    { -driver.leftX },
+//                    { driver.rightX },
+//                )
+//            )
 
         driver
             .b()
@@ -110,28 +109,24 @@ class Bindings(
             )
 
         // shoot from anywhere
-        operator.a().onTrue(
-            runOnce({
-                CommandScheduler.getInstance().schedule(
-                    AimAtTargetCommand(
-                        robotContainer.drive,
-                        { -robotContainer.driveController.leftY },
-                        { -robotContainer.driveController.leftX },
-                        { hubPosition }
-                    ),
-                    AimbotShooterCommand(
-                        robotContainer.shooter,
-                        robotHubDistanceSupplier
-                    )
-                )
-            })
+        driver.a().onTrue(
+            Commands.sequence(
+                AimAtTargetCommand(
+                    robotContainer.drive,
+                    { -robotContainer.driveController.leftY },
+                    { -robotContainer.driveController.leftX },
+                    { hubPosition }
+                ),
+                actions.prepShotFromAnywhere(
+                    robotHubDistanceSupplier
+                ),
+                actions.checkAndFeed()
+            )
         ).onFalse(
             Commands.sequence(
-                runOnce({
-                    CommandScheduler.getInstance().schedule(drive.defaultCommand)
-                }),
+                drive.defaultCommand,
                 robotContainer.shooter.stopFlywheel(),
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+
             )
 
         )
