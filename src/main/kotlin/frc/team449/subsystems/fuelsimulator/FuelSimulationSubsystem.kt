@@ -31,11 +31,7 @@ class FuelSimulationSubsystem(
 
     val fuelSim = FuelSim()
 
-    var hasBall = false
-    var isSpunUp = false
-    var isFeeding = false
-
-    var ballCount: Int = 50
+    var ballCount: Int = 0
     var simIntaking: Boolean = false
     var effectiveShotSpeed: Double = 0.0
 
@@ -76,9 +72,6 @@ class FuelSimulationSubsystem(
         Logger.recordOutput("FuelSim/BallCount", ballCount)
         Logger.recordOutput("FuelSim/ShotSpeedMetersPerSec", effectiveShotSpeed)
         Logger.recordOutput("FuelSim/SimIntaking", simIntaking)
-        Logger.recordOutput("FuelSim/hasBall", hasBall)
-        Logger.recordOutput("FuelSim/isSpunUp", isSpunUp)
-        Logger.recordOutput("FuelSim/isFeeding", isFeeding)
     }
 
     fun pollFuelLaunch() {
@@ -89,12 +82,12 @@ class FuelSimulationSubsystem(
             return
         }
 
-        hasBall = ballCount > 0
-        isSpunUp = robotContainer.shooter.isFlywheelAtTolerance() &&
+        val hasBall = ballCount > 0
+        val isSpunUp = robotContainer.shooter.isFlywheelAtTolerance() &&
             robotContainer.shooter.isHoodAtTolerance() &&
             robotContainer.shooter.flywheelTargetVelocityRadPerSec >= 10.0
 
-        isFeeding = robotContainer.indexer.indexerTargetVelocityRadPerSec >= 10.0
+        val isFeeding = robotContainer.indexer.indexerTargetVelocityRadPerSec >= 10.0
 
         if (!hasBall || !isSpunUp || !isFeeding) return
 

@@ -5,6 +5,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants.AIMBOT_KD
@@ -27,15 +28,21 @@ class AimAtTargetCommand(
     private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
 
-    private val request = SwerveRequest
-        .FieldCentric()
+    private val request = SwerveRequest.
+        FieldCentricFacingAngle()
         .withDeadband(
             DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-                * DriveConstants.TRANSLATION_DEADBAND,
+                    * DriveConstants.TRANSLATION_DEADBAND,
         ).withRotationalDeadband(
             DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
-                * DriveConstants.ANGULAR_DEADBAND,
+                    * DriveConstants.ANGULAR_DEADBAND,
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+        .withHeadingPID(
+            AIMBOT_KP,
+            AIMBOT_KI,
+            AIMBOT_KD,
+        )
+
 
     init {
         addRequirements(drive)
@@ -51,13 +58,7 @@ class AimAtTargetCommand(
 
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
-    private var turn: Double = 0.0
 
-    private val turnController = PIDController(
-        AIMBOT_KP,
-        AIMBOT_KI,
-        AIMBOT_KD,
-    )
 
     override fun execute() {
         val target = targetSupplier.get()
@@ -66,18 +67,18 @@ class AimAtTargetCommand(
         strafe = abs(strafeSupplier.asDouble).pow(2.0) * sign(strafeSupplier.asDouble) *
             DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
 
-        val targetHeading = Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
-        val delta = targetHeading.minus(drive.pose.rotation).radians
-        turn = turnController.calculate(
-            0.0,
-            delta
-        )
+        val targetHeading = if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            Rotation2d(atan2(- target.y + drive.pose.y, - target.x + drive.pose.x))
+        } else {
+            Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
+        }
+
 
         drive.setControl(
             request
                 .withVelocityX(throttle)
                 .withVelocityY(strafe)
-                .withRotationalRate(turn)
+                .withTargetDirection(targetHeading)
         )
 
         val headingErrorDegrees = targetHeading.minus(drive.pose.rotation).degrees
