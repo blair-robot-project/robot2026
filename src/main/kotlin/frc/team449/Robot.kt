@@ -6,17 +6,15 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.Commands
+import frc.team449.RobotContainer.actions
 import frc.team449.RobotContainer.drive
-import frc.team449.RobotContainer.fuelSim
+import frc.team449.RobotContainer.fuelSimulator
 import frc.team449.auto.BLineRoutines
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
@@ -29,7 +27,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-    val bLineRoutines = BLineRoutines(this)
+    val bLineRoutines = BLineRoutines(drive, actions)
     private val autoChooser = SendableChooser<Command>()
 
     init {
@@ -89,7 +87,9 @@ class Robot : LoggedRobot() {
         CommandScheduler.getInstance().schedule(autoChooser.selected)
     }
 
-    override fun autonomousPeriodic() {}
+    override fun autonomousPeriodic() {
+        bLineRoutines.logBLineAuto()
+    }
 
     override fun teleopInit() {}
 
@@ -105,11 +105,15 @@ class Robot : LoggedRobot() {
 
     override fun simulationInit() {
         Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
+
+        SmartDashboard.putData(
+            (fuelSimulator?.resetFuel())
+                ?.withName("Reset Fuel")
+                ?.ignoringDisable(true),
+        )
     }
 
     override fun simulationPeriodic() {
-        bLineRoutines.logBLineAuto()
-
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
@@ -122,15 +126,15 @@ class Robot : LoggedRobot() {
                     ) * 0.3,
                     0.0,
                     0.0,
-                    Rotation3d()
+                    Rotation3d(),
                 ),
                 Pose3d(
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle - 0.2591940418, 0.0)
-                )
-            )
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle - 0.2591940418, 0.0),
+                ),
+            ),
         )
     }
 }

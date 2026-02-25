@@ -11,41 +11,42 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
-import frc.team449.Constants.AutoConstants.CTC_D
-import frc.team449.Constants.AutoConstants.CTC_I
-import frc.team449.Constants.AutoConstants.CTC_P
+import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME
+import frc.team449.Constants.AutoConstants.CTE_D
+import frc.team449.Constants.AutoConstants.CTE_I
+import frc.team449.Constants.AutoConstants.CTE_P
 import frc.team449.Constants.AutoConstants.ROTATION_D
 import frc.team449.Constants.AutoConstants.ROTATION_I
 import frc.team449.Constants.AutoConstants.ROTATION_P
 import frc.team449.Constants.AutoConstants.TRANSLATION_D
 import frc.team449.Constants.AutoConstants.TRANSLATION_I
 import frc.team449.Constants.AutoConstants.TRANSLATION_P
-import frc.team449.Robot
-import frc.team449.RobotContainer.actions
-import frc.team449.RobotContainer.drive
+import frc.team449.subsystems.RobotActions
+import frc.team449.subsystems.drive.DriveSubsystem
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.function.Consumer
 
 class BLineRoutines(
-    robot: Robot
+    private val drive: DriveSubsystem,
+    private val actions: RobotActions
 ) {
-    private val transP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
-    private val transI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
-    private val transD = LoggedNetworkNumber("Auto/Translation/D", TRANSLATION_D)
+    private val translationP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
+    private val translationI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
+    private val translationD = LoggedNetworkNumber("Auto/Translation/D", TRANSLATION_D)
 
-    private val rotP = LoggedNetworkNumber("Auto/Rotation/P", ROTATION_P)
-    private val rotI = LoggedNetworkNumber("Auto/Rotation/I", ROTATION_I)
-    private val rotD = LoggedNetworkNumber("Auto/Rotation/D", ROTATION_D)
+    private val rotationP = LoggedNetworkNumber("Auto/Rotation/P", ROTATION_P)
+    private val rotationI = LoggedNetworkNumber("Auto/Rotation/I", ROTATION_I)
+    private val rotationD = LoggedNetworkNumber("Auto/Rotation/D", ROTATION_D)
 
-    private val ctcP = LoggedNetworkNumber("Auto/CrossTrack/P", CTC_P)
-    private val ctcI = LoggedNetworkNumber("Auto/CrossTrack/I", CTC_I)
-    private val ctcD = LoggedNetworkNumber("Auto/CrossTrack/D", CTC_D)
+    private val crossTrackP = LoggedNetworkNumber("Auto/CrossTrackError/P", CTE_P)
+    private val crossTrackI = LoggedNetworkNumber("Auto/CrossTrackError/I", CTE_I)
+    private val crossTrackD = LoggedNetworkNumber("Auto/CrossTrackError/D", CTE_D)
 
     fun logBLineAuto() {
-        translationController.setPID(transP.get(), transI.get(), transD.get())
-        rotationController.setPID(rotP.get(), rotI.get(), rotD.get())
-        crossTrackController.setPID(ctcP.get(), ctcI.get(), ctcD.get())
+        translationController.setPID(translationP.get(), translationI.get(), translationD.get())
+        rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get())
+        crossTrackController.setPID(crossTrackP.get(), crossTrackI.get(), crossTrackD.get())
 
         FollowPath.setPoseLoggingConsumer { pair ->
             Logger.recordOutput(pair.first, pair.second)
@@ -60,11 +61,17 @@ class BLineRoutines(
         FollowPath.setDoubleLoggingConsumer { pair ->
             Logger.recordOutput(pair.first, pair.second)
         }
+
+        FollowPath.setBooleanLoggingConsumer(
+            Consumer { pair: Pair<String, Boolean> ->
+                Logger.recordOutput(pair.first, pair.second)
+            },
+        )
     }
 
     val translationController = PIDController(TRANSLATION_P, TRANSLATION_I, TRANSLATION_D)
     val rotationController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
-    val crossTrackController = PIDController(CTC_P, CTC_I, CTC_D)
+    val crossTrackController = PIDController(CTE_P, CTE_I, CTE_D)
 
     var pathBuilderWithReset: FollowPath.Builder =
         FollowPath
@@ -100,18 +107,9 @@ class BLineRoutines(
             ).withDefaultShouldFlip()
 
     fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger(
-            "start_intake",
-            Commands.parallel(
-                actions.deployAndIntake(),
-                actions.stopShooter(),
-            ),
-        )
+        FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
-        FollowPath.registerEventTrigger(
-            "start_shooting",
-            actions.prepTrenchShot().andThen(actions.feed()),
-        )
+        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
         FollowPath.registerEventTrigger("stop_shooting", actions.stopShooter())
     }
 
@@ -127,10 +125,10 @@ class BLineRoutines(
         return Commands.sequence(
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -147,10 +145,10 @@ class BLineRoutines(
         return Commands.sequence(
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -166,9 +164,9 @@ class BLineRoutines(
         return Commands.sequence(
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path3),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path4),
         )
     }
@@ -185,10 +183,10 @@ class BLineRoutines(
         return Commands.sequence(
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -205,10 +203,10 @@ class BLineRoutines(
         return Commands.sequence(
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -224,9 +222,9 @@ class BLineRoutines(
         return Commands.sequence(
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path3),
-            WaitCommand(6.0),
+            WaitCommand(AUTO_SHOOTING_TIME),
             pathBuilderWithReset.build(path4),
         )
     }

@@ -13,7 +13,6 @@ import edu.wpi.first.units.measure.*
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
 import kotlin.math.PI
-import kotlin.math.round
 
 object Constants {
     const val LOOP_TIME = 0.02
@@ -21,7 +20,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY,
+        REPLAY
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -55,7 +54,7 @@ object Constants {
     object AutoConstants {
         // auto constants
 // TODO: tune
-        const val TRANSLATION_P = 3.4
+        const val TRANSLATION_P = 3.2
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.0
 
@@ -63,11 +62,13 @@ object Constants {
         const val ROTATION_I = 0.0
         const val ROTATION_D = 0.0
 
-        const val CTC_P = 1.0
-        const val CTC_I = 0.0
-        const val CTC_D = 0.0
+        const val CTE_P = 1.0
+        const val CTE_I = 0.0
+        const val CTE_D = 0.0
         const val AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 1.26767 * PI
         const val AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND = PI
+
+        const val AUTO_SHOOTING_TIME = 6.0 // in seconds
     }
 
     object FieldConstants {
