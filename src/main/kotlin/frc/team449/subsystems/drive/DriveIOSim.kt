@@ -23,7 +23,6 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig
 import org.ironmaple.simulation.motorsims.SimulatedBattery
 import org.ironmaple.simulation.motorsims.SimulatedMotorController
 import java.util.function.Consumer
-import kotlin.math.PI
 
 class DriveIOSim(
     driveConstants: SwerveDrivetrainConstants,

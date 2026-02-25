@@ -2,7 +2,6 @@ package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
-import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
@@ -28,21 +27,20 @@ class AimAtTargetCommand(
     private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
 
-    private val request = SwerveRequest.
-        FieldCentricFacingAngle()
+    private val request = SwerveRequest
+        .FieldCentricFacingAngle()
         .withDeadband(
             DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-                    * DriveConstants.TRANSLATION_DEADBAND,
+                * DriveConstants.TRANSLATION_DEADBAND,
         ).withRotationalDeadband(
             DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
-                    * DriveConstants.ANGULAR_DEADBAND,
+                * DriveConstants.ANGULAR_DEADBAND,
         ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
         .withHeadingPID(
             AIMBOT_KP,
             AIMBOT_KI,
             AIMBOT_KD,
         )
-
 
     init {
         addRequirements(drive)
@@ -59,7 +57,6 @@ class AimAtTargetCommand(
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
 
-
     override fun execute() {
         val target = targetSupplier.get()
         throttle = abs(throttleSupplier.asDouble).pow(2.0) * sign(throttleSupplier.asDouble) *
@@ -68,11 +65,10 @@ class AimAtTargetCommand(
             DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
 
         val targetHeading = if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-            Rotation2d(atan2(- target.y + drive.pose.y, - target.x + drive.pose.x))
+            Rotation2d(atan2(-target.y + drive.pose.y, -target.x + drive.pose.x))
         } else {
             Rotation2d(atan2(target.y - drive.pose.y, target.x - drive.pose.x))
         }
-
 
         drive.setControl(
             request
