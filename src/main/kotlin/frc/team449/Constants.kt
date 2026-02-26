@@ -46,7 +46,6 @@ object Constants {
 
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
-        const val X_LOCK_DEADBAND = 0.25
 
         const val WHEEL_COF = 1.4
     }
@@ -95,8 +94,8 @@ object Constants {
         // HOOD
         const val HOOD_MOTOR_ID = 15
 
-        const val HOOD_SUPPLY_LIM = 40.0
-        const val HOOD_STATOR_LIM = 50.0
+        const val HOOD_SUPPLY_LIM = 20.0
+        const val HOOD_STATOR_LIM = 40.0
 
         const val HOOD_GEARING = 106.0
         const val HOOD_ROLLER_GEARING = 1.0 / 3.0
@@ -112,15 +111,15 @@ object Constants {
         const val HOOD_KV = 2.1
 
         // HOMING AND TOLERANCE
-        const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
+        const val HOMING_DEBOUNCE_TIME = 0.2 // seconds
         const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
 
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 45.0 // amps
-        const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
+        const val HOMING_CURRENT_AMPS = 40.0 // amps
+        const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
+        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
-        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
         val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
         val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify
@@ -194,8 +193,8 @@ object Constants {
     // INDEXER CONSTANTS STILL SLIGHTLY OFF
     object IndexerConstants {
         const val WEDGE_INDEXER_ID = 21
-        const val WEDGE_STATOR_LIMIT = 30.0
-        const val WEDGE_SUPPLY_LIMIT = 30.0
+        const val WEDGE_STATOR_LIMIT = 50.0
+        const val WEDGE_SUPPLY_LIMIT = 25.0
         const val WEDGE_GEARING = 1.5
 
         val WEDGE_NEUTRAL_MODE = NeutralModeValue.Coast
@@ -205,39 +204,39 @@ object Constants {
         const val WEDGE_KI = 0.0
         const val WEDGE_KD = 0.0
         const val WEDGE_KS = 0.05
-        const val WEDGE_KV = 0.12
+        const val WEDGE_KV = 0.15
 
         const val WEDGE_MOI = .001
 
         const val FLOOR_INDEXER_ID = 22
         const val FLOOR_STATOR_LIMIT = 50.0
-        const val FLOOR_SUPPLY_LIMIT = 30.0
+        const val FLOOR_SUPPLY_LIMIT = 25.0
         const val FLOOR_GEARING = 27.0 / 14.0
 
         val FLOOR_NEUTRAL_MODE = NeutralModeValue.Coast
         val FLOOR_INVERSION = InvertedValue.CounterClockwise_Positive
 
-        const val FLOOR_KP = 0.5
+        const val FLOOR_KP = 1.75
         const val FLOOR_KI = 0.0
         const val FLOOR_KD = 0.0
         const val FLOOR_KS = 0.05
-        const val FLOOR_KV = 0.1
+        const val FLOOR_KV = 0.2
 
         const val FLOOR_MOI = .005
 
         const val TOP_INDEXER_ID = 23
-        const val TOP_STATOR_LIMIT = 60.0
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_STATOR_LIMIT = 50.0
+        const val TOP_SUPPLY_LIMIT = 25.0
         const val TOP_GEARING = 31.0 / 11.0
 
         val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
-        const val TOP_KP = 0.5
+        const val TOP_KP = 0.25
         const val TOP_KI = 0.0
         const val TOP_KD = 0.0
         const val TOP_KS = 0.05
-        const val TOP_KV = 0.1
+        const val TOP_KV = 0.34
 
         const val TOP_MOI = .000000008 // TODO: Find
 

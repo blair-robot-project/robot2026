@@ -7,7 +7,6 @@ import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.Units
-import edu.wpi.first.units.Units.RotationsPerSecond
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IndexerConstants
@@ -19,15 +18,15 @@ import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IndexerIOHardware : IndexerIO {
     val wedgeIndexer: TalonFX = TalonFX(WEDGE_INDEXER_ID) // kraken x44
-    val wedgeVelocityRequest: VelocityVoltage = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
+    val wedgeVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val wedgeVoltageRequest: VoltageOut = VoltageOut(0.0)
 
     val floorIndexer: TalonFX = TalonFX(FLOOR_INDEXER_ID) // kraken x60
-    val floorVelocityRequest: VelocityVoltage = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
+    val floorVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val floorVoltageRequest: VoltageOut = VoltageOut(0.0)
 
     val topIndexer: TalonFX = TalonFX(TOP_INDEXER_ID) // kraken x44
-    val topVelocityRequest: VelocityVoltage = VelocityVoltage(0.0).withUpdateFreqHz(0.0)
+    val topVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val topVoltageRequest: VoltageOut = VoltageOut(0.0)
 
     private val wedgeVelocity = wedgeIndexer.velocity
@@ -83,7 +82,6 @@ open class IndexerIOHardware : IndexerIO {
 
         tryUntilOk(5) { wedgeIndexer.configurator.apply(leftWedgeConfig) }
         tryUntilOk(5) { floorIndexer.configurator.apply(rightFloorConfig) }
-
         tryUntilOk(5) { topIndexer.configurator.apply(topFloorConfig) }
 
         BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioritySignals)
@@ -123,19 +121,19 @@ open class IndexerIOHardware : IndexerIO {
 
     override fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {
         floorIndexer.setControl(
-            floorVelocityRequest.withVelocity(floorSurfaceSpeed.`in`(RotationsPerSecond))
+            floorVelocityRequest.withVelocity(floorSurfaceSpeed)
         )
     }
 
     override fun setWedgeSpeed(wedgeSurfaceSpeed: AngularVelocity) {
         wedgeIndexer.setControl(
-            wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed.`in`(RotationsPerSecond)),
+            wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed),
         )
     }
 
     override fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {
         topIndexer.setControl(
-            topVelocityRequest.withVelocity(topSurfaceSpeed.`in`(RotationsPerSecond))
+            topVelocityRequest.withVelocity(topSurfaceSpeed)
         )
     }
 

@@ -70,7 +70,7 @@ class IntakeSubsystem(
     ): Command {
         return this.defer {
             pivotDeployedState = deployedState
-            val hardstopDebouncer = Debouncer(0.25)
+            val hardstopDebouncer = Debouncer(0.2)
 
             this.run {
                 io.setPivotVoltage(moveVolts)
