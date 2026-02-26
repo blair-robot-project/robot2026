@@ -135,7 +135,7 @@ object Constants {
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
-        // the x is the distance from the hub in meters, the y is the shot time in seconds
+        // x is distance to hub (meters), y is shot time (sec)
         val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
             put(1.0, 0.75)
             put(2.0, 0.97)
@@ -143,18 +143,17 @@ object Constants {
             put(5.0, 1.35)
         }
 
-        // The x is distance to hub (meters), y is flywheel velocity (rad/s)
+        // x is distance to hub (meters), y is flywheel velocity (rad/s)
         val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
             put(2.0, 181.0)
             put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
             put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
         }
 
-        // the x is distance to hub (meters), y is hood angle (DEGREES)
+        // x is distance to hub (meters), y is hood angle (DEGREES)
         val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
             put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
             put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
-            // Standardize 25.2 as an Angle object for safety
             put(5.0, Degrees.of(25.2).`in`(Degrees))
         }
     }
