@@ -51,10 +51,18 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                actions.checkAndFeed()
-            )
-            .onFalse(
-                actions.stopFeed()
+                ParallelCommandGroup(
+                    AimAtTargetCommand(
+                        robotContainer.drive,
+                        { -robotContainer.driveController.leftY },
+                        { -robotContainer.driveController.leftX },
+                        { FieldUtil.HUB_TRANSLATION },
+                    ),
+                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
+                    actions.checkAndFeed()
+                )
+            ).onFalse(
+                actions.stopFeedAndShooter(),
             )
 
         driver
@@ -119,33 +127,5 @@ class Bindings(
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
             )
-
-        operator.a().onTrue(
-            ParallelCommandGroup(
-                AimAtTargetCommand(
-                    robotContainer.drive,
-                    { -robotContainer.driveController.leftY },
-                    { -robotContainer.driveController.leftX },
-                    { FieldUtil.HUB_TRANSLATION },
-                ).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf), // redundant but just doing this to be clear
-                actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
-                actions.checkAndFeed()
-            )
-        ).onFalse(
-            Commands.sequence(
-                actions.stopFeedAndShooter(),
-                runOnce({
-                    CommandScheduler.getInstance().schedule(
-                        SwerveRequestCommand(
-                            robotContainer.drive,
-                            { -robotContainer.driveController.leftY },
-                            { -robotContainer.driveController.leftX },
-                            { -driver.rightX }
-                        )
-                    )
-                })
-            )
-
-        )
     }
 }
