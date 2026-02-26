@@ -1,8 +1,10 @@
 package frc.team449
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.commands.XLockCommand
@@ -27,6 +29,7 @@ class Bindings(
                 { -driver.leftX },
                 { -driver.rightX }
             )
+        // controls for simulation
     }
 
     fun bindControls() {
@@ -45,10 +48,18 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                actions.checkAndFeed()
-            )
-            .onFalse(
-                actions.stopFeed()
+                ParallelCommandGroup(
+                    AimAtTargetCommand(
+                        robotContainer.drive,
+                        { -robotContainer.driveController.leftY },
+                        { -robotContainer.driveController.leftX },
+                        { FieldUtil.HUB_TRANSLATION },
+                    ),
+                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
+                    actions.checkAndFeed()
+                )
+            ).onFalse(
+                actions.stopFeedAndShooter()
             )
 
         driver
@@ -74,12 +85,6 @@ class Bindings(
             )
 
         driver
-            .b()
-            .onTrue(
-                actions.prepTowerShot()
-            )
-
-        driver
             .x()
             .onTrue(
                 SequentialCommandGroup(
@@ -96,11 +101,7 @@ class Bindings(
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) }
             )
 
-        driver
-            .y()
-            .onTrue(
-                actions.prepHubShot()
-            )
+        // tower sequence on b()
 
         driver
             .povUp()

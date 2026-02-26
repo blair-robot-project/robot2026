@@ -1,4 +1,6 @@
 package frc.team449.subsystems
+import edu.wpi.first.units.Units.Degrees
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
@@ -11,6 +13,7 @@ import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import java.util.function.Supplier
 
 class RobotActions(
     robotContainer: RobotContainer
@@ -47,6 +50,12 @@ class RobotActions(
         SequentialCommandGroup(
             shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
             shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
+        )
+
+    fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
+        shooter.setFlywheelAndHoodFromSuppliers(
+            { RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())) },
+            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) }
         )
 
     fun prepTowerShot(): Command =

@@ -5,6 +5,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -58,7 +59,7 @@ object Constants {
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
         val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
-        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
+        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldWidth
     }
 
     object VisionConstants {
@@ -109,7 +110,7 @@ object Constants {
         const val HOMING_VOLTAGE = -2.0
         const val HOMING_CURRENT_AMPS = 40.0 // amps
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
-        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
+        const val HOOD_TOLERANCE_RAD = 0.1 // 5.7 degrees todo: REFINE
 
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
 
@@ -122,8 +123,7 @@ object Constants {
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
         // setpoints
-
-        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate
+        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate // ngl this actually works really well
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
@@ -134,6 +134,28 @@ object Constants {
 
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
+
+        // x is distance to hub (meters), y is shot time (sec)
+        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
+            put(1.0, 0.75)
+            put(2.0, 0.97)
+            put(3.0, 1.10)
+            put(5.0, 1.35)
+        }
+
+        // x is distance to hub (meters), y is flywheel velocity (rad/s)
+        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
+            put(2.0, 181.0)
+            put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+            put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+        }
+
+        // x is distance to hub (meters), y is hood angle (DEGREES)
+        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
+            put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
+            put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
+            put(5.0, Degrees.of(25.2).`in`(Degrees))
+        }
     }
 
     object IntakeConstants {
@@ -233,6 +255,13 @@ object Constants {
         const val TOP_MOI = .000000008 // TODO: Find
 
         val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
+    }
+
+    object AimbotConstants {
+        // Aimbot PID Constants
+        const val AIMBOT_KP = 10.0
+        const val AIMBOT_KI = 0.0
+        const val AIMBOT_KD = 0.5
     }
 
     object LEDConstants {

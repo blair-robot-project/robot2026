@@ -31,6 +31,12 @@ class DriveSubsystem(
         io.logModules(inputs)
 
         Logger.processInputs("Drive", inputs)
+
+        // couldn't find a good way to do it in the io, so just sticking it on here
+        Logger.recordOutput(
+            "Drive/ActiveCommand",
+            currentCommand?.name ?: "None"
+        )
     }
 
     fun setControl(request: SwerveRequest) {
