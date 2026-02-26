@@ -3,10 +3,13 @@ package frc.team449
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
-import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.commands.XLockCommand
 import frc.team449.util.FieldUtil
+import kotlin.math.abs
 
 class Bindings(
     val robotContainer: RobotContainer
@@ -15,6 +18,8 @@ class Bindings(
     val operator = robotContainer.opController
     val actions = robotContainer.actions
 
+    val joysticksMovedPastDeadband: Trigger = Trigger { abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 || abs(driver.rightX) > 0.25 }
+
     fun setDefaultCommands() {
         // set default commands for systems here
         robotContainer.drive.defaultCommand =
@@ -22,10 +27,9 @@ class Bindings(
                 robotContainer.drive,
                 { -driver.leftY },
                 { -driver.leftX },
-                { -driver.rightX },
-                Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND,
-                Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
+                { -driver.rightX }
             )
+        // controls for simulation
     }
 
     fun bindControls() {
@@ -44,15 +48,23 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                actions.checkAndFeed()
-            )
-            .onFalse(
-                actions.stopFeed()
+                ParallelCommandGroup(
+                    AimAtTargetCommand(
+                        robotContainer.drive,
+                        { -robotContainer.driveController.leftY },
+                        { -robotContainer.driveController.leftX },
+                        { FieldUtil.HUB_TRANSLATION },
+                    ),
+                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
+                    actions.checkAndFeed()
+                )
+            ).onFalse(
+                actions.stopFeedAndShooter()
             )
 
         driver
             .leftBumper()
-            .onTrue(
+            .whileTrue(
                 SwerveRequestCommand(
                     robotContainer.drive,
                     { -driver.leftY },
@@ -62,72 +74,39 @@ class Bindings(
                     Constants.DriveConstants.SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND,
                 )
             )
-            .onFalse(
-                SwerveRequestCommand(
-                    robotContainer.drive,
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { -driver.rightX },
-                    Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND,
-                    Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
-                )
-            )
 
         driver
             .a()
             .onTrue(
-                SmartXLockCommand(
-                    robotContainer.drive,
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { driver.rightX },
+                XLockCommand(
+                    robotContainer.drive
                 )
-            )
-
-        driver
-            .b()
-            .onTrue(
-                actions.prepTowerShot()
+                    .until(joysticksMovedPastDeadband)
             )
 
         driver
             .x()
             .onTrue(
                 SequentialCommandGroup(
-                    ParallelCommandGroup(
-                        PoseAlignCommand(
-                            robotContainer.drive,
-                            { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
-                            { -driver.leftY },
-                            { -driver.leftX },
-                            { -driver.rightX },
-                        ),
-                        actions.prepTrenchShot()
-                    ),
+                    actions.prepTrenchShot(),
+                    PoseAlignCommand(
+                        robotContainer.drive
+                    ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
                     actions.checkAndFeed(),
-                    SmartXLockCommand(
-                        robotContainer.drive,
-                        { -driver.leftY },
-                        { -driver.leftX },
-                        { driver.rightX },
+                    XLockCommand(
+                        robotContainer.drive
                     )
-                ).finallyDo { end ->
-                    CommandScheduler.getInstance().schedule(
-                        actions.stopShooter()
-                    )
-                }
+                )
+                    .until(joysticksMovedPastDeadband)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) }
             )
 
-        driver
-            .y()
-            .onTrue(
-                actions.prepHubShot()
-            )
+        // tower sequence on b()
 
         driver
             .povUp()
             .onTrue(
-                actions.stopShooter()
+                actions.stopFeedAndShooter()
             )
 
         driver

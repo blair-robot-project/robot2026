@@ -11,20 +11,13 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
-import java.util.function.DoubleSupplier
 import java.util.function.Supplier
 import kotlin.math.PI
-import kotlin.math.abs
 
 class PoseAlignCommand(
     private val drive: DriveSubsystem,
-    private val targetPoseSupplier: Supplier<Pose2d>,
-    private val throttleSupplier: DoubleSupplier,
-    private val strafeSupplier: DoubleSupplier,
-    private val turnSupplier: DoubleSupplier
+    private val targetPoseSupplier: Supplier<Pose2d>
 ) : Command() {
-    private val xLockDeadband = Constants.DriveConstants.X_LOCK_DEADBAND
-
     private val xController = PIDController(5.0, 0.0, 0.15)
     private val yController = PIDController(5.0, 0.0, 0.15)
     private val thetaController = ProfiledPIDController(
@@ -70,10 +63,7 @@ class PoseAlignCommand(
     }
 
     override fun isFinished(): Boolean {
-        return driveController.atReference() ||
-            abs(throttleSupplier.asDouble) > xLockDeadband ||
-            abs(strafeSupplier.asDouble) > xLockDeadband ||
-            abs(turnSupplier.asDouble) > xLockDeadband
+        return driveController.atReference()
     }
 
     override fun end(interrupted: Boolean) {}

@@ -10,7 +10,7 @@ import kotlin.math.abs
 class IntakeSubsystem(
     private val io: IntakeIO
 ) : SubsystemBase() {
-    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
+    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
 
     // boolean over position logging increases speed and is easier to read
     var pivotDeployedState: Boolean = false
@@ -70,7 +70,7 @@ class IntakeSubsystem(
     ): Command {
         return this.defer {
             pivotDeployedState = deployedState
-            val hardstopDebouncer = Debouncer(0.25)
+            val hardstopDebouncer = Debouncer(0.2)
 
             this.run {
                 io.setPivotVoltage(moveVolts)
