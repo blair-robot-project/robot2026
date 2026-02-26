@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.Timer;
 
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
@@ -319,11 +318,6 @@ public class FuelSim {
     protected ArrayList<SimIntake> intakes = new ArrayList<>();
     protected int subticks = 5;
 
-    //scoring
-    protected double teleopStartTime = -1;
-    protected double timeSinceLastSwitch = -1;
-    protected boolean redActive = false;
-
     /**
      * Creates a new instance of FuelSim
      * @param tableKey NetworkTable to log fuel positions to as an array of {@link Translation3d} structs.
@@ -456,27 +450,6 @@ public class FuelSim {
      */
     public void updateSim() {
         stepSim();
-
-        // if we're in auto or first 10 seconds of teleop,
-        // OR the last 30 seconds of teleop
-        // these remain true
-        double teleopTimeElapsed = Timer.getFPGATimestamp() - teleopStartTime;
-        if (teleopStartTime < 0 || teleopTimeElapsed  < 10 || teleopTimeElapsed >= 90) {
-            Hub.RED_HUB.active = true;
-            Hub.BLUE_HUB.active = true;
-        } else if (timeSinceLastSwitch < 0) {
-            System.out.println("initializing time since last switch... starting count");
-            timeSinceLastSwitch = Timer.getFPGATimestamp();
-            Hub.RED_HUB.active = redActive;
-            Hub.BLUE_HUB.active = !redActive;
-        } else if (Timer.getFPGATimestamp() - timeSinceLastSwitch >= 25) {
-            redActive = !redActive;
-
-            Hub.RED_HUB.active = redActive;
-            Hub.BLUE_HUB.active = !redActive;
-
-            timeSinceLastSwitch = Timer.getFPGATimestamp();
-        }
     }
 
     /**
@@ -514,7 +487,7 @@ public class FuelSim {
      * @param launchHeight Height of the fuel to launch at. Make sure this is higher than your robot's bumper height, or else it will collide with your robot immediately.
      * @throws IllegalStateException if robot is not registered
      */
-    public void launchFuel(LinearVelocity launchVelocity, Angle hoodAngle, Angle turretYaw, Distance launchHeight, boolean left) {
+    public void launchFuel(LinearVelocity launchVelocity, Angle hoodAngle, Angle turretYaw, Distance launchHeight) {
         if (robotPoseSupplier == null || robotFieldSpeedsSupplier == null) {
             throw new IllegalStateException("Robot must be registered before launching fuel.");
         }
@@ -535,7 +508,7 @@ public class FuelSim {
         xVel += fieldSpeeds.vxMetersPerSecond;
         yVel += fieldSpeeds.vyMetersPerSecond;
 
-        spawnFuel(launchPose.getTranslation().plus(new Translation3d(left ? -.08 : .08, 0.0, 0.0)), new Translation3d(xVel, yVel, verticalVel));
+        spawnFuel(launchPose.getTranslation(), new Translation3d(xVel, yVel, verticalVel));
     }
 
     protected void handleRobotCollision(Fuel fuel, Pose2d robot, Translation2d robotVel) {
@@ -740,40 +713,6 @@ public class FuelSim {
         registerIntake(xMin.in(Meters), xMax.in(Meters), yMin.in(Meters), yMax.in(Meters));
     }
 
-    public void teleopSeedInfo(double currentTime) {
-        // seed current time
-        teleopStartTime = currentTime;
-
-        // set up for phase switches
-        redActive =
-                Hub.RED_HUB.score == Hub.BLUE_HUB.score ?
-                        Math.random() > 0.5 :
-                        Hub.BLUE_HUB.score > Hub.RED_HUB.score;
-    }
-
-    public int getRedScore() {
-        return Hub.RED_HUB.score;
-    }
-
-    public int getBlueScore() {
-        return Hub.BLUE_HUB.score;
-    }
-
-    public boolean redIsActiveHub() {
-        return Hub.RED_HUB.active;
-    }
-
-    public boolean blueIsActiveHub() {
-        return Hub.BLUE_HUB.active;
-    }
-
-    public double getTimeSinceLastSwitch() {
-        if (timeSinceLastSwitch < 0) {
-            return -1;
-        }
-        return Timer.getFPGATimestamp() - timeSinceLastSwitch;
-    }
-
     public static class Hub {
         public static final Hub BLUE_HUB =
                 new Hub(new Translation2d(4.61, FIELD_WIDTH / 2), new Translation3d(5.3, FIELD_WIDTH / 2, 0.89), 1);
@@ -796,7 +735,6 @@ public class FuelSim {
         protected final Translation3d exit;
         protected final int exitVelXMult;
 
-        protected boolean active = true;
         protected int score = 0;
 
         protected Hub(Translation2d center, Translation3d exit, int exitVelXMult) {
@@ -809,8 +747,7 @@ public class FuelSim {
             if (didFuelScore(fuel, subticks)) {
                 fuel.pos = exit;
                 fuel.vel = getDispersalVelocity();
-                if (active)
-                    score++;
+                score++;
             }
         }
 

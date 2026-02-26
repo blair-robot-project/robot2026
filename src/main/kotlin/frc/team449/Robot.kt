@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
-import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.RobotContainer.fuelSimulator
@@ -84,9 +83,7 @@ class Robot : LoggedRobot() {
         robotContainer.bLineRoutines.logBLineAuto()
     }
 
-    override fun teleopInit() {
-        robotContainer.fuelSimulator?.fuelSim?.teleopSeedInfo(Timer.getFPGATimestamp())
-    }
+    override fun teleopInit() {}
 
     override fun teleopPeriodic() {}
 
