@@ -90,7 +90,9 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
+    }
 
     override fun simulationPeriodic() {
         Logger.recordOutput(
