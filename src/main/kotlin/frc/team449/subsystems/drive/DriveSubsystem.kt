@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import org.littletonrobotics.junction.Logger
-import java.util.function.Supplier
 
 class DriveSubsystem(
     val io: DriveIO
@@ -44,18 +43,9 @@ class DriveSubsystem(
         io.setControl(request)
     }
 
-    fun getGyroAngle(): Double = inputs.gyroAngle
-
-    fun getPitchVel(): Double = inputs.pitchVel
-
-    fun getRollVel(): Double = inputs.rollVel
-
-    fun getYawVel(): Double = inputs.yawVel
-
     fun resetOdometry(pose: Pose2d) {
         io.resetOdometry(pose)
     }
-    val rotation: Supplier<Rotation2d> = Supplier { Rotation2d(inputs.gyroAngle * Math.PI / 180) }
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
@@ -91,7 +81,7 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    /* Swerve requests to apply during SysId characterization */
+    // swerve requests to apply during SysId characterization
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     private val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
     private val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()
