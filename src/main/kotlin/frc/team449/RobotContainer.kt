@@ -2,9 +2,7 @@ package frc.team449
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
-import frc.robot.FuelSim
 import frc.team449.Constants.Mode
 import frc.team449.auto.BLineRoutines
 import frc.team449.generated.TunerConstants
