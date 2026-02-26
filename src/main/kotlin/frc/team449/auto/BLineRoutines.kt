@@ -48,6 +48,7 @@ class BLineRoutines(
         rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get())
         crossTrackController.setPID(crossTrackP.get(), crossTrackI.get(), crossTrackD.get())
 
+        // might be too much logging unless we trynna debug stuff, comment it out later
         FollowPath.setPoseLoggingConsumer { pair ->
             Logger.recordOutput(pair.first, pair.second)
         }
@@ -73,6 +74,8 @@ class BLineRoutines(
     val rotationController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
     val crossTrackController = PIDController(CTE_P, CTE_I, CTE_D)
 
+    private val applyRobotSpeedsRequest = SwerveRequest.ApplyRobotSpeeds()
+
     var pathBuilderWithReset: FollowPath.Builder =
         FollowPath
             .Builder(
@@ -80,9 +83,7 @@ class BLineRoutines(
                 drive::pose,
                 drive::getRobotRelativeSpeeds,
                 { speeds: ChassisSpeeds ->
-                    drive.setControl(
-                        SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
-                    )
+                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
                 },
                 translationController,
                 rotationController,
@@ -97,9 +98,7 @@ class BLineRoutines(
                 drive::pose,
                 drive::getRobotRelativeSpeeds,
                 { speeds: ChassisSpeeds ->
-                    drive.setControl(
-                        SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds),
-                    )
+                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
                 },
                 translationController,
                 rotationController,

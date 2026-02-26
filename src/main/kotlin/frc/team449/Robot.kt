@@ -8,14 +8,9 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.team449.RobotContainer.actions
-import frc.team449.RobotContainer.drive
 import frc.team449.RobotContainer.fuelSimulator
-import frc.team449.auto.BLineRoutines
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
@@ -27,12 +22,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-    val bLineRoutines = BLineRoutines(drive, actions)
-    private val autoChooser = SendableChooser<Command>()
+    private val robotContainer = RobotContainer
 
     init {
         println("Initializing Robot!")
-        bLineRoutines.addAutoOptions(autoChooser)
+        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
 
         HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Kotlin)
         DriverStation.silenceJoystickConnectionWarning(true)
@@ -59,8 +53,6 @@ class Robot : LoggedRobot() {
         Logger.start()
     }
 
-    private val robotContainer = RobotContainer
-
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
     }
@@ -69,7 +61,7 @@ class Robot : LoggedRobot() {
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
 
-        SmartDashboard.putData("Auto Chooser", autoChooser)
+        SmartDashboard.putData("Auto Chooser", robotContainer.autoChooser)
     }
 
     override fun robotPeriodic() {
@@ -84,11 +76,11 @@ class Robot : LoggedRobot() {
     }
 
     override fun autonomousInit() {
-        CommandScheduler.getInstance().schedule(autoChooser.selected)
+        CommandScheduler.getInstance().schedule(robotContainer.autoChooser.selected)
     }
 
     override fun autonomousPeriodic() {
-        bLineRoutines.logBLineAuto()
+        robotContainer.bLineRoutines.logBLineAuto()
     }
 
     override fun teleopInit() {}
