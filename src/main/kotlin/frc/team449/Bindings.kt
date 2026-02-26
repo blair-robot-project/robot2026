@@ -102,6 +102,22 @@ class Bindings(
             )
 
         // tower sequence on b()
+        driver
+            .b()
+            .onTrue(
+                SequentialCommandGroup(
+                    actions.prepTowerShot(),
+                    PoseAlignCommand(
+                        robotContainer.drive
+                    ) { FieldUtil.getClosestTowerPose(robotContainer.drive.pose)},
+                    actions.checkAndFeed(),
+                    XLockCommand(
+                        robotContainer.drive
+                    )
+                )
+                    .until(joysticksMovedPastDeadband)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter())}
+            )
 
         driver
             .povUp()
