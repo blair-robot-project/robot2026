@@ -27,15 +27,15 @@ class RobotActions(
         SequentialCommandGroup(
             ConditionalCommand(
                 intake.stopRollers(),
-                intake.intake(),
+                intake.intake()
             ) { intake.rollerTargetVelocityRadPerSec != 0.0 },
-            intake.deploy(),
+            intake.deploy()
         )
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
-            intake.stow(),
+            intake.stow()
         )
 
     fun stopIntake(): Command = intake.stopRollers()
@@ -69,10 +69,11 @@ class RobotActions(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
-            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
         )
 
-    fun stopFeed(): Command = indexer.stop()
+    fun stopFeed(): Command =
+        indexer.stop()
 
     fun stopFeedAndShooter(): Command =
         ParallelCommandGroup(
@@ -80,11 +81,6 @@ class RobotActions(
             indexer.stop(),
         )
 
-    fun homeHood(): Command = shooter.homeHood()
-
-    fun autoTrenchShot(): Command =
-        SequentialCommandGroup(
-            prepTrenchShot(),
-            checkAndFeed(),
-        )
+    fun homeHood(): Command =
+        shooter.homeHood()
 }
