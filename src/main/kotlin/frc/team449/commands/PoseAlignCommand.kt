@@ -9,13 +9,11 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
 import kotlin.math.PI
-import kotlin.math.abs
 
 class PoseAlignCommand(
     private val drive: DriveSubsystem,
@@ -71,10 +69,7 @@ class PoseAlignCommand(
     }
 
     override fun isFinished(): Boolean {
-        return driveController.atReference() ||
-            abs(throttleSupplier.asDouble) > xLockDeadband ||
-            abs(strafeSupplier.asDouble) > xLockDeadband ||
-            abs(turnSupplier.asDouble) > xLockDeadband
+        return driveController.atReference()
     }
 
     override fun end(interrupted: Boolean) {}

@@ -83,9 +83,9 @@ class FuelSimulationSubsystem(
         }
 
         val hasBall = ballCount > 0
-        val isSpunUp = robotContainer.shooter.isFlywheelAtTolerance()
-                && robotContainer.shooter.isHoodAtTolerance()
-                && robotContainer.shooter.flywheelTargetVelocityRadPerSec >= 10.0
+        val isSpunUp = robotContainer.shooter.isFlywheelAtTolerance() &&
+            robotContainer.shooter.isHoodAtTolerance() &&
+            robotContainer.shooter.flywheelTargetVelocityRadPerSec >= 10.0
 
         val isFeeding = robotContainer.indexer.indexerTargetVelocityRadPerSec >= 10.0
 

@@ -1,14 +1,13 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
+import kotlin.math.abs
 
 class Bindings(
     val robotContainer: RobotContainer
@@ -113,7 +112,12 @@ class Bindings(
                         { -driver.leftX },
                         { driver.rightX },
                     )
-                ).finallyDo { end ->
+                ).until {
+                    val xLockDeadband = Constants.DriveConstants.X_LOCK_DEADBAND
+                    abs(driver.leftY) > xLockDeadband ||
+                        abs(driver.leftX) > xLockDeadband ||
+                        abs(driver.rightX) > xLockDeadband
+                }.finallyDo { end ->
                     CommandScheduler.getInstance().schedule(
                         actions.stopShooter()
                     )
