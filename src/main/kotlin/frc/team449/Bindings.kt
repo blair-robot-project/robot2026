@@ -59,7 +59,7 @@ class Bindings(
                     actions.checkAndFeed()
                 )
             ).onFalse(
-                actions.stopFeedAndShooter(),
+                actions.stopFeedAndShooter()
             )
 
         driver
@@ -85,12 +85,6 @@ class Bindings(
             )
 
         driver
-            .b()
-            .onTrue(
-                actions.prepTowerShot()
-            )
-
-        driver
             .x()
             .onTrue(
                 SequentialCommandGroup(
@@ -107,11 +101,7 @@ class Bindings(
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) }
             )
 
-        driver
-            .y()
-            .onTrue(
-                actions.prepHubShot()
-            )
+        // tower sequence on b()
 
         driver
             .povUp()

@@ -11,7 +11,6 @@ import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.wpilibj.RobotBase
-import java.util.Map
 import kotlin.math.PI
 
 object Constants {
@@ -60,7 +59,7 @@ object Constants {
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
         val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
-        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
+        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldWidth
     }
 
     object VisionConstants {
@@ -123,14 +122,6 @@ object Constants {
         const val HOOD_MOI = 0.077132
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
-        // the x is the distance from the hub in meters, the y is the shot time in seconds
-        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap.ofEntries(
-            Map.entry(1.0, 0.75),
-            Map.entry(2.0, 0.97),
-            Map.entry(3.0, 1.10),
-            Map.entry(5.0, 1.35)
-        )
-
         // setpoints
         val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate // ngl this actually works really well
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
@@ -144,19 +135,28 @@ object Constants {
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
-        // the x is the distance from the hub in meters, the y is the flywheel velocity in radians per second
-        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap.ofEntries(
-            Map.entry(2.0, 181.0),
-            Map.entry(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond)),
-            Map.entry(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-        )
+        // the x is the distance from the hub in meters, the y is the shot time in seconds
+        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
+            put(1.0, 0.75)
+            put(2.0, 0.97)
+            put(3.0, 1.10)
+            put(5.0, 1.35)
+        }
 
-        // the x is the distance from the hub in meters, the y is the hood angle in degrees
-        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap.ofEntries(
-            Map.entry(2.0, MIN_HOOD_ANGLE.`in`(Degrees)),
-            Map.entry(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees)),
-            Map.entry(5.0, 25.2)
-        )
+        // The x is distance to hub (meters), y is flywheel velocity (rad/s)
+        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
+            put(2.0, 181.0)
+            put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+            put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+        }
+
+        // the x is distance to hub (meters), y is hood angle (DEGREES)
+        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
+            put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
+            put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
+            // Standardize 25.2 as an Angle object for safety
+            put(5.0, Degrees.of(25.2).`in`(Degrees))
+        }
     }
 
     object IntakeConstants {
