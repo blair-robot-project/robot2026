@@ -5,8 +5,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -61,12 +59,6 @@ object Constants {
 
         val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
         val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
-
-        val BLUE_TRENCH_POSES: List<Pose2d> =
-            listOf(
-                Pose2d(4.35, 0.45, Rotation2d(1.5)),
-                Pose2d(4.35, 7.60, Rotation2d(-1.5)),
-            )
     }
 
     object VisionConstants {
