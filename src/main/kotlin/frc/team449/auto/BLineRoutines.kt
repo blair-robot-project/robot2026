@@ -109,7 +109,7 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
         FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
-        FollowPath.registerEventTrigger("stop_shooting", actions.stopShooter())
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
     }
 
     fun rHalfClose(): Command {
