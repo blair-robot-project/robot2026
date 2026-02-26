@@ -76,16 +76,13 @@ class ShooterIOSim : ShooterIOHardware() {
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
-//        val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
-//        RoboRioSim.setVInVoltage(loadedVoltage)
+        // something something dont use stator current alr stop yapping yall
 
-        val loadedVoltage = 12.0 // TODO: fix the loaded voltage calculation, drawing too much because flywheelsim.currentDrawAmps returns stator not supply
-
-        hoodSimState.setSupplyVoltage(loadedVoltage)
-        leftLeaderSimState.setSupplyVoltage(loadedVoltage)
-        leftFollowerSimState.setSupplyVoltage(loadedVoltage)
-        rightLeaderSimState.setSupplyVoltage(loadedVoltage)
-        rightFollowerSimState.setSupplyVoltage(loadedVoltage)
+        hoodSimState.setSupplyVoltage(12.0)
+        leftLeaderSimState.setSupplyVoltage(12.0)
+        leftFollowerSimState.setSupplyVoltage(12.0)
+        rightLeaderSimState.setSupplyVoltage(12.0)
+        rightFollowerSimState.setSupplyVoltage(12.0)
 
         hoodSim.setInput(hoodSimState.motorVoltage)
         hoodSim.update(Constants.LOOP_TIME)

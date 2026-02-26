@@ -15,6 +15,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.measure.Angle
@@ -85,12 +86,16 @@ open class DriveIOHardware(
         inputs.gyroAngle = inputs.Pose.rotation.degrees
     }
 
-    override fun resetOdometry(pose: Pose2d) {
-        super.resetPose(pose)
-    }
-
     override fun setControl(request: SwerveRequest) {
         super<SwerveDrivetrain>.setControl(request)
+    }
+
+    override fun seedFieldCentric() {
+        super<SwerveDrivetrain>.seedFieldCentric()
+    }
+
+    override fun setOperatorPerspectiveForward(yaw: Rotation2d) {
+        super<SwerveDrivetrain>.setOperatorPerspectiveForward(yaw)
     }
 
     override fun addVisionMeasurement(
@@ -102,7 +107,7 @@ open class DriveIOHardware(
     }
 
     override fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
-        this.setStateStdDevs(visionMeasurementStdDevs)
+        super<SwerveDrivetrain>.setStateStdDevs(visionMeasurementStdDevs)
     }
 
     override fun logModules(driveState: SwerveDriveState) {

@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.geometry.*
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -45,7 +46,6 @@ object Constants {
 
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
-        const val X_LOCK_DEADBAND = 0.25
 
         const val WHEEL_COF = 1.4
     }
@@ -60,13 +60,7 @@ object Constants {
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
         val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
-        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
-
-        val BLUE_TRENCH_POSES: List<Pose2d> =
-            listOf(
-                Pose2d(4.35, 0.45, Rotation2d(1.5)),
-                Pose2d(4.35, 7.60, Rotation2d(-1.5)),
-            )
+        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldWidth
     }
 
     object ShooterConstants {
@@ -90,8 +84,8 @@ object Constants {
         // HOOD
         const val HOOD_MOTOR_ID = 15
 
-        const val HOOD_SUPPLY_LIM = 40.0
-        const val HOOD_STATOR_LIM = 50.0
+        const val HOOD_SUPPLY_LIM = 20.0
+        const val HOOD_STATOR_LIM = 40.0
 
         const val HOOD_GEARING = 106.0
         const val HOOD_ROLLER_GEARING = 1.0 / 3.0
@@ -107,15 +101,15 @@ object Constants {
         const val HOOD_KV = 2.1
 
         // HOMING AND TOLERANCE
-        const val HOMING_DEBOUNCE_TIME = 0.5 // seconds
+        const val HOMING_DEBOUNCE_TIME = 0.2 // seconds
         const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
 
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 45.0 // amps
-        const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
+        const val HOMING_CURRENT_AMPS = 40.0 // amps
+        const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
+        const val HOOD_TOLERANCE_RAD = 0.1 // 5.7 degrees todo: REFINE
 
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
-        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
 
         val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467) // todo: verify
         val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767) // todo: verify
@@ -126,8 +120,7 @@ object Constants {
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
         // setpoints
-
-        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate
+        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate // ngl this actually works really well
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
@@ -138,6 +131,28 @@ object Constants {
 
         val FLYWHEEL_RADIUS = Units.inchesToMeters(3.965079 / 2)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
+
+        // x is distance to hub (meters), y is shot time (sec)
+        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
+            put(1.0, 0.75)
+            put(2.0, 0.97)
+            put(3.0, 1.10)
+            put(5.0, 1.35)
+        }
+
+        // x is distance to hub (meters), y is flywheel velocity (rad/s)
+        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
+            put(2.0, 181.0)
+            put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+            put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+        }
+
+        // x is distance to hub (meters), y is hood angle (DEGREES)
+        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
+            put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
+            put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
+            put(5.0, Degrees.of(25.2).`in`(Degrees))
+        }
     }
 
     object IntakeConstants {
@@ -189,8 +204,8 @@ object Constants {
     // INDEXER CONSTANTS STILL SLIGHTLY OFF
     object IndexerConstants {
         const val WEDGE_INDEXER_ID = 21
-        const val WEDGE_STATOR_LIMIT = 30.0
-        const val WEDGE_SUPPLY_LIMIT = 30.0
+        const val WEDGE_STATOR_LIMIT = 50.0
+        const val WEDGE_SUPPLY_LIMIT = 25.0
         const val WEDGE_GEARING = 1.5
 
         val WEDGE_NEUTRAL_MODE = NeutralModeValue.Coast
@@ -200,48 +215,54 @@ object Constants {
         const val WEDGE_KI = 0.0
         const val WEDGE_KD = 0.0
         const val WEDGE_KS = 0.05
-        const val WEDGE_KV = 0.12
+        const val WEDGE_KV = 0.15
 
         const val WEDGE_MOI = .001
 
         const val FLOOR_INDEXER_ID = 22
         const val FLOOR_STATOR_LIMIT = 50.0
-        const val FLOOR_SUPPLY_LIMIT = 30.0
+        const val FLOOR_SUPPLY_LIMIT = 25.0
         const val FLOOR_GEARING = 27.0 / 14.0
 
         val FLOOR_NEUTRAL_MODE = NeutralModeValue.Coast
         val FLOOR_INVERSION = InvertedValue.CounterClockwise_Positive
 
-        const val FLOOR_KP = 0.5
+        const val FLOOR_KP = 1.75
         const val FLOOR_KI = 0.0
         const val FLOOR_KD = 0.0
         const val FLOOR_KS = 0.05
-        const val FLOOR_KV = 0.1
+        const val FLOOR_KV = 0.2
 
         const val FLOOR_MOI = .005
 
         const val TOP_INDEXER_ID = 23
-        const val TOP_STATOR_LIMIT = 60.0
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_STATOR_LIMIT = 50.0
+        const val TOP_SUPPLY_LIMIT = 25.0
         const val TOP_GEARING = 31.0 / 11.0
 
         val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
-        const val TOP_KP = 0.5
+        const val TOP_KP = 0.25
         const val TOP_KI = 0.0
         const val TOP_KD = 0.0
         const val TOP_KS = 0.05
-        const val TOP_KV = 0.1
+        const val TOP_KV = 0.34
 
         const val TOP_MOI = .000000008 // TODO: Find
 
         val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
     }
 
+    object AimbotConstants {
+        // Aimbot PID Constants
+        const val AIMBOT_KP = 10.0
+        const val AIMBOT_KI = 0.0
+        const val AIMBOT_KD = 0.5
+    }
+
     object LEDConstants {
         // led constants
-        // leds on a non working robot lfg
     }
 
     object VisionConstants {

@@ -155,7 +155,7 @@ open class IntakeIOHardware : IntakeIO {
             }
 
             Slot0.apply {
-                kP = 6.0
+                kP = 0.1
                 kV = 0.12
             }
         }
