@@ -75,7 +75,7 @@ class RobotActions(
     fun stopFeed(): Command =
         indexer.stop()
 
-    fun stopShooter(): Command =
+    fun stopFeedAndShooter(): Command =
         ParallelCommandGroup(
             shooter.stopFlywheel(),
             indexer.stop(),

@@ -56,23 +56,17 @@ class DriveSubsystem(
         )
 
     fun seedFieldCentric(): Command =
-        runOnce {
-            if (io is DriveIOHardware) {
-                io.seedFieldCentric()
-            }
-        }
+        runOnce { io.seedFieldCentric() }
 
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
-        if (io is DriveIOHardware) {
-            io.setOperatorPerspectiveForward(
-                if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-                    Rotation2d.kZero
-                } else {
-                    Rotation2d.k180deg
-                },
-            )
-        }
+        io.setOperatorPerspectiveForward(
+            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+                Rotation2d.kZero
+            } else {
+                Rotation2d.k180deg
+            },
+        )
     }
 
     fun addVisionMeasurement(
@@ -97,7 +91,7 @@ class DriveSubsystem(
         SysIdRoutine(
             SysIdRoutine.Config(
                 null, // default ramp rate (1 V/s)
-                Volts.of(4.0), // dynamic step voltage
+                Volts.of(1.0), // dynamic step voltage
                 null, // default timeout (10 s)
             ) { state: SysIdRoutineLog.State ->
                 Logger.recordOutput(
@@ -117,7 +111,7 @@ class DriveSubsystem(
         SysIdRoutine(
             SysIdRoutine.Config(
                 null, // default ramp rate (1 V/s)
-                Volts.of(7.0), // dynamic voltage of 7 V
+                Volts.of(4.0), // dynamic voltage of 4 V
                 null, // default timeout (10 s)
             ) { state: SysIdRoutineLog.State ->
                 Logger.recordOutput(
