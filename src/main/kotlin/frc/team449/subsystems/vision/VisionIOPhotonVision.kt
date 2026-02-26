@@ -38,7 +38,6 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
                         Rotation2d.fromDegrees(result.bestTarget.getYaw()),
                         Rotation2d.fromDegrees(result.bestTarget.getPitch())
                     )
-
             } else {
                 inputs.latestTargetObservationPhoton = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
             }
