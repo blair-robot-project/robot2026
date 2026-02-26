@@ -138,7 +138,7 @@ object Constants {
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
         // setpoints
-        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate // ngl this actually works really well
+        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(16.5)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
