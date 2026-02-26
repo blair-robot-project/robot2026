@@ -116,6 +116,7 @@ class Vision(
                 // Calculate standard deviations
                 val stdDevFactor: Double =
                     observation.averageTagDistance.pow(2.0) / observation.tagCount
+                println(stdDevFactor)
                 var linearStdDev = Constants.VisionConstants.linearStdDevBaseline * stdDevFactor
                 var angularStdDev = Constants.VisionConstants.angularStdDevBaseline * stdDevFactor
                 if (observation.type == VisionIO.PoseObservationType.MEGATAG_2) {
@@ -126,6 +127,10 @@ class Vision(
                     linearStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
                     angularStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
                 }
+
+                inputs[cameraIndex].stdDevFactor = stdDevFactor
+                inputs[cameraIndex].linearStdDev = linearStdDev
+                inputs[cameraIndex].angularStdDev = angularStdDev
 
                 sumAngDev += angularStdDev
                 sumLinDev += linearStdDev
