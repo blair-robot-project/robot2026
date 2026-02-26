@@ -7,49 +7,45 @@ import org.littletonrobotics.junction.AutoLog
 interface IntakeIO {
     @AutoLog
     open class IntakeIOInputs {
-        @JvmField var pivotAppliedVolts: Double = 0.0
+        @JvmField var leftPivotLeaderAppliedVolts: Double = 0.0
 
-        @JvmField var pivotCurrentState: String = "None" // "STOW", "DEPLOY", etc.
+        @JvmField var leftPivotLeaderPositionRad: Double = 0.0
 
-        @JvmField var pivotPositionRad: Double = 0.0
+        @JvmField var leftPivotLeaderVelocityRadPerSec: Double = 0.0
 
-        @JvmField var pivotVelocityRadPerSec: Double = 0.0
+        @JvmField var leftPivotLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var pivotSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftPivotLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField var pivotStatorCurrentAmps: Double = 0.0
+        @JvmField var leftPivotLeaderTempCelsius: Double = 0.0
 
-        @JvmField var pivotTempCelsius: Double = 0.0
+        @JvmField var rightPivotFollowerAppliedVolts: Double = 0.0
 
-        @JvmField var pivotFollowerAppliedVolts: Double = 0.0
+        @JvmField var rightPivotFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var pivotFollowerSupplyCurrentAmps: Double = 0.0
+        @JvmField var rightPivotFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField var pivotFollowerStatorCurrentAmps: Double = 0.0
+        @JvmField var rightPivotFollowerTempCelsius: Double = 0.0
 
-        @JvmField var pivotFollowerTempCelsius: Double = 0.0
+        // Rollers
 
-        // rollers
+        @JvmField var leftRollerLeaderAppliedVolts: Double = 0.0
 
-        @JvmField var rollerAppliedVolts: Double = 0.0
+        @JvmField var leftRollerLeaderVelocityRadPerSec: Double = 0.0
 
-        @JvmField var rollerControlMode: String = "None"
+        @JvmField var leftRollerLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var rollerVelocityRadPerSec: Double = 0.0
+        @JvmField var leftRollerLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField var rollerSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftRollerLeaderTempCelsius: Double = 0.0
 
-        @JvmField var rollerStatorCurrentAmps: Double = 0.0
+        @JvmField var rightRollerFollowerAppliedVolts: Double = 0.0
 
-        @JvmField var rollerTempCelsius: Double = 0.0
+        @JvmField var rightRollerFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var rollerFollowerAppliedVolts: Double = 0.0
+        @JvmField var rightRollerFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField var rollerFollowerSupplyCurrentAmps: Double = 0.0
-
-        @JvmField var rollerFollowerStatorCurrentAmps: Double = 0.0
-
-        @JvmField var rollerFollowerTempCelsius: Double = 0.0
+        @JvmField var rightRollerFollowerTempCelsius: Double = 0.0
     }
 
     fun updateInputs(inputs: IntakeIOInputs) {}
@@ -57,4 +53,6 @@ interface IntakeIO {
     fun setPivotVoltage(volts: Double) {}
 
     fun setRollerVelocity(velocity: AngularVelocity) {}
+
+    fun setRollerVoltage(volts: Double) {}
 }

@@ -15,11 +15,13 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
+import frc.team449.Constants
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
@@ -33,7 +35,7 @@ open class DriveIOHardware(
     ::TalonFXS,
     ::CANcoder,
     driveConstants,
-    100.0,
+    Constants.DriveConstants.ODOMETRY_LOOP_HZ,
     *moduleConstants,
 ),
     DriveIO {
@@ -63,18 +65,9 @@ open class DriveIOHardware(
     )
 
     init {
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0,
-            angularPitchVelocity,
-            angularRollVelocity,
-            angularYawVelocity,
-            roll,
-            pitch,
-            accelX,
-            accelY,
-        )
-
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
+        BaseStatusSignal.setUpdateFrequencyForAll(100.0, angularYawVelocity)
+
         PhoenixUtil.registerSignals(*gyroSignals)
 
         this.odometryThread.setThreadPriority(99)
@@ -87,24 +80,18 @@ open class DriveIOHardware(
         inputs.fromSwerveDriveState(telemetryCache.get())
 
         inputs.gyroAngle = inputs.Pose.rotation.degrees
-
-        BaseStatusSignal.refreshAll(
-            angularRollVelocity,
-            angularPitchVelocity,
-            angularYawVelocity,
-            pitch,
-            roll,
-            accelX,
-            accelY,
-        )
-    }
-
-    override fun resetOdometry(pose: Pose2d) {
-        super.resetPose(pose)
     }
 
     override fun setControl(request: SwerveRequest) {
         super<SwerveDrivetrain>.setControl(request)
+    }
+
+    override fun seedFieldCentric() {
+        super<SwerveDrivetrain>.seedFieldCentric()
+    }
+
+    override fun setOperatorPerspectiveForward(yaw: Rotation2d) {
+        super<SwerveDrivetrain>.setOperatorPerspectiveForward(yaw)
     }
 
     override fun addVisionMeasurement(
@@ -116,7 +103,7 @@ open class DriveIOHardware(
     }
 
     override fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
-        this.setStateStdDevs(visionMeasurementStdDevs)
+        super<SwerveDrivetrain>.setStateStdDevs(visionMeasurementStdDevs)
     }
 
     override fun logModules(driveState: SwerveDriveState) {

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.util.FieldUtil
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
@@ -52,6 +53,7 @@ class Robot : LoggedRobot() {
 
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
+        FieldUtil.setHubPosition()
     }
 
     override fun robotInit() {
@@ -88,10 +90,11 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
+    }
 
     override fun simulationPeriodic() {
-        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
@@ -110,7 +113,7 @@ class Robot : LoggedRobot() {
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle, 0.0)
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle - 0.2591940418, 0.0)
                 )
             )
         )

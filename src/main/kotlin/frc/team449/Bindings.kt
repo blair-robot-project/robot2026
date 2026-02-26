@@ -1,15 +1,24 @@
 package frc.team449
 
-import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import frc.team449.Constants.ShooterConstants
+import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.commands.AimAtTargetCommand
+import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.commands.XLockCommand
+import frc.team449.util.FieldUtil
+import kotlin.math.abs
 
 class Bindings(
     val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
+    val actions = robotContainer.actions
+
+    val joysticksMovedPastDeadband: Trigger = Trigger { abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 || abs(driver.rightX) > 0.25 }
 
     fun setDefaultCommands() {
         // set default commands for systems here
@@ -18,102 +27,92 @@ class Bindings(
                 robotContainer.drive,
                 { -driver.leftY },
                 { -driver.leftX },
-                { driver.rightX },
+                { -driver.rightX }
             )
+        // controls for simulation
     }
 
     fun bindControls() {
         driver
             .rightTrigger()
             .onTrue(
-                SequentialCommandGroup(
-                    robotContainer.intake.deploy(),
-                    robotContainer.intake.intake(),
-                ),
+                actions.deployAndToggleIntake()
             )
 
         driver
             .leftTrigger()
             .onTrue(
-                SequentialCommandGroup(
-                    robotContainer.intake.stopRollers(),
-                    robotContainer.intake.stow(),
-                ),
+                actions.stopAndStow()
             )
 
         driver
             .rightBumper()
             .whileTrue(
-                robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
-                // check tol and feed
+                ParallelCommandGroup(
+                    AimAtTargetCommand(
+                        robotContainer.drive,
+                        { -robotContainer.driveController.leftY },
+                        { -robotContainer.driveController.leftX },
+                        { FieldUtil.HUB_TRANSLATION },
+                    ),
+                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
+                    actions.checkAndFeed()
+                )
             ).onFalse(
-                robotContainer.shooter.stopFlywheel(),
-                // coast hopper
+                actions.stopFeedAndShooter()
             )
-//
-//        driver
-//            .x()
-//            .onTrue(
-//                SequentialCommandGroup(
-//                    ParallelCommandGroup(
-//                        PoseAlignCommand(
-//                            robotContainer.drive,
-//                            { Field.getClosestTrenchPose(robotContainer.drive.pose) },
-//                            { -driver.leftY },
-//                            { -driver.leftX },
-//                            { driver.rightX },
-//                        ),
-//                        robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
-//                    ),
-//                ),
-//                // feed
-//            )
 
-//        driver
-//            .a()
-//            .onTrue(
-//                SmartXLockCommand(
-//                    robotContainer.drive,
-//                    { -driver.leftY },
-//                    { -driver.leftX },
-//                    { driver.rightX },
-//                )
-//            )
+        driver
+            .leftBumper()
+            .whileTrue(
+                SwerveRequestCommand(
+                    robotContainer.drive,
+                    { -driver.leftY },
+                    { -driver.leftX },
+                    { -driver.rightX },
+                    Constants.DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SECOND,
+                    Constants.DriveConstants.SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                )
+            )
+
+        driver
+            .a()
+            .onTrue(
+                XLockCommand(
+                    robotContainer.drive
+                )
+                    .until(joysticksMovedPastDeadband)
+            )
+
+        driver
+            .x()
+            .onTrue(
+                SequentialCommandGroup(
+                    actions.prepTrenchShot(),
+                    PoseAlignCommand(
+                        robotContainer.drive
+                    ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
+                    actions.checkAndFeed(),
+                    XLockCommand(
+                        robotContainer.drive
+                    )
+                )
+                    .until(joysticksMovedPastDeadband)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) }
+            )
+
+        // tower sequence on b()
+
+        driver
+            .povUp()
+            .onTrue(
+                actions.stopFeedAndShooter()
+            )
 
         driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
             )
-
-        driver
-            .b()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-            ).onFalse(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
-            )
-
-        driver
-            .a()
-            .onTrue(
-                robotContainer.intake.deploy(),
-            ).onFalse(
-                robotContainer.intake.stow(),
-            )
-
-        driver
-            .y()
-            .onTrue(
-                robotContainer.indexer.index(RadiansPerSecond.of(3.0)),
-            ).onFalse(
-                robotContainer.indexer.stop(),
-            )
-
-        driver
-            .x()
-            .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(RadiansPerSecond.of(130.0)),
-            ).onFalse(robotContainer.shooter.stopFlywheel())
     }
 }

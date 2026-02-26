@@ -12,6 +12,9 @@ import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.Notifier
 import frc.team449.Constants
 import frc.team449.Constants.DriveConstants.SIM_LOOP_TIME
+import frc.team449.Constants.ROBOT_WIDTH_INCHES
+import frc.team449.subsystems.intake.IntakeIOSim
+import org.ironmaple.simulation.IntakeSimulation
 import org.ironmaple.simulation.SimulatedArena
 import org.ironmaple.simulation.drivesims.COTS
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation
@@ -57,7 +60,7 @@ class DriveIOSim(
                 ),
             )
 
-    private val startingPose = Pose2d(0.0, 0.0, Rotation2d())
+    private val startingPose = Pose2d(4.35, 0.45, Rotation2d(1.5))
     val mapleSimDrive = SwerveDriveSimulation(simulationConfig, startingPose)
 
     private val simNotifier =
@@ -81,9 +84,6 @@ class DriveIOSim(
     }
 
     private fun initializeSimulation() {
-        // ONLY FOR CONFIG
-        SimulatedArena.getInstance().shutDown()
-
         SimulatedArena.overrideSimulationTimings(Seconds.of(SIM_LOOP_TIME), 1)
         SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive)
 
@@ -116,7 +116,23 @@ class DriveIOSim(
         }
     }
 
+    private val intakeSimulation =
+        IntakeSimulation.OverTheBumperIntake(
+            "fuel",
+            this.mapleSimDrive,
+            Inches.of(ROBOT_WIDTH_INCHES),
+            Inches.of(9.198),
+            IntakeSimulation.IntakeSide.FRONT,
+            0,
+        )
+
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
+        if (IntakeIOSim.isDeployed) {
+            intakeSimulation.startIntake()
+        } else {
+            intakeSimulation.stopIntake()
+        }
+
         super.updateInputs(inputs)
     }
 

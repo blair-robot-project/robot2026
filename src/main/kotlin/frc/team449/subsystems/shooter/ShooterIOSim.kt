@@ -1,5 +1,7 @@
 package frc.team449.subsystems.shooter
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
@@ -24,13 +26,12 @@ class ShooterIOSim : ShooterIOHardware() {
     private val flywheelSim: FlywheelSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX60(2),
+                DCMotor.getKrakenX60(4),
                 FLYWHEEL_MOI,
                 FLYWHEEL_GEARING,
             ),
-            DCMotor.getKrakenX60(2),
+            DCMotor.getKrakenX60(4),
         )
-    // two flywheel sims will have the exact same behavior -- unnecessary
 
     val hoodSim: SingleJointedArmSim =
         SingleJointedArmSim(
@@ -67,18 +68,21 @@ class ShooterIOSim : ShooterIOHardware() {
 
     init {
         SmartDashboard.putData("Hood", mech)
+
+        hoodMotor.configurator.apply(
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+        )
     }
 
-    fun simulationPeriodic() {
+    override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
-        val loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(totalCurrent)
-        RoboRioSim.setVInVoltage(loadedVoltage)
+        // something something dont use stator current alr stop yapping yall
 
-        hoodSimState.setSupplyVoltage(loadedVoltage)
-        leftLeaderSimState.setSupplyVoltage(loadedVoltage)
-        leftFollowerSimState.setSupplyVoltage(loadedVoltage)
-        rightLeaderSimState.setSupplyVoltage(loadedVoltage)
-        rightFollowerSimState.setSupplyVoltage(loadedVoltage)
+        hoodSimState.setSupplyVoltage(12.0)
+        leftLeaderSimState.setSupplyVoltage(12.0)
+        leftFollowerSimState.setSupplyVoltage(12.0)
+        rightLeaderSimState.setSupplyVoltage(12.0)
+        rightFollowerSimState.setSupplyVoltage(12.0)
 
         hoodSim.setInput(hoodSimState.motorVoltage)
         hoodSim.update(Constants.LOOP_TIME)
@@ -100,9 +104,7 @@ class ShooterIOSim : ShooterIOHardware() {
         leftFollowerSimState.setRotorVelocity(rotorVel)
         rightLeaderSimState.setRotorVelocity(rotorVel)
         rightFollowerSimState.setRotorVelocity(rotorVel)
-    }
 
-    override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         super.updateInputs(inputs)
     }
 }
