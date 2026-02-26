@@ -22,6 +22,9 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 
 object RobotContainer {
     // driver/op controllers
@@ -62,6 +65,29 @@ object RobotContainer {
                 }
             },
         )
+
+    val vision: Vision =
+        when (Constants.CURRENT_MODE) {
+            Mode.REAL ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation, Constants.VisionConstants.robotToCameraRight),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation, Constants.VisionConstants.robotToCameraLeft)
+                )
+            Mode.SIM ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.robotToCamera0) { drive.pose },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.robotToCamera1) { drive.pose },
+                )
+            Mode.REPLAY ->
+                Vision(
+                    drive::addVisionMeasurement,
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation, Constants.VisionConstants.robotToCameraRight),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation, Constants.VisionConstants.robotToCameraLeft)
+                )
+                    .also { vision = it }
+        }
 
     val intake: IntakeSubsystem =
         IntakeSubsystem(
