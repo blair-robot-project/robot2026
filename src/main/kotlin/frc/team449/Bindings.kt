@@ -7,7 +7,6 @@ import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SmartXLockCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
-import kotlin.math.abs
 
 class Bindings(
     val robotContainer: RobotContainer
@@ -112,12 +111,7 @@ class Bindings(
                         { -driver.leftX },
                         { driver.rightX },
                     )
-                ).until {
-                    val xLockDeadband = Constants.DriveConstants.X_LOCK_DEADBAND
-                    abs(driver.leftY) > xLockDeadband ||
-                        abs(driver.leftX) > xLockDeadband ||
-                        abs(driver.rightX) > xLockDeadband
-                }.finallyDo { end ->
+                ).finallyDo { end ->
                     CommandScheduler.getInstance().schedule(
                         actions.stopShooter()
                     )

@@ -43,13 +43,14 @@ class DriveSubsystem(
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
 
-    fun getFieldRelativeSpeeds(): ChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(
-        getRobotRelativeSpeeds(),
-        inputs.Pose.rotation
-    )
+    fun getFieldRelativeSpeeds(): ChassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(
+            inputs.Speeds,
+            inputs.Pose.rotation,
+        )
 
     fun seedFieldCentric(): Command =
-        this.runOnce {
+        runOnce {
             if (io is DriveIOHardware) {
                 io.seedFieldCentric()
             }
