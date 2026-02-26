@@ -111,7 +111,7 @@ object Constants {
         const val HOMING_VOLTAGE = -2.0
         const val HOMING_CURRENT_AMPS = 40.0 // amps
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
-        const val HOOD_TOLERANCE_RAD = 0.1 // todo: REFINE
+        const val HOOD_TOLERANCE_RAD = 0.1 // 5.7 degrees todo: REFINE
 
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
 

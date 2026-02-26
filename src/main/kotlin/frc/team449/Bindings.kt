@@ -1,6 +1,9 @@
 package frc.team449
 
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.Commands.runOnce
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
@@ -124,12 +127,25 @@ class Bindings(
                     { -robotContainer.driveController.leftY },
                     { -robotContainer.driveController.leftX },
                     { FieldUtil.HUB_TRANSLATION },
-                ),
+                ).withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf), // redundant but just doing this to be clear
                 actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
                 actions.checkAndFeed()
             )
         ).onFalse(
-            actions.stopFeedAndShooter()
+            Commands.sequence(
+                actions.stopFeedAndShooter(),
+                runOnce({
+                    CommandScheduler.getInstance().schedule(
+                        SwerveRequestCommand(
+                            robotContainer.drive,
+                            { -robotContainer.driveController.leftY },
+                            { -robotContainer.driveController.leftX },
+                            { -driver.rightX }
+                        )
+                    )
+                })
+            )
+
         )
     }
 }
