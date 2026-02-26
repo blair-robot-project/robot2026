@@ -206,15 +206,15 @@ open class ShooterIOHardware : ShooterIO {
     }
 
     override fun setHoodAngle(angle: Angle) {
-        hoodMotor.setControl(PositionVoltage(angle))
+        //hoodMotor.setControl(PositionVoltage(angle))
     }
 
     override fun setHoodVoltage(voltage: Double) {
-        hoodMotor.setVoltage(voltage)
+        //hoodMotor.setVoltage(voltage)
     }
 
     override fun resetHoodPosition(angle: Angle) {
-        hoodMotor.setPosition(angle)
+       //hoodMotor.setPosition(angle)
     }
 
     companion object {

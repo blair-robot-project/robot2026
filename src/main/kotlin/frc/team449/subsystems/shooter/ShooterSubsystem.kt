@@ -6,6 +6,7 @@ import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.ShooterConstants
 import org.littletonrobotics.junction.Logger
@@ -106,23 +107,24 @@ class ShooterSubsystem(
     }
 
     fun homeHood(): Command {
-        return this.defer {
-            val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
-
-            Commands.sequence(
-                this.runOnce { io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE) },
-                Commands.waitUntil {
-                    val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
-                    val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
-                    homingDebouncer.calculate(highCurrent && lowVelocity)
-                },
-                this.runOnce {
-                    io.setHoodVoltage(0.0)
-                    io.resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
-                    io.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
-                }
-            )
-        }.withName("Home Hood")
+        return InstantCommand()
+//        return this.defer {
+//            val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
+//
+//            Commands.sequence(
+//                this.runOnce { io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE) },
+//                Commands.waitUntil {
+//                    val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
+//                    val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
+//                    homingDebouncer.calculate(highCurrent && lowVelocity)
+//                },
+//                this.runOnce {
+//                    io.setHoodVoltage(0.0)
+//                    io.resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
+//                    io.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+//                }
+//            )
+//        }.withName("Home Hood")
     }
 
     fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
