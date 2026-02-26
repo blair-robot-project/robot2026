@@ -22,7 +22,7 @@ import java.util.function.Supplier
 class DriveSubsystem(
     val io: DriveIO
 ) : SubsystemBase() {
-    val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+    private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
     val pose: Pose2d
         get() = inputs.Pose
@@ -37,6 +37,14 @@ class DriveSubsystem(
     fun setControl(request: SwerveRequest) {
         io.setControl(request)
     }
+
+    fun getGyroAngle(): Double = inputs.gyroAngle
+
+    fun getPitchVel(): Double = inputs.pitchVel
+
+    fun getRollVel(): Double = inputs.rollVel
+
+    fun getYawVel(): Double = inputs.yawVel
 
     fun resetOdometry(pose: Pose2d) {
         io.resetOdometry(pose)

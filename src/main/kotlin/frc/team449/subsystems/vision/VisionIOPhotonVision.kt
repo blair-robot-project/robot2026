@@ -38,6 +38,20 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
                         Rotation2d.fromDegrees(result.bestTarget.getYaw()),
                         Rotation2d.fromDegrees(result.bestTarget.getPitch())
                     )
+                inputs.latestTimestamp = result.timestampSeconds
+                inputs.tagIds = DoubleArray(result.targets.size)
+                var runningMinAmbiguity = 0.0
+                var runningMaxAmbiguity = 0.0
+                var sumAmbiguity = 0.0
+                for (i in 1..result.targets.size) {
+                    inputs.tagIds[i - 1] = result.targets[i - 1].fiducialId + 0.0
+                    if (result.targets[i - 1].poseAmbiguity < runningMinAmbiguity) runningMinAmbiguity = result.targets[i - 1].poseAmbiguity
+                    if (result.targets[i - 1].poseAmbiguity > runningMaxAmbiguity) runningMaxAmbiguity = result.targets[i - 1].poseAmbiguity
+                    sumAmbiguity += result.targets[i - 1].poseAmbiguity
+                    inputs.orientation = result.targets[i - 1].yaw
+                    inputs.latestAverageTagDist = result.targets[i - 1].bestCameraToTarget.translation.norm
+                }
+                inputs.latestAverageTagAmbiguity = sumAmbiguity / result.targets.size
             } else {
                 inputs.latestTargetObservationPhoton = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
             }
@@ -71,6 +85,8 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
                         PoseObservationType.PHOTONVISION
                     )
                 ) // Observation type
+
+                inputs.latestPose = robotPose
             } else if (result.targets.isNotEmpty()) { // Single tag result
                 val target = result.targets[0]
 
@@ -97,6 +113,7 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
                             PoseObservationType.PHOTONVISION
                         )
                     ) // Observation type
+                    inputs.latestPose = robotPose
                 }
             }
         }

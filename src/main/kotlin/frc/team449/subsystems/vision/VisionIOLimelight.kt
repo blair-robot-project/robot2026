@@ -30,31 +30,28 @@ import kotlin.math.pow
  */
 class VisionIOLimelight(
     name: String,
-    private val rotationSupplier: Supplier<Rotation2d>
+    private val rotationSupplier: Supplier<Rotation2d>,
+    offset: Pose3d
 ) : VisionIO {
     private val limelight = Limelight(name)
     private var estimationMode = EstimationMode.MEGATAG2 // can change this if wanna run both megatag1 and 2
     private var poseObservationType = PoseObservationType.MEGATAG_2 // TODO() this is lowk stupid
 
-    fun configure(offset: Pose3d): VisionIOLimelight {
-        limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
-            .withCameraOffset(offset)
-            .save()
-        return this
-    }
-
     init {
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d(Rotation2d(drive.inputs.gyroAngle)),
+                    Rotation3d(Rotation2d(drive.getGyroAngle())),
                     AngularVelocity3d(
-                        DegreesPerSecond.of(drive.inputs.pitchVel),
-                        DegreesPerSecond.of(drive.inputs.rollVel),
-                        DegreesPerSecond.of(drive.inputs.yawVel),
+                        DegreesPerSecond.of(drive.getPitchVel()),
+                        DegreesPerSecond.of(drive.getRollVel()),
+                        DegreesPerSecond.of(drive.getYawVel()),
                     )
                 )
             )
+            .save()
+        limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
+            .withCameraOffset(offset)
             .save()
         limelight.settings.withImuMode(LimelightSettings.ImuMode.InternalImuExternalAssist)
     }
@@ -118,11 +115,11 @@ class VisionIOLimelight(
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d(Rotation2d(drive.inputs.gyroAngle)),
+                    Rotation3d(Rotation2d(drive.getGyroAngle())),
                     AngularVelocity3d(
-                        DegreesPerSecond.of(drive.inputs.pitchVel),
-                        DegreesPerSecond.of(drive.inputs.rollVel),
-                        DegreesPerSecond.of(drive.inputs.yawVel),
+                        DegreesPerSecond.of(drive.getPitchVel()),
+                        DegreesPerSecond.of(drive.getRollVel()),
+                        DegreesPerSecond.of(drive.getYawVel()),
                     )
                 )
             )

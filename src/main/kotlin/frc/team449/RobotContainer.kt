@@ -71,10 +71,8 @@ object RobotContainer {
             Mode.REAL ->
                 Vision(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation)
-                        .configure(Constants.VisionConstants.robotToCameraRight),
-                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation)
-                        .configure(Constants.VisionConstants.robotToCameraLeft)
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation, Constants.VisionConstants.robotToCameraRight),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation, Constants.VisionConstants.robotToCameraLeft)
                 )
             Mode.SIM ->
                 Vision(
@@ -85,8 +83,8 @@ object RobotContainer {
             Mode.REPLAY ->
                 Vision(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation),
-                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation)
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, drive.rotation, Constants.VisionConstants.robotToCameraRight),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, drive.rotation, Constants.VisionConstants.robotToCameraLeft)
                 )
                     .also { vision = it }
         }

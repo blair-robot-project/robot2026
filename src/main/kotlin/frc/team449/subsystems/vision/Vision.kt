@@ -17,10 +17,9 @@ import kotlin.math.abs
 import kotlin.math.pow
 
 class Vision(
-    visionConsumer: VisionConsumer,
+    private val consumer: VisionConsumer,
     vararg visionIO: VisionIO
 ) : SubsystemBase() {
-    private val consumer = visionConsumer
     private val io = visionIO
     val inputs = mutableListOf<VisionIOInputsAutoLogged>()
     private val disconnectedAlerts = mutableListOf<Alert>()
