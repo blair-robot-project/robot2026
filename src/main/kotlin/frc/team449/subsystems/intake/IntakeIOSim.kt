@@ -4,7 +4,6 @@ import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
-import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
@@ -70,10 +69,10 @@ class IntakeIOSim : IntakeIOHardware() {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        pivotLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        pivotFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        rollerLeaderSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        rollerFollowerSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        pivotLeaderSim.setSupplyVoltage(12.0)
+        pivotFollowerSim.setSupplyVoltage(12.0)
+        rollerLeaderSim.setSupplyVoltage(12.0)
+        rollerFollowerSim.setSupplyVoltage(12.0)
 
         pivotSim.setInput(pivotLeaderSim.motorVoltage)
         pivotSim.update(Constants.LOOP_TIME)
