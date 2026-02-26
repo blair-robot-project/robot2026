@@ -23,11 +23,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-    private val robotContainer = RobotContainer
 
     init {
         println("Initializing Robot!")
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
 
         HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Kotlin)
         DriverStation.silenceJoystickConnectionWarning(true)
@@ -54,12 +52,16 @@ class Robot : LoggedRobot() {
         Logger.start()
     }
 
+    private val robotContainer = RobotContainer
+
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
         FieldUtil.setHubPosition()
     }
 
     override fun robotInit() {
+        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
+
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
 
@@ -67,6 +69,7 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotPeriodic() {
+        Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
         PhoenixUtil.refreshAll()
 
         // high priority (real-time) thread for loop timing
