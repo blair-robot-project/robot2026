@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Meters
 import edu.wpi.first.units.Units.MetersPerSecond
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.FuelSim
@@ -26,7 +27,7 @@ class FuelSimulationSubsystem(
 
     val intakeSimulatedBPS = 20
     val intakeBPSRateLimit = round((1 / Constants.LOOP_TIME) / intakeSimulatedBPS)
-    val simulatedIntakingMissChance = .6
+    val simulatedIntakingMissChance = .85
     val simulatedHopperLimit = 50
 
     val fuelSim = FuelSim()
@@ -36,6 +37,7 @@ class FuelSimulationSubsystem(
     var effectiveShotSpeed: Double = 0.0
 
     private var simBallThrottle = 0
+    private var simBall2Throttle = 0
     private var simIntakeThrottle = 0
 
     private val shooterTransform =
@@ -73,16 +75,15 @@ class FuelSimulationSubsystem(
         Logger.recordOutput("FuelSim/BallCount", ballCount)
         Logger.recordOutput("FuelSim/ShotSpeedMetersPerSec", effectiveShotSpeed)
         Logger.recordOutput("FuelSim/SimIntaking", simIntaking)
+        Logger.recordOutput("FuelSim/RedScore", fuelSim.redScore)
+        Logger.recordOutput("FuelSim/BlueScore", fuelSim.blueScore)
+        Logger.recordOutput("FuelSim/RedActive", fuelSim.redIsActiveHub())
+        Logger.recordOutput("FuelSim/BlueActive", fuelSim.blueIsActiveHub())
+        Logger.recordOutput("FuelSim/BlueActive", fuelSim.blueIsActiveHub())
+        Logger.recordOutput("FuelSim/Time since last shift", fuelSim.timeSinceLastSwitch)
     }
 
     fun pollFuelLaunch() {
-        if (simBallThrottle < flywheelBPSRateLimit) {
-            if (Math.random() > simulatedIndexingMissChance) {
-                simBallThrottle++
-            }
-            return
-        }
-
         val hasBall = ballCount > 0
         val isSpunUp =
             robotContainer.shooter.isFlywheelAtTolerance() &&
@@ -99,15 +100,38 @@ class FuelSimulationSubsystem(
             rightVel * (1.0 / Constants.ShooterConstants.HOOD_ROLLER_GEARING) * Constants.ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
         val effectiveShotSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2.0 * Constants.ShooterConstants.EFFICIENCY
 
-        fuelSim.launchFuel(
-            MetersPerSecond.of(effectiveShotSpeed),
-            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
-            Radians.of(0.0),
-            Constants.ShooterConstants.SHOOTER_HEIGHT,
-        )
+        if (simBallThrottle < flywheelBPSRateLimit) {
+            if (Math.random() > simulatedIndexingMissChance) {
+                simBallThrottle++
+            }
+        } else {
+            fuelSim.launchFuel(
+                MetersPerSecond.of(effectiveShotSpeed),
+                Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
+                Radians.of(0.0),
+                Constants.ShooterConstants.SHOOTER_HEIGHT,
+                false
+            )
+            ballCount -= 1
+            simBallThrottle = 0
+        }
 
-        ballCount--
-        simBallThrottle = 0
+        if (simBall2Throttle < flywheelBPSRateLimit) {
+            if (Math.random() > simulatedIndexingMissChance) {
+                simBall2Throttle++
+            }
+        } else {
+            fuelSim.launchFuel(
+                MetersPerSecond.of(effectiveShotSpeed),
+                Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
+                Radians.of(0.0),
+                Constants.ShooterConstants.SHOOTER_HEIGHT,
+                true
+            )
+            ballCount -= 1
+            simBall2Throttle = 0
+        }
+
     }
 
     fun pollIntakeAcceptBall(): Boolean {
@@ -134,4 +158,8 @@ class FuelSimulationSubsystem(
             fuelSim.clearFuel()
             fuelSim.spawnStartingFuel()
         }
+
+    fun seedFuelSimTimer() {
+        fuelSim.teleopSeedInfo(Timer.getFPGATimestamp())
+    }
 }
