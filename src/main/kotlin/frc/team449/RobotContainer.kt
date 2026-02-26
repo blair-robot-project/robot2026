@@ -32,10 +32,6 @@ object RobotContainer {
     val driveController: CommandXboxController = CommandXboxController(0)
     val opController: CommandXboxController = CommandXboxController(1)
 
-    val autonomousCommand = PrintCommand("This is the autonomous command!")
-
-    val fuelSim = FuelSim("test")
-
     val drive: DriveSubsystem =
         DriveSubsystem(
             when (Constants.CURRENT_MODE) {
