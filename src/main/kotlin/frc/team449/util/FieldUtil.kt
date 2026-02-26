@@ -8,13 +8,19 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
 object FieldUtil {
+    val BLUE_TRENCH_POSES: List<Pose2d> =
+        listOf(
+            Pose2d(4.35, 0.45, Rotation2d(1.5)),
+            Pose2d(4.35, 7.60, Rotation2d(-1.5)),
+        )
+
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
 
         val allianceTrenchSpots: List<Pose2d> = if (flipRed) {
-            Constants.FieldConstants.BLUE_TRENCH_POSES.map { flipPose(it) }
+            BLUE_TRENCH_POSES.map { flipPose(it) }
         } else {
-            Constants.FieldConstants.BLUE_TRENCH_POSES
+            BLUE_TRENCH_POSES
         }
 
         return allianceTrenchSpots.minBy {
