@@ -102,8 +102,8 @@ object Constants {
         // HOOD
         const val HOOD_MOTOR_ID = 15
 
-        const val HOOD_SUPPLY_LIM = 20.0
-        const val HOOD_STATOR_LIM = 40.0
+        const val HOOD_SUPPLY_LIM = 5.0
+        const val HOOD_STATOR_LIM = 10.0
 
         const val HOOD_GEARING = 106.0
         const val HOOD_ROLLER_GEARING = 1.0 / 3.0
@@ -123,7 +123,7 @@ object Constants {
         const val TOLERANCE_DEBOUNCE_TIME = 0.2 // seconds
 
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 40.0 // amps
+        const val HOMING_CURRENT_AMPS = 10.0 // amps
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
         const val HOOD_TOLERANCE_RAD = 0.1 // 5.7 degrees todo: REFINE
 
@@ -191,17 +191,17 @@ object Constants {
 
         const val PIVOT_GEARING_SENSOR_TO_MECH = 52.0
 
-        const val PIVOT_SUPPLY_LIMIT = 20.0
-        const val PIVOT_STATOR_LIMIT = 40.0
+        const val PIVOT_SUPPLY_LIMIT = 5.0
+        const val PIVOT_STATOR_LIMIT = 10.0
 
         const val STOW_POS_RADS = 0.0
         const val DEPLOY_POS_RADS = 2.269
-        const val DEPLOY_VOLTS = 8.0
+        const val DEPLOY_VOLTS = 4.0
         const val DEPLOY_HOLD_VOLTS = 0.0
-        const val STOW_VOLTS = -8.0
-        const val STOW_HOLD_VOLTS = -1.0
+        const val STOW_VOLTS = -4.0
+        const val STOW_HOLD_VOLTS = 0.0
 
-        const val HOMING_CURRENT_AMPS = 20.0
+        const val HOMING_CURRENT_AMPS = 10.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
 
         const val PIVOT_MOI = 0.16241
