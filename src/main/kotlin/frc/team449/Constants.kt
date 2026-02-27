@@ -47,6 +47,8 @@ object Constants {
         const val ANGULAR_DEADBAND = 0.1
 
         const val WHEEL_COF = 1.4
+
+        const val MODULE_ALIGN_TOLERANCE = 5.0 // degrees
     }
 
     object AutoConstants {
@@ -151,26 +153,29 @@ object Constants {
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // x is distance to hub (meters), y is shot time (sec)
-        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
-            put(1.0, 0.75)
-            put(2.0, 0.97)
-            put(3.0, 1.10)
-            put(5.0, 1.35)
-        }
+        val SHOT_TIME_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(1.0, 0.75)
+                put(2.0, 0.97)
+                put(3.0, 1.10)
+                put(5.0, 1.35)
+            }
 
         // x is distance to hub (meters), y is flywheel velocity (rad/s)
-        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
-            put(2.0, 181.0)
-            put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-            put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-        }
+        val FLYWHEEL_VELOCITY_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(2.0, 181.0)
+                put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+                put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+            }
 
         // x is distance to hub (meters), y is hood angle (DEGREES)
-        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
-            put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
-            put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
-            put(5.0, Degrees.of(25.2).`in`(Degrees))
-        }
+        val HOOD_ANGLE_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
+                put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
+                put(5.0, Degrees.of(25.2).`in`(Degrees))
+            }
     }
 
     object IntakeConstants {

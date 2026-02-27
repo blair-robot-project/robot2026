@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.commands.XLockCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -27,7 +26,7 @@ class Bindings(
                 robotContainer.drive,
                 { -driver.leftY },
                 { -driver.leftX },
-                { -driver.rightX }
+                { -driver.rightX },
             )
         // controls for simulation
     }
@@ -36,13 +35,13 @@ class Bindings(
         driver
             .rightTrigger()
             .onTrue(
-                actions.deployAndToggleIntake()
+                actions.deployAndToggleIntake(),
             )
 
         driver
             .leftTrigger()
             .onTrue(
-                actions.stopAndStow()
+                actions.stopAndStow(),
             )
 
         driver
@@ -56,10 +55,10 @@ class Bindings(
                         { FieldUtil.HUB_TRANSLATION },
                     ),
                     actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
-                    actions.checkAndFeed()
-                )
+                    actions.checkAndFeed(),
+                ),
             ).onFalse(
-                actions.stopFeedAndShooter()
+                actions.stopFeedAndShooter(),
             )
 
         driver
@@ -72,16 +71,15 @@ class Bindings(
                     { -driver.rightX },
                     Constants.DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SECOND,
                     Constants.DriveConstants.SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                )
+                ),
             )
 
         driver
             .a()
             .onTrue(
-                XLockCommand(
-                    robotContainer.drive
-                )
-                    .until(joysticksMovedPastDeadband)
+                robotContainer.drive
+                    .xLock()
+                    .until(joysticksMovedPastDeadband),
             )
 
         driver
@@ -90,15 +88,12 @@ class Bindings(
                 SequentialCommandGroup(
                     actions.prepTrenchShot(),
                     PoseAlignCommand(
-                        robotContainer.drive
+                        robotContainer.drive,
                     ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
                     actions.checkAndFeed(),
-                    XLockCommand(
-                        robotContainer.drive
-                    )
-                )
-                    .until(joysticksMovedPastDeadband)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) }
+                    robotContainer.drive.xLock(),
+                ).until(joysticksMovedPastDeadband)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
 
         // tower sequence on b()
@@ -106,7 +101,7 @@ class Bindings(
         driver
             .povUp()
             .onTrue(
-                actions.stopFeedAndShooter()
+                actions.stopFeedAndShooter(),
             )
 
         driver
