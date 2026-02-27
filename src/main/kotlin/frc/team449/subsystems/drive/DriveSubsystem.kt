@@ -35,7 +35,7 @@ class DriveSubsystem(
         // couldn't find a good way to do it in the io, so just sticking it on here
         Logger.recordOutput(
             "Drive/ActiveCommand",
-            currentCommand?.name ?: "None"
+            currentCommand?.name ?: "None",
         )
     }
 
@@ -55,8 +55,7 @@ class DriveSubsystem(
             inputs.Pose.rotation,
         )
 
-    fun seedFieldCentric(): Command =
-        runOnce { io.seedFieldCentric() }
+    fun seedFieldCentric(): Command = runOnce { io.seedFieldCentric() }
 
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
@@ -68,6 +67,16 @@ class DriveSubsystem(
             },
         )
     }
+
+    fun xLock(): Command =
+        runOnce {
+            io.setControl(SwerveRequest.SwerveDriveBrake())
+        }
+
+    fun alignModules(direction: Rotation2d): Command =
+        runOnce {
+            io.setControl(SwerveRequest.PointWheelsAt().withModuleDirection(direction))
+        }
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,

@@ -5,14 +5,12 @@ import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.RobotContainer.fuelSimulator
-import frc.team449.commands.AlignModulesCommand
 import frc.team449.util.FieldUtil
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
@@ -82,10 +80,6 @@ class Robot : LoggedRobot() {
     }
 
     override fun autonomousInit() {
-        CommandScheduler.getInstance().schedule(
-            AlignModulesCommand(robotContainer.drive, Rotation2d.kCW_90deg),
-        )
-
         CommandScheduler.getInstance().schedule(robotContainer.autoChooser.selected)
     }
 

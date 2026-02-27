@@ -3,6 +3,7 @@ package frc.team449.auto
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Pair
 import edu.wpi.first.math.controller.PIDController
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
@@ -122,6 +123,8 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
+            drive.alignModules(Rotation2d.k180deg),
+            WaitCommand(1.0),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -142,6 +145,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
+            drive.alignModules(Rotation2d.k180deg),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -161,6 +165,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
+            drive.alignModules(Rotation2d.k180deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -180,6 +185,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
+            drive.alignModules(Rotation2d.k180deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -200,6 +206,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
+            drive.alignModules(Rotation2d.k180deg),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -219,6 +226,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
+            drive.alignModules(Rotation2d.k180deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
