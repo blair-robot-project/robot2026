@@ -51,8 +51,23 @@ object Constants {
     }
 
     object AutoConstants {
+        // auto constants
+// TODO: tune
+        const val TRANSLATION_P = 3.2
+        const val TRANSLATION_I = 0.0
+        const val TRANSLATION_D = 0.0
+
+        const val ROTATION_P = 2.8
+        const val ROTATION_I = 0.0
+        const val ROTATION_D = 0.0
+
+        const val CTE_P = 1.0
+        const val CTE_I = 0.0
+        const val CTE_D = 0.0
         const val AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 1.26767 * PI
         const val AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND = PI
+
+        const val AUTO_SHOOTING_TIME = 6.0 // in seconds
     }
 
     object FieldConstants {
@@ -120,7 +135,7 @@ object Constants {
         val HOOD_LENGTH = Units.inchesToMeters(7.1)
 
         // setpoints
-        val TRENCH_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // estimate // ngl this actually works really well
+        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(16.5)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0) // estimate
 
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE // todo: find
@@ -181,7 +196,7 @@ object Constants {
         const val DEPLOY_VOLTS = 8.0
         const val DEPLOY_HOLD_VOLTS = 0.0
         const val STOW_VOLTS = -8.0
-        const val STOW_HOLD_VOLTS = -0.0
+        const val STOW_HOLD_VOLTS = -1.0
 
         const val HOMING_CURRENT_AMPS = 20.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5

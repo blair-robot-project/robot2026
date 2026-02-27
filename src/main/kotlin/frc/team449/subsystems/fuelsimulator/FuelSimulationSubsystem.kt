@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.Meters
 import edu.wpi.first.units.Units.MetersPerSecond
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.FuelSim
 import frc.team449.Constants
@@ -18,7 +19,6 @@ import kotlin.math.round
 class FuelSimulationSubsystem(
     private val robotContainer: RobotContainer
 ) : SubsystemBase() {
-
     // take these out of Constants so that they're not wasting memory on real robot
     val flywheelSimulatedBPS = 11
     val flywheelBPSRateLimit = round((1 / Constants.LOOP_TIME) / flywheelSimulatedBPS)
@@ -38,10 +38,11 @@ class FuelSimulationSubsystem(
     private var simBallThrottle = 0
     private var simIntakeThrottle = 0
 
-    private val shooterTransform = Transform2d(
-        Translation2d(-Units.inchesToMeters(26.5) / 2 * 0.75, 0.0),
-        Rotation2d()
-    )
+    private val shooterTransform =
+        Transform2d(
+            Translation2d(-Units.inchesToMeters(26.5) / 2 * 0.75, 0.0),
+            Rotation2d(),
+        )
 
     init {
         fuelSim.enableAirResistance()
@@ -51,7 +52,7 @@ class FuelSimulationSubsystem(
             Units.inchesToMeters(Constants.ROBOT_LENGTH_INCHES),
             Units.inchesToMeters(5.0),
             { robotContainer.drive.pose.plus(shooterTransform) },
-            robotContainer.drive::getFieldRelativeSpeeds
+            robotContainer.drive::getFieldRelativeSpeeds,
         )
 
         fuelSim.registerIntake(
@@ -59,7 +60,7 @@ class FuelSimulationSubsystem(
             Units.inchesToMeters(26.5) / 2 + Units.inchesToMeters(12.0),
             -Units.inchesToMeters(26.5) / 2,
             Units.inchesToMeters(26.5) / 2,
-            this::pollIntakeAcceptBall
+            this::pollIntakeAcceptBall,
         ) { ballCount += 1 }
     }
 
@@ -83,9 +84,10 @@ class FuelSimulationSubsystem(
         }
 
         val hasBall = ballCount > 0
-        val isSpunUp = robotContainer.shooter.isFlywheelAtTolerance() &&
-            robotContainer.shooter.isHoodAtTolerance() &&
-            robotContainer.shooter.flywheelTargetVelocityRadPerSec >= 10.0
+        val isSpunUp =
+            robotContainer.shooter.isFlywheelAtTolerance() &&
+                robotContainer.shooter.isHoodAtTolerance() &&
+                robotContainer.shooter.flywheelTargetVelocityRadPerSec >= 10.0
 
         val isFeeding = robotContainer.indexer.indexerTargetVelocityRadPerSec >= 10.0
 
@@ -93,14 +95,15 @@ class FuelSimulationSubsystem(
 
         val rightVel = robotContainer.shooter.inputs.rightLeaderVelocityRadPerSec
         val flywheelSurfaceSpeed = rightVel * Constants.ShooterConstants.FLYWHEEL_RADIUS
-        val hoodRollerSurfaceSpeed = rightVel * (1.0 / Constants.ShooterConstants.HOOD_ROLLER_GEARING) * Constants.ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
+        val hoodRollerSurfaceSpeed =
+            rightVel * (1.0 / Constants.ShooterConstants.HOOD_ROLLER_GEARING) * Constants.ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
         val effectiveShotSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2.0 * Constants.ShooterConstants.EFFICIENCY
 
         fuelSim.launchFuel(
             MetersPerSecond.of(effectiveShotSpeed),
             Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
             Radians.of(0.0),
-            Constants.ShooterConstants.SHOOTER_HEIGHT
+            Constants.ShooterConstants.SHOOTER_HEIGHT,
         )
 
         ballCount--
@@ -125,4 +128,10 @@ class FuelSimulationSubsystem(
         simIntakeThrottle = 0
         return true
     }
+
+    fun resetFuel(): Command =
+        runOnce {
+            fuelSim.clearFuel()
+            fuelSim.spawnStartingFuel()
+        }
 }
