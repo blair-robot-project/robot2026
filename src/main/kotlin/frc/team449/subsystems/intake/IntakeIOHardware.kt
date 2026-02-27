@@ -154,9 +154,11 @@ open class IntakeIOHardware : IntakeIO {
                 Inverted = IntakeConstants.LEFT_ROLLER_INVERSION
             }
 
+            Feedback.SensorToMechanismRatio = IntakeConstants.ROLLER_GEARING
+
             Slot0.apply {
-                kP = 0.1
-                kV = 0.12
+                kP = 0.0
+                kV = 0.09
             }
         }
     }

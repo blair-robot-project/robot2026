@@ -100,7 +100,11 @@ class Bindings(
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
 
-        // tower sequence on b()
+        driver.b().onTrue(
+            robotContainer.indexer.index(Constants.IndexerConstants.SHOOTING_INDEXER_SPEED)
+        ).onFalse(
+            robotContainer.indexer.stop()
+        )
 
         driver
             .povUp()
@@ -128,6 +132,18 @@ class Bindings(
 
         operator.povUpRight().onTrue(
             robotContainer.shooter.sysIDFlyWheel.dynamic(SysIdRoutine.Direction.kReverse),
+        )
+
+        operator.a().onTrue(
+            robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.MIN_HOOD_ANGLE)
+        )
+
+        operator.y().onTrue(
+            robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TOWER_HOOD_ANGLE)
+        )
+
+        operator.x().onTrue(
+            robotContainer.shooter.homeHood()
         )
     }
 }

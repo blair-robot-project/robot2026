@@ -20,6 +20,8 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
+import frc.team449.Constants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KI
@@ -148,6 +150,8 @@ open class ShooterIOHardware : ShooterIO {
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
 
         PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
+
+        hoodMotor.setPosition(ShooterConstants.MIN_HOOD_ANGLE)
     }
 
     private var isAliveCounter = 0
@@ -239,11 +243,28 @@ open class ShooterIOHardware : ShooterIO {
                 kV = FLYWHEEL_KV
             }
         }
-        val rightFlywheelConfig: TalonFXConfiguration? = leftFlywheelConfig.withMotorOutput(
-            MotorOutputConfigs().withNeutralMode(
-                NeutralModeValue.Coast
-            ).withInverted(InvertedValue.Clockwise_Positive)
-        )
+
+        val rightFlywheelConfig = TalonFXConfiguration().apply {
+            CurrentLimits.apply {
+                SupplyCurrentLimit = FLYWHEEL_SUPPLY_LIM
+                StatorCurrentLimit = FLYWHEEL_STATOR_LIM
+            }
+
+            MotorOutput.apply {
+                NeutralMode = NeutralModeValue.Coast
+                Inverted = InvertedValue.Clockwise_Positive
+            }
+
+            Feedback.SensorToMechanismRatio = FLYWHEEL_GEARING
+
+            Slot0.apply {
+                kP = FLYWHEEL_KP
+                kI = FLYWHEEL_KI
+                kD = FLYWHEEL_KD
+                kS = FLYWHEEL_KS
+                kV = FLYWHEEL_KV
+            }
+        }
 
         val hoodConfig = TalonFXConfiguration().apply {
             CurrentLimits.apply {
@@ -253,7 +274,7 @@ open class ShooterIOHardware : ShooterIO {
 
             MotorOutput.apply {
                 NeutralMode = NeutralModeValue.Brake
-                Inverted = InvertedValue.Clockwise_Positive
+                Inverted = InvertedValue.CounterClockwise_Positive
             }
 
             Feedback.SensorToMechanismRatio = HOOD_GEARING

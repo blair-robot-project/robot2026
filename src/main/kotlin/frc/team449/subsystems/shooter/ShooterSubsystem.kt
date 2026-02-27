@@ -135,8 +135,8 @@ class ShooterSubsystem(
         SysIdRoutine(
             SysIdRoutine.Config(
                 null,
-                Volts.of(1.0),
-                Seconds.of(5.0),
+                Volts.of(8.0),
+                Seconds.of(20.0),
             ) { state: SysIdRoutineLog.State ->
                 Logger.recordOutput(
                     "SysIdFlywheel",

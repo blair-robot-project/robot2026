@@ -102,8 +102,8 @@ object Constants {
         // HOOD
         const val HOOD_MOTOR_ID = 15
 
-        const val HOOD_SUPPLY_LIM = 5.0
-        const val HOOD_STATOR_LIM = 10.0
+        const val HOOD_SUPPLY_LIM = 40.0
+        const val HOOD_STATOR_LIM = 20.0
 
         const val HOOD_GEARING = 106.0
         const val HOOD_ROLLER_GEARING = 1.0 / 3.0
@@ -184,7 +184,7 @@ object Constants {
         val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
 
         val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Coast
-        val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
+        val LEFT_ROLLER_INVERSION = InvertedValue.Clockwise_Positive
 
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
         val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
@@ -269,7 +269,7 @@ object Constants {
 
         const val TOP_MOI = .000000008 // TODO: Find
 
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
+        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(60.0)
     }
 
     object AimbotConstants {
