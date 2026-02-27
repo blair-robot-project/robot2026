@@ -101,22 +101,20 @@ class Bindings(
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) }
             )
 
-        // tower sequence on b()
         driver
             .b()
             .onTrue(
                 SequentialCommandGroup(
                     actions.prepTowerShot(),
                     PoseAlignCommand(
-                        robotContainer.drive
-                    ) { FieldUtil.getClosestTowerPose(robotContainer.drive.pose)},
+                        robotContainer.drive,
+                    ) { FieldUtil.getTowerPose() },
                     actions.checkAndFeed(),
                     XLockCommand(
-                        robotContainer.drive
-                    )
-                )
-                    .until(joysticksMovedPastDeadband)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter())}
+                        robotContainer.drive,
+                    ),
+                ).until(joysticksMovedPastDeadband)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
 
         driver

@@ -19,10 +19,7 @@ object FieldUtil {
             Pose2d(4.35, 7.60, Rotation2d(-1.5)),
         )
 
-    val BLUE_TOWER_POSES: List<Pose2d> =
-        listOf(
-            Pose2d(1.550, 4.022, Rotation2d(0.0)),
-        )
+    val BLUE_TOWER_POSE: Pose2d = Pose2d(1.550, 4.055, Rotation2d(0.0))
 
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
@@ -38,17 +35,16 @@ object FieldUtil {
         }
     }
 
-    fun getClosestTowerPose(robotPose : Pose2d) : Pose2d {
+    fun getTowerPose(): Pose2d {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
 
-        val allianceTowerSpots : List<Pose2d> = if (flipRed) {
-            BLUE_TOWER_POSES.map { flipPose(it) }
-        } else {
-            BLUE_TOWER_POSES
-        }
-        return allianceTowerSpots.minBy {
-            it.translation.getDistance(robotPose.translation)
-        }
+        val allianceTowerSpot: Pose2d =
+            if (flipRed) {
+                flipPose(BLUE_TOWER_POSE)
+            } else {
+                BLUE_TOWER_POSE
+            }
+        return allianceTowerSpot
     }
 
     // flip (wall-blue zero)
@@ -56,7 +52,7 @@ object FieldUtil {
         return Pose2d(
             Constants.FieldConstants.FIELD_LENGTH_METERS - pose.x,
             pose.y,
-            Rotation2d(PI).minus(pose.rotation)
+            Rotation2d(PI).minus(pose.rotation),
         )
     }
 
