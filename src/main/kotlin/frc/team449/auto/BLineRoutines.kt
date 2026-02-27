@@ -123,8 +123,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.k180deg),
-            WaitCommand(1.0),
+            drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -145,7 +144,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.k180deg),
+            drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -165,7 +164,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.k180deg),
+            drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -185,7 +184,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.k180deg),
+            drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -206,7 +205,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.k180deg),
+            drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME),
@@ -226,7 +225,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.k180deg),
+            drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME),

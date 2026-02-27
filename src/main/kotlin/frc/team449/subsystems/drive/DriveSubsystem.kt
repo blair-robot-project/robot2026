@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
+import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
 import org.littletonrobotics.junction.Logger
+import kotlin.math.abs
 
 class DriveSubsystem(
     val io: DriveIO
@@ -68,14 +70,21 @@ class DriveSubsystem(
         )
     }
 
+    // private var xLockRequest = SwerveRequest.SwerveDriveBrake()
+
     fun xLock(): Command =
-        runOnce {
+        run {
             io.setControl(SwerveRequest.SwerveDriveBrake())
         }
 
     fun alignModules(direction: Rotation2d): Command =
-        runOnce {
+        run {
             io.setControl(SwerveRequest.PointWheelsAt().withModuleDirection(direction))
+        }.until {
+            abs(inputs.ModuleTargets[0].angle.degrees - inputs.ModuleStates[0].angle.degrees) <= MODULE_ALIGN_TOLERANCE &&
+                abs(inputs.ModuleTargets[1].angle.degrees - inputs.ModuleStates[1].angle.degrees) <= MODULE_ALIGN_TOLERANCE &&
+                abs(inputs.ModuleTargets[2].angle.degrees - inputs.ModuleStates[2].angle.degrees) <= MODULE_ALIGN_TOLERANCE &&
+                abs(inputs.ModuleTargets[3].angle.degrees - inputs.ModuleStates[3].angle.degrees) <= MODULE_ALIGN_TOLERANCE
         }
 
     fun addVisionMeasurement(

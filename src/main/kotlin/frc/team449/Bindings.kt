@@ -1,6 +1,5 @@
 package frc.team449
 
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
@@ -109,12 +108,6 @@ class Bindings(
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
-            )
-
-        driver
-            .b()
-            .onTrue(
-                robotContainer.drive.alignModules(Rotation2d.k180deg),
             )
     }
 }
