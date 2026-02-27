@@ -1,7 +1,6 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.PositionVoltage
@@ -20,7 +19,6 @@ import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
-import frc.team449.Constants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_KD
