@@ -13,7 +13,7 @@ import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer
+    val robotContainer: RobotContainer,
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
@@ -116,33 +116,38 @@ class Bindings(
             .rightBumper()
             .whileTrue(
                 actions.prepTrenchShot(),
-            )
-            .onFalse(
+            ).onFalse(
                 actions.stopFeedAndShooter(),
             )
 
         operator
             .a()
             .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
             )
 
         operator
             .y()
             .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE)
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
             )
 
         operator
             .x()
             .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE)
+                robotContainer.shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
             )
 
         operator
             .povUp()
             .whileTrue(
-                robotContainer.drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward)
+                robotContainer.drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+            )
+
+        operator
+            .povDown()
+            .whileTrue(
+                robotContainer.drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
             )
     }
 }

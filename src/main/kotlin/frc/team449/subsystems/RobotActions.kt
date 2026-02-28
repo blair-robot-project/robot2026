@@ -16,7 +16,7 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 import java.util.function.Supplier
 
 class RobotActions(
-    robotContainer: RobotContainer
+    robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -35,7 +35,7 @@ class RobotActions(
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
-            intake.stow(),
+            //   intake.stow(),
         )
 
     fun stopIntake(): Command = intake.stopRollers()
@@ -55,7 +55,7 @@ class RobotActions(
     fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
         shooter.setFlywheelAndHoodFromSuppliers(
             { RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())) },
-            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) }
+            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) },
         )
 
     fun prepTowerShot(): Command =

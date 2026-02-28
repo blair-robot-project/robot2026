@@ -19,7 +19,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY
+        REPLAY,
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -124,7 +124,7 @@ object Constants {
         const val HOOD_STATOR_LIM = 20.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
-        val MAX_HOOD_ANGLE: Angle = Radians.of(0.54796)
+        val MAX_HOOD_ANGLE: Angle = Radians.of(0.5185)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
@@ -147,7 +147,7 @@ object Constants {
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
         const val HOOD_KS = 0.1
-        const val HOOD_KG = 0.14
+        const val HOOD_KG = 0.0 // 0.14
         const val HOOD_KV = 2.7
 
         // --- HOMING & TOLERANCE ---
@@ -171,24 +171,27 @@ object Constants {
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(180.0)
 
         // --- INTERPOLATION MAPS ---
-        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
-            put(1.0, 0.75)
-            put(2.0, 0.97)
-            put(3.0, 1.10)
-            put(5.0, 1.35)
-        }
+        val SHOT_TIME_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(1.0, 0.75)
+                put(2.0, 0.97)
+                put(3.0, 1.10)
+                put(5.0, 1.35)
+            }
 
-        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
-            put(2.0, 181.0)
-            put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-            put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-        }
+        val FLYWHEEL_VELOCITY_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(2.0, 181.0)
+                put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+                put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+            }
 
-        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
-            put(2.0, 0.0)
-            put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
-            put(5.0, 0.1806)
-        }
+        val HOOD_ANGLE_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(2.0, 0.0)
+                put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
+                put(5.0, 0.1806)
+            }
     }
 
     object IntakeConstants {
@@ -243,7 +246,6 @@ object Constants {
 
     // INDEXER CONSTANTS STILL SLIGHTLY OFF
     object IndexerConstants {
-
         // --- HARDWARE IDs ---
         const val WEDGE_INDEXER_ID = 21
         const val FLOOR_INDEXER_ID = 22
@@ -340,10 +342,11 @@ object Constants {
 
         // Standard deviation multipliers for each camera
         // (Adjust to trust some cameras more than others)
-        var cameraStdDevFactors: DoubleArray = doubleArrayOf(
-            1.0, // Camera 0
-            1.0 // Camera 1
-        )
+        var cameraStdDevFactors: DoubleArray =
+            doubleArrayOf(
+                1.0, // Camera 0
+                1.0, // Camera 1
+            )
 
         // Multipliers to apply for MegaTag 2 observations
         var linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
