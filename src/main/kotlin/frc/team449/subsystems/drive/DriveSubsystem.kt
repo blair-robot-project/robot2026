@@ -70,8 +70,6 @@ class DriveSubsystem(
         )
     }
 
-    // private var xLockRequest = SwerveRequest.SwerveDriveBrake()
-
     fun xLock(): Command =
         run {
             io.setControl(SwerveRequest.SwerveDriveBrake())
@@ -81,10 +79,12 @@ class DriveSubsystem(
         run {
             io.setControl(SwerveRequest.PointWheelsAt().withModuleDirection(direction))
         }.until {
-            abs(inputs.ModuleTargets[0].angle.degrees - inputs.ModuleStates[0].angle.degrees) <= MODULE_ALIGN_TOLERANCE &&
-                abs(inputs.ModuleTargets[1].angle.degrees - inputs.ModuleStates[1].angle.degrees) <= MODULE_ALIGN_TOLERANCE &&
-                abs(inputs.ModuleTargets[2].angle.degrees - inputs.ModuleStates[2].angle.degrees) <= MODULE_ALIGN_TOLERANCE &&
-                abs(inputs.ModuleTargets[3].angle.degrees - inputs.ModuleStates[3].angle.degrees) <= MODULE_ALIGN_TOLERANCE
+            (0..3).all { i ->
+                val target = inputs.ModuleTargets[i].angle
+                val state = inputs.ModuleStates[i].angle
+
+                abs(target.minus(state).degrees) <= MODULE_ALIGN_TOLERANCE
+            }
         }
 
     fun addVisionMeasurement(
@@ -109,7 +109,7 @@ class DriveSubsystem(
         SysIdRoutine(
             SysIdRoutine.Config(
                 null, // default ramp rate (1 V/s)
-                Volts.of(1.0), // dynamic step voltage
+                Volts.of(6.0), // dynamic step voltage
                 null, // default timeout (10 s)
             ) { state: SysIdRoutineLog.State ->
                 Logger.recordOutput(
