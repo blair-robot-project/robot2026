@@ -35,7 +35,7 @@ class VisionIOLimelight(
     private val limelight = Limelight(name)
     private var estimationMode = EstimationMode.MEGATAG2 // can change this if wanna run both megatag1 and 2
     private var poseObservationType = PoseObservationType.MEGATAG_2
-    private val poseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2)
+    private val poseEstimator = limelight.createPoseEstimator(estimationMode)
 
     init {
         limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
