@@ -72,11 +72,11 @@ class Robot : LoggedRobot() {
         PhoenixUtil.refreshAll()
 
         // high priority (real-time) thread for loop timing
-        Threads.setCurrentThreadPriority(true, 99)
+//        Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()
 
         // return thread to low priority (standard)
-        Threads.setCurrentThreadPriority(false, 10)
+//        Threads.setCurrentThreadPriority(false, 10)
     }
 
     override fun autonomousInit() {
