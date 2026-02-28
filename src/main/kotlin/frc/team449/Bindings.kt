@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
@@ -108,6 +109,33 @@ class Bindings(
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
+            )
+
+        operator
+            .rightBumper()
+            .whileTrue(
+                actions.prepTrenchShot(),
+            )
+            .onFalse(
+                actions.stopFeedAndShooter(),
+            )
+
+        operator
+            .a()
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+            )
+
+        operator
+            .y()
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE)
+            )
+
+        operator
+            .x()
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE)
             )
     }
 }

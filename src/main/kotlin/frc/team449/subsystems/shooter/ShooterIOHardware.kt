@@ -23,9 +23,6 @@ import frc.team449.Constants.ShooterConstants
 import frc.team449.util.PhoenixUtil
 
 open class ShooterIOHardware : ShooterIO {
-    // TODO: a little constants
-    // TODO: interpolating double map for flywheel velocity + hood angle
-
     val leftLeaderMotor = TalonFX(ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
     val leftFollowerMotor = TalonFX(ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID)
     val rightLeaderMotor = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID)
@@ -117,8 +114,8 @@ open class ShooterIOHardware : ShooterIO {
         rightFollowerMotor.configurator.apply(rightFlywheelConfig)
         hoodMotor.configurator.apply(hoodConfig)
 
-        leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
-        rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, MotorAlignmentValue.Aligned))
+        leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT))
+        rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT))
 
         ParentDevice.optimizeBusUtilizationForAll(leftLeaderMotor, leftFollowerMotor, rightLeaderMotor, rightFollowerMotor, hoodMotor)
 
@@ -126,8 +123,6 @@ open class ShooterIOHardware : ShooterIO {
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
 
         PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
-
-        resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
     }
 
     private var isAliveCounter = 0
@@ -205,8 +200,8 @@ open class ShooterIOHardware : ShooterIO {
             }
 
             MotorOutput.apply {
-                NeutralMode = NeutralModeValue.Coast
-                Inverted = InvertedValue.CounterClockwise_Positive
+                NeutralMode = ShooterConstants.LEFT_FLYWHEEL_NEUTRAL_MODE
+                Inverted = ShooterConstants.LEFT_FLYWHEEL_INVERSION
             }
 
             Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_GEARING
@@ -227,8 +222,8 @@ open class ShooterIOHardware : ShooterIO {
             }
 
             MotorOutput.apply {
-                NeutralMode = NeutralModeValue.Coast
-                Inverted = InvertedValue.Clockwise_Positive
+                NeutralMode = ShooterConstants.RIGHT_FLYWHEEL_NEUTRAL_MODE
+                Inverted = ShooterConstants.RIGHT_FLYWHEEL_INVERSION
             }
 
             Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_GEARING
@@ -249,8 +244,8 @@ open class ShooterIOHardware : ShooterIO {
             }
 
             MotorOutput.apply {
-                NeutralMode = NeutralModeValue.Brake
-                Inverted = InvertedValue.CounterClockwise_Positive
+                NeutralMode = ShooterConstants.HOOD_NEUTRAL_MODE
+                Inverted = ShooterConstants.HOOD_INVERSION
             }
 
             Feedback.SensorToMechanismRatio = ShooterConstants.HOOD_GEARING

@@ -42,8 +42,6 @@ interface ShooterIO {
 
         @JvmField var rightFollowerTempCelsius: Double = 0.0
 
-        @JvmField var shooterAtGoal: Boolean = false
-
         @JvmField var hoodPositionRad: Double = 0.0
 
         @JvmField var hoodVelocityRadPerSec: Double = 0.0

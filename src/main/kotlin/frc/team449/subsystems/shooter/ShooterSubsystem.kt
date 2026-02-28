@@ -23,7 +23,7 @@ class ShooterSubsystem(
     val inputs: ShooterIOInputsAutoLogged = ShooterIOInputsAutoLogged() // should not be public
 
     var flywheelTargetVelocityRadPerSec: Double = 0.0
-    private var hoodTargetPositionRad: Double = 0.2591940418
+    private var hoodTargetPositionRad: Double = 0.0
 
     val hoodSimAngle: Double
         get() = inputs.hoodPositionRad
@@ -59,12 +59,14 @@ class ShooterSubsystem(
         hoodAngleSupplier: Supplier<Angle>
     ): Command =
         run {
-            val velocity = flywheelVelocitySupplier.get()
-            flywheelTargetVelocityRadPerSec = velocity.`in`(RadiansPerSecond)
-            io.setFlywheelVelocity(velocity)
-            val angle = hoodAngleSupplier.get()
-            hoodTargetPositionRad = angle.`in`(Radians)
-            io.setHoodAngle(angle)
+            val flywheelVelocity = flywheelVelocitySupplier.get()
+            val hoodAngle = hoodAngleSupplier.get()
+
+            flywheelTargetVelocityRadPerSec = flywheelVelocity.`in`(RadiansPerSecond)
+            hoodTargetPositionRad = hoodAngle.`in`(Radians)
+
+            io.setFlywheelVelocity(flywheelVelocity)
+            io.setHoodAngle(hoodAngle)
         }
 
     fun stopFlywheel(): Command =
