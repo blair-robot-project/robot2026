@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.commands.XLockCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -79,9 +78,9 @@ class Bindings(
         driver
             .a()
             .onTrue(
-                XLockCommand(
-                    robotContainer.drive,
-                ).until(joysticksMovedPastDeadband),
+                robotContainer.drive
+                    .xLock()
+                    .until(joysticksMovedPastDeadband),
             )
 
         driver
@@ -93,9 +92,7 @@ class Bindings(
                         robotContainer.drive,
                     ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
                     actions.checkAndFeed(),
-                    XLockCommand(
-                        robotContainer.drive,
-                    ),
+                    robotContainer.drive.xLock(),
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
