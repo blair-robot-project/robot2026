@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
+import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
@@ -119,8 +120,16 @@ open class DriveIOHardware(
                 driveState.ModuleTargets[i].angle,
             )
             Logger.recordOutput(
+                moduleNames[i] + "/Drive Wheel RPS",
+                this.modules[i].driveMotor.velocity.value.`in`(Units.RotationsPerSecond)
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/Drive Wheel Voltage",
+                this.modules[i].driveMotor.motorVoltage.value.`in`(Units.Volts)
+            )
+            Logger.recordOutput(
                 moduleNames[i] + "/Drive Velocity",
-                driveState.ModuleStates[i].speedMetersPerSecond,
+                driveState.ModuleStates[i].speedMetersPerSecond
             )
             Logger.recordOutput(
                 moduleNames[i] + "/Target Drive Velocity",
