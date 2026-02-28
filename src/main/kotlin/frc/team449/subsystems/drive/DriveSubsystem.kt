@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class DriveSubsystem(
-    val io: DriveIO
+    private val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 

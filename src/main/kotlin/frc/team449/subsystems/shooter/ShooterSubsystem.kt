@@ -112,7 +112,7 @@ class ShooterSubsystem(
     fun homeHood(): Command =
         this
             .defer {
-                val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
+                val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME)
 
                 Commands.sequence(
                     this.runOnce { io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE) },
@@ -131,7 +131,7 @@ class ShooterSubsystem(
 
     fun holdHood(): Command = setHoodAngle(Radians.of(inputs.hoodPositionRad))
 
-    val sysIDFlyWheel =
+    val sysIDFlywheel =
         SysIdRoutine(
             SysIdRoutine.Config(
                 null,

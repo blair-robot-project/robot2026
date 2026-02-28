@@ -1,4 +1,5 @@
 package frc.team449.subsystems.intake
+
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
@@ -70,7 +71,7 @@ class IntakeSubsystem(
     ): Command {
         return this.defer {
             pivotDeployedState = deployedState
-            val hardstopDebouncer = Debouncer(0.2)
+            val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
 
             this.run {
                 io.setPivotVoltage(moveVolts)

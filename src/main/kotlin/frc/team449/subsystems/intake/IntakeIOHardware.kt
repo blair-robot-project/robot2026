@@ -7,7 +7,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
-import edu.wpi.first.units.Units.*
+import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
@@ -79,28 +79,28 @@ open class IntakeIOHardware : IntakeIO {
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         BaseStatusSignal.refreshAll(*allSignals)
 
-        inputs.leftPivotLeaderAppliedVolts = leftPivotLeaderVoltage.value.`in`(Volts)
-        inputs.leftPivotLeaderPositionRad = leftPivotLeaderPosition.value.`in`(Radians)
-        inputs.leftPivotLeaderVelocityRadPerSec = leftPivotLeaderVelocity.value.`in`(RadiansPerSecond)
-        inputs.leftPivotLeaderSupplyCurrentAmps = leftPivotLeaderSupplyCurrent.value.`in`(Amps)
-        inputs.leftPivotLeaderStatorCurrentAmps = leftPivotLeaderStatorCurrent.value.`in`(Amps)
-        inputs.leftPivotLeaderTempCelsius = leftPivotLeaderTemp.value.`in`(Celsius)
+        inputs.leftPivotLeaderAppliedVolts = leftPivotLeaderVoltage.value.`in`(Units.Volts)
+        inputs.leftPivotLeaderPositionRad = leftPivotLeaderPosition.value.`in`(Units.Radians)
+        inputs.leftPivotLeaderVelocityRadPerSec = leftPivotLeaderVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.leftPivotLeaderSupplyCurrentAmps = leftPivotLeaderSupplyCurrent.value.`in`(Units.Amps)
+        inputs.leftPivotLeaderStatorCurrentAmps = leftPivotLeaderStatorCurrent.value.`in`(Units.Amps)
+        inputs.leftPivotLeaderTempCelsius = leftPivotLeaderTemp.value.`in`(Units.Celsius)
 
-        inputs.rightPivotFollowerAppliedVolts = rightPivotFollowerVoltage.value.`in`(Volts)
-        inputs.rightPivotFollowerSupplyCurrentAmps = rightPivotFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.rightPivotFollowerStatorCurrentAmps = rightPivotFollowerStatorCurrent.value.`in`(Amps)
-        inputs.rightPivotFollowerTempCelsius = rightPivotFollowerTemp.value.`in`(Celsius)
+        inputs.rightPivotFollowerAppliedVolts = rightPivotFollowerVoltage.value.`in`(Units.Volts)
+        inputs.rightPivotFollowerSupplyCurrentAmps = rightPivotFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.rightPivotFollowerStatorCurrentAmps = rightPivotFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.rightPivotFollowerTempCelsius = rightPivotFollowerTemp.value.`in`(Units.Celsius)
 
-        inputs.leftRollerLeaderAppliedVolts = leftRollerLeaderVoltage.value.`in`(Volts)
-        inputs.leftRollerLeaderVelocityRadPerSec = leftRollerLeaderVelocity.value.`in`(RadiansPerSecond)
-        inputs.leftRollerLeaderSupplyCurrentAmps = leftRollerLeaderSupplyCurrent.value.`in`(Amps)
-        inputs.leftRollerLeaderStatorCurrentAmps = leftRollerLeaderStatorCurrent.value.`in`(Amps)
-        inputs.leftRollerLeaderTempCelsius = leftRollerLeaderTemp.value.`in`(Celsius)
+        inputs.leftRollerLeaderAppliedVolts = leftRollerLeaderVoltage.value.`in`(Units.Volts)
+        inputs.leftRollerLeaderVelocityRadPerSec = leftRollerLeaderVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.leftRollerLeaderSupplyCurrentAmps = leftRollerLeaderSupplyCurrent.value.`in`(Units.Amps)
+        inputs.leftRollerLeaderStatorCurrentAmps = leftRollerLeaderStatorCurrent.value.`in`(Units.Amps)
+        inputs.leftRollerLeaderTempCelsius = leftRollerLeaderTemp.value.`in`(Units.Celsius)
 
-        inputs.rightRollerFollowerAppliedVolts = rightRollerFollowerVoltage.value.`in`(Volts)
-        inputs.rightRollerFollowerSupplyCurrentAmps = rightRollerFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Amps)
-        inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Celsius)
+        inputs.rightRollerFollowerAppliedVolts = rightRollerFollowerVoltage.value.`in`(Units.Volts)
+        inputs.rightRollerFollowerSupplyCurrentAmps = rightRollerFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Units.Celsius)
 
         if (isAliveCounter++ >= 50) {
             isAliveCounter = 0
