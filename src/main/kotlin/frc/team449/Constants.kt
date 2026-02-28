@@ -44,8 +44,8 @@ object Constants {
         const val WHEEL_COF = 1.4
 
         // --- SPEED LIMITS (STANDARD) ---
-        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
-        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
+        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.7
+        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 5.804 / 4 * PI
 
         // --- SPEED LIMITS (SLOW) ---
         const val SLOW_LINEAR_SPEED_METERS_PER_SECOND = 1.5
@@ -162,10 +162,10 @@ object Constants {
 
         // --- STATIC SETPOINTS ---
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
-        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(150.5)
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
 
-        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.02878528478034)
-        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0)
+        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.1)
+        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         val TOWER_HOOD_ANGLE: Angle = Radians.of(0.1422)
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(180.0)
@@ -303,7 +303,7 @@ object Constants {
         const val TOP_KV = 0.34
 
         // --- SETPOINTS ---
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(60.0)
+        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(90.0)
     }
 
     object AimbotConstants {
