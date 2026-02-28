@@ -4,11 +4,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.commands.XLockCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -79,9 +77,9 @@ class Bindings(
         driver
             .a()
             .onTrue(
-                XLockCommand(
-                    robotContainer.drive,
-                ).until(joysticksMovedPastDeadband),
+                robotContainer.drive
+                    .xLock()
+                    .until(joysticksMovedPastDeadband),
             )
 
         driver
@@ -93,18 +91,12 @@ class Bindings(
                         robotContainer.drive,
                     ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
                     actions.checkAndFeed(),
-                    XLockCommand(
-                        robotContainer.drive,
-                    ),
+                    robotContainer.drive.xLock(),
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
 
-        driver.b().onTrue(
-            robotContainer.indexer.index(Constants.IndexerConstants.SHOOTING_INDEXER_SPEED)
-        ).onFalse(
-            robotContainer.indexer.stop()
-        )
+        // tower sequence on b()
 
         driver
             .povUp()
@@ -117,33 +109,5 @@ class Bindings(
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
             )
-
-        operator.povUp().onTrue(
-            robotContainer.shooter.sysIDFlyWheel.quasistatic(SysIdRoutine.Direction.kForward),
-        )
-
-        operator.povDown().onTrue(
-            robotContainer.shooter.sysIDFlyWheel.quasistatic(SysIdRoutine.Direction.kReverse),
-        )
-
-        operator.povLeft().onTrue(
-            robotContainer.shooter.sysIDFlyWheel.dynamic(SysIdRoutine.Direction.kForward),
-        )
-
-        operator.povUpRight().onTrue(
-            robotContainer.shooter.sysIDFlyWheel.dynamic(SysIdRoutine.Direction.kReverse),
-        )
-
-        operator.a().onTrue(
-            robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.MIN_HOOD_ANGLE)
-        )
-
-        operator.y().onTrue(
-            robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TOWER_HOOD_ANGLE)
-        )
-
-        operator.x().onTrue(
-            robotContainer.shooter.homeHood()
-        )
     }
 }
