@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
-import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME
+import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME_SEC
 import frc.team449.Constants.AutoConstants.CTE_D
 import frc.team449.Constants.AutoConstants.CTE_I
 import frc.team449.Constants.AutoConstants.CTE_P
@@ -126,10 +126,10 @@ class BLineRoutines(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -147,10 +147,10 @@ class BLineRoutines(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -167,9 +167,9 @@ class BLineRoutines(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path3),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path4),
         )
     }
@@ -187,10 +187,10 @@ class BLineRoutines(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -208,10 +208,10 @@ class BLineRoutines(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path3),
             pathBuilderWithReset.build(path4),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path5),
         )
     }
@@ -228,9 +228,9 @@ class BLineRoutines(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path3),
-            WaitCommand(AUTO_SHOOTING_TIME),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilderWithReset.build(path4),
         )
     }

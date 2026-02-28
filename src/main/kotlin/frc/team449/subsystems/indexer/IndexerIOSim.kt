@@ -8,18 +8,18 @@ import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import frc.team449.Constants
 import frc.team449.Constants.IndexerConstants.FLOOR_GEARING
-import frc.team449.Constants.IndexerConstants.FLOOR_MOI
+import frc.team449.Constants.IndexerConstants.FLOOR_MOI_KG_MM
 import frc.team449.Constants.IndexerConstants.TOP_GEARING
-import frc.team449.Constants.IndexerConstants.TOP_MOI
+import frc.team449.Constants.IndexerConstants.TOP_MOI_KG_MM
 import frc.team449.Constants.IndexerConstants.WEDGE_GEARING
-import frc.team449.Constants.IndexerConstants.WEDGE_MOI
+import frc.team449.Constants.IndexerConstants.WEDGE_MOI_KG_MM
 
 class IndexerIOSim : IndexerIOHardware() {
     var wedgeSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(1),
-                WEDGE_MOI,
+                WEDGE_MOI_KG_MM,
                 WEDGE_GEARING,
             ),
             DCMotor.getKrakenX60(1),
@@ -29,7 +29,7 @@ class IndexerIOSim : IndexerIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(1),
-                FLOOR_MOI,
+                FLOOR_MOI_KG_MM,
                 FLOOR_GEARING,
             ),
             DCMotor.getKrakenX60(1),
@@ -39,7 +39,7 @@ class IndexerIOSim : IndexerIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(1),
-                TOP_MOI,
+                TOP_MOI_KG_MM,
                 TOP_GEARING,
             ),
             DCMotor.getKrakenX60(1),

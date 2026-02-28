@@ -10,22 +10,19 @@ import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IndexerConstants
-import frc.team449.Constants.IndexerConstants.FLOOR_INDEXER_ID
-import frc.team449.Constants.IndexerConstants.TOP_INDEXER_ID
-import frc.team449.Constants.IndexerConstants.WEDGE_INDEXER_ID
 import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IndexerIOHardware : IndexerIO {
-    val wedgeIndexer: TalonFX = TalonFX(WEDGE_INDEXER_ID) // kraken x44
+    val wedgeIndexer: TalonFX = TalonFX(IndexerConstants.WEDGE_INDEXER_ID) // kraken x44
     val wedgeVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val wedgeVoltageRequest: VoltageOut = VoltageOut(0.0)
 
-    val floorIndexer: TalonFX = TalonFX(FLOOR_INDEXER_ID) // kraken x60
+    val floorIndexer: TalonFX = TalonFX(IndexerConstants.FLOOR_INDEXER_ID) // kraken x60
     val floorVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val floorVoltageRequest: VoltageOut = VoltageOut(0.0)
 
-    val topIndexer: TalonFX = TalonFX(TOP_INDEXER_ID) // kraken x44
+    val topIndexer: TalonFX = TalonFX(IndexerConstants.TOP_INDEXER_ID) // kraken x44
     val topVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val topVoltageRequest: VoltageOut = VoltageOut(0.0)
 
@@ -70,12 +67,12 @@ open class IndexerIOHardware : IndexerIO {
         )
 
     private val wedgeIndexerDisconnectedAlert =
-        Alert("Wedge Indexing Motor Disconnected (ID $WEDGE_INDEXER_ID).", Alert.AlertType.kError)
+        Alert("Wedge Indexing Motor Disconnected (ID $IndexerConstants.WEDGE_INDEXER_ID).", Alert.AlertType.kError)
     private val floorIndexerDisconnectedAlert =
-        Alert("Floor Indexing Motor Disconnected (ID $FLOOR_INDEXER_ID).", Alert.AlertType.kError)
+        Alert("Floor Indexing Motor Disconnected (ID $IndexerConstants.FLOOR_INDEXER_ID).", Alert.AlertType.kError)
 
     private val topIndexerDisconnectedAlert =
-        Alert("Top Indexing Motor Disconnected (ID $TOP_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Top Indexing Motor Disconnected (ID $IndexerConstants.TOP_INDEXER_ID)", Alert.AlertType.kError)
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(wedgeIndexer, floorIndexer, topIndexer)
@@ -120,21 +117,15 @@ open class IndexerIOHardware : IndexerIO {
     }
 
     override fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {
-        floorIndexer.setControl(
-            floorVelocityRequest.withVelocity(floorSurfaceSpeed)
-        )
+        floorIndexer.setControl(floorVelocityRequest.withVelocity(floorSurfaceSpeed),)
     }
 
     override fun setWedgeSpeed(wedgeSurfaceSpeed: AngularVelocity) {
-        wedgeIndexer.setControl(
-            wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed),
-        )
+        wedgeIndexer.setControl(wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed),)
     }
 
     override fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {
-        topIndexer.setControl(
-            topVelocityRequest.withVelocity(topSurfaceSpeed)
-        )
+        topIndexer.setControl(topVelocityRequest.withVelocity(topSurfaceSpeed),)
     }
 
     override fun setIndexerVoltage(floorVolts: Double, wedgeVolts: Double, topVolts: Double) {
