@@ -44,7 +44,7 @@ object Constants {
         const val WHEEL_COF = 1.4
 
         // --- SPEED LIMITS (STANDARD) ---
-        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.7
+        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.7244
         const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 5.804 / 4 * PI
 
         // --- SPEED LIMITS (SLOW) ---
@@ -221,8 +221,8 @@ object Constants {
         // --- CURRENT & OPERATIONAL LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 5.0
         const val PIVOT_STATOR_LIMIT = 10.0
-        const val ROLLER_SUPPLY_LIMIT = 40.0
-        const val ROLLER_STATOR_LIMIT = 80.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
+        const val ROLLER_STATOR_LIMIT = 40.0
 
         // --- PIVOT STATE SETTINGS ---
         const val STOW_POS_RADS = 0.0
@@ -303,7 +303,7 @@ object Constants {
         const val TOP_KV = 0.34
 
         // --- SETPOINTS ---
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(90.0)
+        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(120.0)
     }
 
     object AimbotConstants {
