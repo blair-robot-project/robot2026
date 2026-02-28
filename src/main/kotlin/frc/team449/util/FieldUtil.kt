@@ -9,9 +9,11 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
 object FieldUtil {
-
     val BLUE_HUB_TRANSLATION = Translation2d(4.625594, 4.034536)
     var HUB_TRANSLATION = BLUE_HUB_TRANSLATION
+
+    val BLUE_TOWER_POSE: Pose2d = Pose2d(1.470, 4.034, Rotation2d(0.0))
+    var TOWER_POSE = BLUE_TOWER_POSE
 
     val BLUE_TRENCH_POSES: List<Pose2d> =
         listOf(
@@ -19,48 +21,37 @@ object FieldUtil {
             Pose2d(4.35, 7.60, Rotation2d(-1.5)),
         )
 
-    val BLUE_TOWER_POSE: Pose2d = Pose2d(1.550, 4.055, Rotation2d(0.0))
-
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
 
-        val allianceTrenchSpots: List<Pose2d> = if (flipRed) {
-            BLUE_TRENCH_POSES.map { flipPose(it) }
-        } else {
-            BLUE_TRENCH_POSES
-        }
+        val allianceTrenchSpots: List<Pose2d> =
+            if (flipRed) {
+                BLUE_TRENCH_POSES.map { flipPose(it) }
+            } else {
+                BLUE_TRENCH_POSES
+            }
 
         return allianceTrenchSpots.minBy {
             it.translation.getDistance(robotPose.translation)
         }
     }
 
-    fun getTowerPose(): Pose2d {
-        val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
-
-        val allianceTowerSpot: Pose2d =
-            if (flipRed) {
-                flipPose(BLUE_TOWER_POSE)
-            } else {
-                BLUE_TOWER_POSE
-            }
-        return allianceTowerSpot
-    }
-
     // flip (wall-blue zero)
-    fun flipPose(pose: Pose2d): Pose2d {
-        return Pose2d(
+    fun flipPose(pose: Pose2d): Pose2d =
+        Pose2d(
             Constants.FieldConstants.FIELD_LENGTH_METERS - pose.x,
             pose.y,
             Rotation2d(PI).minus(pose.rotation),
         )
-    }
 
-    fun setHubPosition() {
+    fun updateKeyPositions() {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
-
         if (flipRed) {
-            HUB_TRANSLATION = flipPose(Pose2d(HUB_TRANSLATION, Rotation2d())).translation
+            HUB_TRANSLATION = flipPose(Pose2d(BLUE_HUB_TRANSLATION, Rotation2d())).translation
+            TOWER_POSE = flipPose(BLUE_TOWER_POSE)
+        } else {
+            HUB_TRANSLATION = BLUE_HUB_TRANSLATION
+            TOWER_POSE = BLUE_TOWER_POSE
         }
     }
 }

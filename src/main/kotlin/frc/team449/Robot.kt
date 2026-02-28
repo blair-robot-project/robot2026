@@ -23,7 +23,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-
     init {
         println("Initializing Robot!")
 
@@ -56,7 +55,7 @@ class Robot : LoggedRobot() {
 
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.setHubPosition()
+        FieldUtil.updateKeyPositions()
     }
 
     override fun robotInit() {
