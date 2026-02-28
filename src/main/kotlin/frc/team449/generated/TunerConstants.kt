@@ -141,7 +141,7 @@ object TunerConstants {
     // Front Left
     private const val kFrontLeftDriveMotorId: Int = 1
     private const val kFrontLeftSteerMotorId: Int = 2
-    private const val kFrontLeftEncoderId: Int = 8
+    private const val kFrontLeftEncoderId: Int = 2
     private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-106.52 + 180)
     private const val kFrontLeftSteerMotorInverted: Boolean = true
     private const val kFrontLeftEncoderInverted: Boolean = true
@@ -152,7 +152,7 @@ object TunerConstants {
     // Front Right
     private const val kFrontRightDriveMotorId: Int = 3
     private const val kFrontRightSteerMotorId: Int = 4
-    private const val kFrontRightEncoderId: Int = 6
+    private const val kFrontRightEncoderId: Int = 4
     private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(-317.46 + 180)
     private const val kFrontRightSteerMotorInverted: Boolean = true
     private const val kFrontRightEncoderInverted: Boolean = true
