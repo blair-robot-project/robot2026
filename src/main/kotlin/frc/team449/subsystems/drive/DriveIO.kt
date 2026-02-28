@@ -7,8 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.units.Units.Degrees
-import edu.wpi.first.units.measure.Angle
 import org.littletonrobotics.junction.AutoLog
 
 interface DriveIO {
@@ -21,14 +19,6 @@ interface DriveIO {
         @JvmField var rollVel: Double = 0.0
 
         @JvmField var yawVel: Double = 0.0
-
-        @JvmField var frontLeftDrivePosition: Angle = Degrees.of(0.0)
-
-        @JvmField var frontRightDrivePosition: Angle = Degrees.of(0.0)
-
-        @JvmField var backLeftDrivePosition: Angle = Degrees.of(0.0)
-
-        @JvmField var backRightDrivePosition: Angle = Degrees.of(0.0)
 
         init {
             this.Pose = Pose2d()

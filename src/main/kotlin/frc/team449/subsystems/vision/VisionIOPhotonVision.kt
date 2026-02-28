@@ -21,78 +21,60 @@ import java.util.*
  * @param name The configured name of the camera.
  * @param robotToCamera The 3D position of the camera relative to the robot.
  */
-open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transform3d) : VisionIO {
+open class VisionIOPhotonVision(
+    name: String,
+    private val robotToCamera: Transform3d
+) : VisionIO {
     protected val camera: PhotonCamera = PhotonCamera(name)
 
     override fun updateInputs(inputs: VisionIOInputs) {
         inputs.connected = camera.isConnected
 
-        // Read new camera observations
-        val tagIds: MutableList<Short> = mutableListOf()
-        val poseObservations: MutableList<PoseObservation> = LinkedList()
+        val tagIds = mutableSetOf<Int>()
+
+        val poseObservations = mutableListOf<PoseObservation>()
+
         for (result in camera.allUnreadResults) {
-            // Update latest target observation
+            // update latest target observation
             if (result.hasTargets()) {
-                inputs.latestTargetObservationPhoton =
-                    TargetObservation(
-                        Rotation2d.fromDegrees(result.bestTarget.getYaw()),
-                        Rotation2d.fromDegrees(result.bestTarget.getPitch())
-                    )
+                inputs.latestTargetObservation = TargetObservation(
+                    Rotation2d.fromDegrees(result.bestTarget.yaw),
+                    Rotation2d.fromDegrees(result.bestTarget.pitch)
+                )
             } else {
-                inputs.latestTargetObservationPhoton = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
+                inputs.latestTargetObservation = TargetObservation(Rotation2d(), Rotation2d())
             }
 
-            // Add pose observation
-            if (result.multitagResult.isPresent) { // Multitag result
+            // add pose observation
+            if (result.multitagResult.isPresent) {
                 val multitagResult = result.multitagResult.get()
 
-                // Calculate robot pose
+                // calculate robot pose
                 val fieldToCamera: Transform3d = multitagResult.estimatedPose.best
                 val fieldToRobot = fieldToCamera.plus(robotToCamera.inverse())
                 val robotPose = Pose3d(fieldToRobot.translation, fieldToRobot.rotation)
 
-                // Calculate average tag distance
+                // calculate average tag distance and collect IDs safely
                 var totalTagDistance = 0.0
                 for (target in result.targets) {
                     totalTagDistance += target.bestCameraToTarget.translation.norm
+                    tagIds.add(target.fiducialId)
                 }
 
-                // Add tag IDs
-                tagIds.addAll(multitagResult.fiducialIDsUsed)
-                inputs.latestTagCount = multitagResult.fiducialIDsUsed.size
-
-                inputs.latestTimestamp = result.timestampSeconds
-                var runningMinAmbiguity = 100.0
-                var runningMaxAmbiguity = 0.0
-                var sumAmbiguity = 0.0
-                for (i in 1..result.targets.size) {
-                    if (result.targets[i - 1].poseAmbiguity < runningMinAmbiguity) runningMinAmbiguity = result.targets[i - 1].poseAmbiguity
-                    if (result.targets[i - 1].poseAmbiguity > runningMaxAmbiguity) runningMaxAmbiguity = result.targets[i - 1].poseAmbiguity
-                    sumAmbiguity += result.targets[i - 1].poseAmbiguity
-                    inputs.orientation = result.targets[i - 1].yaw
-                    inputs.latestAverageTagDist = result.targets[i - 1].bestCameraToTarget.translation.norm
-                }
-                inputs.latestMinTagAmbiguity = runningMinAmbiguity
-                inputs.latestMaxTagAmbiguity = runningMaxAmbiguity
-                inputs.latestAverageTagAmbiguity = sumAmbiguity / result.targets.size
-
-                // Add observation
                 poseObservations.add(
                     PoseObservation(
-                        result.timestampSeconds, // Timestamp
-                        robotPose, // 3D pose estimate
-                        multitagResult.estimatedPose.ambiguity, // Ambiguity
-                        multitagResult.fiducialIDsUsed.size, // Tag count
-                        totalTagDistance / result.targets.size, // Average tag distance
+                        result.timestampSeconds,
+                        robotPose,
+                        multitagResult.estimatedPose.ambiguity,
+                        multitagResult.fiducialIDsUsed.size,
+                        totalTagDistance / result.targets.size,
                         PoseObservationType.PHOTONVISION
                     )
-                ) // Observation type
-
-                inputs.latestPose = robotPose
-            } else if (result.targets.isNotEmpty()) { // Single tag result
+                )
+            } else if (result.targets.isNotEmpty()) { // single tag result
                 val target = result.targets[0]
 
-                // Calculate robot pose
+                // calculate robot pose
                 val tagPose = aprilTagLayout.getTagPose(target.fiducialId)
                 if (tagPose.isPresent) {
                     val fieldToTarget = Transform3d(tagPose.get().translation, tagPose.get().rotation)
@@ -101,34 +83,26 @@ open class VisionIOPhotonVision(name: String?, private val robotToCamera: Transf
                     val fieldToRobot = fieldToCamera.plus(robotToCamera.inverse())
                     val robotPose = Pose3d(fieldToRobot.translation, fieldToRobot.rotation)
 
-                    // Add tag ID
-                    tagIds.add(target.fiducialId.toShort())
-                    inputs.latestTagCount = 1
+                    // add tag ID
+                    tagIds.add(target.fiducialId)
 
-                    // Add observation
+                    // add observation
                     poseObservations.add(
                         PoseObservation(
-                            result.timestampSeconds, // Timestamp
-                            robotPose, // 3D pose estimate
-                            target.poseAmbiguity, // Ambiguity
-                            1, // Tag count
-                            cameraToTarget.translation.norm, // Average tag distance
+                            result.timestampSeconds,
+                            robotPose,
+                            target.poseAmbiguity,
+                            1,
+                            cameraToTarget.translation.norm,
                             PoseObservationType.PHOTONVISION
                         )
-                    ) // Observation type
-                    inputs.latestPose = robotPose
+                    )
                 }
             }
-        }
 
-        // Save pose observations to inputs object
-        inputs.poseObservations = poseObservations.toTypedArray()
-
-        // Save tag IDs to inputs objects
-        inputs.tagIds = DoubleArray(tagIds.size)
-        var i = 0
-        for (id in tagIds) {
-            inputs.tagIds[i++] = id.toDouble()
+            // save collections to the inputs arrays
+            inputs.poseObservations = poseObservations.toTypedArray()
+            inputs.tagIds = tagIds.toIntArray()
         }
     }
 }
