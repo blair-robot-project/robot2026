@@ -21,7 +21,7 @@ class IntakeIOSim : IntakeIOHardware() {
         SingleJointedArmSim(
             DCMotor.getKrakenX44(2),
             IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
-            IntakeConstants.PIVOT_MOI,
+            IntakeConstants.PIVOT_MOI_KG_MM,
             IntakeConstants.ARM_LENGTH_METERS,
             IntakeConstants.STOW_POS_RADS,
             IntakeConstants.DEPLOY_POS_RADS,
@@ -33,7 +33,7 @@ class IntakeIOSim : IntakeIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(2),
-                IntakeConstants.ROLLER_MOI,
+                IntakeConstants.ROLLER_MOI_KG_MM,
                 IntakeConstants.ROLLER_GEARING,
             ),
             DCMotor.getKrakenX60(2),

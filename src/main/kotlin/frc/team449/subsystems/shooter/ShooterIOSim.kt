@@ -15,10 +15,10 @@ import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
-import frc.team449.Constants.ShooterConstants.FLYWHEEL_MOI
+import frc.team449.Constants.ShooterConstants.FLYWHEEL_MOI_KG_MM
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
 import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
-import frc.team449.Constants.ShooterConstants.HOOD_MOI
+import frc.team449.Constants.ShooterConstants.HOOD_MOI_KG_MM
 import frc.team449.Constants.ShooterConstants.MAX_HOOD_ANGLE
 import frc.team449.Constants.ShooterConstants.MIN_HOOD_ANGLE
 
@@ -27,7 +27,7 @@ class ShooterIOSim : ShooterIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(4),
-                FLYWHEEL_MOI,
+                FLYWHEEL_MOI_KG_MM,
                 FLYWHEEL_GEARING,
             ),
             DCMotor.getKrakenX60(4),
@@ -37,7 +37,7 @@ class ShooterIOSim : ShooterIOHardware() {
         SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
             HOOD_GEARING,
-            HOOD_MOI,
+            HOOD_MOI_KG_MM,
             HOOD_LENGTH,
             MIN_HOOD_ANGLE.`in`(Radians),
             MAX_HOOD_ANGLE.`in`(Radians),
