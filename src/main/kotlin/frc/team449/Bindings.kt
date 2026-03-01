@@ -111,7 +111,6 @@ class Bindings(
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
 
-
         driver
             .povUp()
             .onTrue(
