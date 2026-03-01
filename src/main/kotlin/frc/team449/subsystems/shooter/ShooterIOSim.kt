@@ -42,9 +42,7 @@ class ShooterIOSim : ShooterIOHardware() {
             MIN_HOOD_ANGLE.`in`(Radians),
             MAX_HOOD_ANGLE.`in`(Radians),
             true,
-            MIN_HOOD_ANGLE.`in`(Radians),
-            0.0,
-            0.0,
+            MIN_HOOD_ANGLE.`in`(Radians)
         )
 
     private val mech: Mechanism2d = Mechanism2d(3.0, 3.0)
@@ -68,6 +66,10 @@ class ShooterIOSim : ShooterIOHardware() {
 
     init {
         SmartDashboard.putData("Hood", mech)
+
+        rightLeaderMotor.configurator.apply(
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+        )
 
         hoodMotor.configurator.apply(
             MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)

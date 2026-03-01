@@ -36,8 +36,8 @@ object TunerConstants {
             .withKP(0.1)
             .withKI(0.0)
             .withKD(0.0)
-            .withKS(0.0)
-            .withKV(0.124)
+            .withKS(0.107)
+            .withKV(0.119)
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
@@ -72,7 +72,7 @@ object TunerConstants {
             .withCurrentLimits(
                 CurrentLimitsConfigs() // Swerve azimuth does not require much torque output, so we can set a relatively low
                     // stator current limit to help avoid brownouts without impacting performance.
-                    .withStatorCurrentLimit(Units.Amps.of(60.0))
+                    .withStatorCurrentLimit(Units.Amps.of(40.0))
                     .withStatorCurrentLimitEnable(true),
             )
 
@@ -141,7 +141,7 @@ object TunerConstants {
     // Front Left
     private const val kFrontLeftDriveMotorId: Int = 1
     private const val kFrontLeftSteerMotorId: Int = 2
-    private const val kFrontLeftEncoderId: Int = 8
+    private const val kFrontLeftEncoderId: Int = 2
     private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-106.52 + 180)
     private const val kFrontLeftSteerMotorInverted: Boolean = true
     private const val kFrontLeftEncoderInverted: Boolean = true
@@ -152,7 +152,7 @@ object TunerConstants {
     // Front Right
     private const val kFrontRightDriveMotorId: Int = 3
     private const val kFrontRightSteerMotorId: Int = 4
-    private const val kFrontRightEncoderId: Int = 6
+    private const val kFrontRightEncoderId: Int = 4
     private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(-317.46 + 180)
     private const val kFrontRightSteerMotorInverted: Boolean = true
     private const val kFrontRightEncoderInverted: Boolean = true

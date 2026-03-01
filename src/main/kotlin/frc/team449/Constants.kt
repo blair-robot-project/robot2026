@@ -44,8 +44,8 @@ object Constants {
         const val WHEEL_COF = 1.4
 
         // --- SPEED LIMITS (STANDARD) ---
-        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 5.04
-        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
+        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.7244
+        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 5.804 / 4 * PI
 
         // --- SPEED LIMITS (SLOW) ---
         const val SLOW_LINEAR_SPEED_METERS_PER_SECOND = 1.5
@@ -55,6 +55,9 @@ object Constants {
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
         const val MODULE_ALIGN_TOLERANCE = 5.0 // degrees
+
+        // --- WHEEL RADIUS CHARACTERIZATION ---
+        const val WHEEL_RADIUS_RAMP_RATE = 0.0
     }
 
     object AutoConstants {
@@ -93,6 +96,18 @@ object Constants {
         const val RIGHT_FLYWHEEL_FOLLOWER_ID = 14
         const val HOOD_MOTOR_ID = 15
 
+        // --- HARDWARE CONFIGURATION ---
+        val LEFT_FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_FLYWHEEL_INVERSION = InvertedValue.CounterClockwise_Positive
+        val LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
+
+        val RIGHT_FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
+        val RIGHT_FLYWHEEL_INVERSION = InvertedValue.Clockwise_Positive
+        val RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
+
+        val HOOD_NEUTRAL_MODE = NeutralModeValue.Brake
+        val HOOD_INVERSION = InvertedValue.CounterClockwise_Positive
+
         // --- PHYSICAL SPECS & GEARING ---
         const val FLYWHEEL_GEARING = 16.0 / 9.0
         const val FLYWHEEL_MOI_KG_MM = .0033537
@@ -111,8 +126,8 @@ object Constants {
         const val HOOD_SUPPLY_LIM = 40.0
         const val HOOD_STATOR_LIM = 20.0
 
-        val MIN_HOOD_ANGLE: Angle = Degrees.of(14.85072467)
-        val MAX_HOOD_ANGLE: Angle = Degrees.of(46.24524767)
+        val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
+        val MAX_HOOD_ANGLE: Angle = Radians.of(0.5185)
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
@@ -131,12 +146,12 @@ object Constants {
         // const val RIGHT_FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
-        const val HOOD_KP = 100.0
+        const val HOOD_KP = 150.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
         const val HOOD_KS = 0.1
-        const val HOOD_KG = 0.11
-        const val HOOD_KV = 2.1
+        const val HOOD_KG = 0.0 // 0.14
+        const val HOOD_KV = 2.7
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
@@ -150,33 +165,36 @@ object Constants {
 
         // --- STATIC SETPOINTS ---
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
-        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(150.5)
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TRENCH_HOOD_ANGLE: Angle = Degrees.of(16.5)
-        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(220.0)
+        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.1)
+        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TOWER_HOOD_ANGLE: Angle = Degrees.of(23.0)
-        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(180.0)
+        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.1222)
+        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         // --- INTERPOLATION MAPS ---
-        val SHOT_TIME_MAP = InterpolatingDoubleTreeMap().apply {
-            put(1.0, 0.75)
-            put(2.0, 0.97)
-            put(3.0, 1.10)
-            put(5.0, 1.35)
-        }
+        val SHOT_TIME_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(1.0, 0.75)
+                put(2.0, 0.97)
+                put(3.0, 1.10)
+                put(5.0, 1.35)
+            }
 
-        val FLYWHEEL_VELOCITY_MAP = InterpolatingDoubleTreeMap().apply {
-            put(2.0, 181.0)
-            put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-            put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-        }
+        val FLYWHEEL_VELOCITY_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(2.0, 181.0)
+                put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+                put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+            }
 
-        val HOOD_ANGLE_MAP = InterpolatingDoubleTreeMap().apply {
-            put(2.0, MIN_HOOD_ANGLE.`in`(Degrees))
-            put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Degrees))
-            put(5.0, Degrees.of(25.2).`in`(Degrees))
-        }
+        val HOOD_ANGLE_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(2.0, 0.0)
+                put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
+                put(5.0, 0.1806)
+            }
     }
 
     object IntakeConstants {
@@ -206,8 +224,8 @@ object Constants {
         // --- CURRENT & OPERATIONAL LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 5.0
         const val PIVOT_STATOR_LIMIT = 10.0
-        const val ROLLER_SUPPLY_LIMIT = 40.0
-        const val ROLLER_STATOR_LIMIT = 80.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
+        const val ROLLER_STATOR_LIMIT = 40.0
 
         // --- PIVOT STATE SETTINGS ---
         const val STOW_POS_RADS = 0.0
@@ -231,7 +249,6 @@ object Constants {
 
     // INDEXER CONSTANTS STILL SLIGHTLY OFF
     object IndexerConstants {
-
         // --- HARDWARE IDs ---
         const val WEDGE_INDEXER_ID = 21
         const val FLOOR_INDEXER_ID = 22
@@ -289,7 +306,7 @@ object Constants {
         const val TOP_KV = 0.34
 
         // --- SETPOINTS ---
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(60.0)
+        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(120.0)
     }
 
     object AimbotConstants {
@@ -328,10 +345,11 @@ object Constants {
 
         // Standard deviation multipliers for each camera
         // (Adjust to trust some cameras more than others)
-        var cameraStdDevFactors: DoubleArray = doubleArrayOf(
-            1.0, // Camera 0
-            1.0 // Camera 1
-        )
+        var cameraStdDevFactors: DoubleArray =
+            doubleArrayOf(
+                1.0, // Camera 0
+                1.0, // Camera 1
+            )
 
         // Multipliers to apply for MegaTag 2 observations
         var linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve

@@ -24,9 +24,10 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
 import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
+import frc.team449.subsystems.vision.VisionSubsystem
 
 object RobotContainer {
     // driver/op controllers
@@ -66,27 +67,26 @@ object RobotContainer {
             },
         )
 
-    val vision: Vision =
+    val vision: VisionSubsystem =
         when (Constants.CURRENT_MODE) {
             Mode.REAL ->
-                Vision(
+                VisionSubsystem(
                     drive::addVisionMeasurement,
                     VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraRight),
                     VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraLeft)
                 )
             Mode.SIM ->
-                Vision(
+                VisionSubsystem(
                     drive::addVisionMeasurement,
                     VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.robotToCamera0) { drive.pose },
                     VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.robotToCamera1) { drive.pose },
                 )
             Mode.REPLAY ->
-                Vision(
+                VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraRight),
-                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraLeft)
+                    object : VisionIO {},
+                    object : VisionIO {},
                 )
-                    .also { vision = it }
         }
 
     val intake: IntakeSubsystem =
@@ -106,6 +106,7 @@ object RobotContainer {
                 Mode.REPLAY -> object : IndexerIO {}
             },
         )
+
     val shooter: ShooterSubsystem =
         ShooterSubsystem(
             when (Constants.CURRENT_MODE) {

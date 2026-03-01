@@ -1,4 +1,6 @@
 package frc.team449.subsystems.intake
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
@@ -60,11 +62,12 @@ class IntakeIOSim : IntakeIOHardware() {
 
     init {
         leftPivotLeader.configurator.apply(
-            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive),
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
         )
-        rightPivotFollower.configurator.apply(
-            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive),
+        leftPivotLeader.configurator.apply(
+            CurrentLimitsConfigs().withSupplyCurrentLimit(20.0).withStatorCurrentLimit(40.0)
         )
+
         SmartDashboard.putData("Intake", mech)
     }
 

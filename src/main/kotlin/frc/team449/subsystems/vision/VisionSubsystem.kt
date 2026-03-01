@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 import kotlin.math.pow
 
-class Vision(
+class VisionSubsystem(
     private val consumer: VisionConsumer,
     private vararg val io: VisionIO
 ) : SubsystemBase() {
