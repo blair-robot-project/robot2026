@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.commands.XLockCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -107,9 +106,7 @@ class Bindings(
                         robotContainer.drive,
                     ) { FieldUtil.TOWER_POSE },
                     actions.checkAndFeed(),
-                    XLockCommand(
-                        robotContainer.drive,
-                    ),
+                    robotContainer.drive.xLock(),
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
