@@ -105,13 +105,13 @@ class Bindings(
         driver
             .povUp()
             .onTrue(
-                actions.prepHubShot()
+                actions.prepHubShot(),
             )
 
         driver
             .povLeft()
             .onTrue(
-                actions.prepTrenchShot()
+                actions.prepTrenchShot(),
             )
 
         driver
@@ -119,8 +119,8 @@ class Bindings(
             .onTrue(
                 SequentialCommandGroup(
                     robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0))
-                )
+                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0)),
+                ),
             )
 
         driver
@@ -132,10 +132,9 @@ class Bindings(
         driver
             .povDown()
             .whileTrue(
-                robotContainer.indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
-            )
-            .onFalse(
-                robotContainer.indexer.stop()
+                robotContainer.indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+            ).onFalse(
+                robotContainer.indexer.stop(),
             )
 
         driver
@@ -147,7 +146,15 @@ class Bindings(
         operator
             .povUp()
             .whileTrue(
-                WheelRadiusCharacterizationCommand(robotContainer.drive)
+                WheelRadiusCharacterizationCommand(robotContainer.drive),
             )
+
+        operator.povLeft().onTrue(
+            robotContainer.shooter.hoodManualUp(),
+        )
+
+        operator.povRight().onTrue(
+            robotContainer.shooter.hoodManualDown(),
+        )
     }
 }
