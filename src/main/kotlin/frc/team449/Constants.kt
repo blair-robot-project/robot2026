@@ -131,7 +131,7 @@ object Constants {
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
-        const val LEFT_FLYWHEEL_KP = 0.5
+        const val LEFT_FLYWHEEL_KP = 0.55
         const val LEFT_FLYWHEEL_KI = 0.0
         const val LEFT_FLYWHEEL_KD = 0.0
         const val LEFT_FLYWHEEL_KS = 0.286
@@ -167,7 +167,7 @@ object Constants {
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
         val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.1)
+        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.11)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         val TOWER_HOOD_ANGLE: Angle = Radians.of(0.1222)
@@ -224,8 +224,8 @@ object Constants {
         // --- CURRENT & OPERATIONAL LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 5.0
         const val PIVOT_STATOR_LIMIT = 10.0
-        const val ROLLER_SUPPLY_LIMIT = 20.0
-        const val ROLLER_STATOR_LIMIT = 40.0
+        const val ROLLER_SUPPLY_LIMIT = 30.0
+        const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
         const val STOW_POS_RADS = 0.0
@@ -237,7 +237,7 @@ object Constants {
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- ROLLER VELOCITY SETPOINTS ---
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
+        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(100.0)
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
 
         // --- HOMING & VISUALIZATION ---

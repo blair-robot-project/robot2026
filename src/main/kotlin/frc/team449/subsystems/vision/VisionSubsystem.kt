@@ -5,6 +5,7 @@ import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
@@ -19,6 +20,13 @@ class VisionSubsystem(
     private val consumer: VisionConsumer,
     private vararg val io: VisionIO
 ) : SubsystemBase() {
+
+    init {
+        val robottotag = Pose3d(0.444, 0.0, -1.12395, Rotation3d(0.0, 0.0, 0.0))
+        val camtotag = Pose3d(0.42, -0.3, -0.68, Rotation3d(-0.58782689, 0.36686821, -0.22724187))
+        println("robot to cam: ${Pose3d(robottotag.toMatrix() * camtotag.toMatrix())}")
+    }
+
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
     private val disconnectedAlerts = Array(io.size) { i ->
         Alert("Vision Camera $i Disconnected.", AlertType.kWarning)
