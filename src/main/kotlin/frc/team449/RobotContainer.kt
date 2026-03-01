@@ -25,6 +25,7 @@ import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import frc.team449.subsystems.vision.Vision
+import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
 import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 
@@ -83,10 +84,9 @@ object RobotContainer {
             Mode.REPLAY ->
                 Vision(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraRight),
-                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraLeft)
+                    object : VisionIO {},
+                    object : VisionIO {},
                 )
-                    .also { vision = it }
         }
 
     val intake: IntakeSubsystem =
