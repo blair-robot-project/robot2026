@@ -170,7 +170,7 @@ object Constants {
         val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.11)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.1222)
+        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.05)
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         // --- INTERPOLATION MAPS ---
@@ -329,7 +329,7 @@ object Constants {
         // Robot to camera transforms
         // TODO: idt these are actually right, will prolly havta look at it again after it's mounted
         var robotToCameraRight: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var robotToCameraLeft: Pose3d = Pose3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        var robotToCameraLeft: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
 
         var robotToCamera0: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
         var robotToCamera1: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))

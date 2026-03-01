@@ -2,10 +2,7 @@ package frc.team449.subsystems.vision
 
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.math.geometry.*
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
@@ -17,14 +14,16 @@ import kotlin.math.abs
 import kotlin.math.pow
 
 class VisionSubsystem(
-    private val consumer: VisionConsumer,
+    private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit,
     private vararg val io: VisionIO
 ) : SubsystemBase() {
 
     init {
-        val robottotag = Pose3d(0.444, 0.0, -1.12395, Rotation3d(0.0, 0.0, 0.0))
-        val camtotag = Pose3d(0.42, -0.3, -0.68, Rotation3d(-0.58782689, 0.36686821, -0.22724187))
-        println("robot to cam: ${Pose3d(robottotag.toMatrix() * camtotag.toMatrix())}")
+        val robottotag = Transform3d(0.419, 0.305, 1.13284, Rotation3d(0.0, 0.0, 0.0))
+        val tagtocam = Transform3d(-0.32, 0.24, -0.81, Rotation3d(0.59, -0.459, 0.328))
+        println("robot to cam: ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix())}")
+        println("rotation ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix()).rotation.x}, y: ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix()).rotation.y}, z: ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix()).rotation.z}")
+
     }
 
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
@@ -42,14 +41,6 @@ class VisionSubsystem(
         val input = inputs[cameraIndex]
         if (input.tagIds.isEmpty()) return Rotation2d.kZero
         return input.latestTargetObservation.ty
-    }
-
-    fun interface VisionConsumer {
-        fun accept(
-            visionRobotPoseMeters: Pose2d,
-            timestampSeconds: Double,
-            visionMeasurementStdDevs: Matrix<N3, N1>
-        )
     }
 
     override fun periodic() {
@@ -94,7 +85,7 @@ class VisionSubsystem(
                     angularStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
                 }
 
-                consumer.accept(
+                consumeVisionMeasurement(
                     observation.pose.toPose2d(),
                     observation.timestamp,
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)

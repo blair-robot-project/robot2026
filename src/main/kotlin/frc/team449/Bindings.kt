@@ -117,11 +117,11 @@ class Bindings(
         driver
             .povRight()
             .onTrue(
-                SequentialCommandGroup(
-                    robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0)),
-                ),
-            )
+//                SequentialCommandGroup(
+//                    robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
+//                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0)),
+                actions.prepTowerShot()
+                )
 
         driver
             .start()

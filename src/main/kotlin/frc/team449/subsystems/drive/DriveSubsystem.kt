@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
+import frc.team449.subsystems.vision.VisionSubsystem
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
