@@ -16,7 +16,7 @@ import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
