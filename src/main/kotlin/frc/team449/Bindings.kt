@@ -78,9 +78,9 @@ class Bindings(
         driver
             .a()
             .onTrue(
-                XLockCommand(
-                    robotContainer.drive,
-                ).until(joysticksMovedPastDeadband),
+                robotContainer.drive
+                    .xLock()
+                    .until(joysticksMovedPastDeadband),
             )
 
         driver
@@ -92,13 +92,12 @@ class Bindings(
                         robotContainer.drive,
                     ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
                     actions.checkAndFeed(),
-                    XLockCommand(
-                        robotContainer.drive,
-                    ),
+                    robotContainer.drive.xLock(),
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
 
+        // tower sequence on b()
         driver
             .b()
             .onTrue(
@@ -114,6 +113,7 @@ class Bindings(
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
             )
+
 
         driver
             .povUp()

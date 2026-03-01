@@ -16,10 +16,12 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
+import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
 import org.littletonrobotics.junction.Logger
+import kotlin.math.abs
 
 class DriveSubsystem(
-    val io: DriveIO
+    private val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
@@ -35,7 +37,7 @@ class DriveSubsystem(
         // couldn't find a good way to do it in the io, so just sticking it on here
         Logger.recordOutput(
             "Drive/ActiveCommand",
-            currentCommand?.name ?: "None"
+            currentCommand?.name ?: "None",
         )
     }
 
@@ -55,8 +57,7 @@ class DriveSubsystem(
             inputs.Pose.rotation,
         )
 
-    fun seedFieldCentric(): Command =
-        runOnce { io.seedFieldCentric() }
+    fun seedFieldCentric(): Command = runOnce { io.seedFieldCentric() }
 
     // should only be called in driverStationConnected() to prevent null alliance
     fun setOperatorPerspectiveForward() {
@@ -68,6 +69,23 @@ class DriveSubsystem(
             },
         )
     }
+
+    fun xLock(): Command =
+        run {
+            io.setControl(SwerveRequest.SwerveDriveBrake())
+        }
+
+    fun alignModules(direction: Rotation2d): Command =
+        run {
+            io.setControl(SwerveRequest.PointWheelsAt().withModuleDirection(direction))
+        }.until {
+            (0..3).all { i ->
+                val target = inputs.ModuleTargets[i].angle
+                val state = inputs.ModuleStates[i].angle
+
+                abs(target.minus(state).degrees) <= MODULE_ALIGN_TOLERANCE
+            }
+        }
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
@@ -91,7 +109,7 @@ class DriveSubsystem(
         SysIdRoutine(
             SysIdRoutine.Config(
                 null, // default ramp rate (1 V/s)
-                Volts.of(1.0), // dynamic step voltage
+                Volts.of(6.0), // dynamic step voltage
                 null, // default timeout (10 s)
             ) { state: SysIdRoutineLog.State ->
                 Logger.recordOutput(

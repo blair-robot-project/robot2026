@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.RobotContainer.fuelSimulator
@@ -72,11 +71,11 @@ class Robot : LoggedRobot() {
         PhoenixUtil.refreshAll()
 
         // high priority (real-time) thread for loop timing
-        Threads.setCurrentThreadPriority(true, 99)
+//        Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()
 
         // return thread to low priority (standard)
-        Threads.setCurrentThreadPriority(false, 10)
+//        Threads.setCurrentThreadPriority(false, 10)
     }
 
     override fun autonomousInit() {
