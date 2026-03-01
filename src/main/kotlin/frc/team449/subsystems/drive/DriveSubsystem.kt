@@ -5,9 +5,9 @@ import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.units.Units.Second
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
@@ -27,6 +27,9 @@ class DriveSubsystem(
 
     val pose: Pose2d
         get() = inputs.Pose
+
+    val modulePositions: Array<SwerveModulePosition>
+        get() = inputs.ModulePositions
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -99,12 +102,7 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    // swerve requests to apply during SysId characterization
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
-    private val steerCharacterizationRequest = SwerveRequest.SysIdSwerveSteerGains()
-    private val rotationCharacterizationRequest = SwerveRequest.SysIdSwerveRotation()
-
-    // SysId routine for characterizing translation. This is used to find PID gains for the drive motors.
     val sysIDTranslationRoutine =
         SysIdRoutine(
             SysIdRoutine.Config(
@@ -124,53 +122,5 @@ class DriveSubsystem(
             ),
         )
 
-    // SysId routine for characterizing steer. This is used to find PID gains for the steer motors.
-    val sysIDSteerRoutine =
-        SysIdRoutine(
-            SysIdRoutine.Config(
-                null, // default ramp rate (1 V/s)
-                Volts.of(4.0), // dynamic voltage of 4 V
-                null, // default timeout (10 s)
-            ) { state: SysIdRoutineLog.State ->
-                Logger.recordOutput(
-                    "SysIdSteer_State",
-                    state.toString(),
-                )
-            },
-            Mechanism(
-                { volts: Voltage -> setControl(steerCharacterizationRequest.withVolts(volts)) },
-                null,
-                this,
-            ),
-        )
 
-    /*
-     * SysId routine for characterizing rotation.
-     * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
-     * See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
-     */
-    val sysIDRotationRoutine =
-        SysIdRoutine(
-            SysIdRoutine.Config( // This is in radians per second², but SysId only supports "volts per second"
-                Volts.of(Math.PI / 6).per(Second), // This is in radians per second, but SysId only supports "volts"
-                Volts.of(Math.PI),
-                null,
-            ) // Use default timeout (10 s)
-                // Log state with SignalLogger class
-                { state: SysIdRoutineLog.State ->
-                    Logger.recordOutput(
-                        "SysIdRotation_State",
-                        state.toString(),
-                    )
-                },
-            Mechanism(
-                { output: Voltage ->
-                    // output is actually radians per second, but SysId only supports "volts"
-                    setControl(rotationCharacterizationRequest.withRotationalRate(output.`in`(Volts)))
-                    Logger.recordOutput("Rotational_Rate", output.`in`(Volts)) // log requested output for SysId
-                },
-                null,
-                this,
-            ),
-        )
 }
