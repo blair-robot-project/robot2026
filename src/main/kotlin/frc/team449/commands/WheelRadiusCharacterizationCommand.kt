@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.subsystems.drive.DriveSubsystem
 import kotlin.math.abs
-import kotlin.math.hypot
 
 /** Measures the robot's wheel radius by spinning in a circle. */
 class WheelRadiusCharacterizationCommand(

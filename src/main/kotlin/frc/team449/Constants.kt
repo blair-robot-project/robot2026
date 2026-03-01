@@ -58,7 +58,6 @@ object Constants {
 
         // --- WHEEL RADIUS CHARACTERIZATION ---
         const val WHEEL_RADIUS_RAMP_RATE = 0.0
-
     }
 
     object AutoConstants {

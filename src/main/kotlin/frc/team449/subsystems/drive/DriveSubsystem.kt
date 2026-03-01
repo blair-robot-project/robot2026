@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class DriveSubsystem(
-    private val io: DriveIO,
+    private val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
 
@@ -93,7 +93,7 @@ class DriveSubsystem(
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>,
+        visionMeasurementStdDevs: Matrix<N3, N1>
     ) {
         io.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
@@ -121,6 +121,4 @@ class DriveSubsystem(
                 this,
             ),
         )
-
-
 }
