@@ -4,10 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.util.Units
-import edu.wpi.first.units.Units.Meters
-import edu.wpi.first.units.Units.MetersPerSecond
-import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.FuelSim
@@ -29,6 +26,8 @@ class FuelSimulationSubsystem(
     val intakeBPSRateLimit = round((1 / Constants.LOOP_TIME) / intakeSimulatedBPS)
     val simulatedIntakingMissChance = .85
     val simulatedHopperLimit = 50
+
+    val inaccuracy_degrees = 2.0
 
     val fuelSim = FuelSim()
 
@@ -99,13 +98,6 @@ class FuelSimulationSubsystem(
                     simBallThrottle++
                 }
             } else {
-                fuelSim.launchFuel(
-                    MetersPerSecond.of(effectiveShotSpeed),
-                    Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
-                    Radians.of(0.0),
-                    Constants.ShooterConstants.SHOOTER_HEIGHT,
-                    true
-                )
                 ballCount--
                 simBallThrottle = 0
             }
@@ -115,17 +107,21 @@ class FuelSimulationSubsystem(
                     simBall2Throttle++
                 }
             } else {
-                fuelSim.launchFuel(
-                    MetersPerSecond.of(effectiveShotSpeed),
-                    Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
-                    Radians.of(0.0),
-                    Constants.ShooterConstants.SHOOTER_HEIGHT,
-                    false
-                )
+                simLaunchFuel(effectiveShotSpeed)
                 ballCount--
                 simBall2Throttle = 0
             }
         }
+    }
+
+    fun simLaunchFuel(effectiveShotSpeed: Double) {
+        fuelSim.launchFuel(
+            MetersPerSecond.of(effectiveShotSpeed),
+            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle) + Degrees.of(Math.random() * 2 * inaccuracy_degrees - inaccuracy_degrees),
+            Radians.of(0.0) + Degrees.of(Math.random() * 2 * inaccuracy_degrees - inaccuracy_degrees),
+            Constants.ShooterConstants.SHOOTER_HEIGHT,
+            true
+        )
     }
 
     fun pollIntakeAcceptBall(): Boolean {
