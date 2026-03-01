@@ -30,7 +30,7 @@ import java.util.function.Consumer
 
 class BLineRoutines(
     private val drive: DriveSubsystem,
-    private val actions: RobotActions
+    private val actions: RobotActions,
 ) {
     private val translationP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val translationI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
@@ -237,8 +237,18 @@ class BLineRoutines(
 
     fun nothing(): Command = Commands.none()
 
+    fun twoMeter(): Command {
+        val path1 = Path("twoMeter")
+
+        return Commands.sequence(
+            drive.alignModules(Rotation2d.kZero),
+            pathBuilderWithReset.build(path1),
+        )
+    }
+
     fun addAutoOptions(autoChooser: SendableChooser<Command>) {
         autoChooser.setDefaultOption("Do Nothing", nothing())
+        autoChooser.addOption("Drive 2m forward", twoMeter())
         autoChooser.addOption("R Half Close", rHalfClose())
         autoChooser.addOption("R Half Far", rHalfFar())
         autoChooser.addOption("R Half Loop", rHalfAndLoop())
