@@ -24,10 +24,10 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import frc.team449.subsystems.vision.VisionSubsystem
 import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
 import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
+import frc.team449.subsystems.vision.VisionSubsystem
 
 object RobotContainer {
     // driver/op controllers
