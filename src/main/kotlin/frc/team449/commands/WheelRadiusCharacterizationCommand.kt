@@ -60,8 +60,12 @@ class WheelRadiusCharacterizationCommand(
         lastAngle = currentAngle
     }
 
+    override fun isFinished(): Boolean {
+        return gyroDelta >= Math.PI * 10
+    }
+
     override fun end(interrupted: Boolean) {
-        if (!interrupted && timer.hasElapsed(1.0)) {
+        if (timer.hasElapsed(1.0)) {
             val averageWheelDistance = accumWheelDistance / 4.0
 
             val drivebaseRadius = 0.3906411413 // meters

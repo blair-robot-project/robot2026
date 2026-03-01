@@ -166,13 +166,13 @@ object Constants {
 
         // --- STATIC SETPOINTS ---
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
-        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.1)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.1422)
-        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(180.0)
+        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.1222)
+        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         // --- INTERPOLATION MAPS ---
         val SHOT_TIME_MAP =

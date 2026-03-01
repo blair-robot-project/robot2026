@@ -11,6 +11,7 @@ import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.commands.WheelRadiusCharacterizationCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -145,41 +146,9 @@ class Bindings(
             )
 
         operator
-            .rightBumper()
-            .whileTrue(
-                actions.prepTrenchShot(),
-            ).onFalse(
-                actions.stopFeedAndShooter(),
-            )
-
-        operator
-            .a()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
-            )
-
-        operator
-            .y()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-            )
-
-        operator
-            .x()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
-            )
-
-        operator
             .povUp()
             .whileTrue(
-                robotContainer.drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-            )
-
-        operator
-            .povDown()
-            .whileTrue(
-                robotContainer.drive.sysIDTranslationRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+                WheelRadiusCharacterizationCommand(robotContainer.drive)
             )
     }
 }
