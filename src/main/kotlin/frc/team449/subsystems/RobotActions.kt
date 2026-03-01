@@ -16,7 +16,7 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 import java.util.function.Supplier
 
 class RobotActions(
-    robotContainer: RobotContainer,
+    robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
