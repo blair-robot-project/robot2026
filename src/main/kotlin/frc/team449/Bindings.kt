@@ -1,12 +1,16 @@
 package frc.team449
 
+import edu.wpi.first.units.Units
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.Constants.IndexerConstants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.commands.WheelRadiusCharacterizationCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -114,13 +118,49 @@ class Bindings(
         driver
             .povUp()
             .onTrue(
-                actions.stopFeedAndShooter(),
+                actions.prepHubShot()
+            )
+
+        driver
+            .povLeft()
+            .onTrue(
+                actions.prepTrenchShot()
+            )
+
+        driver
+            .povRight()
+            .onTrue(
+                SequentialCommandGroup(
+                    robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
+                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0))
+                )
             )
 
         driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
+            )
+
+        driver
+            .povDown()
+            .whileTrue(
+                robotContainer.indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
+            )
+            .onFalse(
+                robotContainer.indexer.stop()
+            )
+
+        driver
+            .povDownRight()
+            .onTrue(
+                actions.stopFeedAndShooter(),
+            )
+
+        operator
+            .povUp()
+            .whileTrue(
+                WheelRadiusCharacterizationCommand(robotContainer.drive)
             )
     }
 }

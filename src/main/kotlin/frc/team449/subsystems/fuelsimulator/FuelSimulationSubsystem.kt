@@ -101,7 +101,7 @@ class FuelSimulationSubsystem(
 
         fuelSim.launchFuel(
             MetersPerSecond.of(effectiveShotSpeed),
-            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle),
+            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle - 0.2591940418),
             Radians.of(0.0),
             Constants.ShooterConstants.SHOOTER_HEIGHT,
         )
