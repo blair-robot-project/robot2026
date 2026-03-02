@@ -72,14 +72,14 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraRight),
-                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraLeft)
+//                  VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_RIGHT),
+                    VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_LEFT)
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.robotToCamera0) { drive.pose },
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.robotToCamera1) { drive.pose },
+//                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_CAMERA_RIGHT) { Pose2d() },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_LEFT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             Mode.REPLAY ->
                 VisionSubsystem(

@@ -98,10 +98,6 @@ open class DriveIOHardware(
         timestampSeconds: Double,
         visionMeasurementStdDevs: Matrix<N3, N1>
     ) {
-        println("We just added a vision measurement!!!")
-        println("x: ${visionRobotPoseMeters.x}, y: ${visionRobotPoseMeters.y}")
-        println("Time: $timestampSeconds")
-
         super<SwerveDrivetrain>.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
 

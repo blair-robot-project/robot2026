@@ -1,6 +1,7 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants
+import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
 import frc.team449.Constants.ShooterConstants.FLYWHEEL_MOI_KG_MM
 import frc.team449.Constants.ShooterConstants.HOOD_GEARING
@@ -66,6 +68,18 @@ class ShooterIOSim : ShooterIOHardware() {
 
     init {
         SmartDashboard.putData("Hood", mech)
+
+        leftLeaderMotor.configurator.apply(
+            Slot0Configs()
+                .withKS(ShooterConstants.LEFT_FLYWHEEL_KS)
+                .withKV(ShooterConstants.LEFT_FLYWHEEL_KV)
+        )
+
+        rightLeaderMotor.configurator.apply(
+            Slot0Configs()
+                .withKS(ShooterConstants.LEFT_FLYWHEEL_KS)
+                .withKV(ShooterConstants.LEFT_FLYWHEEL_KV)
+        )
 
         rightLeaderMotor.configurator.apply(
             MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)

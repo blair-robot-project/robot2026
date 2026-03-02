@@ -1,5 +1,6 @@
 package frc.team449.subsystems.vision
 
+import com.ctre.phoenix6.Utils
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.*
@@ -8,7 +9,9 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.Alert.AlertType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants
+import frc.team449.Constants.FieldConstants
+import frc.team449.Constants.FieldConstants.FIELD_LENGTH_METERS
+import frc.team449.Constants.VisionConstants
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 import kotlin.math.pow
@@ -23,7 +26,6 @@ class VisionSubsystem(
         val tagtocam = Transform3d(-0.32, 0.24, -0.81, Rotation3d(0.59, -0.459, 0.328))
         println("robot to cam: ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix())}")
         println("rotation ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix()).rotation.x}, y: ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix()).rotation.y}, z: ${Transform3d(robottotag.toMatrix() * tagtocam.toMatrix()).rotation.z}")
-
     }
 
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
@@ -60,10 +62,10 @@ class VisionSubsystem(
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
                     observation.tagCount == 0 ||
-                        (observation.tagCount == 1 && observation.ambiguity > Constants.VisionConstants.maxAmbiguity) ||
-                        abs(observation.pose.z) > Constants.VisionConstants.maxZError ||
-                        observation.pose.x < 0.0 || observation.pose.x > Constants.VisionConstants.aprilTagLayout.fieldLength ||
-                        observation.pose.y < 0.0 || observation.pose.y > Constants.VisionConstants.aprilTagLayout.fieldWidth
+                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
+                        abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
+                        observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
+                        observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
 
                 if (rejectPose) {
                     robotPosesRejected.add(observation.pose)
@@ -73,21 +75,21 @@ class VisionSubsystem(
                 robotPosesAccepted.add(observation.pose)
 
                 val stdDevFactor = observation.averageTagDistance.pow(2.0) / observation.tagCount
-                var linearStdDev = Constants.VisionConstants.linearStdDevBaseline * stdDevFactor
-                var angularStdDev = Constants.VisionConstants.angularStdDevBaseline * stdDevFactor
+                var linearStdDev = VisionConstants.LINEAR_STD_DEV_BASELINE_METERS * stdDevFactor
+                var angularStdDev = VisionConstants.ANGULAR_STD_DEV_BASELINE_RADIANS * stdDevFactor
 
                 if (observation.type == VisionIO.PoseObservationType.MEGATAG_2) {
-                    linearStdDev *= Constants.VisionConstants.linearStdDevMegatag2Factor
-                    angularStdDev *= Constants.VisionConstants.angularStdDevMegatag2Factor
+                    linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
+                    angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
                 }
-                if (cameraIndex < Constants.VisionConstants.cameraStdDevFactors.size) {
-                    linearStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
-                    angularStdDev *= Constants.VisionConstants.cameraStdDevFactors[cameraIndex]
+                if (cameraIndex < VisionConstants.cameraStdDevFactors.size) {
+                    linearStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
+                    angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
                 }
 
                 consumeVisionMeasurement(
                     observation.pose.toPose2d(),
-                    observation.timestamp,
+                    Utils.fpgaToCurrentTime(observation.timestamp),
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                 )
 

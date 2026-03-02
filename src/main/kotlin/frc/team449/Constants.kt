@@ -81,11 +81,8 @@ object Constants {
     }
 
     object FieldConstants {
-        // CHS uses AndyMark Rebuilt Field
-        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
-
-        val FIELD_LENGTH_METERS = REBUILT_FIELD_LAYOUT.fieldLength
-        val FIELD_WIDTH_METERS = REBUILT_FIELD_LAYOUT.fieldWidth
+        val FIELD_LENGTH_METERS = VisionConstants.REBUILT_FIELD_LAYOUT.fieldLength
+        val FIELD_WIDTH_METERS = VisionConstants.REBUILT_FIELD_LAYOUT.fieldWidth
     }
 
     object ShooterConstants {
@@ -165,12 +162,12 @@ object Constants {
 
         // --- STATIC SETPOINTS ---
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
-        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
+        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
 
         val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.11)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.05)
+        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.04)
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         // --- INTERPOLATION MAPS ---
@@ -184,14 +181,17 @@ object Constants {
 
         val FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(2.0, 181.0)
-                put(3.59511479485, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-                put(5.0, TRENCH_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+                put(1.041, HUB_FLYWHEEL_VEL.`in`(RadiansPerSecond))
+                put(2.032, 200.5)
+                put(3.59511479485, 200.5)
+                put(5.0, 250.5)
+                put(6.13, 250.5)
             }
 
         val HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(2.0, 0.0)
+                put(1.041, HUB_HOOD_ANGLE.`in`(Radians))
+                put(2.032, 0.04)
                 put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
                 put(5.0, 0.1806)
             }
@@ -237,7 +237,7 @@ object Constants {
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- ROLLER VELOCITY SETPOINTS ---
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(100.0)
+        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
 
         // --- HOMING & VISUALIZATION ---
@@ -321,27 +321,27 @@ object Constants {
     }
 
     object VisionConstants {
-        var aprilTagLayout: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
+        // --- CHS ANDYMARK REBUILT FIELD ---
+        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
 
-        var cameraRightName: String = "limelight-right"
-        var cameraLeftName: String = "limelight-left"
+        const val CAMERA_RIGHT_NAME: String = "limelight-right"
+        const val CAMERA_LEFT_NAME: String = "limelight-left"
 
-        // Robot to camera transforms
-        // TODO: idt these are actually right, will prolly havta look at it again after it's mounted
-        var robotToCameraRight: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var robotToCameraLeft: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
+        // --- ROBOT TO CAMERA TRANSFORMS ---
+        val ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        val ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
 
-        var robotToCamera0: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var robotToCamera1: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
 
-        // Basic filtering thresholds
-        var maxAmbiguity: Double = 0.3
-        var maxZError: Double = 0.75
+        // --- FILTERING THRESHOLDS --
+        const val MAX_AMBIGUITY: Double = 0.3
+        const val MAX_Z_ERROR_METERS: Double = 0.5
 
-        // Standard deviation baselines, for 1 meter distance and 1 tag
-        // (Adjusted automatically based on distance and # of tags)
-        var linearStdDevBaseline: Double = 0.02 // Meters
-        var angularStdDevBaseline: Double = 0.06 // Radians
+        // --- STANDARD DEVIATION BASELINES ---
+        // std dev baselines for 1 tag @ 1 meter dist
+        const val LINEAR_STD_DEV_BASELINE_METERS: Double = 0.02 // Meters
+        const val ANGULAR_STD_DEV_BASELINE_RADIANS: Double = 0.06 // Radians
 
         // Standard deviation multipliers for each camera
         // (Adjust to trust some cameras more than others)
