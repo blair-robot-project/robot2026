@@ -7,22 +7,12 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.units.Units.Degrees
-import edu.wpi.first.units.measure.Angle
 import org.littletonrobotics.junction.AutoLog
 
 interface DriveIO {
     @AutoLog
     open class DriveIOInputs : SwerveDriveState() {
         @JvmField var gyroAngle: Double = 0.0
-
-        @JvmField var frontLeftDrivePosition: Angle = Degrees.of(0.0)
-
-        @JvmField var frontRightDrivePosition: Angle = Degrees.of(0.0)
-
-        @JvmField var backLeftDrivePosition: Angle = Degrees.of(0.0)
-
-        @JvmField var backRightDrivePosition: Angle = Degrees.of(0.0)
 
         init {
             this.Pose = Pose2d()
@@ -34,6 +24,7 @@ interface DriveIO {
             this.FailedDaqs = stateIn.FailedDaqs
             this.ModuleStates = stateIn.ModuleStates
             this.ModuleTargets = stateIn.ModuleTargets
+            this.ModulePositions = stateIn.ModulePositions
             this.Speeds = stateIn.Speeds
             this.OdometryPeriod = stateIn.OdometryPeriod
         }

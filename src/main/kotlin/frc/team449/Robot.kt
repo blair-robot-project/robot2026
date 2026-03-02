@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.RobotContainer.fuelSimulator
@@ -23,7 +22,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
 class Robot : LoggedRobot() {
-
     init {
         println("Initializing Robot!")
 
@@ -73,11 +71,11 @@ class Robot : LoggedRobot() {
         PhoenixUtil.refreshAll()
 
         // high priority (real-time) thread for loop timing
-        Threads.setCurrentThreadPriority(true, 99)
+//        Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()
 
         // return thread to low priority (standard)
-        Threads.setCurrentThreadPriority(false, 10)
+//        Threads.setCurrentThreadPriority(false, 10)
     }
 
     override fun autonomousInit() {
@@ -129,7 +127,7 @@ class Robot : LoggedRobot() {
                     -0.1,
                     0.0,
                     0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle - 0.2591940418, 0.0),
+                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle + 0.2591940418, 0.0),
                 ),
             ),
         )

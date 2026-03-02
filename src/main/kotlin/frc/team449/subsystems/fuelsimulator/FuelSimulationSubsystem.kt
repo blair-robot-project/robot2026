@@ -117,7 +117,7 @@ class FuelSimulationSubsystem(
     fun simLaunchFuel(effectiveShotSpeed: Double) {
         fuelSim.launchFuel(
             MetersPerSecond.of(effectiveShotSpeed),
-            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
+            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle - 0.2591940418) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
             Radians.of(0.0) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
             Constants.ShooterConstants.SHOOTER_HEIGHT,
             true

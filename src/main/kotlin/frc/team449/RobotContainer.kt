@@ -24,6 +24,10 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import frc.team449.subsystems.vision.VisionIO
+import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
+import frc.team449.subsystems.vision.VisionSubsystem
 
 object RobotContainer {
     // driver/op controllers
@@ -63,6 +67,28 @@ object RobotContainer {
             },
         )
 
+    val vision: VisionSubsystem =
+        when (Constants.CURRENT_MODE) {
+            Mode.REAL ->
+                VisionSubsystem(
+                    drive::addVisionMeasurement,
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraRight),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraLeft)
+                )
+            Mode.SIM ->
+                VisionSubsystem(
+                    drive::addVisionMeasurement,
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.robotToCamera0) { drive.pose },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.robotToCamera1) { drive.pose },
+                )
+            Mode.REPLAY ->
+                VisionSubsystem(
+                    drive::addVisionMeasurement,
+                    object : VisionIO {},
+                    object : VisionIO {},
+                )
+        }
+
     val intake: IntakeSubsystem =
         IntakeSubsystem(
             when (Constants.CURRENT_MODE) {
@@ -80,6 +106,7 @@ object RobotContainer {
                 Mode.REPLAY -> object : IndexerIO {}
             },
         )
+
     val shooter: ShooterSubsystem =
         ShooterSubsystem(
             when (Constants.CURRENT_MODE) {

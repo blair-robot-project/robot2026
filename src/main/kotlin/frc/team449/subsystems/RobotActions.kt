@@ -35,7 +35,7 @@ class RobotActions(
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
-            intake.stow(),
+            //   intake.stow(),
         )
 
     fun stopIntake(): Command = intake.stopRollers()
@@ -55,7 +55,7 @@ class RobotActions(
     fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
         shooter.setFlywheelAndHoodFromSuppliers(
             { RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())) },
-            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) }
+            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) },
         )
 
     fun prepTowerShot(): Command =

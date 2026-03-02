@@ -1,4 +1,6 @@
 package frc.team449.subsystems.intake
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
@@ -21,7 +23,7 @@ class IntakeIOSim : IntakeIOHardware() {
         SingleJointedArmSim(
             DCMotor.getKrakenX44(2),
             IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH,
-            IntakeConstants.PIVOT_MOI,
+            IntakeConstants.PIVOT_MOI_KG_MM,
             IntakeConstants.ARM_LENGTH_METERS,
             IntakeConstants.STOW_POS_RADS,
             IntakeConstants.DEPLOY_POS_RADS,
@@ -33,7 +35,7 @@ class IntakeIOSim : IntakeIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(2),
-                IntakeConstants.ROLLER_MOI,
+                IntakeConstants.ROLLER_MOI_KG_MM,
                 IntakeConstants.ROLLER_GEARING,
             ),
             DCMotor.getKrakenX60(2),
@@ -60,11 +62,12 @@ class IntakeIOSim : IntakeIOHardware() {
 
     init {
         leftPivotLeader.configurator.apply(
-            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive),
+            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
         )
-        rightPivotFollower.configurator.apply(
-            MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive),
+        leftPivotLeader.configurator.apply(
+            CurrentLimitsConfigs().withSupplyCurrentLimit(20.0).withStatorCurrentLimit(40.0)
         )
+
         SmartDashboard.putData("Intake", mech)
     }
 
