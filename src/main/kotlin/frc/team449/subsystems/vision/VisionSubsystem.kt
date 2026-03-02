@@ -1,5 +1,6 @@
 package frc.team449.subsystems.vision
 
+import com.ctre.phoenix6.Utils
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.*
@@ -87,7 +88,7 @@ class VisionSubsystem(
 
                 consumeVisionMeasurement(
                     observation.pose.toPose2d(),
-                    observation.timestamp,
+                    Utils.fpgaToCurrentTime(observation.timestamp),
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                 )
 
