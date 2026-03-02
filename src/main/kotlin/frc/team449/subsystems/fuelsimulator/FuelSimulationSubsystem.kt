@@ -19,13 +19,17 @@ class FuelSimulationSubsystem(
     private val robotContainer: RobotContainer
 ) : SubsystemBase() {
     // take these out of Constants so that they're not wasting memory on real robot
-    val flywheelSimulatedBPS = 5
+    val flywheelSimulatedBPS = 8
     val flywheelBPSRateLimit = round((1 / Constants.LOOP_TIME) / flywheelSimulatedBPS)
-    val simulatedIndexingMissChance = .6
+    val simulatedIndexingMissChance = .7
+    val simulatedIndexingScaleIncrease = 0.2
+    val simulatedIndexingScaleFactor = 10
 
     val intakeSimulatedBPS = 20
     val intakeBPSRateLimit = round((1 / Constants.LOOP_TIME) / intakeSimulatedBPS)
-    val simulatedIntakingMissChance = .85
+    val simulatedIntakingMissChance = .8
+    val simulatedIntakingScaleIncrease = 0.2
+    val simulatedIntakingScaleFactor = 6
     val simulatedHopperLimit = 50
 
     val inaccuracyDegrees = 2.0
@@ -94,8 +98,9 @@ class FuelSimulationSubsystem(
         effectiveShotSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2.0 * Constants.ShooterConstants.EFFICIENCY
 
         if (isShooting) {
+            val missScaling = simulatedIndexingScaleIncrease * (1.0 - (ballCount / simulatedHopperLimit.toFloat())).pow(simulatedIndexingScaleFactor)
             if (simBallThrottle < flywheelBPSRateLimit) {
-                if (Math.random() > simulatedIndexingMissChance) {
+                if (Math.random() > simulatedIndexingMissChance + missScaling) {
                     simBallThrottle++
                 }
             } else {
@@ -105,7 +110,7 @@ class FuelSimulationSubsystem(
             }
 
             if (simBall2Throttle < flywheelBPSRateLimit) {
-                if (Math.random() > simulatedIndexingMissChance) {
+                if (Math.random() > simulatedIndexingMissChance + missScaling) {
                     simBall2Throttle++
                 }
             } else {
@@ -135,7 +140,8 @@ class FuelSimulationSubsystem(
 
         if (simIntaking) {
             if (simIntakeThrottle < intakeBPSRateLimit) {
-                if (Math.random() > simulatedIntakingMissChance + (10 * (ballCount / simulatedHopperLimit).toFloat().pow(4))) {
+                val missScaling = (simulatedIntakingScaleIncrease * (ballCount / simulatedHopperLimit.toFloat()).pow(simulatedIntakingScaleFactor))
+                if (Math.random() > simulatedIntakingMissChance + missScaling) {
                     simIntakeThrottle++
                 }
             } else {
