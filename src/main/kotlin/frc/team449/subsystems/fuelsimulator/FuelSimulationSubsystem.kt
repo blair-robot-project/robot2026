@@ -12,13 +12,14 @@ import frc.team449.Constants
 import frc.team449.RobotContainer
 import org.littletonrobotics.junction.Logger
 import kotlin.math.PI
+import kotlin.math.pow
 import kotlin.math.round
 
 class FuelSimulationSubsystem(
     private val robotContainer: RobotContainer
 ) : SubsystemBase() {
     // take these out of Constants so that they're not wasting memory on real robot
-    val flywheelSimulatedBPS = 11
+    val flywheelSimulatedBPS = 5
     val flywheelBPSRateLimit = round((1 / Constants.LOOP_TIME) / flywheelSimulatedBPS)
     val simulatedIndexingMissChance = .6
 
@@ -98,6 +99,7 @@ class FuelSimulationSubsystem(
                     simBallThrottle++
                 }
             } else {
+                simLaunchFuel(effectiveShotSpeed, true)
                 ballCount--
                 simBallThrottle = 0
             }
@@ -107,20 +109,20 @@ class FuelSimulationSubsystem(
                     simBall2Throttle++
                 }
             } else {
-                simLaunchFuel(effectiveShotSpeed)
+                simLaunchFuel(effectiveShotSpeed, false)
                 ballCount--
                 simBall2Throttle = 0
             }
         }
     }
 
-    fun simLaunchFuel(effectiveShotSpeed: Double) {
+    fun simLaunchFuel(effectiveShotSpeed: Double, isLeftShooter: Boolean) {
         fuelSim.launchFuel(
             MetersPerSecond.of(effectiveShotSpeed),
             Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle - 0.2591940418) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
             Radians.of(0.0) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
             Constants.ShooterConstants.SHOOTER_HEIGHT,
-            true
+            isLeftShooter
         )
     }
 
@@ -133,7 +135,7 @@ class FuelSimulationSubsystem(
 
         if (simIntaking) {
             if (simIntakeThrottle < intakeBPSRateLimit) {
-                if (Math.random() > simulatedIntakingMissChance) {
+                if (Math.random() > simulatedIntakingMissChance + (10 * (ballCount / simulatedHopperLimit).toFloat().pow(4))) {
                     simIntakeThrottle++
                 }
             } else {
