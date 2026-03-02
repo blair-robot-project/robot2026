@@ -54,7 +54,7 @@ class Robot : LoggedRobot() {
 
     override fun driverStationConnected() {
         robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.setHubPosition()
+        FieldUtil.updateKeyPositions()
     }
 
     override fun robotInit() {
