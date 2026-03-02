@@ -340,8 +340,8 @@ object Constants {
 
         // --- STANDARD DEVIATION BASELINES ---
         // std dev baselines for 1 tag @ 1 meter dist
-        const val LINEAR_STD_DEV_BASELINE_METERS: Double = 0.02 // Meters
-        const val ANGULAR_STD_DEV_BASELINE_RADIANS: Double = 0.06 // Radians
+        const val LINEAR_STD_DEV_BASELINE_METERS: Double = 0.02
+        const val ANGULAR_STD_DEV_BASELINE_RADIANS: Double = 0.06
 
         // Standard deviation multipliers for each camera
         // (Adjust to trust some cameras more than others)

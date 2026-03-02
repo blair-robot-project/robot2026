@@ -40,7 +40,7 @@ class PoseAlignCommand(
 
     init {
         thetaController.enableContinuousInput(-PI, PI)
-        driveController.setTolerance(Pose2d(0.05, 0.05, Rotation2d.fromDegrees(2.0)))
+        driveController.setTolerance(Pose2d(0.02, 0.02, Rotation2d.fromDegrees(1.0)))
         addRequirements(drive)
     }
 
