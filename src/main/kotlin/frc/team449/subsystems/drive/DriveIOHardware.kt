@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
 import frc.team449.Constants
 import frc.team449.util.PhoenixUtil
+import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
@@ -108,6 +109,9 @@ open class DriveIOHardware(
     override fun logModules(driveState: SwerveDriveState) {
         val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
         if (driveState.ModuleStates == null) return
-        for (i in 0 until modules.count()) {}
+        for (i in 0 until modules.count()) {
+            Logger.recordOutput(moduleNames[i] + "/DriveSupplyCurrentAmps", this.modules[i].driveMotor.supplyCurrent.valueAsDouble)
+            Logger.recordOutput(moduleNames[i] + "/DriveStatorCurrentAmps", this.modules[i].driveMotor.statorCurrent.valueAsDouble)
+        }
     }
 }

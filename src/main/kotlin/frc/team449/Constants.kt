@@ -55,9 +55,6 @@ object Constants {
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
         const val MODULE_ALIGN_TOLERANCE = 5.0 // degrees
-
-        // --- WHEEL RADIUS CHARACTERIZATION ---
-        const val WHEEL_RADIUS_RAMP_RATE = 0.0
     }
 
     object AutoConstants {
