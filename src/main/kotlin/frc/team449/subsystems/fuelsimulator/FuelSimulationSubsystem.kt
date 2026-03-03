@@ -4,9 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.util.Units
-import edu.wpi.first.units.Units.Meters
-import edu.wpi.first.units.Units.MetersPerSecond
-import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.FuelSim
@@ -14,20 +12,27 @@ import frc.team449.Constants
 import frc.team449.RobotContainer
 import org.littletonrobotics.junction.Logger
 import kotlin.math.PI
+import kotlin.math.pow
 import kotlin.math.round
 
 class FuelSimulationSubsystem(
     private val robotContainer: RobotContainer
 ) : SubsystemBase() {
     // take these out of Constants so that they're not wasting memory on real robot
-    val flywheelSimulatedBPS = 11
+    val flywheelSimulatedBPS = 8
     val flywheelBPSRateLimit = round((1 / Constants.LOOP_TIME) / flywheelSimulatedBPS)
-    val simulatedIndexingMissChance = .6
+    val simulatedIndexingMissChance = .7
+    val simulatedIndexingScaleIncrease = 0.2
+    val simulatedIndexingScaleFactor = 10
 
     val intakeSimulatedBPS = 20
     val intakeBPSRateLimit = round((1 / Constants.LOOP_TIME) / intakeSimulatedBPS)
-    val simulatedIntakingMissChance = .6
+    val simulatedIntakingMissChance = .8
+    val simulatedIntakingScaleIncrease = 0.2
+    val simulatedIntakingScaleFactor = 6
     val simulatedHopperLimit = 50
+
+    val inaccuracyDegrees = 2.0
 
     val fuelSim = FuelSim()
 
@@ -36,6 +41,7 @@ class FuelSimulationSubsystem(
     var effectiveShotSpeed: Double = 0.0
 
     private var simBallThrottle = 0
+    private var simBall2Throttle = 0
     private var simIntakeThrottle = 0
 
     private val shooterTransform =
@@ -66,7 +72,7 @@ class FuelSimulationSubsystem(
 
     override fun simulationPeriodic() {
         pollFuelLaunch()
-        simIntaking = pollIntakeAcceptBall()
+        pollIntakeAcceptBall()
         fuelSim.updateSim()
 
         Logger.recordOutput("FuelSim/Fuels", *fuelSim.fuels)
@@ -76,13 +82,6 @@ class FuelSimulationSubsystem(
     }
 
     fun pollFuelLaunch() {
-        if (simBallThrottle < flywheelBPSRateLimit) {
-            if (Math.random() > simulatedIndexingMissChance) {
-                simBallThrottle++
-            }
-            return
-        }
-
         val hasBall = ballCount > 0
         val isSpunUp =
             robotContainer.shooter.isFlywheelAtTolerance() &&
@@ -90,43 +89,67 @@ class FuelSimulationSubsystem(
                 robotContainer.shooter.flywheelTargetVelocityRadPerSec >= 10.0
 
         val isFeeding = robotContainer.indexer.indexerTargetVelocityRadPerSec >= 10.0
-
-        if (!hasBall || !isSpunUp || !isFeeding) return
+        val isShooting = hasBall && isSpunUp && isFeeding
 
         val rightVel = robotContainer.shooter.inputs.rightLeaderVelocityRadPerSec
         val flywheelSurfaceSpeed = rightVel * Constants.ShooterConstants.FLYWHEEL_RADIUS
         val hoodRollerSurfaceSpeed =
             rightVel * (1.0 / Constants.ShooterConstants.HOOD_ROLLER_GEARING) * Constants.ShooterConstants.HOOD_ROLLER_RADIUS.`in`(Meters)
-        val effectiveShotSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2.0 * Constants.ShooterConstants.EFFICIENCY
+        effectiveShotSpeed = (flywheelSurfaceSpeed + hoodRollerSurfaceSpeed) / 2.0 * Constants.ShooterConstants.EFFICIENCY
 
+        if (isShooting) {
+            val missScaling = simulatedIndexingScaleIncrease * (1.0 - (ballCount / simulatedHopperLimit.toFloat())).pow(simulatedIndexingScaleFactor)
+            if (simBallThrottle < flywheelBPSRateLimit) {
+                if (Math.random() > simulatedIndexingMissChance + missScaling) {
+                    simBallThrottle++
+                }
+            } else {
+                simLaunchFuel(effectiveShotSpeed, true)
+                ballCount--
+                simBallThrottle = 0
+            }
+
+            if (simBall2Throttle < flywheelBPSRateLimit) {
+                if (Math.random() > simulatedIndexingMissChance + missScaling) {
+                    simBall2Throttle++
+                }
+            } else {
+                simLaunchFuel(effectiveShotSpeed, false)
+                ballCount--
+                simBall2Throttle = 0
+            }
+        }
+    }
+
+    fun simLaunchFuel(effectiveShotSpeed: Double, isLeftShooter: Boolean) {
         fuelSim.launchFuel(
             MetersPerSecond.of(effectiveShotSpeed),
-            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle - 0.2591940418),
-            Radians.of(0.0),
+            Radians.of((PI / 2) - robotContainer.shooter.hoodSimAngle - 0.2591940418) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
+            Radians.of(0.0) + Degrees.of(Math.random() * 2 * inaccuracyDegrees - inaccuracyDegrees),
             Constants.ShooterConstants.SHOOTER_HEIGHT,
+            isLeftShooter
         )
-
-        ballCount--
-        simBallThrottle = 0
     }
 
     fun pollIntakeAcceptBall(): Boolean {
         val intakeDeployed = robotContainer.intake.pivotDeployedState
+        // this should be actual vel not target
+        val intakeMoving = robotContainer.intake.rollerTargetVelocityRadPerSec >= Constants.IntakeConstants.INTAKE_VELOCITY.`in`(RadiansPerSecond)
         val hasCapacity = ballCount < simulatedHopperLimit
+        simIntaking = intakeDeployed && hasCapacity && intakeMoving
 
-        if (!intakeDeployed || !hasCapacity) {
-            return false
-        }
-
-        if (simIntakeThrottle < intakeBPSRateLimit) {
-            if (Math.random() > simulatedIntakingMissChance) {
-                simIntakeThrottle++
+        if (simIntaking) {
+            if (simIntakeThrottle < intakeBPSRateLimit) {
+                val missScaling = (simulatedIntakingScaleIncrease * (ballCount / simulatedHopperLimit.toFloat()).pow(simulatedIntakingScaleFactor))
+                if (Math.random() > simulatedIntakingMissChance + missScaling) {
+                    simIntakeThrottle++
+                }
+            } else {
+                simIntakeThrottle = 0
+                return true
             }
-            return false
         }
-
-        simIntakeThrottle = 0
-        return true
+        return false
     }
 
     fun resetFuel(): Command =
