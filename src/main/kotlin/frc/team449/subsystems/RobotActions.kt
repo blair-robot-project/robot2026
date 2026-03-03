@@ -1,5 +1,4 @@
 package frc.team449.subsystems
-import edu.wpi.first.units.Units.Degrees
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command

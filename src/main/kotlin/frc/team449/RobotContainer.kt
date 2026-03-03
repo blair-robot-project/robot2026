@@ -1,5 +1,6 @@
 package frc.team449
 
+import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
@@ -72,8 +73,9 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                  VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_RIGHT),
-                    VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_LEFT)
+                    // TODO UNCOMMENT THE RIGHT CAMERA WHEN USING IT ON ROBOT
+//                  VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.rotation)),
+                    VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.rotation))
                 )
             Mode.SIM ->
                 VisionSubsystem(

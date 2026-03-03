@@ -324,11 +324,12 @@ object Constants {
         const val CAMERA_LEFT_NAME: String = "limelight-left"
 
         // --- ROBOT TO CAMERA TRANSFORMS ---
-        val ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        val ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
+//        val ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+//        val ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
 
-        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(0.2, -0.2, 0.53594, Rotation3d(0.0, 0.3, 0.3))
+        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.3, 0.3))
+        // TODO CHECK ROTATION - see if poses are accurate on actual field
 
         // --- FILTERING THRESHOLDS --
         const val MAX_AMBIGUITY: Double = 0.3
