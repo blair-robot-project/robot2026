@@ -1,1 +1,1 @@
-# The Blair Robot Project 2026: FRC team 449
+# The Blair Robot Project 2026: FRC Team 449
