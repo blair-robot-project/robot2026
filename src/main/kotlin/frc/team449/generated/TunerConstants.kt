@@ -66,11 +66,12 @@ object TunerConstants {
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-    private val driveInitialConfigs: TalonFXConfiguration = TalonFXConfiguration().apply {
-        CurrentLimits.apply {
-            SupplyCurrentLimit = 40.0
-        }
-    }
+    private val driveInitialConfigs: TalonFXConfiguration = TalonFXConfiguration()
+        .withCurrentLimits(
+            CurrentLimitsConfigs() // Swerve azimuth does not require much torque output, so we can set a relatively low
+                .withSupplyCurrentLimit(Units.Amps.of(40.0))
+                .withSupplyCurrentLimitEnable(true)
+        )
 
     private val steerInitialConfigs: TalonFXSConfiguration =
         TalonFXSConfiguration()
@@ -79,6 +80,8 @@ object TunerConstants {
                     // stator current limit to help avoid brownouts without impacting performance.
                     .withStatorCurrentLimit(Units.Amps.of(40.0))
                     .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Units.Amps.of(40.0))
+                    .withSupplyCurrentLimitEnable(true)
             )
 
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs

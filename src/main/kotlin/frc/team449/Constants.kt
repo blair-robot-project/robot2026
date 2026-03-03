@@ -181,8 +181,7 @@ object Constants {
                 put(1.041, HUB_FLYWHEEL_VEL.`in`(RadiansPerSecond))
                 put(2.032, 200.5)
                 put(3.59511479485, 200.5)
-                put(5.0, 250.5)
-                put(6.13, 250.5)
+                put(5.0, 220.5)
             }
 
         val HOOD_ANGLE_MAP =
