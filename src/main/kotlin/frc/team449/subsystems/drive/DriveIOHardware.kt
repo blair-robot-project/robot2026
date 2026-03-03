@@ -54,15 +54,16 @@ open class DriveIOHardware(
     val accelX: StatusSignal<LinearAcceleration> = pigeon2.accelerationX
     val accelY: StatusSignal<LinearAcceleration> = pigeon2.accelerationY
 
-    val gyroSignals = arrayOf(
-        angularPitchVelocity,
-        angularRollVelocity,
-        angularYawVelocity,
-        roll,
-        pitch,
-        accelX,
-        accelY
-    )
+    val gyroSignals =
+        arrayOf(
+            angularPitchVelocity,
+            angularRollVelocity,
+            angularYawVelocity,
+            roll,
+            pitch,
+            accelX,
+            accelY,
+        )
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
@@ -89,9 +90,9 @@ open class DriveIOHardware(
     override fun seedFieldCentric() {
         super<SwerveDrivetrain>.seedFieldCentric()
     }
+
     override fun resetOdometry(pose: Pose2d) {
         super<SwerveDrivetrain>.resetPose(pose)
-        // super<SwerveDrivetrain>.seedFieldCentric(pose.rotation)
     }
 
     override fun setOperatorPerspectiveForward(yaw: Rotation2d) {
@@ -114,8 +115,16 @@ open class DriveIOHardware(
         val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
         if (driveState.ModuleStates == null) return
         for (i in 0 until modules.count()) {
-            Logger.recordOutput(moduleNames[i] + "/DriveSupplyCurrentAmps", this.modules[i].driveMotor.supplyCurrent.valueAsDouble)
-            Logger.recordOutput(moduleNames[i] + "/DriveStatorCurrentAmps", this.modules[i].driveMotor.statorCurrent.valueAsDouble)
+            Logger.recordOutput(
+                moduleNames[i] + "/DriveSupplyCurrentAmps",
+                this.modules[i]
+                    .driveMotor.supplyCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/DriveStatorCurrentAmps",
+                this.modules[i]
+                    .driveMotor.statorCurrent.valueAsDouble,
+            )
         }
     }
 }

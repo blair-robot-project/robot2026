@@ -124,7 +124,6 @@ class BLineRoutines(
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
-
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
@@ -238,18 +237,8 @@ class BLineRoutines(
 
     fun nothing(): Command = Commands.none()
 
-    fun twoMeter(): Command {
-        val path1 = Path("twoMeter")
-
-        return Commands.sequence(
-            drive.alignModules(Rotation2d.kZero),
-            pathBuilderWithReset.build(path1),
-        )
-    }
-
     fun addAutoOptions(autoChooser: SendableChooser<Command>) {
         autoChooser.setDefaultOption("Do Nothing", nothing())
-        autoChooser.addOption("Drive 2m forward", twoMeter())
         autoChooser.addOption("R Half Close", rHalfClose())
         autoChooser.addOption("R Half Far", rHalfFar())
         autoChooser.addOption("R Half Loop", rHalfAndLoop())
