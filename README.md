@@ -4,7 +4,7 @@ Our robot's code repository for the 2026 FIRST Robotics Competition.
 
 -----------------------------
 
-## Codebase Ooganization
+## Codebase Organization
 
 
 
