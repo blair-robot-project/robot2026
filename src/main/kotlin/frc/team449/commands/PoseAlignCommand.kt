@@ -13,13 +13,16 @@ import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.Supplier
 import kotlin.math.PI
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
 
 class PoseAlignCommand(
     private val drive: DriveSubsystem,
     private val targetPoseSupplier: Supplier<Pose2d>
 ) : Command() {
-    private val xController = PIDController(5.0, 0.0, 0.15)
-    private val yController = PIDController(5.0, 0.0, 0.15)
+    private val xController = PIDController(2.0, 0.0, 0.0)
+    private val yController = PIDController(2.0, 0.0, 0.0)
     private val thetaController = ProfiledPIDController(
         4.0,
         0.0,
@@ -38,9 +41,11 @@ class PoseAlignCommand(
 
     private val applyChassisSpeeds = SwerveRequest.ApplyRobotSpeeds()
 
+    private val maxSpeed = Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+
     init {
         thetaController.enableContinuousInput(-PI, PI)
-        driveController.setTolerance(Pose2d(0.02, 0.02, Rotation2d.fromDegrees(1.0)))
+        driveController.setTolerance(Pose2d(0.07, 0.07, Rotation2d.fromDegrees(1.0)))
         addRequirements(drive)
     }
 
@@ -58,6 +63,10 @@ class PoseAlignCommand(
             0.0,
             targetPose.rotation
         )
+
+        val translationSpeed = sqrt(robotSpeeds.vxMetersPerSecond * robotSpeeds.vxMetersPerSecond + robotSpeeds.vyMetersPerSecond * robotSpeeds.vyMetersPerSecond)
+        robotSpeeds.vxMetersPerSecond *= min(translationSpeed, maxSpeed) / translationSpeed
+        robotSpeeds.vyMetersPerSecond *= min(translationSpeed, maxSpeed) / translationSpeed
 
         drive.setControl(applyChassisSpeeds.withSpeeds(robotSpeeds))
     }

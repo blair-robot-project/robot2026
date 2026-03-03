@@ -89,6 +89,10 @@ open class DriveIOHardware(
     override fun seedFieldCentric() {
         super<SwerveDrivetrain>.seedFieldCentric()
     }
+    override fun resetOdometry(pose: Pose2d) {
+        super<SwerveDrivetrain>.resetPose(pose)
+       // super<SwerveDrivetrain>.seedFieldCentric(pose.rotation)
+    }
 
     override fun setOperatorPerspectiveForward(yaw: Rotation2d) {
         super<SwerveDrivetrain>.setOperatorPerspectiveForward(yaw)

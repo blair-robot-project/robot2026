@@ -100,6 +100,7 @@ class VisionIOLimelight(
             for (target in results.targets_Fiducials) {
                 tagIdsSet.add(target.fiducialID.toInt())
             }
+            println(tagIdsSet.toIntArray())
             inputs.tagIds = tagIdsSet.toIntArray()
         } else {
             inputs.latestTargetObservation = TargetObservation(Rotation2d(), Rotation2d())

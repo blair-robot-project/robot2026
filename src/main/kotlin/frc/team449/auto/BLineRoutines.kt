@@ -124,6 +124,7 @@ class BLineRoutines(
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
+
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
