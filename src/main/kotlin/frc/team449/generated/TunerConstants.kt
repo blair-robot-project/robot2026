@@ -62,11 +62,15 @@ object TunerConstants {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private val kSlipCurrent: Current = Units.Amps.of(40.0)
+    private val kSlipCurrent: Current = Units.Amps.of(80.0)
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-    private val driveInitialConfigs: TalonFXConfiguration = TalonFXConfiguration()
+    private val driveInitialConfigs: TalonFXConfiguration = TalonFXConfiguration().apply {
+        CurrentLimits.apply {
+            SupplyCurrentLimit = 40.0
+        }
+    }
 
     private val steerInitialConfigs: TalonFXSConfiguration =
         TalonFXSConfiguration()
@@ -75,8 +79,6 @@ object TunerConstants {
                     // stator current limit to help avoid brownouts without impacting performance.
                     .withStatorCurrentLimit(Units.Amps.of(40.0))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Units.Amps.of(40.0))
-                    .withSupplyCurrentLimitEnable(true)
             )
 
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs

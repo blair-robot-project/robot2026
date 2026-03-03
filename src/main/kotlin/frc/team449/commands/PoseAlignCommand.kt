@@ -1,9 +1,11 @@
 package frc.team449.commands
 
+import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.HolonomicDriveController
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
@@ -20,31 +22,24 @@ class PoseAlignCommand(
     private val drive: DriveSubsystem,
     private val targetPoseSupplier: Supplier<Pose2d>
 ) : Command() {
-    private val xController = PIDController(2.0, 0.0, 0.0)
-    private val yController = PIDController(2.0, 0.0, 0.0)
+    private val xController = PIDController(3.0, 0.0, 0.00)
+    private val yController = PIDController(3.0, 0.0, 0.00)
     private val thetaController = ProfiledPIDController(
-        4.0,
-        0.0,
-        0.0,
+        4.0, 0.0, 0.0,
         TrapezoidProfile.Constraints(
             Constants.AutoConstants.AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND,
             Constants.AutoConstants.AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND
         )
     )
 
-    private val driveController = HolonomicDriveController(
-        xController,
-        yController,
-        thetaController
-    )
+    private val driveController = HolonomicDriveController(xController, yController, thetaController)
 
-    private val applyChassisSpeeds = SwerveRequest.ApplyRobotSpeeds()
-
-    private val maxSpeed = Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+    private val applyChassisSpeeds = SwerveRequest.RobotCentric()
+        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     init {
         thetaController.enableContinuousInput(-PI, PI)
-        driveController.setTolerance(Pose2d(0.07, 0.07, Rotation2d.fromDegrees(1.0)))
+        driveController.setTolerance(Pose2d(0.03, 0.03, Rotation2d.fromDegrees(1.0)))
         addRequirements(drive)
     }
 
@@ -53,26 +48,35 @@ class PoseAlignCommand(
     }
 
     override fun execute() {
-        val currentPose = drive.pose
-        val targetPose = targetPoseSupplier.get()
-
         val robotSpeeds: ChassisSpeeds = driveController.calculate(
-            currentPose,
-            targetPose,
+            drive.pose,
+            targetPoseSupplier.get(),
             0.0,
-            targetPose.rotation
+            targetPoseSupplier.get().rotation
         )
 
-        val translationSpeed = sqrt(robotSpeeds.vxMetersPerSecond * robotSpeeds.vxMetersPerSecond + robotSpeeds.vyMetersPerSecond * robotSpeeds.vyMetersPerSecond)
-        robotSpeeds.vxMetersPerSecond *= min(translationSpeed, maxSpeed) / translationSpeed
-        robotSpeeds.vyMetersPerSecond *= min(translationSpeed, maxSpeed) / translationSpeed
+        val xVel = robotSpeeds.vxMetersPerSecond
+            .coerceIn(-MAX_LINEAR_SPEED_METERS_PER_SECOND, MAX_LINEAR_SPEED_METERS_PER_SECOND)
+        val yVel = robotSpeeds.vyMetersPerSecond
+            .coerceIn(-MAX_LINEAR_SPEED_METERS_PER_SECOND, MAX_LINEAR_SPEED_METERS_PER_SECOND)
 
-        drive.setControl(applyChassisSpeeds.withSpeeds(robotSpeeds))
+        drive.setControl(
+            applyChassisSpeeds
+                .withVelocityX(xVel)
+                .withVelocityY(yVel)
+                .withRotationalRate(robotSpeeds.omegaRadiansPerSecond)
+        )
     }
 
     override fun isFinished(): Boolean {
         return driveController.atReference()
     }
 
-    override fun end(interrupted: Boolean) {}
+    override fun end(interrupted: Boolean) {
+        drive.setControl(SwerveRequest.Idle())
+    }
+
+    companion object {
+        private const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.0
+    }
 }
