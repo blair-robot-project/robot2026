@@ -1,6 +1,5 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
@@ -28,11 +27,14 @@ import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
 import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 import frc.team449.subsystems.vision.VisionSubsystem
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 
 object RobotContainer {
     // driver/op controllers
     val driveController: CommandXboxController = CommandXboxController(0)
     val opController: CommandXboxController = CommandXboxController(1)
+
+    var autonomousCommand: Command? = null
 
     val drive: DriveSubsystem =
         DriveSubsystem(
@@ -72,13 +74,13 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                  VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_RIGHT),
+                    VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_RIGHT),
                     VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Constants.VisionConstants.ROBOT_TO_CAMERA_LEFT)
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_CAMERA_RIGHT) { Pose2d() },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT) { drive.pose },
                     VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_LEFT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             Mode.REPLAY ->
@@ -130,5 +132,5 @@ object RobotContainer {
     val bindings = Bindings(this)
 
     val bLineRoutines = BLineRoutines(drive, actions)
-    val autoChooser = SendableChooser<Command>()
+    val autoChooser = LoggedDashboardChooser<Command>("Auto Routines")
 }

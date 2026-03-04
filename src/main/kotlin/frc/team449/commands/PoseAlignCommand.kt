@@ -5,7 +5,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.HolonomicDriveController
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
-import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
@@ -15,17 +14,17 @@ import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.Supplier
 import kotlin.math.PI
-import kotlin.math.min
-import kotlin.math.sqrt
 
 class PoseAlignCommand(
     private val drive: DriveSubsystem,
     private val targetPoseSupplier: Supplier<Pose2d>
 ) : Command() {
-    private val xController = PIDController(3.0, 0.0, 0.00)
-    private val yController = PIDController(3.0, 0.0, 0.00)
+    private val xController = PIDController(4.0, 0.0, 0.05)
+    private val yController = PIDController(4.0, 0.0, 0.05)
     private val thetaController = ProfiledPIDController(
-        4.0, 0.0, 0.0,
+        4.0,
+        0.0,
+        0.0,
         TrapezoidProfile.Constraints(
             Constants.AutoConstants.AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND,
             Constants.AutoConstants.AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND
@@ -39,7 +38,7 @@ class PoseAlignCommand(
 
     init {
         thetaController.enableContinuousInput(-PI, PI)
-        driveController.setTolerance(Pose2d(0.03, 0.03, Rotation2d.fromDegrees(1.0)))
+        driveController.setTolerance(Pose2d(0.05, 0.05, Rotation2d.fromDegrees(1.0)))
         addRequirements(drive)
     }
 

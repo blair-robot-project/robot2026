@@ -102,9 +102,9 @@ open class ShooterIOHardware : ShooterIO {
     private val rightLeaderDisconnectedAlert =
         Alert("Right Leader Flywheel Motor Disconnected (ID $ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
     private val leftFollowerDisconnectedAlert =
-        Alert("Left Leader Flywheel Motor Disconnected (ID $ShooterConstants.LEFT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
+        Alert("Left Follower Flywheel Motor Disconnected (ID $ShooterConstants.LEFT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
     private val rightFollowerDisconnectedAlert =
-        Alert("Right Leader Flywheel Motor Disconnected (ID $ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
+        Alert("Right Follower Flywheel Motor Disconnected (ID $ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
     private val hoodDisconnectedAlert = Alert("Hood Motor Disconnected (ID $ShooterConstants.HOOD_MOTOR_ID).", Alert.AlertType.kError)
 
     init {

@@ -4,7 +4,9 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.util.Color
 import frc.team449.Constants
+import org.littletonrobotics.junction.Logger
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
@@ -20,6 +22,10 @@ object FieldUtil {
             Pose2d(4.35, 0.45, Rotation2d(1.5)),
             Pose2d(4.35, 7.60, Rotation2d(-1.5)),
         )
+
+    fun initialize() {
+        Logger.recordOutput("Auto Winner", Color.kDimGray.toHexString())
+    }
 
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
         val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
@@ -53,5 +59,14 @@ object FieldUtil {
             HUB_TRANSLATION = BLUE_HUB_TRANSLATION
             TOWER_POSE = BLUE_TOWER_POSE
         }
+    }
+
+    fun updateAutoWinner() {
+        val autoWinner = DriverStation.getGameSpecificMessage()
+
+        if (autoWinner.isBlank()) return
+
+        if (autoWinner == "R") Logger.recordOutput("Auto Winner", Color.kRed.toHexString())
+        if (autoWinner == "B") Logger.recordOutput("Auto Winner", Color.kBlue.toHexString())
     }
 }

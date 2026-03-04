@@ -6,7 +6,6 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
@@ -25,6 +24,7 @@ import frc.team449.Constants.AutoConstants.TRANSLATION_P
 import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveSubsystem
 import org.littletonrobotics.junction.Logger
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.function.Consumer
 
@@ -247,9 +247,9 @@ class BLineRoutines(
         )
     }
 
-    fun addAutoOptions(autoChooser: SendableChooser<Command>) {
-        autoChooser.setDefaultOption("Do Nothing", nothing())
-        autoChooser.addOption("Drive 2m forward", twoMeter())
+    fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
+        autoChooser.addDefaultOption("Do Nothing", nothing())
+//        autoChooser.addOption("Drive 2m forward", twoMeter())
         autoChooser.addOption("R Half Close", rHalfClose())
         autoChooser.addOption("R Half Far", rHalfFar())
         autoChooser.addOption("R Half Loop", rHalfAndLoop())

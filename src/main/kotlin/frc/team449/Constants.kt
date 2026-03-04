@@ -217,7 +217,7 @@ object Constants {
         const val ROLLER_GEARING = 4.0 / 3
         const val ROLLER_MOI_KG_MM = .0001411489
 
-        // --- CURRENT & OPERATIONAL LIMITS ---
+        // --- CURRENT LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 5.0
         const val PIVOT_STATOR_LIMIT = 10.0
         const val ROLLER_SUPPLY_LIMIT = 30.0
@@ -303,6 +303,7 @@ object Constants {
 
         // --- SETPOINTS ---
         val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(120.0)
+        val INTAKING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
     }
 
     object AimbotConstants {
@@ -328,7 +329,7 @@ object Constants {
         val ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
 
         val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        val PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
 
         // --- FILTERING THRESHOLDS --
         const val MAX_AMBIGUITY: Double = 0.3
@@ -341,14 +342,14 @@ object Constants {
 
         // Standard deviation multipliers for each camera
         // (Adjust to trust some cameras more than others)
-        var cameraStdDevFactors: DoubleArray =
+        val cameraStdDevFactors: DoubleArray =
             doubleArrayOf(
                 1.0, // Camera 0
                 1.0, // Camera 1
             )
 
         // Multipliers to apply for MegaTag 2 observations
-        var linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
-        var angularStdDevMegatag2Factor: Double = Double.POSITIVE_INFINITY // No rotation data available
+        const val linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
+        const val angularStdDevMegatag2Factor: Double = Double.POSITIVE_INFINITY // No rotation data available
     }
 }

@@ -16,21 +16,14 @@ import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.team449.Constants
 import frc.team449.Constants.ShooterConstants
-import frc.team449.Constants.ShooterConstants.FLYWHEEL_GEARING
-import frc.team449.Constants.ShooterConstants.FLYWHEEL_MOI_KG_MM
-import frc.team449.Constants.ShooterConstants.HOOD_GEARING
-import frc.team449.Constants.ShooterConstants.HOOD_LENGTH
-import frc.team449.Constants.ShooterConstants.HOOD_MOI_KG_MM
-import frc.team449.Constants.ShooterConstants.MAX_HOOD_ANGLE
-import frc.team449.Constants.ShooterConstants.MIN_HOOD_ANGLE
 
 class ShooterIOSim : ShooterIOHardware() {
     private val flywheelSim: FlywheelSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(4),
-                FLYWHEEL_MOI_KG_MM,
-                FLYWHEEL_GEARING,
+                ShooterConstants.FLYWHEEL_MOI_KG_MM,
+                ShooterConstants.FLYWHEEL_GEARING,
             ),
             DCMotor.getKrakenX60(4),
         )
@@ -38,13 +31,13 @@ class ShooterIOSim : ShooterIOHardware() {
     val hoodSim: SingleJointedArmSim =
         SingleJointedArmSim(
             DCMotor.getKrakenX60(1),
-            HOOD_GEARING,
-            HOOD_MOI_KG_MM,
-            HOOD_LENGTH,
-            MIN_HOOD_ANGLE.`in`(Radians),
-            MAX_HOOD_ANGLE.`in`(Radians),
+            ShooterConstants.HOOD_GEARING,
+            ShooterConstants.HOOD_MOI_KG_MM,
+            ShooterConstants.HOOD_LENGTH,
+            ShooterConstants.MIN_HOOD_ANGLE.`in`(Radians),
+            ShooterConstants.MAX_HOOD_ANGLE.`in`(Radians),
             true,
-            MIN_HOOD_ANGLE.`in`(Radians)
+            ShooterConstants.MIN_HOOD_ANGLE.`in`(Radians)
         )
 
     private val mech: Mechanism2d = Mechanism2d(3.0, 3.0)
@@ -54,7 +47,7 @@ class ShooterIOSim : ShooterIOHardware() {
             MechanismLigament2d(
                 "Hood",
                 0.5,
-                MIN_HOOD_ANGLE.`in`(Radians),
+                ShooterConstants.MIN_HOOD_ANGLE.`in`(Radians),
                 6.0,
                 Color8Bit(Color.kCyan),
             ),
@@ -91,7 +84,9 @@ class ShooterIOSim : ShooterIOHardware() {
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
-        val totalCurrent = hoodSim.currentDrawAmps + flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
+        val totalCurrent =
+            hoodSim.currentDrawAmps +
+                flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
         // something something dont use stator current alr stop yapping yall
 
         hoodSimState.setSupplyVoltage(12.0)
@@ -103,8 +98,10 @@ class ShooterIOSim : ShooterIOHardware() {
         hoodSim.setInput(hoodSimState.motorVoltage)
         hoodSim.update(Constants.LOOP_TIME)
 
-        val hoodRotorPos = Units.radiansToRotations(hoodSim.angleRads) * HOOD_GEARING
-        val hoodRotorVel = Units.radiansToRotations(hoodSim.velocityRadPerSec) * HOOD_GEARING
+        val hoodRotorPos =
+            Units.radiansToRotations(hoodSim.angleRads) * ShooterConstants.HOOD_GEARING
+        val hoodRotorVel =
+            Units.radiansToRotations(hoodSim.velocityRadPerSec) * ShooterConstants.HOOD_GEARING
 
         hoodSimState.setRawRotorPosition(hoodRotorPos)
         hoodSimState.setRotorVelocity(hoodRotorVel)
@@ -114,7 +111,8 @@ class ShooterIOSim : ShooterIOHardware() {
         flywheelSim.setInput(leftLeaderSimState.motorVoltage)
         flywheelSim.update(Constants.LOOP_TIME)
 
-        val rotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * FLYWHEEL_GEARING
+        val rotorVel =
+            Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * ShooterConstants.FLYWHEEL_GEARING
 
         leftLeaderSimState.setRotorVelocity(rotorVel)
         leftFollowerSimState.setRotorVelocity(rotorVel)

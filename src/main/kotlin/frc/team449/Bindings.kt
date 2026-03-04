@@ -30,6 +30,8 @@ class Bindings(
                 { -driver.leftX },
                 { -driver.rightX },
             )
+
+        robotContainer.indexer.defaultCommand = robotContainer.indexer.stop()
         // controls for simulation
     }
 
@@ -93,15 +95,14 @@ class Bindings(
                         robotContainer.drive,
                     ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
                     actions.checkAndFeed(),
-                    robotContainer.drive.xLock(),
+                    ParallelCommandGroup(
+                        robotContainer.drive.xLock(),
+                        actions.shuffleIntake()
+                    ),
                 ).until(joysticksMovedPastDeadband)
-                    .finallyDo { _ ->
-                        // retract intake
-                        CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter())
-                    },
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
             )
 
-        // tower sequence on b()
         driver
             .b()
             .onTrue(
@@ -111,9 +112,12 @@ class Bindings(
                         robotContainer.drive,
                     ) { FieldUtil.TOWER_POSE },
                     actions.checkAndFeed(),
-                    robotContainer.drive.xLock(),
+                    ParallelCommandGroup(
+                        robotContainer.drive.xLock(),
+                        actions.shuffleIntake()
+                    ),
                 ).until(joysticksMovedPastDeadband)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
             )
 
         driver
@@ -131,9 +135,6 @@ class Bindings(
         driver
             .povRight()
             .onTrue(
-//                SequentialCommandGroup(
-//                    robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-//                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0)),
                 actions.prepTowerShot()
             )
 
@@ -147,8 +148,6 @@ class Bindings(
             .povDown()
             .whileTrue(
                 robotContainer.indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
-            ).onFalse(
-                robotContainer.indexer.stop(),
             )
 
         driver
