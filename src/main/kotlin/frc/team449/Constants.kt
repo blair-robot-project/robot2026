@@ -153,7 +153,7 @@ object Constants {
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
         const val HOMING_DEBOUNCE_TIME = 0.1
 
-        const val HOOD_TOLERANCE_RAD = 0.1
+        const val HOOD_TOLERANCE_RAD = 0.02
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
         const val TOLERANCE_DEBOUNCE_TIME = 0.2
 

@@ -81,18 +81,6 @@ class ShooterSubsystem(
             io.setHoodAngle(angle)
         }
 
-    fun hoodManualUp(): Command =
-        runOnce {
-            hoodTargetPositionRad = inputs.hoodPositionRad + 0.0174533
-            io.setHoodAngle(Radians.of(hoodTargetPositionRad))
-        }
-
-    fun hoodManualDown(): Command =
-        runOnce {
-            hoodTargetPositionRad = inputs.hoodPositionRad - 0.0174533
-            io.setHoodAngle(Radians.of(hoodTargetPositionRad))
-        }
-
     fun setHoodVoltage(volts: Double): Command =
         runOnce {
             io.setHoodVoltage(volts)
@@ -117,7 +105,6 @@ class ShooterSubsystem(
 
     fun isHoodAtTolerance(): Boolean {
         val error = abs(inputs.hoodPositionRad - hoodTargetPositionRad)
-
         val isAtPos = error < ShooterConstants.HOOD_TOLERANCE_RAD
 
         return hoodDebouncer.calculate(isAtPos)

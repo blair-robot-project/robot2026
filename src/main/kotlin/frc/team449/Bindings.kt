@@ -8,7 +8,6 @@ import frc.team449.Constants.IndexerConstants
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.commands.WheelRadiusCharacterizationCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -155,19 +154,5 @@ class Bindings(
             .onTrue(
                 actions.stopFeedAndShooter(),
             )
-
-        operator
-            .povUp()
-            .whileTrue(
-                WheelRadiusCharacterizationCommand(robotContainer.drive),
-            )
-
-        operator.povLeft().onTrue(
-            robotContainer.shooter.hoodManualUp(),
-        )
-
-        operator.povRight().onTrue(
-            robotContainer.shooter.hoodManualDown(),
-        )
     }
 }
