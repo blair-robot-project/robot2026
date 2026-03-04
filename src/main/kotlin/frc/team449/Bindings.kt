@@ -154,5 +154,11 @@ class Bindings(
             .onTrue(
                 actions.stopFeedAndShooter(),
             )
+
+        operator
+            .a()
+            .onTrue(
+                actions.systemCheckCommand(),
+            )
     }
 }

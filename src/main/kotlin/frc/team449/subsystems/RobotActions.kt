@@ -11,13 +11,16 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
+import frc.team449.commands.SystemCheckCommand
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import java.util.function.Supplier
 
-class RobotActions(robotContainer: RobotContainer) {
+class RobotActions(
+    private val robotContainer: RobotContainer
+) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
     private val indexer: IndexerSubsystem = robotContainer.indexer
@@ -110,4 +113,6 @@ class RobotActions(robotContainer: RobotContainer) {
             prepTrenchShot(),
             checkAndFeed(),
         )
+
+    fun systemCheckCommand(): Command = SystemCheckCommand(robotContainer)
 }
