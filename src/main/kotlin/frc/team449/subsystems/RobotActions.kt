@@ -87,4 +87,10 @@ class RobotActions(
             prepTrenchShot(),
             checkAndFeed(),
         )
+
+    fun autoHubShot(): Command =
+        SequentialCommandGroup(
+            prepHubShot(),
+            checkAndFeed(),
+        )
 }
