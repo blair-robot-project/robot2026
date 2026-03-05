@@ -97,15 +97,52 @@ open class ShooterIOHardware : ShooterIO {
             hoodStatorCurrent,
         )
 
+    private val hoodMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            hoodPosition,
+            hoodVelocity,
+            hoodMotorVoltage,
+            hoodSupplyCurrent,
+            hoodStatorCurrent,
+        )
+
+    private val leftLeaderShooterMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftLeaderVelocity,
+            leftLeaderMotorVoltage,
+            leftLeaderStatorCurrent,
+        )
+
+    private val leftFollowerShooterMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftFollowerMotorVoltage,
+            leftFollowerSupplyCurrent,
+            leftFollowerStatorCurrent,
+        )
+
+    private val rightLeaderShooterMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            rightLeaderVelocity,
+            rightLeaderMotorVoltage,
+            rightLeaderStatorCurrent,
+        )
+
+    private val rightFollowerShooterMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftFollowerMotorVoltage,
+            rightFollowerSupplyCurrent,
+            rightFollowerStatorCurrent,
+        )
+
     private val leftLeaderDisconnectedAlert =
-        Alert("Left Leader Flywheel Motor Disconnected (ID $ShooterConstants.LEFT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
+        Alert("Left Leader Flywheel Motor Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
     private val rightLeaderDisconnectedAlert =
-        Alert("Right Leader Flywheel Motor Disconnected (ID $ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
+        Alert("Right Leader Flywheel Motor Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
     private val leftFollowerDisconnectedAlert =
-        Alert("Left Leader Flywheel Motor Disconnected (ID $ShooterConstants.LEFT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
+        Alert("Left Leader Flywheel Motor Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
     private val rightFollowerDisconnectedAlert =
-        Alert("Right Leader Flywheel Motor Disconnected (ID $ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID).", Alert.AlertType.kError)
-    private val hoodDisconnectedAlert = Alert("Hood Motor Disconnected (ID $ShooterConstants.HOOD_MOTOR_ID).", Alert.AlertType.kError)
+        Alert("Right Leader Flywheel Motor Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
+    private val hoodDisconnectedAlert = Alert("Hood Motor Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
 
     init {
         leftLeaderMotor.configurator.apply(leftFlywheelConfig)
@@ -160,14 +197,11 @@ open class ShooterIOHardware : ShooterIO {
         inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
         inputs.hoodTempCelsius = hoodTemperature.value.`in`(Celsius)
 
-        if (isAliveCounter++ >= 50) {
-            isAliveCounter = 0
-            hoodDisconnectedAlert.set(!hoodMotor.isAlive)
-            leftLeaderDisconnectedAlert.set(!leftLeaderMotor.isAlive)
-            rightLeaderDisconnectedAlert.set(!rightLeaderMotor.isAlive)
-            leftFollowerDisconnectedAlert.set(!leftFollowerMotor.isAlive)
-            rightFollowerDisconnectedAlert.set(!rightFollowerMotor.isAlive)
-        }
+        hoodDisconnectedAlert.set(!hoodMotorConnected)
+        leftLeaderDisconnectedAlert.set(!leftLeaderShooterMotorConnected)
+        rightLeaderDisconnectedAlert.set(!rightLeaderShooterMotorConnected)
+        leftFollowerDisconnectedAlert.set(!leftFollowerShooterMotorConnected)
+        rightFollowerDisconnectedAlert.set(!rightFollowerShooterMotorConnected)
     }
 
     override fun setFlywheelVelocity(velocity: AngularVelocity) {
