@@ -14,7 +14,7 @@ class IntakeSubsystem(
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
 
     // boolean over position logging increases speed and is easier to read
-    var pivotDeployedState: Boolean = false
+    var pivotIsDeployed: Boolean = false
     var rollerTargetVelocityRadPerSec: Double = 0.0
 
     val intakeSimAngle: Double
@@ -24,8 +24,9 @@ class IntakeSubsystem(
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
 
-        Logger.recordOutput("Intake/PivotDeployedState", pivotDeployedState)
+        Logger.recordOutput("Intake/PivotIsDeployed", pivotIsDeployed)
         Logger.recordOutput("Intake/RollerTargetVelocityRadPerSec", rollerTargetVelocityRadPerSec)
+        Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadPerSec > 10.0))
     }
 
     // roller commands
@@ -58,20 +59,20 @@ class IntakeSubsystem(
             IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy")
 
-//    fun stow(): Command =
-//        slamHoming(
-//            false,
-//            IntakeConstants.STOW_VOLTS,
-//            IntakeConstants.STOW_HOLD_VOLTS,
-//        ).withName("Stow")
+    fun stow(): Command =
+        slamHoming(
+            false,
+            IntakeConstants.STOW_VOLTS,
+            IntakeConstants.STOW_HOLD_VOLTS,
+        ).withName("Stow")
 
     private fun slamHoming(
-        deployedState: Boolean,
+        isDeployed: Boolean,
         moveVolts: Double,
         holdVolts: Double
     ): Command =
         this.defer {
-            pivotDeployedState = deployedState
+            pivotIsDeployed = isDeployed
             val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
 
             this

@@ -40,8 +40,6 @@ interface DriveIO {
 
     fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
 
-    fun resetGyro() {}
-
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,

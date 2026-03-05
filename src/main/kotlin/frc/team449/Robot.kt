@@ -58,16 +58,16 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotInit() {
+        FieldUtil.initialize()
         robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
 
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
-
-        SmartDashboard.putData("Auto Chooser", robotContainer.autoChooser)
     }
 
     override fun robotPeriodic() {
         Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
+        Logger.recordOutput("Match Time", DriverStation.getMatchTime())
         PhoenixUtil.refreshAll()
 
         // high priority (real-time) thread for loop timing
@@ -79,14 +79,18 @@ class Robot : LoggedRobot() {
     }
 
     override fun autonomousInit() {
-        CommandScheduler.getInstance().schedule(robotContainer.autoChooser.selected)
+        robotContainer.autonomousCommand = robotContainer.autoChooser.get()
+        CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
     override fun autonomousPeriodic() {
         robotContainer.bLineRoutines.logBLineAuto()
     }
 
-    override fun teleopInit() {}
+    override fun teleopInit() {
+        robotContainer.autonomousCommand?.cancel()
+        FieldUtil.updateAutoWinner()
+    }
 
     override fun teleopPeriodic() {}
 
@@ -99,8 +103,6 @@ class Robot : LoggedRobot() {
     override fun testPeriodic() {}
 
     override fun simulationInit() {
-        Logger.recordOutput("ZeroedComponentPoses", *Array(3) { Pose3d() })
-
         SmartDashboard.putData(
             (fuelSimulator?.resetFuel())
                 ?.withName("Reset Fuel")
