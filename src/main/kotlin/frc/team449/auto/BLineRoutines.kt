@@ -76,22 +76,6 @@ class BLineRoutines(
     val crossTrackController = PIDController(CTE_P, CTE_I, CTE_D)
 
     private val applyRobotSpeedsRequest = SwerveRequest.ApplyRobotSpeeds()
-
-    var pathBuilderWithReset: FollowPath.Builder =
-        FollowPath
-            .Builder(
-                drive,
-                drive::pose,
-                drive::getRobotRelativeSpeeds,
-                { speeds: ChassisSpeeds ->
-                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
-                },
-                translationController,
-                rotationController,
-                crossTrackController,
-            ).withDefaultShouldFlip()
-            .withPoseReset(drive::resetOdometry)
-
     var pathBuilder: FollowPath.Builder =
         FollowPath
             .Builder(
@@ -106,10 +90,13 @@ class BLineRoutines(
                 crossTrackController,
             ).withDefaultShouldFlip()
 
+    var pathBuilderWithReset: FollowPath.Builder = pathBuilder.withPoseReset(drive::resetOdometry)
+
     fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
         FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
         FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
     }
 
@@ -124,7 +111,6 @@ class BLineRoutines(
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
-
             pathBuilderWithReset.build(path1),
             pathBuilderWithReset.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
@@ -238,8 +224,22 @@ class BLineRoutines(
 
     fun nothing(): Command = Commands.none()
 
+    private fun preloadHubShot(): Command {
+        val path1 = Path("hub_start")
+        val path2 = Path("hub_end")
+
+        eventTriggerCommands()
+
+        return Commands.sequence(
+            pathBuilderWithReset.build(path1),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilderWithReset.build(path2),
+        )
+    }
+
     fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
         autoChooser.addDefaultOption("Do Nothing", nothing())
+        autoChooser.addOption("Preload Hub", preloadHubShot())
         autoChooser.addOption("R Half Close", rHalfClose())
         autoChooser.addOption("R Half Far", rHalfFar())
         autoChooser.addOption("R Half Loop", rHalfAndLoop())

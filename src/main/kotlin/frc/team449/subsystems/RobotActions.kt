@@ -38,9 +38,9 @@ class RobotActions(
                     indexer.index(
                         IndexerConstants.INTAKING_INDEXER_SPEED,
                         IndexerConstants.INTAKING_INDEXER_SPEED,
-                        RadiansPerSecond.of(0.0)
+                        RadiansPerSecond.of(0.0),
                     ),
-                )
+                ),
             ) { intake.rollerTargetVelocityRadPerSec != 0.0 },
             intake.deploy(),
         )
@@ -54,9 +54,9 @@ class RobotActions(
 
     fun shuffleIntake(): Command =
         SequentialCommandGroup(
-            stopAndStow(),
+            intake.stow(),
             WaitCommand(0.5),
-            deployAndToggleIntake(),
+            intake.deploy(),
             WaitCommand(0.5),
         ).repeatedly()
 
@@ -84,7 +84,7 @@ class RobotActions(
         shooter.setFlywheelAndHoodFromSuppliers(
             {
                 RadiansPerSecond.of(
-                    ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())
+                    ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()),
                 )
             },
             { Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) },
@@ -111,7 +111,17 @@ class RobotActions(
     fun autoTrenchShot(): Command =
         SequentialCommandGroup(
             prepTrenchShot(),
-            checkAndFeed(),
+            checkAndFeed().alongWith(
+                shuffleIntake(),
+            ),
+        )
+
+    fun autoHubShot(): Command =
+        SequentialCommandGroup(
+            prepHubShot(),
+            checkAndFeed().alongWith(
+                shuffleIntake(),
+            ),
         )
 
     fun systemCheckCommand(): Command = SystemCheckCommand(robotContainer)
