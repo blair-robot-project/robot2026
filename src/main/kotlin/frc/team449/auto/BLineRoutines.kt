@@ -90,7 +90,20 @@ class BLineRoutines(
                 crossTrackController,
             ).withDefaultShouldFlip()
 
-    var pathBuilderWithReset: FollowPath.Builder = pathBuilder.withPoseReset(drive::resetOdometry)
+    var pathBuilderWithReset: FollowPath.Builder =
+        FollowPath
+            .Builder(
+                drive,
+                drive::pose,
+                drive::getRobotRelativeSpeeds,
+                { speeds: ChassisSpeeds ->
+                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
+                },
+                translationController,
+                rotationController,
+                crossTrackController,
+            ).withDefaultShouldFlip()
+            .withPoseReset(drive::resetOdometry)
 
     fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
