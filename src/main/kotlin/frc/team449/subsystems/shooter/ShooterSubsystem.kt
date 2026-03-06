@@ -105,7 +105,6 @@ class ShooterSubsystem(
 
     fun isHoodAtTolerance(): Boolean {
         val error = abs(inputs.hoodPositionRad - hoodTargetPositionRad)
-
         val isAtPos = error < ShooterConstants.HOOD_TOLERANCE_RAD
 
         return hoodDebouncer.calculate(isAtPos)

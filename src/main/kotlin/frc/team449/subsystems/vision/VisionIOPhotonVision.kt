@@ -9,7 +9,7 @@ package frc.team449.subsystems.vision
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform3d
-import frc.team449.Constants.VisionConstants.aprilTagLayout
+import frc.team449.Constants.VisionConstants
 import frc.team449.subsystems.vision.VisionIO.*
 import org.photonvision.PhotonCamera
 import java.util.*
@@ -75,7 +75,7 @@ open class VisionIOPhotonVision(
                 val target = result.targets[0]
 
                 // calculate robot pose
-                val tagPose = aprilTagLayout.getTagPose(target.fiducialId)
+                val tagPose = VisionConstants.REBUILT_FIELD_LAYOUT.getTagPose(target.fiducialId)
                 if (tagPose.isPresent) {
                     val fieldToTarget = Transform3d(tagPose.get().translation, tagPose.get().rotation)
                     val cameraToTarget: Transform3d = target.bestCameraToTarget

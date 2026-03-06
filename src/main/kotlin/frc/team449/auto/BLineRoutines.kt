@@ -6,7 +6,6 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
@@ -25,6 +24,7 @@ import frc.team449.Constants.AutoConstants.TRANSLATION_P
 import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveSubsystem
 import org.littletonrobotics.junction.Logger
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.function.Consumer
 
@@ -76,6 +76,19 @@ class BLineRoutines(
     val crossTrackController = PIDController(CTE_P, CTE_I, CTE_D)
 
     private val applyRobotSpeedsRequest = SwerveRequest.ApplyRobotSpeeds()
+    var pathBuilder: FollowPath.Builder =
+        FollowPath
+            .Builder(
+                drive,
+                drive::pose,
+                drive::getRobotRelativeSpeeds,
+                { speeds: ChassisSpeeds ->
+                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
+                },
+                translationController,
+                rotationController,
+                crossTrackController,
+            ).withDefaultShouldFlip()
 
     var pathBuilderWithReset: FollowPath.Builder =
         FollowPath
@@ -92,24 +105,11 @@ class BLineRoutines(
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
 
-    var pathBuilder: FollowPath.Builder =
-        FollowPath
-            .Builder(
-                drive,
-                drive::pose,
-                drive::getRobotRelativeSpeeds,
-                { speeds: ChassisSpeeds ->
-                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
-                },
-                translationController,
-                rotationController,
-                crossTrackController,
-            ).withDefaultShouldFlip()
-
     fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
         FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
         FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
     }
 
@@ -237,8 +237,22 @@ class BLineRoutines(
 
     fun nothing(): Command = Commands.none()
 
-    fun addAutoOptions(autoChooser: SendableChooser<Command>) {
-        autoChooser.setDefaultOption("Do Nothing", nothing())
+    private fun preloadHubShot(): Command {
+        val path1 = Path("hub_start")
+        val path2 = Path("hub_end")
+
+        eventTriggerCommands()
+
+        return Commands.sequence(
+            pathBuilderWithReset.build(path1),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilderWithReset.build(path2),
+        )
+    }
+
+    fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
+        autoChooser.addDefaultOption("Do Nothing", nothing())
+        autoChooser.addOption("Preload Hub", preloadHubShot())
         autoChooser.addOption("R Half Close", rHalfClose())
         autoChooser.addOption("R Half Far", rHalfFar())
         autoChooser.addOption("R Half Loop", rHalfAndLoop())
