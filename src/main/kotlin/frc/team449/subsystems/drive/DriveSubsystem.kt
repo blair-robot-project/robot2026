@@ -11,6 +11,8 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.smartdashboard.Field2d
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -24,6 +26,9 @@ class DriveSubsystem(
     private val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+    private val field: Field2d = Field2d().apply {
+        SmartDashboard.putData("Field", this)
+    }
 
     val pose: Pose2d
         get() = inputs.Pose
@@ -34,10 +39,9 @@ class DriveSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         io.logModules(inputs)
+        field.robotPose = pose
 
         Logger.processInputs("Drive", inputs)
-
-        // couldn't find a good way to do it in the io, so just sticking it on here
         Logger.recordOutput(
             "Drive/ActiveCommand",
             currentCommand?.name ?: "None",
@@ -73,10 +77,7 @@ class DriveSubsystem(
         )
     }
 
-    fun xLock(): Command =
-        run {
-            io.setControl(SwerveRequest.SwerveDriveBrake())
-        }
+    fun xLock(): Command = run { io.setControl(SwerveRequest.SwerveDriveBrake()) }
 
     fun alignModules(direction: Rotation2d): Command =
         run {
