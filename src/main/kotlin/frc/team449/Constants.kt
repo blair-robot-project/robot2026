@@ -328,8 +328,8 @@ object Constants {
 
         // Robot to camera transforms
 
-        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
-        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092 - 0.079375, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
         // TODO CHECK ROTATION - see if poses are accurate on actual field
         // fyi i think right camera might actually be the left one on the actual camera configs
 
