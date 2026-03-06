@@ -327,12 +327,11 @@ object Constants {
         var cameraLeftName: String = "limelight-left"
 
         // Robot to camera transforms
-        // TODO: idt these are actually right, will prolly havta look at it again after it's mounted
-        var robotToCameraRight: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var robotToCameraLeft: Pose3d = Pose3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
 
-        var robotToCamera0: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        var robotToCamera1: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        // TODO CHECK ROTATION - see if poses are accurate on actual field
+        // fyi i think right camera might actually be the left one on the actual camera configs
 
         // Basic filtering thresholds
         var maxAmbiguity: Double = 0.3

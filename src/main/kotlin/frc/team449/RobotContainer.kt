@@ -1,5 +1,6 @@
 package frc.team449
 
+import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
@@ -72,14 +73,14 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraRight),
-                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Constants.VisionConstants.robotToCameraLeft)
+                    VisionIOLimelight(Constants.VisionConstants.cameraRightName, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.rotation)),
+                    VisionIOLimelight(Constants.VisionConstants.cameraLeftName, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.rotation))
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.robotToCamera0) { drive.pose },
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.robotToCamera1) { drive.pose },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraRightName, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT) { drive.pose },
+                    VisionIOPhotonVisionSim(Constants.VisionConstants.cameraLeftName, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             Mode.REPLAY ->
                 VisionSubsystem(
