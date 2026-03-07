@@ -36,7 +36,7 @@ interface DriveIO {
 
     fun setControl(request: SwerveRequest) {}
 
-    fun seedFieldCentric() {}
+    fun seedFieldCentric(yaw: Rotation2d) {}
 
     fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
 
