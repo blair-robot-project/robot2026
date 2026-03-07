@@ -70,7 +70,7 @@ object TunerConstants {
         TalonFXConfiguration()
             .withCurrentLimits(
                 CurrentLimitsConfigs() // Swerve azimuth does not require much torque output, so we can set a relatively low
-                    .withSupplyCurrentLimit(Units.Amps.of(40.0))
+                    .withSupplyCurrentLimit(Units.Amps.of(30.0))
                     .withSupplyCurrentLimitEnable(true),
             )
 
@@ -81,7 +81,7 @@ object TunerConstants {
                     // stator current limit to help avoid brownouts without impacting performance.
                     .withStatorCurrentLimit(Units.Amps.of(40.0))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Units.Amps.of(40.0))
+                    .withSupplyCurrentLimit(Units.Amps.of(20.0))
                     .withSupplyCurrentLimitEnable(true),
             )
 
@@ -151,7 +151,7 @@ object TunerConstants {
     private const val kFrontLeftDriveMotorId: Int = 1
     private const val kFrontLeftSteerMotorId: Int = 2
     private const val kFrontLeftEncoderId: Int = 2
-    private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-106.52)
+    private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-106.52 + 180.0)
     private const val kFrontLeftSteerMotorInverted: Boolean = true
     private const val kFrontLeftEncoderInverted: Boolean = true
 
@@ -162,7 +162,7 @@ object TunerConstants {
     private const val kFrontRightDriveMotorId: Int = 3
     private const val kFrontRightSteerMotorId: Int = 4
     private const val kFrontRightEncoderId: Int = 4
-    private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(-317.46)
+    private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(-317.46 + 180.0)
     private const val kFrontRightSteerMotorInverted: Boolean = true
     private const val kFrontRightEncoderInverted: Boolean = true
 
@@ -173,7 +173,7 @@ object TunerConstants {
     private const val kBackLeftDriveMotorId: Int = 5
     private const val kBackLeftSteerMotorId: Int = 8
     private const val kBackLeftEncoderId: Int = 6
-    private val kBackLeftEncoderOffset: Angle = Units.Degrees.of(12.22)
+    private val kBackLeftEncoderOffset: Angle = Units.Degrees.of(12.22 + 180.0)
     private const val kBackLeftSteerMotorInverted: Boolean = true
     private const val kBackLeftEncoderInverted: Boolean = true
 
@@ -184,7 +184,7 @@ object TunerConstants {
     private const val kBackRightDriveMotorId: Int = 7
     private const val kBackRightSteerMotorId: Int = 6
     private const val kBackRightEncoderId: Int = 8
-    private val kBackRightEncoderOffset: Angle = Units.Degrees.of(254.49 - 180.0)
+    private val kBackRightEncoderOffset: Angle = Units.Degrees.of(254.49) // -180.0
     private const val kBackRightSteerMotorInverted: Boolean = true
     private const val kBackRightEncoderInverted: Boolean = true
 

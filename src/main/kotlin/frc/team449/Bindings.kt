@@ -28,7 +28,6 @@ class Bindings(
                 { driver.rightX },
             )
 
-        // robotContainer.indexer.defaultCommand = robotContainer.indexer.stop()
         // controls for simulation
     }
 
@@ -153,7 +152,6 @@ class Bindings(
         driver.start().onTrue(
             SequentialCommandGroup(
                 robotContainer.drive.seedFieldCentric(),
-//                InstantCommand({ robotContainer.drive.setOperatorPerspectiveForward() })
             )
         )
 

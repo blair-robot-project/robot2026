@@ -115,9 +115,9 @@ object Constants {
         const val EFFICIENCY = 0.97
 
         // --- CURRENT & OPERATIONAL LIMITS ---
-        const val FLYWHEEL_SUPPLY_LIM = 40.0
+        const val FLYWHEEL_SUPPLY_LIM = 30.0
         const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 40.0
+        const val HOOD_SUPPLY_LIM = 20.0
         const val HOOD_STATOR_LIM = 20.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
@@ -222,7 +222,7 @@ object Constants {
         // --- CURRENT LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 30.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
