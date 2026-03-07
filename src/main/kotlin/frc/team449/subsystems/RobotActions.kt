@@ -52,13 +52,21 @@ class RobotActions(
             intake.stow(),
         )
 
-    fun shuffleIntake(): Command =
+    fun shuffleIntakePivot(): Command =
         SequentialCommandGroup(
             intake.stow(),
             WaitCommand(0.5),
             intake.deploy(),
             WaitCommand(0.5),
         ).repeatedly()
+
+    fun shuffleIntakeRollers(): Command =
+        SequentialCommandGroup(
+            intake.intake(),
+            WaitCommand(0.3),
+            intake.outtake(),
+            WaitCommand(0.2)
+        )
 
     fun stopIntake(): Command = intake.stopRollers()
 
@@ -112,7 +120,7 @@ class RobotActions(
         SequentialCommandGroup(
             prepTrenchShot(),
             checkAndFeed().alongWith(
-                shuffleIntake(),
+                shuffleIntakePivot(),
             ),
         )
 
@@ -120,7 +128,7 @@ class RobotActions(
         SequentialCommandGroup(
             prepHubShot(),
             checkAndFeed().alongWith(
-                shuffleIntake(),
+                shuffleIntakePivot(),
             ),
         )
 

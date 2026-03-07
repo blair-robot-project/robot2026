@@ -96,7 +96,7 @@ class Bindings(
                     actions.checkAndFeed(),
                     ParallelCommandGroup(
                         robotContainer.drive.xLock(),
-                        actions.shuffleIntake()
+                        actions.shuffleIntakePivot()
                     ),
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
@@ -113,7 +113,7 @@ class Bindings(
                     actions.checkAndFeed(),
                     ParallelCommandGroup(
                         robotContainer.drive.xLock(),
-                        actions.shuffleIntake()
+                        actions.shuffleIntakePivot()
                     ),
                 ).until(joysticksMovedPastDeadband)
                     .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
