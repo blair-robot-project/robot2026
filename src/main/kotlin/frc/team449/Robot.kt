@@ -90,6 +90,8 @@ class Robot : LoggedRobot() {
     override fun teleopInit() {
         robotContainer.autonomousCommand?.cancel()
         FieldUtil.updateAutoWinner()
+        robotContainer.actions.stopIntake()
+        robotContainer.actions.stopFeedAndShooter()
     }
 
     override fun teleopPeriodic() {}
