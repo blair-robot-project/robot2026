@@ -151,7 +151,7 @@ object TunerConstants {
     private const val kFrontLeftDriveMotorId: Int = 1
     private const val kFrontLeftSteerMotorId: Int = 2
     private const val kFrontLeftEncoderId: Int = 2
-    private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-106.52 + 180)
+    private val kFrontLeftEncoderOffset: Angle = Units.Degrees.of(-106.52)
     private const val kFrontLeftSteerMotorInverted: Boolean = true
     private const val kFrontLeftEncoderInverted: Boolean = true
 
@@ -162,7 +162,7 @@ object TunerConstants {
     private const val kFrontRightDriveMotorId: Int = 3
     private const val kFrontRightSteerMotorId: Int = 4
     private const val kFrontRightEncoderId: Int = 4
-    private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(-317.46 + 180)
+    private val kFrontRightEncoderOffset: Angle = Units.Degrees.of(-317.46)
     private const val kFrontRightSteerMotorInverted: Boolean = true
     private const val kFrontRightEncoderInverted: Boolean = true
 
@@ -171,9 +171,9 @@ object TunerConstants {
 
     // Back Left
     private const val kBackLeftDriveMotorId: Int = 5
-    private const val kBackLeftSteerMotorId: Int = 6
+    private const val kBackLeftSteerMotorId: Int = 8
     private const val kBackLeftEncoderId: Int = 6
-    private val kBackLeftEncoderOffset: Angle = Units.Degrees.of(12.22 + 180)
+    private val kBackLeftEncoderOffset: Angle = Units.Degrees.of(12.22)
     private const val kBackLeftSteerMotorInverted: Boolean = true
     private const val kBackLeftEncoderInverted: Boolean = true
 
@@ -182,9 +182,9 @@ object TunerConstants {
 
     // Back Right
     private const val kBackRightDriveMotorId: Int = 7
-    private const val kBackRightSteerMotorId: Int = 8
+    private const val kBackRightSteerMotorId: Int = 6
     private const val kBackRightEncoderId: Int = 8
-    private val kBackRightEncoderOffset: Angle = Units.Degrees.of(254.49)
+    private val kBackRightEncoderOffset: Angle = Units.Degrees.of(254.49 - 180.0)
     private const val kBackRightSteerMotorInverted: Boolean = true
     private const val kBackRightEncoderInverted: Boolean = true
 

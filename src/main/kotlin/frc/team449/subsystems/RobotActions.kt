@@ -45,6 +45,17 @@ class RobotActions(
             intake.deploy(),
         )
 
+    fun deployAndRunIntake(): Command =
+        SequentialCommandGroup(
+            intake.intake(),
+            indexer.index(
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                RadiansPerSecond.of(0.0),
+            ),
+            intake.deploy()
+        )
+
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
@@ -54,19 +65,11 @@ class RobotActions(
 
     fun shuffleIntakePivot(): Command =
         SequentialCommandGroup(
-            intake.stow(),
-            WaitCommand(0.5),
-            intake.deploy(),
-            WaitCommand(0.5),
-        ).repeatedly()
-
-    fun shuffleIntakeRollers(): Command =
-        SequentialCommandGroup(
             intake.intake(),
             WaitCommand(0.3),
             intake.outtake(),
             WaitCommand(0.2)
-        )
+        ).repeatedly()
 
     fun stopIntake(): Command = intake.stopRollers()
 
@@ -103,7 +106,7 @@ class RobotActions(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
-            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).repeatedly(),
         )
 
     fun stopFeed(): Command = indexer.stop()
@@ -115,6 +118,11 @@ class RobotActions(
         )
 
     fun homeHood(): Command = shooter.homeHood()
+
+    fun outtakeIntakeAndReverseIndex(): Command = ParallelCommandGroup(
+        intake.outtake(),
+        indexer.index(RadiansPerSecond.of(-30.0))
+    )
 
     fun autoTrenchShot(): Command =
         SequentialCommandGroup(

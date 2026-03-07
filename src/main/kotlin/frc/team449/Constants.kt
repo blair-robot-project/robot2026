@@ -167,6 +167,8 @@ object Constants {
         val TOWER_HOOD_ANGLE: Angle = Radians.of(0.04)
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
+        val TEST_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(20.0)
+
         // --- INTERPOLATION MAPS ---
         val SHOT_TIME_MAP =
             InterpolatingDoubleTreeMap().apply {
@@ -218,8 +220,8 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 5.0
-        const val PIVOT_STATOR_LIMIT = 10.0
+        const val PIVOT_SUPPLY_LIMIT = 15.0
+        const val PIVOT_STATOR_LIMIT = 40.0
         const val ROLLER_SUPPLY_LIMIT = 30.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
@@ -237,9 +239,9 @@ object Constants {
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
 
         // --- HOMING & VISUALIZATION ---
-        const val HOMING_CURRENT_AMPS = 10.0
+        const val HOMING_CURRENT_AMPS = 35.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
-        const val HOMING_DEBOUNCE_TIME = 0.1
+        const val HOMING_DEBOUNCE_TIME = 0.3
         const val VIZ_OFFSET_DEG = 33.873
     }
 
