@@ -75,20 +75,20 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.rotation)),
+//                    VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.rotation)),
                     VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.rotation))
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT) { drive.pose },
+//                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT) { drive.pose },
                     VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_LEFT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             Mode.REPLAY ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
                     object : VisionIO {},
-                    object : VisionIO {},
+//                    object : VisionIO {},
                 )
         }
 
