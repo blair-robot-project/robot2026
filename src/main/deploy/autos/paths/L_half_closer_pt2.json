@@ -20,18 +20,18 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.805853585738154,
+      "t_ratio": 0.8058535857381541,
       "lib_key": "end_intake"
     },
     {
       "type": "translation",
-      "x_meters": 5.921,
-      "y_meters": 7.449,
+      "x_meters": 6.026390557939914,
+      "y_meters": 7.554390557939914,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.9396976730708212,
+      "t_ratio": 0.9396976730708214,
       "lib_key": "start_shooting"
     },
     {
@@ -60,7 +60,7 @@
         "end_ordinal": 2
       },
       {
-        "value": 2.5,
+        "value": 2.0,
         "start_ordinal": 3,
         "end_ordinal": 3
       }
