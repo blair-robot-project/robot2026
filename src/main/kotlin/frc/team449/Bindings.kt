@@ -23,8 +23,6 @@ class Bindings(
                 { -driver.leftX },
                 { -driver.rightX },
             )
-
-        // controls for simulation
     }
 
     fun bindControls() {

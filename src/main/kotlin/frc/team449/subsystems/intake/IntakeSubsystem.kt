@@ -3,7 +3,10 @@ package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.RepeatCommand
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
 import org.littletonrobotics.junction.Logger
@@ -61,23 +64,18 @@ class IntakeSubsystem(
         ).withName("Deploy")
 
     fun repeatedlyDeploy(): Command =
-        slamHoming(
-            true,
-            IntakeConstants.DEPLOY_VOLTS,
-            IntakeConstants.DEPLOY_HOLD_VOLTS,
-        ).withName("Deploy").withTimeout(1.0).andThen(
-            if (abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) > 0.12) {
-                stow().withTimeout(0.5).andThen(
-                    slamHoming(
-                        true,
-                        IntakeConstants.DEPLOY_VOLTS,
-                        IntakeConstants.DEPLOY_HOLD_VOLTS
-                    )
-                )
-            } else {
-                Commands.none()
-            }
-        ).repeatedly()
+        RepeatCommand(
+            SequentialCommandGroup(
+                deploy()
+                    .withTimeout(1.0),
+                ConditionalCommand(
+                    stow()
+                        .withTimeout(0.5),
+                    InstantCommand()
+                ) { abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.12 }
+            )
+        )
+            .withName("Repeated Deploy")
 
     fun stow(): Command =
         slamHoming(
@@ -101,7 +99,6 @@ class IntakeSubsystem(
                 }.until {
                     val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
                     val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
-
                     hardstopDebouncer.calculate(highCurrent && lowVelocity)
                 }.andThen(
                     runOnce {
