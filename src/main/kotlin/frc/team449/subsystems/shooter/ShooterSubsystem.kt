@@ -32,8 +32,8 @@ class ShooterSubsystem(
     private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
     private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME, Debouncer.DebounceType.kRising)
 
-    val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftLeaderStatorCurrentAmps) > ShooterConstants.FLYWHEEL_STATOR_LIM || abs(inputs.rightLeaderStatorCurrentAmps) > ShooterConstants.FLYWHEEL_STATOR_LIM }
-        .debounce(0.25)
+    val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) || abs(inputs.rightLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
+        .debounce(0.5)
 
     override fun periodic() {
         io.updateInputs(inputs)

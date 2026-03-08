@@ -125,12 +125,12 @@ class BLineRoutines(
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
+            pathBuilder.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path3),
-            pathBuilderWithReset.build(path4),
+            pathBuilder.build(path3),
+            pathBuilder.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path5),
+            pathBuilder.build(path5),
         )
     }
 
@@ -186,12 +186,12 @@ class BLineRoutines(
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
+            pathBuilder.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path3),
-            pathBuilderWithReset.build(path4),
+            pathBuilder.build(path3),
+            pathBuilder.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path5),
+            pathBuilder.build(path5),
         )
     }
 

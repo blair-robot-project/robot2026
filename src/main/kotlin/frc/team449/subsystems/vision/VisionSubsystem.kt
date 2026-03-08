@@ -1,6 +1,8 @@
 package frc.team449.subsystems.vision
 
+import com.ctre.phoenix6.Utils
 import edu.wpi.first.math.Matrix
+import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.*
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
@@ -77,11 +79,11 @@ class VisionSubsystem(
                     angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
                 }
 
-//                consumeVisionMeasurement(
-//                    observation.pose.toPose2d(),
-//                    Utils.fpgaToCurrentTime(observation.timestamp),
-//                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
-//                )
+                consumeVisionMeasurement(
+                    observation.pose.toPose2d(),
+                    Utils.fpgaToCurrentTime(observation.timestamp),
+                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
+                )
 
                 Logger.recordOutput("Vision/Camera$cameraIndex/Observation$observationID/LinearStandardDeviation", linearStdDev)
                 Logger.recordOutput("Vision/Camera$cameraIndex/Observation$observationID/AngularStandardDeviation", angularStdDev)

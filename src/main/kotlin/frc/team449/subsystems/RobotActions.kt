@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
+import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -20,7 +21,7 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 import java.util.function.Supplier
 
 class RobotActions(
-    private val robotContainer: RobotContainer,
+    private val robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -132,10 +133,12 @@ class RobotActions(
     fun autoUnjam(): Command =
         SequentialCommandGroup(
             PrintCommand("AUTO UNJAM!"),
-            ParallelCommandGroup(
-                robotContainer.indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
-                robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
-            ).withTimeout(0.5),
+            RepeatCommand(
+                ParallelCommandGroup(
+                    robotContainer.indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
+                    robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
+                )
+            ).withTimeout(0.25),
             stopFeedAndShooter(),
         )
 
