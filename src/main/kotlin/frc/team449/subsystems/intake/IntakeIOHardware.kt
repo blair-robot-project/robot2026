@@ -126,8 +126,6 @@ open class IntakeIOHardware : IntakeIO {
         PhoenixUtil.registerSignals(*allSignals)
     }
 
-    private var isAliveCounter = 0
-
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         BaseStatusSignal.refreshAll(*allSignals)
 

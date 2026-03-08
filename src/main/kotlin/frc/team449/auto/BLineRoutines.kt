@@ -106,7 +106,7 @@ class BLineRoutines(
             .withPoseReset(drive::resetOdometry)
 
     fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
+        FollowPath.registerEventTrigger("start_intake", actions.autoDeployAndRunIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
         FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())

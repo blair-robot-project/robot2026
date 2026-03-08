@@ -64,7 +64,7 @@ class RobotActions(
                 IndexerConstants.INTAKING_INDEXER_SPEED,
                 RadiansPerSecond.of(0.0),
             ),
-            intake.deploy(), // add a command to retract and deploy agian
+            intake.repeatedlyDeploy()
         )
 
     fun stopAndStow(): Command =

@@ -58,8 +58,15 @@ class IntakeSubsystem(
             true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
+        ).withName("Deploy")
+
+    fun repeatedlyDeploy(): Command =
+        slamHoming(
+            true,
+            IntakeConstants.DEPLOY_VOLTS,
+            IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy").withTimeout(1.0).andThen(
-            if (abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) > 0.1) {
+            if (abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) > 0.12) {
                 stow().withTimeout(0.5).andThen(
                     slamHoming(
                         true,
@@ -71,17 +78,6 @@ class IntakeSubsystem(
                 Commands.none()
             }
         ).repeatedly()
-
-//    fun autoDeploy(): Command {
-//        return SequentialCommandGroup(
-//            slamHoming(
-//                true,
-//                IntakeConstants.DEPLOY_VOLTS,
-//                IntakeConstants.DEPLOY_HOLD_VOLTS,
-//            ).withName("Deploy") ,
-//             if(inputs.leftPivotLeaderPositionRad)
-//        )
-//    }
 
     fun stow(): Command =
         slamHoming(
@@ -105,13 +101,8 @@ class IntakeSubsystem(
                 }.until {
                     val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
                     val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
-//                    val atTargetPosition = if (isDeployed) {
-//                        abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.1
-//                    } else {
-//                        true
-//                    }
 
-                    hardstopDebouncer.calculate(highCurrent && lowVelocity) // && atTargetPosition)
+                    hardstopDebouncer.calculate(highCurrent && lowVelocity)
                 }.andThen(
                     runOnce {
                         io.setPivotVoltage(holdVolts)
