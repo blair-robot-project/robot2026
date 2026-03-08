@@ -20,18 +20,18 @@
     },
     {
       "type": "translation",
-      "x_meters": 5.85,
-      "y_meters": 0.584,
+      "x_meters": 5.925278969957082,
+      "y_meters": 0.5237768240343339,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.1809202191362183,
+      "t_ratio": 0.1809202191362181,
       "lib_key": "end_intake"
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.7999999999999997,
+      "t_ratio": 0.6,
       "lib_key": "start_shooting"
     },
     {
@@ -50,7 +50,7 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 3.5,
+        "value": 4.0,
         "start_ordinal": 0,
         "end_ordinal": 1
       },

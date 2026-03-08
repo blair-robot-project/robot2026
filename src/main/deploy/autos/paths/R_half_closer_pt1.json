@@ -14,7 +14,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.1198503465681229,
+      "t_ratio": 0.11985034656812298,
       "lib_key": "stop_shooting"
     },
     {
@@ -24,8 +24,8 @@
     },
     {
       "type": "translation",
-      "x_meters": 5.7,
-      "y_meters": 0.534,
+      "x_meters": 5.94089270386266,
+      "y_meters": 0.4737768240343385,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -44,12 +44,12 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 3.5,
+        "value": 3.0,
         "start_ordinal": 2,
         "end_ordinal": 2
       },
       {
-        "value": 1.9,
+        "value": 2.0,
         "start_ordinal": 0,
         "end_ordinal": 1
       }
