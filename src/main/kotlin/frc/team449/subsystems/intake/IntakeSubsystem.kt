@@ -71,11 +71,10 @@ class IntakeSubsystem(
                 ConditionalCommand(
                     stow()
                         .withTimeout(0.5),
-                    InstantCommand()
-                ) { abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.12 }
-            )
-        )
-            .withName("Repeated Deploy")
+                    InstantCommand(),
+                ) { abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.12 },
+            ),
+        ).withName("Repeated Deploy")
 
     fun stow(): Command =
         slamHoming(

@@ -12,7 +12,11 @@ class Bindings(
     val operator = robotContainer.opController
     val actions = robotContainer.actions
 
-    val joysticksMovedPastDeadbandTrigger: Trigger = Trigger { abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 || abs(driver.rightX) > 0.25 }
+    val joysticksMovedPastDeadbandTrigger: Trigger =
+        Trigger {
+            abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
+                abs(driver.rightX) > 0.25
+        }
     val shooterJamTrigger = robotContainer.shooter.shooterJamTrigger
 
     fun setDefaultCommands() {
@@ -31,12 +35,11 @@ class Bindings(
             .rightTrigger()
             .whileTrue(
                 actions.deployAndRunIntake(),
-            )
-            .onFalse(
+            ).onFalse(
                 SequentialCommandGroup(
                     actions.stopIntake(),
-                    actions.stopFeed()
-                )
+                    actions.stopFeed(),
+                ),
             )
 
         driver
@@ -67,14 +70,13 @@ class Bindings(
             .whileTrue(
                 SequentialCommandGroup(
                     actions.checkAndFeed(),
-                    actions.shuffleIntakePivot()
-                )
-            )
-            .onFalse(
+                    actions.shuffleIntakeRoller(),
+                ),
+            ).onFalse(
                 SequentialCommandGroup(
                     actions.stopFeedAndShooter(),
-                    actions.stopIntake()
-                )
+                    actions.stopIntake(),
+                ),
             )
 
         driver
@@ -101,7 +103,7 @@ class Bindings(
         driver
             .y()
             .onTrue(
-                actions.prepHubShot()
+                actions.prepHubShot(),
             )
 
 //        driver
@@ -126,13 +128,13 @@ class Bindings(
         driver
             .x()
             .onTrue(
-                actions.prepTrenchShot()
+                actions.prepTrenchShot(),
             )
 
         driver
             .b()
             .onTrue(
-                actions.prepTowerShot()
+                actions.prepTowerShot(),
             )
 
 //        driver
@@ -157,26 +159,26 @@ class Bindings(
         driver
             .povDown()
             .onTrue(
-                actions.outtakeIntakeAndReverseIndex()
+                actions.outtakeIntakeAndReverseIndex(),
             ).onFalse(
-                actions.stopIntake()
+                actions.stopIntake(),
             )
 
         driver
             .start()
             .onTrue(
-                robotContainer.drive.seedFieldCentric()
+                robotContainer.drive.seedFieldCentric(),
             )
 
         shooterJamTrigger
             .onTrue(
-                actions.autoUnjam()
+                actions.autoUnjam(),
             )
 
         operator
             .leftBumper()
             .whileTrue(
-                actions.outtakeIntakeAndReverseIndex()
+                actions.outtakeIntakeAndReverseIndex(),
             )
 
         operator
@@ -206,37 +208,37 @@ class Bindings(
         operator
             .x()
             .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TRENCH_FLYWHEEL_VEL)
+                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TRENCH_FLYWHEEL_VEL),
             )
 
         operator
             .y()
             .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TEST_FLYWHEEL_VEL)
+                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TEST_FLYWHEEL_VEL),
             )
 
         operator
             .povDown()
             .onTrue(
-                actions.homeHood()
+                actions.homeHood(),
             )
 
         operator
             .povLeft()
             .onTrue(
-                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TOWER_HOOD_ANGLE)
+                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TOWER_HOOD_ANGLE),
             )
 
         operator
             .povUp()
             .onTrue(
-                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TRENCH_HOOD_ANGLE)
+                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TRENCH_HOOD_ANGLE),
             )
 
         operator
             .povRight()
             .onTrue(
-                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.MAX_HOOD_ANGLE)
+                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.MAX_HOOD_ANGLE),
             )
 
         operator
