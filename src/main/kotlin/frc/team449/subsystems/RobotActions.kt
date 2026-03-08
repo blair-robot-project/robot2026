@@ -79,7 +79,7 @@ class RobotActions(
             intake.intake(),
             WaitCommand(0.3),
             intake.outtake(),
-            WaitCommand(0.2)
+            WaitCommand(0.1)
         ).repeatedly()
 
 //    fun positionControlAgigate(): Command =

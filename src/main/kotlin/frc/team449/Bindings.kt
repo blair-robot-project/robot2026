@@ -64,10 +64,16 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                actions.checkAndFeed()
+                SequentialCommandGroup(
+                    actions.checkAndFeed(),
+                    actions.shuffleIntakePivot()
+                )
             )
             .onFalse(
-                actions.stopFeedAndShooter()
+                SequentialCommandGroup(
+                    actions.stopFeedAndShooter(),
+                    actions.stopIntake()
+                )
             )
 
         driver
@@ -167,11 +173,11 @@ class Bindings(
                 actions.stopFeedAndShooter()
             )
 
-        driver.start().onTrue(
-            SequentialCommandGroup(
-                robotContainer.drive.seedFieldCentric(),
+        driver
+            .start()
+            .onTrue(
+                robotContainer.drive.seedFieldCentric()
             )
-        )
 
         operator
             .leftBumper()
