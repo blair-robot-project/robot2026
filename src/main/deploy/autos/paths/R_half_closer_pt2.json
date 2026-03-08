@@ -26,12 +26,12 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.18092021913621834,
+      "t_ratio": 0.1809202191362183,
       "lib_key": "end_intake"
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.8,
+      "t_ratio": 0.7999999999999997,
       "lib_key": "start_shooting"
     },
     {
