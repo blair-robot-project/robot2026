@@ -5,6 +5,7 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -82,14 +83,6 @@ class RobotActions(
             WaitCommand(0.1)
         ).repeatedly()
 
-//    fun positionControlAgigate(): Command =
-//        SequentialCommandGroup(
-//            intake.stow(),
-//            WaitCommand(0.5),
-//            intake.deploy(),
-//            WaitCommand(0.5)
-//        ).repeatedly()
-
     fun stopIntake(): Command = intake.stopRollers()
 
     fun prepTrenchShot(): Command =
@@ -126,6 +119,16 @@ class RobotActions(
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
             indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).repeatedly(),
+        )
+
+    fun autoUnjam(): Command =
+        SequentialCommandGroup(
+            PrintCommand("AUTO UNJAM!"),
+            ParallelCommandGroup(
+                robotContainer.indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
+                robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL)
+            ).withTimeout(0.5),
+            stopFeedAndShooter()
         )
 
     fun stopFeed(): Command = indexer.stop()

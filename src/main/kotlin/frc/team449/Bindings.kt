@@ -12,7 +12,8 @@ class Bindings(
     val operator = robotContainer.opController
     val actions = robotContainer.actions
 
-    val joysticksMovedPastDeadband: Trigger = Trigger { abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 || abs(driver.rightX) > 0.25 }
+    val joysticksMovedPastDeadbandTrigger: Trigger = Trigger { abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 || abs(driver.rightX) > 0.25 }
+    val shooterJamTrigger = robotContainer.shooter.shooterJamTrigger
 
     fun setDefaultCommands() {
         // set default commands for systems here
@@ -94,7 +95,7 @@ class Bindings(
             .onTrue(
                 robotContainer.drive
                     .xLock()
-                    .until(joysticksMovedPastDeadband),
+                    .until(joysticksMovedPastDeadbandTrigger),
             )
 
         driver
@@ -162,21 +163,14 @@ class Bindings(
             )
 
         driver
-            .povUp()
-            .whileTrue(
-                SequentialCommandGroup(
-                    robotContainer.indexer.index(Constants.IndexerConstants.SHOOTING_INDEXER_SPEED),
-                    robotContainer.shooter.setFlywheelVelocity(-Constants.ShooterConstants.HUB_FLYWHEEL_VEL)
-                )
-            )
-            .onFalse(
-                actions.stopFeedAndShooter()
-            )
-
-        driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric()
+            )
+
+        shooterJamTrigger
+            .onTrue(
+                actions.autoUnjam()
             )
 
         operator
