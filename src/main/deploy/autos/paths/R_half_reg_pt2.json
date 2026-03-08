@@ -37,13 +37,13 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.9535052240532138,
+      "t_ratio": 0.8,
       "lib_key": "start_shooting"
     },
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 4.246422199963723,
+        "x_meters": 3.846,
         "y_meters": 0.534,
         "intermediate_handoff_radius_meters": 0.2
       },

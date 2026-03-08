@@ -263,14 +263,14 @@ object Constants {
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val WEDGE_STATOR_LIMIT = 50.0
-        const val WEDGE_SUPPLY_LIMIT = 25.0
+        const val WEDGE_STATOR_LIMIT = 60.0
+        const val WEDGE_SUPPLY_LIMIT = 30.0
 
-        const val FLOOR_STATOR_LIMIT = 50.0
-        const val FLOOR_SUPPLY_LIMIT = 25.0
+        const val FLOOR_STATOR_LIMIT = 20.0
+        const val FLOOR_SUPPLY_LIMIT = 10.0
 
-        const val TOP_STATOR_LIMIT = 50.0
-        const val TOP_SUPPLY_LIMIT = 25.0
+        const val TOP_STATOR_LIMIT = 60.0
+        const val TOP_SUPPLY_LIMIT = 30.0
 
         // --- PHYSICAL SPECS & GEARING ---
         const val WEDGE_GEARING = 1.5
@@ -329,8 +329,8 @@ object Constants {
 
         // Robot to camera transforms
 
-        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
-        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092 - 0.079375, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092 - 0.079375, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
         // TODO CHECK ROTATION - see if poses are accurate on actual field
         // fyi i think right camera might actually be the left one on the actual camera configs
 

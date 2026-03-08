@@ -53,7 +53,6 @@ class Robot : LoggedRobot() {
     private val robotContainer = RobotContainer
 
     override fun driverStationConnected() {
-        robotContainer.drive.setOperatorPerspectiveForward()
         FieldUtil.updateKeyPositions()
     }
 
@@ -79,6 +78,7 @@ class Robot : LoggedRobot() {
     }
 
     override fun autonomousInit() {
+        robotContainer.drive.setOperatorPerspectiveForward()
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }

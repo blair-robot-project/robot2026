@@ -56,6 +56,17 @@ class RobotActions(
             intake.deploy()
         )
 
+    fun autoDeployAndRunIntake(): Command =
+        SequentialCommandGroup(
+            intake.intake(),
+            indexer.index(
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                RadiansPerSecond.of(0.0),
+            ),
+            intake.deploy(), // add a command to retract and deploy agian
+        )
+
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             intake.stopRollers(),
@@ -70,6 +81,14 @@ class RobotActions(
             intake.outtake(),
             WaitCommand(0.2)
         ).repeatedly()
+
+//    fun positionControlAgigate(): Command =
+//        SequentialCommandGroup(
+//            intake.stow(),
+//            WaitCommand(0.5),
+//            intake.deploy(),
+//            WaitCommand(0.5)
+//        ).repeatedly()
 
     fun stopIntake(): Command = intake.stopRollers()
 

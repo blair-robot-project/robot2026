@@ -1,12 +1,8 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
@@ -25,7 +21,7 @@ class Bindings(
                 robotContainer.drive,
                 { -driver.leftY },
                 { -driver.leftX },
-                { driver.rightX },
+                { -driver.rightX },
             )
 
         // controls for simulation
@@ -34,8 +30,14 @@ class Bindings(
     fun bindControls() {
         driver
             .rightTrigger()
-            .onTrue(
-                actions.deployAndToggleIntake(),
+            .whileTrue(
+                actions.deployAndRunIntake(),
+            )
+            .onFalse(
+                SequentialCommandGroup(
+                    actions.stopIntake(),
+                    actions.stopFeed()
+                )
             )
 
         driver
@@ -77,7 +79,7 @@ class Bindings(
                     robotContainer.drive,
                     { -driver.leftY },
                     { -driver.leftX },
-                    { driver.rightX },
+                    { -driver.rightX },
                     Constants.DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SECOND,
                     Constants.DriveConstants.SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND,
                 ),
@@ -97,23 +99,29 @@ class Bindings(
                 actions.prepHubShot()
             )
 
+//        driver
+//            .x()
+//            .onTrue(
+//                SequentialCommandGroup(
+//                    actions.prepTrenchShot(),
+//                    PoseAlignCommand(
+//                        robotContainer.drive,
+//                        { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
+//                        driver.povUp()
+//                    ),
+//                    actions.checkAndFeed(),
+//                    ParallelCommandGroup(
+//                        robotContainer.drive.xLock(),
+//                        actions.shuffleIntakePivot()
+//                    ),
+//                ).until(joysticksMovedPastDeadband)
+//                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
+//            )
+
         driver
             .x()
             .onTrue(
-                SequentialCommandGroup(
-                    actions.prepTrenchShot(),
-                    PoseAlignCommand(
-                        robotContainer.drive,
-                        { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
-                        driver.povUp()
-                    ),
-                    actions.checkAndFeed(),
-                    ParallelCommandGroup(
-                        robotContainer.drive.xLock(),
-                        actions.shuffleIntakePivot()
-                    ),
-                ).until(joysticksMovedPastDeadband)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
+                actions.prepTrenchShot()
             )
 
         driver
@@ -147,6 +155,18 @@ class Bindings(
                 actions.outtakeIntakeAndReverseIndex()
             ).onFalse(
                 actions.stopIntake()
+            )
+
+        driver
+            .povUp()
+            .whileTrue(
+                SequentialCommandGroup(
+                    robotContainer.indexer.index(Constants.IndexerConstants.SHOOTING_INDEXER_SPEED),
+                    robotContainer.shooter.setFlywheelVelocity(-Constants.ShooterConstants.HUB_FLYWHEEL_VEL)
+                )
+            )
+            .onFalse(
+                actions.stopFeedAndShooter()
             )
 
         driver.start().onTrue(

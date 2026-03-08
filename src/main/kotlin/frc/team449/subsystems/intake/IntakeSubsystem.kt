@@ -3,6 +3,7 @@ package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
 import org.littletonrobotics.junction.Logger
@@ -57,7 +58,30 @@ class IntakeSubsystem(
             true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
-        ).withName("Deploy")
+        ).withName("Deploy").withTimeout(1.0).andThen(
+            if (abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) > 0.1) {
+                stow().withTimeout(0.5).andThen(
+                    slamHoming(
+                        true,
+                        IntakeConstants.DEPLOY_VOLTS,
+                        IntakeConstants.DEPLOY_HOLD_VOLTS
+                    )
+                )
+            } else {
+                Commands.none()
+            }
+        ).repeatedly()
+
+//    fun autoDeploy(): Command {
+//        return SequentialCommandGroup(
+//            slamHoming(
+//                true,
+//                IntakeConstants.DEPLOY_VOLTS,
+//                IntakeConstants.DEPLOY_HOLD_VOLTS,
+//            ).withName("Deploy") ,
+//             if(inputs.leftPivotLeaderPositionRad)
+//        )
+//    }
 
     fun stow(): Command =
         slamHoming(
@@ -81,7 +105,13 @@ class IntakeSubsystem(
                 }.until {
                     val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
                     val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
-                    hardstopDebouncer.calculate(highCurrent && lowVelocity)
+//                    val atTargetPosition = if (isDeployed) {
+//                        abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.1
+//                    } else {
+//                        true
+//                    }
+
+                    hardstopDebouncer.calculate(highCurrent && lowVelocity) // && atTargetPosition)
                 }.andThen(
                     runOnce {
                         io.setPivotVoltage(holdVolts)
