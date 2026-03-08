@@ -49,6 +49,7 @@ class RobotActions(
 
     fun deployAndRunIntake(): Command =
         SequentialCommandGroup(
+            shooter.stopFlywheel(),
             intake.intake(),
             indexer.index(
                 IndexerConstants.INTAKING_INDEXER_SPEED,
@@ -79,7 +80,7 @@ class RobotActions(
     fun shuffleIntakeRoller(): Command =
         SequentialCommandGroup(
             intake.intake(),
-            WaitCommand(0.3),
+            WaitCommand(1.0),
             intake.outtake(),
             WaitCommand(0.1),
         ).repeatedly()
@@ -139,7 +140,22 @@ class RobotActions(
                     robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
                 )
             ).withTimeout(0.25),
-            stopFeedAndShooter(),
+            stopFeed(),
+            robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
+        )
+
+    fun autonUnjamAndShoot(): Command =
+        SequentialCommandGroup(
+            PrintCommand("AUTO UNJAM!"),
+            RepeatCommand(
+                ParallelCommandGroup(
+                    robotContainer.indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
+                    robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
+                )
+            ).withTimeout(0.25),
+            stopFeed(),
+            robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TOWER_FLYWHEEL_VEL),
+            checkAndFeed()
         )
 
     fun stopFeed(): Command = indexer.stop()

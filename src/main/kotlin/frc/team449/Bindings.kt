@@ -74,7 +74,7 @@ class Bindings(
                 ),
             ).onFalse(
                 SequentialCommandGroup(
-                    actions.stopFeedAndShooter(),
+                    actions.stopFeed(),
                     actions.stopIntake(),
                 ),
             )
@@ -162,6 +162,12 @@ class Bindings(
                 actions.outtakeIntakeAndReverseIndex(),
             ).onFalse(
                 actions.stopIntake(),
+            )
+
+        driver
+            .povRight()
+            .onTrue(
+                robotContainer.shooter.stopFlywheel()
             )
 
         driver

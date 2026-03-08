@@ -108,7 +108,7 @@ class BLineRoutines(
     fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.autoDeployAndRunIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
-        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("start_shooting", actions.autonUnjamAndShoot())
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
         FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
     }
@@ -123,7 +123,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
+            // drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilder.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
@@ -184,7 +184,7 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
+            //   drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
             pathBuilder.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),

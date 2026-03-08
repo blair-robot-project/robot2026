@@ -161,7 +161,7 @@ object Constants {
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
         val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
 
-        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.12)
+        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.15)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         val TOWER_HOOD_ANGLE: Angle = Radians.of(0.04)
