@@ -54,6 +54,7 @@ class Robot : LoggedRobot() {
 
     override fun driverStationConnected() {
         FieldUtil.updateKeyPositions()
+        Logger.recordOutput("Alliance reset to:", DriverStation.getAlliance().get().name)
     }
 
     override fun robotInit() {
