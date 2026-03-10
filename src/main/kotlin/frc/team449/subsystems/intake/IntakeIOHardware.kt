@@ -43,17 +43,69 @@ open class IntakeIOHardware : IntakeIO {
     private val rightRollerFollowerStatorCurrent = rightRollerFollower.statorCurrent
     private val rightRollerFollowerTemp = rightRollerFollower.deviceTemp
 
-    val leftPivotLeaderDisconnectedAlert = Alert("left pivot leader disconnected (ID ${IntakeConstants.LEFT_PIVOT_MOTOR_ID})", Alert.AlertType.kError)
-    val rightPivotFollowerDisconnectedAlert = Alert("right pivot follower disconnected (ID ${IntakeConstants.RIGHT_PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
-    val leftRollerLeaderDisconnectedAlert = Alert("left roller leader motor disconnected (ID ${IntakeConstants.LEFT_ROLLER_MOTOR_ID})", Alert.AlertType.kError)
-    val rightRollerFollowerDisconnectedAlert = Alert("right roller follower motor disconnected (ID ${IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
+    private val leftRollerMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftRollerLeaderVelocity,
+            leftRollerLeaderVoltage,
+            leftRollerLeaderSupplyCurrent,
+            leftRollerLeaderStatorCurrent,
+        )
 
-    private val allSignals = arrayOf(
-        leftPivotLeaderVoltage, leftPivotLeaderSupplyCurrent, leftPivotLeaderStatorCurrent, leftPivotLeaderPosition, leftPivotLeaderVelocity, leftPivotLeaderTemp,
-        rightPivotFollowerVoltage, rightPivotFollowerSupplyCurrent, rightPivotFollowerStatorCurrent, rightPivotFollowerTemp,
-        leftRollerLeaderVoltage, leftRollerLeaderSupplyCurrent, leftRollerLeaderStatorCurrent, leftRollerLeaderVelocity, leftRollerLeaderTemp,
-        rightRollerFollowerVoltage, rightRollerFollowerSupplyCurrent, rightRollerFollowerStatorCurrent, rightRollerFollowerTemp
-    )
+    private val rightRollerMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            rightRollerFollowerVoltage,
+            rightRollerFollowerSupplyCurrent,
+            rightRollerFollowerStatorCurrent,
+        )
+
+    private val leftPivotMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftPivotLeaderPosition,
+            leftPivotLeaderVelocity,
+            leftPivotLeaderVoltage,
+            leftPivotLeaderSupplyCurrent,
+            leftPivotLeaderStatorCurrent,
+        )
+
+    private val rightPivotMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            rightPivotFollowerVoltage,
+            rightPivotFollowerSupplyCurrent,
+            rightPivotFollowerStatorCurrent,
+            rightPivotFollowerTemp,
+        )
+
+    val leftPivotLeaderDisconnectedAlert =
+        Alert("left pivot leader disconnected (ID ${IntakeConstants.LEFT_PIVOT_MOTOR_ID})", Alert.AlertType.kError)
+    val rightPivotFollowerDisconnectedAlert =
+        Alert("right pivot follower disconnected (ID ${IntakeConstants.RIGHT_PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
+    val leftRollerLeaderDisconnectedAlert =
+        Alert("left roller leader motor disconnected (ID ${IntakeConstants.LEFT_ROLLER_MOTOR_ID})", Alert.AlertType.kError)
+    val rightRollerFollowerDisconnectedAlert =
+        Alert("right roller follower motor disconnected (ID ${IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
+
+    private val allSignals =
+        arrayOf(
+            leftPivotLeaderVoltage,
+            leftPivotLeaderSupplyCurrent,
+            leftPivotLeaderStatorCurrent,
+            leftPivotLeaderPosition,
+            leftPivotLeaderVelocity,
+            leftPivotLeaderTemp,
+            rightPivotFollowerVoltage,
+            rightPivotFollowerSupplyCurrent,
+            rightPivotFollowerStatorCurrent,
+            rightPivotFollowerTemp,
+            leftRollerLeaderVoltage,
+            leftRollerLeaderSupplyCurrent,
+            leftRollerLeaderStatorCurrent,
+            leftRollerLeaderVelocity,
+            leftRollerLeaderTemp,
+            rightRollerFollowerVoltage,
+            rightRollerFollowerSupplyCurrent,
+            rightRollerFollowerStatorCurrent,
+            rightRollerFollowerTemp,
+        )
 
     private val pivotVoltageRequest = VoltageOut(0.0)
     private val rollerVelocityRequest = VelocityVoltage(0.0)
@@ -73,8 +125,6 @@ open class IntakeIOHardware : IntakeIO {
 
         PhoenixUtil.registerSignals(*allSignals)
     }
-
-    private var isAliveCounter = 0
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
         BaseStatusSignal.refreshAll(*allSignals)
@@ -102,13 +152,10 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Units.Amps)
         inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Units.Celsius)
 
-        if (isAliveCounter++ >= 50) {
-            isAliveCounter = 0
-            leftPivotLeaderDisconnectedAlert.set(!leftPivotLeader.isAlive)
-            rightPivotFollowerDisconnectedAlert.set(!rightPivotFollower.isAlive)
-            leftRollerLeaderDisconnectedAlert.set(!leftRollerLeader.isAlive)
-            rightRollerFollowerDisconnectedAlert.set(!rightRollerFollower.isAlive)
-        }
+        leftPivotLeaderDisconnectedAlert.set(!leftPivotMotorConnected)
+        rightPivotFollowerDisconnectedAlert.set(!rightPivotMotorConnected)
+        leftRollerLeaderDisconnectedAlert.set(!leftRollerMotorConnected)
+        rightRollerFollowerDisconnectedAlert.set(!rightRollerMotorConnected)
     }
 
     override fun setPivotVoltage(volts: Double) {
@@ -124,42 +171,44 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     companion object {
-        val pivotConfig = TalonFXConfiguration().apply {
-            CurrentLimits.apply {
-                SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
-                StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
+        val pivotConfig =
+            TalonFXConfiguration().apply {
+                CurrentLimits.apply {
+                    SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
+                    StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
+                }
+
+                MotorOutput.apply {
+                    NeutralMode = IntakeConstants.LEFT_PIVOT_NEUTRAL_MODE
+                    Inverted = IntakeConstants.LEFT_PIVOT_INVERSION
+                }
+
+                Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+
+                Slot0.apply {
+                    kP = 5.0
+                    kG = 0.1
+                }
             }
 
-            MotorOutput.apply {
-                NeutralMode = IntakeConstants.LEFT_PIVOT_NEUTRAL_MODE
-                Inverted = IntakeConstants.LEFT_PIVOT_INVERSION
+        val rollerConfig =
+            TalonFXConfiguration().apply {
+                CurrentLimits.apply {
+                    SupplyCurrentLimit = IntakeConstants.ROLLER_SUPPLY_LIMIT
+                    StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
+                }
+
+                MotorOutput.apply {
+                    NeutralMode = IntakeConstants.LEFT_ROLLER_NEUTRAL_MODE
+                    Inverted = IntakeConstants.LEFT_ROLLER_INVERSION
+                }
+
+                Feedback.SensorToMechanismRatio = IntakeConstants.ROLLER_GEARING
+
+                Slot0.apply {
+                    kP = 0.0
+                    kV = 0.09
+                }
             }
-
-            Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
-
-            Slot0.apply {
-                kP = 5.0
-                kG = 0.1
-            }
-        }
-
-        val rollerConfig = TalonFXConfiguration().apply {
-            CurrentLimits.apply {
-                SupplyCurrentLimit = IntakeConstants.ROLLER_SUPPLY_LIMIT
-                StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
-            }
-
-            MotorOutput.apply {
-                NeutralMode = IntakeConstants.LEFT_ROLLER_NEUTRAL_MODE
-                Inverted = IntakeConstants.LEFT_ROLLER_INVERSION
-            }
-
-            Feedback.SensorToMechanismRatio = IntakeConstants.ROLLER_GEARING
-
-            Slot0.apply {
-                kP = 0.0
-                kV = 0.09
-            }
-        }
     }
 }

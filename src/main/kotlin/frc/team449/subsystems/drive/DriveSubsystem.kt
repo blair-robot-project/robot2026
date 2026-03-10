@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
@@ -64,17 +66,24 @@ class DriveSubsystem(
             inputs.Pose.rotation,
         )
 
-    fun seedFieldCentric(): Command = runOnce { io.seedFieldCentric() }
+    fun seedFieldCentric(): Command = runOnce {
+        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+            io.seedFieldCentric(Rotation2d.kZero)
+        } else {
+            io.seedFieldCentric(Rotation2d.k180deg)
+        }
+    }
 
-    // should only be called in driverStationConnected() to prevent null alliance
+    // should only be called in autoInit() to prevent null alliance
     fun setOperatorPerspectiveForward() {
-        io.setOperatorPerspectiveForward(
-            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-                Rotation2d.kZero
-            } else {
-                Rotation2d.k180deg
-            },
-        )
+        var forward: Rotation2d = Rotation2d.kZero
+
+        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            forward = Rotation2d.k180deg
+        }
+
+        io.setOperatorPerspectiveForward(forward)
+        CommandScheduler.getInstance().schedule(PrintCommand(forward.toString()))
     }
 
     fun xLock(): Command = run { io.setControl(SwerveRequest.SwerveDriveBrake()) }

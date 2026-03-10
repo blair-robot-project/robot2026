@@ -77,5 +77,6 @@ class AimAtTargetCommand(
 
         val headingErrorDegrees = targetHeading.minus(drive.pose.rotation).degrees
         Logger.recordOutput("aimbot degree error", headingErrorDegrees)
+        Logger.recordOutput("Distance To Hub", target.getDistance(drive.pose.translation))
     }
 }

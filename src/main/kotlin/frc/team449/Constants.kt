@@ -115,9 +115,9 @@ object Constants {
         const val EFFICIENCY = 0.97
 
         // --- CURRENT & OPERATIONAL LIMITS ---
-        const val FLYWHEEL_SUPPLY_LIM = 40.0
+        const val FLYWHEEL_SUPPLY_LIM = 30.0
         const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 40.0
+        const val HOOD_SUPPLY_LIM = 20.0
         const val HOOD_STATOR_LIM = 20.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
@@ -140,12 +140,12 @@ object Constants {
         // const val RIGHT_FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
-        const val HOOD_KP = 150.0
+        const val HOOD_KP = 200.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
         const val HOOD_KS = 0.1
-        const val HOOD_KG = 0.0 // 0.14
-        const val HOOD_KV = 2.7
+        const val HOOD_KG = 0.14 // 0.14
+        const val HOOD_KV = 3.5
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
@@ -161,11 +161,13 @@ object Constants {
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
         val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
 
-        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.11)
+        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.14)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.04)
+        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.09)
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
+
+        val TEST_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(20.0)
 
         // --- INTERPOLATION MAPS ---
         val SHOT_TIME_MAP =
@@ -189,7 +191,7 @@ object Constants {
                 put(1.041, HUB_HOOD_ANGLE.`in`(Radians))
                 put(2.032, 0.04)
                 put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
-                put(5.0, 0.1806)
+                put(5.0, 0.2806)
             }
     }
 
@@ -218,9 +220,9 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 5.0
-        const val PIVOT_STATOR_LIMIT = 10.0
-        const val ROLLER_SUPPLY_LIMIT = 30.0
+        const val PIVOT_SUPPLY_LIMIT = 15.0
+        const val PIVOT_STATOR_LIMIT = 40.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -237,9 +239,9 @@ object Constants {
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
 
         // --- HOMING & VISUALIZATION ---
-        const val HOMING_CURRENT_AMPS = 10.0
+        const val HOMING_CURRENT_AMPS = 35.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
-        const val HOMING_DEBOUNCE_TIME = 0.1
+        const val HOMING_DEBOUNCE_TIME = 0.3
         const val VIZ_OFFSET_DEG = 33.873
     }
 
@@ -261,14 +263,14 @@ object Constants {
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val WEDGE_STATOR_LIMIT = 50.0
-        const val WEDGE_SUPPLY_LIMIT = 25.0
+        const val WEDGE_STATOR_LIMIT = 60.0
+        const val WEDGE_SUPPLY_LIMIT = 30.0
 
-        const val FLOOR_STATOR_LIMIT = 50.0
-        const val FLOOR_SUPPLY_LIMIT = 25.0
+        const val FLOOR_STATOR_LIMIT = 20.0
+        const val FLOOR_SUPPLY_LIMIT = 10.0
 
-        const val TOP_STATOR_LIMIT = 50.0
-        const val TOP_SUPPLY_LIMIT = 25.0
+        const val TOP_STATOR_LIMIT = 60.0
+        const val TOP_SUPPLY_LIMIT = 30.0
 
         // --- PHYSICAL SPECS & GEARING ---
         const val WEDGE_GEARING = 1.5
@@ -320,16 +322,17 @@ object Constants {
     object VisionConstants {
         // --- CHS ANDYMARK REBUILT FIELD ---
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
+//        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout(frc.team449.subsystems.vision.field_map_mar_07_08_28_22.json)
 
         const val CAMERA_RIGHT_NAME: String = "limelight-right"
         const val CAMERA_LEFT_NAME: String = "limelight-left"
 
-        // --- ROBOT TO CAMERA TRANSFORMS ---
-        val ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        val ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.303, -0.251, 0.53594, Rotation3d(0.0, 0.5236, 0.5236))
+        // Robot to camera transforms
 
-        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
-        val PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2, -0.2, 0.53, Rotation3d(0.0, -0.523599, 0.0))
+        val PV_ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var PV_ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        // TODO CHECK ROTATION - see if poses are accurate on actual field
+        // fyi i think right camera might actually be the left one on the actual camera configs
 
         // --- FILTERING THRESHOLDS --
         const val MAX_AMBIGUITY: Double = 0.3

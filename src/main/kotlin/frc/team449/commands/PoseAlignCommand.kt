@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
 import java.util.function.Supplier
@@ -17,7 +18,8 @@ import kotlin.math.PI
 
 class PoseAlignCommand(
     private val drive: DriveSubsystem,
-    private val targetPoseSupplier: Supplier<Pose2d>
+    private val targetPoseSupplier: Supplier<Pose2d>,
+    private val override: Trigger
 ) : Command() {
     private val xController = PIDController(4.0, 0.0, 0.05)
     private val yController = PIDController(4.0, 0.0, 0.05)
@@ -68,7 +70,7 @@ class PoseAlignCommand(
     }
 
     override fun isFinished(): Boolean {
-        return driveController.atReference()
+        return driveController.atReference() || override.asBoolean
     }
 
     override fun end(interrupted: Boolean) {

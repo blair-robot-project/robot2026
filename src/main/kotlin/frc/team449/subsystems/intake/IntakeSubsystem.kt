@@ -3,6 +3,10 @@ package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.RepeatCommand
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
 import org.littletonrobotics.junction.Logger
@@ -58,6 +62,19 @@ class IntakeSubsystem(
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy")
+
+    fun repeatedlyDeploy(): Command =
+        RepeatCommand(
+            SequentialCommandGroup(
+                deploy()
+                    .withTimeout(1.0),
+                ConditionalCommand(
+                    stow()
+                        .withTimeout(0.5),
+                    InstantCommand(),
+                ) { abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.12 },
+            ),
+        ).withName("Repeated Deploy")
 
     fun stow(): Command =
         slamHoming(

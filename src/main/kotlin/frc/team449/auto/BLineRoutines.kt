@@ -106,9 +106,9 @@ class BLineRoutines(
             .withPoseReset(drive::resetOdometry)
 
     fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
+        FollowPath.registerEventTrigger("start_intake", actions.autoDeployAndRunIntake())
         FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
-        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("start_shooting", actions.autonUnjamAndShoot())
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
         FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
     }
@@ -123,14 +123,14 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
+            // drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
+            pathBuilder.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path3),
-            pathBuilderWithReset.build(path4),
+            pathBuilder.build(path3),
+            pathBuilder.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path5),
+            pathBuilder.build(path5),
         )
     }
 
@@ -184,14 +184,14 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
+            //   drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
+            pathBuilder.build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path3),
-            pathBuilderWithReset.build(path4),
+            pathBuilder.build(path3),
+            pathBuilder.build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path5),
+            pathBuilder.build(path5),
         )
     }
 
