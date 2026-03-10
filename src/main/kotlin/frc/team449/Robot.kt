@@ -52,8 +52,7 @@ class Robot : LoggedRobot() {
 
     private val robotContainer = RobotContainer
 
-    override fun driverStationConnected() {
-    }
+    override fun driverStationConnected() {}
 
     override fun robotInit() {
         FieldUtil.initialize()
