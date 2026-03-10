@@ -1,5 +1,6 @@
 package frc.team449
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.SwerveRequestCommand
@@ -46,6 +47,7 @@ class Bindings(
             .leftTrigger()
             .onTrue(
                 actions.stopAndStow(),
+
             )
 
 //        driver
@@ -68,7 +70,7 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                SequentialCommandGroup(
+                ParallelCommandGroup(
                     actions.checkAndFeed(),
                     actions.shuffleIntakeRoller(),
                 ),

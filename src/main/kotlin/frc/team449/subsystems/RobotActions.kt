@@ -67,14 +67,19 @@ class RobotActions(
                 IndexerConstants.INTAKING_INDEXER_SPEED,
                 RadiansPerSecond.of(0.0),
             ),
-            intake.repeatedlyDeploy(),
+            intake.deploy()
         )
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
+            indexer.index(
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                RadiansPerSecond.of(0.0),
+            ),
             intake.stopRollers(),
-            indexer.stop(),
             intake.stow(),
+            indexer.stop(),
         )
 
     fun shuffleIntakeRoller(): Command =
@@ -82,7 +87,7 @@ class RobotActions(
             intake.intake(),
             WaitCommand(1.0),
             intake.outtake(),
-            WaitCommand(0.1),
+            WaitCommand(0.2),
         ).repeatedly()
 
     fun shuffleIntakePivot(): Command =

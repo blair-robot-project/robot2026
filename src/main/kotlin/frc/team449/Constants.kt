@@ -140,12 +140,12 @@ object Constants {
         // const val RIGHT_FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
-        const val HOOD_KP = 150.0
+        const val HOOD_KP = 200.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
         const val HOOD_KS = 0.1
-        const val HOOD_KG = 0.0 // 0.14
-        const val HOOD_KV = 2.7
+        const val HOOD_KG = 0.14 // 0.14
+        const val HOOD_KV = 3.5
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
@@ -161,10 +161,10 @@ object Constants {
         val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
         val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
 
-        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.15)
+        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.14)
         val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
-        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.04)
+        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.09)
         val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
 
         val TEST_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(20.0)
@@ -191,7 +191,7 @@ object Constants {
                 put(1.041, HUB_HOOD_ANGLE.`in`(Radians))
                 put(2.032, 0.04)
                 put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
-                put(5.0, 0.1806)
+                put(5.0, 0.2806)
             }
     }
 
