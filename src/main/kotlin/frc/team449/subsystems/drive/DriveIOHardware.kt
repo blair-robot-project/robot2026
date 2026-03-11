@@ -5,6 +5,7 @@ import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.configs.TalonFXSConfiguration
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
@@ -108,6 +109,22 @@ open class DriveIOHardware(
 
     override fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         super<SwerveDrivetrain>.setStateStdDevs(visionMeasurementStdDevs)
+    }
+
+    override fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
+        val driveCurrentLimitConfig = CurrentLimitsConfigs()
+        val steerCurrentLimitConfig = CurrentLimitsConfigs()
+
+        for (i in 0 until modules.count()) {    
+            modules[i].driveMotor.configurator.refresh(driveCurrentLimitConfig)
+            modules[i].steerMotor.configurator.refresh(steerCurrentLimitConfig)
+
+            driveCurrentLimitConfig.SupplyCurrentLimit = driveSupplyLimitAmps
+            steerCurrentLimitConfig.SupplyCurrentLimit = steerSupplyLimitAmps
+
+            modules[i].driveMotor.configurator.apply(driveCurrentLimitConfig)
+            modules[i].steerMotor.configurator.apply(steerCurrentLimitConfig)
+        }
     }
 
     override fun logModules(driveState: SwerveDriveState) {

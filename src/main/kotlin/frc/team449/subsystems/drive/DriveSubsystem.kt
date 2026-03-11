@@ -112,6 +112,10 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
+    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
+        io.setSupplyLimits(driveSupplyLimitAmps, steerSupplyLimitAmps)
+    }
+
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     val sysIDTranslationRoutine =
         SysIdRoutine(

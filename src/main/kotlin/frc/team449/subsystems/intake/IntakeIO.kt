@@ -27,8 +27,6 @@ interface IntakeIO {
 
         @JvmField var rightPivotFollowerTempCelsius: Double = 0.0
 
-        // Rollers
-
         @JvmField var leftRollerLeaderAppliedVolts: Double = 0.0
 
         @JvmField var leftRollerLeaderVelocityRadPerSec: Double = 0.0
@@ -55,4 +53,6 @@ interface IntakeIO {
     fun setRollerVelocity(velocity: AngularVelocity) {}
 
     fun setRollerVoltage(volts: Double) {}
+
+    fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {}
 }

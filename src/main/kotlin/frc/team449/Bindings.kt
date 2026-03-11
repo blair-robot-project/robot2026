@@ -34,7 +34,7 @@ class Bindings(
     fun bindControls() {
         driver
             .rightTrigger()
-            .whileTrue(
+            .onTrue(
                 actions.deployAndRunIntake(),
             ).onFalse(
                 SequentialCommandGroup(

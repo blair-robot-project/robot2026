@@ -73,6 +73,10 @@ class IntakeSubsystem(
         )
             .withName("Stow")
 
+    fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
+        io.setSupplyLimits(pivotSupplyLimitAmps, rollerSupplyLimitAmps)
+    }
+
     private fun slamHoming(
         isDeployed: Boolean,
         moveVolts: Double,

@@ -119,15 +119,6 @@ object RobotContainer {
             },
         )
 
-    val fuelSimulator: FuelSimulationSubsystem? =
-        if (Constants.CURRENT_MODE == Mode.SIM) {
-            FuelSimulationSubsystem(
-                this,
-            )
-        } else {
-            null
-        }
-
     val actions = RobotActions(this)
 
     val bindings = Bindings(this)

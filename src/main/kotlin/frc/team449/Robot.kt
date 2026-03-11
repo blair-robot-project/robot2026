@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.team449.RobotContainer.fuelSimulator
 import frc.team449.util.FieldUtil
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
@@ -101,13 +100,7 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {
-        SmartDashboard.putData(
-            (fuelSimulator?.resetFuel())
-                ?.withName("Reset Fuel")
-                ?.ignoringDisable(true),
-        )
-    }
+    override fun simulationInit() {}
 
     override fun simulationPeriodic() {
         Logger.recordOutput(
