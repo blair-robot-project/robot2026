@@ -17,21 +17,28 @@ class IndexerSubsystem(
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
-    var indexerTargetVelocityRadPerSec: Double = 0.0
+    var wedgeTargetVelocityRadPerSec: Double = 0.0
+    var floorTargetVelocityRadPerSec: Double = 0.0
+    var topTargetVelocityRadPerSec: Double = 0.0
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
 
-        Logger.recordOutput("Indexer/IndexerTargetRadPerSec", indexerTargetVelocityRadPerSec)
+        Logger.recordOutput("Indexer/FloorTargetRadPerSec", floorTargetVelocityRadPerSec)
+        Logger.recordOutput("Indexer/WedgeTargetRadPerSec", wedgeTargetVelocityRadPerSec)
+        Logger.recordOutput("Indexer/TopTargetVelocityRadPerSec", topTargetVelocityRadPerSec)
     }
 
     fun index(
-        wedgeSpeed: AngularVelocity,
         floorSpeed: AngularVelocity,
+        wedgeSpeed: AngularVelocity,
         topSpeed: AngularVelocity
     ): Command =
         this.runOnce {
+            floorTargetVelocityRadPerSec = floorSpeed.`in`(RadiansPerSecond)
+            wedgeTargetVelocityRadPerSec = wedgeSpeed.`in`(RadiansPerSecond)
+            topTargetVelocityRadPerSec = topSpeed.`in`(RadiansPerSecond)
             io.setFloorSpeed(floorSpeed)
             io.setWedgeSpeed(wedgeSpeed)
             io.setTopSpeed(topSpeed)
@@ -42,14 +49,14 @@ class IndexerSubsystem(
             surfaceSpeed,
             surfaceSpeed,
             surfaceSpeed,
-        ).beforeStarting({
-            indexerTargetVelocityRadPerSec = surfaceSpeed.`in`(RadiansPerSecond)
-        })
+        )
     }
 
     fun stop(): Command =
         this.runOnce {
-            indexerTargetVelocityRadPerSec = 0.0
+            floorTargetVelocityRadPerSec = 0.0
+            wedgeTargetVelocityRadPerSec = 0.0
+            topTargetVelocityRadPerSec = 0.0
             io.setIndexerVoltage(0.0, 0.0, 0.0)
         }
 }

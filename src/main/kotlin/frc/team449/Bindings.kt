@@ -1,17 +1,9 @@
 package frc.team449
 
-import edu.wpi.first.units.Units
-import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import frc.team449.Constants.IndexerConstants
-import frc.team449.Constants.ShooterConstants
-import frc.team449.commands.AimAtTargetCommand
-import frc.team449.commands.PoseAlignCommand
 import frc.team449.commands.SwerveRequestCommand
-import frc.team449.commands.WheelRadiusCharacterizationCommand
-import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
@@ -21,7 +13,12 @@ class Bindings(
     val operator = robotContainer.opController
     val actions = robotContainer.actions
 
-    val joysticksMovedPastDeadband: Trigger = Trigger { abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 || abs(driver.rightX) > 0.25 }
+    val joysticksMovedPastDeadbandTrigger: Trigger =
+        Trigger {
+            abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
+                abs(driver.rightX) > 0.25
+        }
+    val shooterJamTrigger = robotContainer.shooter.shooterJamTrigger
 
     fun setDefaultCommands() {
         // set default commands for systems here
@@ -32,37 +29,56 @@ class Bindings(
                 { -driver.leftX },
                 { -driver.rightX },
             )
-        // controls for simulation
     }
 
     fun bindControls() {
         driver
             .rightTrigger()
-            .onTrue(
-                actions.deployAndToggleIntake(),
+            .whileTrue(
+                actions.deployAndRunIntake(),
+            ).onFalse(
+                SequentialCommandGroup(
+                    actions.stopIntake(),
+                    actions.stopFeed(),
+                ),
             )
 
         driver
             .leftTrigger()
             .onTrue(
                 actions.stopAndStow(),
+
             )
+
+//        driver
+//            .rightBumper()
+//            .whileTrue(
+//                ParallelCommandGroup(
+//                    AimAtTargetCommand(
+//                        robotContainer.drive,
+//                        { -robotContainer.driveController.leftY },
+//                        { -robotContainer.driveController.leftX },
+//                        { FieldUtil.HUB_TRANSLATION },
+//                    ),
+//                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
+//                    actions.checkAndFeed(),
+//                ),
+//            ).onFalse(
+//                actions.stopFeedAndShooter(),
+//            )
 
         driver
             .rightBumper()
             .whileTrue(
                 ParallelCommandGroup(
-                    AimAtTargetCommand(
-                        robotContainer.drive,
-                        { -robotContainer.driveController.leftY },
-                        { -robotContainer.driveController.leftX },
-                        { FieldUtil.HUB_TRANSLATION },
-                    ),
-                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
                     actions.checkAndFeed(),
+                    actions.shuffleIntakeRoller(),
                 ),
             ).onFalse(
-                actions.stopFeedAndShooter(),
+                SequentialCommandGroup(
+                    actions.stopFeed(),
+                    actions.stopIntake(),
+                ),
             )
 
         driver
@@ -83,57 +99,77 @@ class Bindings(
             .onTrue(
                 robotContainer.drive
                     .xLock()
-                    .until(joysticksMovedPastDeadband),
+                    .until(joysticksMovedPastDeadbandTrigger),
             )
+
+        driver
+            .y()
+            .onTrue(
+                actions.prepHubShot(),
+            )
+
+//        driver
+//            .x()
+//            .onTrue(
+//                SequentialCommandGroup(
+//                    actions.prepTrenchShot(),
+//                    PoseAlignCommand(
+//                        robotContainer.drive,
+//                        { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
+//                        driver.povUp()
+//                    ),
+//                    actions.checkAndFeed(),
+//                    ParallelCommandGroup(
+//                        robotContainer.drive.xLock(),
+//                        actions.shuffleIntakePivot()
+//                    ),
+//                ).until(joysticksMovedPastDeadband)
+//                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
+//            )
 
         driver
             .x()
             .onTrue(
-                SequentialCommandGroup(
-                    actions.prepTrenchShot(),
-                    PoseAlignCommand(
-                        robotContainer.drive,
-                    ) { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
-                    actions.checkAndFeed(),
-                    robotContainer.drive.xLock(),
-                ).until(joysticksMovedPastDeadband)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
+                actions.prepTrenchShot(),
             )
 
-        // tower sequence on b()
         driver
             .b()
             .onTrue(
-                SequentialCommandGroup(
-                    actions.prepTowerShot(),
-                    PoseAlignCommand(
-                        robotContainer.drive,
-                    ) { FieldUtil.TOWER_POSE },
-                    actions.checkAndFeed(),
-                    robotContainer.drive.xLock(),
-                ).until(joysticksMovedPastDeadband)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter()) },
+                actions.prepTowerShot(),
             )
 
-        driver
-            .povUp()
-            .onTrue(
-                actions.prepHubShot()
-            )
+//        driver
+//            .b()
+//            .onTrue(
+//                SequentialCommandGroup(
+//                    actions.prepTowerShot(),
+//                    PoseAlignCommand(
+//                        robotContainer.drive,
+//                        { FieldUtil.TOWER_POSE },
+//                        driver.povUp()
+//                    ),
+//                    actions.checkAndFeed(),
+//                    ParallelCommandGroup(
+//                        robotContainer.drive.xLock(),
+//                        actions.shuffleIntakePivot()
+//                    ),
+//                ).until(joysticksMovedPastDeadband)
+//                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
+//            )
 
         driver
-            .povLeft()
+            .povDown()
             .onTrue(
-                actions.prepTrenchShot()
+                actions.outtakeIntakeAndReverseIndex(),
+            ).onFalse(
+                actions.stopIntake(),
             )
 
         driver
             .povRight()
             .onTrue(
-                SequentialCommandGroup(
-                    robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-                    robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(280.0))
-                )
+                robotContainer.shooter.stopFlywheel()
             )
 
         driver
@@ -142,25 +178,81 @@ class Bindings(
                 robotContainer.drive.seedFieldCentric(),
             )
 
-        driver
-            .povDown()
-            .whileTrue(
-                robotContainer.indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED)
-            )
-            .onFalse(
-                robotContainer.indexer.stop()
+        shooterJamTrigger
+            .onTrue(
+                actions.autoUnjam(),
             )
 
-        driver
-            .povDownRight()
+        operator
+            .leftBumper()
+            .whileTrue(
+                actions.outtakeIntakeAndReverseIndex(),
+            )
+
+        operator
+            .a()
             .onTrue(
-                actions.stopFeedAndShooter(),
+                actions.systemCheckCommand(),
+            )
+
+        operator
+            .rightTrigger()
+            .onTrue(
+                actions.deployAndRunIntake(),
+            )
+
+        operator
+            .leftTrigger()
+            .onTrue(
+                actions.stopAndStow(),
+            )
+
+        operator
+            .rightBumper()
+            .onTrue(
+                actions.checkAndFeed(),
+            )
+
+        operator
+            .x()
+            .onTrue(
+                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TRENCH_FLYWHEEL_VEL),
+            )
+
+        operator
+            .y()
+            .onTrue(
+                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TEST_FLYWHEEL_VEL),
+            )
+
+        operator
+            .povDown()
+            .onTrue(
+                actions.homeHood(),
+            )
+
+        operator
+            .povLeft()
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TOWER_HOOD_ANGLE),
             )
 
         operator
             .povUp()
-            .whileTrue(
-                WheelRadiusCharacterizationCommand(robotContainer.drive)
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TRENCH_HOOD_ANGLE),
+            )
+
+        operator
+            .povRight()
+            .onTrue(
+                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.MAX_HOOD_ANGLE),
+            )
+
+        operator
+            .povDownRight()
+            .onTrue(
+                actions.stopFeedAndShooter(),
             )
     }
 }

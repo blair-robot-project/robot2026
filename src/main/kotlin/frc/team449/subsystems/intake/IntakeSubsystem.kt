@@ -3,6 +3,10 @@ package frc.team449.subsystems.intake
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.RepeatCommand
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants.IntakeConstants
 import org.littletonrobotics.junction.Logger
@@ -14,7 +18,7 @@ class IntakeSubsystem(
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
 
     // boolean over position logging increases speed and is easier to read
-    var pivotDeployedState: Boolean = false
+    var pivotIsDeployed: Boolean = false
     var rollerTargetVelocityRadPerSec: Double = 0.0
 
     val intakeSimAngle: Double
@@ -24,8 +28,9 @@ class IntakeSubsystem(
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
 
-        Logger.recordOutput("Intake/PivotDeployedState", pivotDeployedState)
+        Logger.recordOutput("Intake/PivotIsDeployed", pivotIsDeployed)
         Logger.recordOutput("Intake/RollerTargetVelocityRadPerSec", rollerTargetVelocityRadPerSec)
+        Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadPerSec > 10.0))
     }
 
     // roller commands
@@ -58,20 +63,33 @@ class IntakeSubsystem(
             IntakeConstants.DEPLOY_HOLD_VOLTS,
         ).withName("Deploy")
 
-//    fun stow(): Command =
-//        slamHoming(
-//            false,
-//            IntakeConstants.STOW_VOLTS,
-//            IntakeConstants.STOW_HOLD_VOLTS,
-//        ).withName("Stow")
+    fun repeatedlyDeploy(): Command =
+        RepeatCommand(
+            SequentialCommandGroup(
+                deploy()
+                    .withTimeout(1.0),
+                ConditionalCommand(
+                    stow()
+                        .withTimeout(0.5),
+                    InstantCommand(),
+                ) { abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.12 },
+            ),
+        ).withName("Repeated Deploy")
+
+    fun stow(): Command =
+        slamHoming(
+            false,
+            IntakeConstants.STOW_VOLTS,
+            IntakeConstants.STOW_HOLD_VOLTS,
+        ).withName("Stow")
 
     private fun slamHoming(
-        deployedState: Boolean,
+        isDeployed: Boolean,
         moveVolts: Double,
         holdVolts: Double
     ): Command =
         this.defer {
-            pivotDeployedState = deployedState
+            pivotIsDeployed = isDeployed
             val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
 
             this

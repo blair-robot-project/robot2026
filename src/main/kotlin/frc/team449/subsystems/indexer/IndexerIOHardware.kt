@@ -66,13 +66,36 @@ open class IndexerIOHardware : IndexerIO {
             topStatorCurrent,
         )
 
-    private val wedgeIndexerDisconnectedAlert =
-        Alert("Wedge Indexing Motor Disconnected (ID $IndexerConstants.WEDGE_INDEXER_ID).", Alert.AlertType.kError)
-    private val floorIndexerDisconnectedAlert =
-        Alert("Floor Indexing Motor Disconnected (ID $IndexerConstants.FLOOR_INDEXER_ID).", Alert.AlertType.kError)
+    private val wedgeMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            wedgeVelocity,
+            wedgeVoltage,
+            wedgeStatorCurrent,
+            wedgeSupplyCurrent,
+        )
 
+    private val topMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            topVelocity,
+            topVoltage,
+            topStatorCurrent,
+            topSupplyCurrent,
+        )
+
+    private val floorMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            floorVelocity,
+            floorVoltage,
+            floorStatorCurrent,
+            floorSupplyCurrent,
+        )
+
+    private val wedgeIndexerDisconnectedAlert =
+        Alert("Wedge Indexing Motor Disconnected (ID ${IndexerConstants.WEDGE_INDEXER_ID}).", Alert.AlertType.kError)
+    private val floorIndexerDisconnectedAlert =
+        Alert("Floor Indexing Motor Disconnected (ID ${IndexerConstants.FLOOR_INDEXER_ID}).", Alert.AlertType.kError)
     private val topIndexerDisconnectedAlert =
-        Alert("Top Indexing Motor Disconnected (ID $IndexerConstants.TOP_INDEXER_ID)", Alert.AlertType.kError)
+        Alert("Top Indexing Motor Disconnected (ID ${IndexerConstants.TOP_INDEXER_ID}).", Alert.AlertType.kError)
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(wedgeIndexer, floorIndexer, topIndexer)
@@ -86,8 +109,6 @@ open class IndexerIOHardware : IndexerIO {
 
         PhoenixUtil.registerSignals(*lowPrioritySignals, *highPrioritySignals)
     }
-
-    private var isAliveCounter = 0
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
         inputs.wedgeVelocityRadPerSec = wedgeVelocity.value.`in`(Units.RadiansPerSecond)
@@ -108,27 +129,28 @@ open class IndexerIOHardware : IndexerIO {
         inputs.topSupplyCurrentAmps = topSupplyCurrent.value.`in`(Units.Amps)
         inputs.topTempCelsius = topTemperature.value.`in`(Units.Celsius)
 
-        if (isAliveCounter++ >= 50) {
-            isAliveCounter = 0
-            wedgeIndexerDisconnectedAlert.set(!wedgeIndexer.isAlive)
-            floorIndexerDisconnectedAlert.set(!floorIndexer.isAlive)
-            topIndexerDisconnectedAlert.set(!topIndexer.isAlive)
-        }
+        wedgeIndexerDisconnectedAlert.set(!wedgeMotorConnected)
+        floorIndexerDisconnectedAlert.set(!floorMotorConnected)
+        topIndexerDisconnectedAlert.set(!topMotorConnected)
     }
 
     override fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {
-        floorIndexer.setControl(floorVelocityRequest.withVelocity(floorSurfaceSpeed),)
+        floorIndexer.setControl(floorVelocityRequest.withVelocity(floorSurfaceSpeed))
     }
 
     override fun setWedgeSpeed(wedgeSurfaceSpeed: AngularVelocity) {
-        wedgeIndexer.setControl(wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed),)
+        wedgeIndexer.setControl(wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed))
     }
 
     override fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {
-        topIndexer.setControl(topVelocityRequest.withVelocity(topSurfaceSpeed),)
+        topIndexer.setControl(topVelocityRequest.withVelocity(topSurfaceSpeed))
     }
 
-    override fun setIndexerVoltage(floorVolts: Double, wedgeVolts: Double, topVolts: Double) {
+    override fun setIndexerVoltage(
+        floorVolts: Double,
+        wedgeVolts: Double,
+        topVolts: Double
+    ) {
         floorIndexer.setControl(floorVoltageRequest.withOutput(floorVolts))
         wedgeIndexer.setControl(wedgeVoltageRequest.withOutput(wedgeVolts))
         topIndexer.setControl(topVoltageRequest.withOutput(topVolts))

@@ -11,8 +11,12 @@ import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.smartdashboard.Field2d
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
@@ -24,6 +28,9 @@ class DriveSubsystem(
     private val io: DriveIO
 ) : SubsystemBase() {
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+    private val field: Field2d = Field2d().apply {
+        SmartDashboard.putData("Field", this)
+    }
 
     val pose: Pose2d
         get() = inputs.Pose
@@ -34,10 +41,9 @@ class DriveSubsystem(
     override fun periodic() {
         io.updateInputs(inputs)
         io.logModules(inputs)
+        field.robotPose = pose
 
         Logger.processInputs("Drive", inputs)
-
-        // couldn't find a good way to do it in the io, so just sticking it on here
         Logger.recordOutput(
             "Drive/ActiveCommand",
             currentCommand?.name ?: "None",
@@ -60,23 +66,27 @@ class DriveSubsystem(
             inputs.Pose.rotation,
         )
 
-    fun seedFieldCentric(): Command = runOnce { io.seedFieldCentric() }
-
-    // should only be called in driverStationConnected() to prevent null alliance
-    fun setOperatorPerspectiveForward() {
-        io.setOperatorPerspectiveForward(
-            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-                Rotation2d.kZero
-            } else {
-                Rotation2d.k180deg
-            },
-        )
+    fun seedFieldCentric(): Command = runOnce {
+        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+            io.seedFieldCentric(Rotation2d.kZero)
+        } else {
+            io.seedFieldCentric(Rotation2d.k180deg)
+        }
     }
 
-    fun xLock(): Command =
-        run {
-            io.setControl(SwerveRequest.SwerveDriveBrake())
+    // should only be called in autoInit() to prevent null alliance
+    fun setOperatorPerspectiveForward() {
+        var forward: Rotation2d = Rotation2d.kZero
+
+        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            forward = Rotation2d.k180deg
         }
+
+        io.setOperatorPerspectiveForward(forward)
+        CommandScheduler.getInstance().schedule(PrintCommand(forward.toString()))
+    }
+
+    fun xLock(): Command = run { io.setControl(SwerveRequest.SwerveDriveBrake()) }
 
     fun alignModules(direction: Rotation2d): Command =
         run {

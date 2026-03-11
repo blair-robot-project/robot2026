@@ -1,14 +1,19 @@
 package frc.team449.subsystems
-import edu.wpi.first.units.Units.Degrees
+
+import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.PrintCommand
+import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
+import frc.team449.commands.SystemCheckCommand
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
@@ -16,7 +21,7 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 import java.util.function.Supplier
 
 class RobotActions(
-    robotContainer: RobotContainer
+    private val robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -26,17 +31,72 @@ class RobotActions(
     fun deployAndToggleIntake(): Command =
         SequentialCommandGroup(
             ConditionalCommand(
-                intake.stopRollers(),
-                intake.intake(),
+                ParallelCommandGroup(
+                    intake.stopRollers(),
+                    indexer.stop(),
+                ),
+                ParallelCommandGroup(
+                    intake.intake(),
+                    indexer.index(
+                        IndexerConstants.INTAKING_INDEXER_SPEED,
+                        IndexerConstants.INTAKING_INDEXER_SPEED,
+                        RadiansPerSecond.of(0.0),
+                    ),
+                ),
             ) { intake.rollerTargetVelocityRadPerSec != 0.0 },
             intake.deploy(),
         )
 
+    fun deployAndRunIntake(): Command =
+        SequentialCommandGroup(
+            shooter.stopFlywheel(),
+            intake.intake(),
+            indexer.index(
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                RadiansPerSecond.of(0.0),
+            ),
+            intake.deploy(),
+        )
+
+    fun autoDeployAndRunIntake(): Command =
+        SequentialCommandGroup(
+            intake.intake(),
+            indexer.index(
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                RadiansPerSecond.of(0.0),
+            ),
+            intake.deploy()
+        )
+
     fun stopAndStow(): Command =
         SequentialCommandGroup(
+            indexer.index(
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                IndexerConstants.INTAKING_INDEXER_SPEED,
+                RadiansPerSecond.of(0.0),
+            ),
             intake.stopRollers(),
-            //   intake.stow(),
+            intake.stow(),
+            indexer.stop(),
         )
+
+    fun shuffleIntakeRoller(): Command =
+        SequentialCommandGroup(
+            intake.intake(),
+            WaitCommand(1.0),
+            intake.outtake(),
+            WaitCommand(0.2),
+        ).repeatedly()
+
+    fun shuffleIntakePivot(): Command =
+        SequentialCommandGroup(
+            intake.deploy(),
+            WaitCommand(0.6),
+            intake.stow(),
+            WaitCommand(0.3),
+        ).repeatedly()
 
     fun stopIntake(): Command = intake.stopRollers()
 
@@ -52,16 +112,20 @@ class RobotActions(
             shooter.setHoodAngle(ShooterConstants.HUB_HOOD_ANGLE),
         )
 
-    fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
-        shooter.setFlywheelAndHoodFromSuppliers(
-            { RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get())) },
-            { Degrees.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) },
-        )
-
     fun prepTowerShot(): Command =
         SequentialCommandGroup(
             shooter.setFlywheelVelocity(ShooterConstants.TOWER_FLYWHEEL_VEL),
             shooter.setHoodAngle(ShooterConstants.TOWER_HOOD_ANGLE),
+        )
+
+    fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
+        shooter.setFlywheelAndHoodFromSuppliers(
+            {
+                RadiansPerSecond.of(
+                    ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()),
+                )
+            },
+            { Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())) },
         )
 
     fun checkAndFeed(): Command =
@@ -69,7 +133,34 @@ class RobotActions(
             WaitUntilCommand {
                 shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance()
             },
-            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+            indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).repeatedly(),
+        )
+
+    fun autoUnjam(): Command =
+        SequentialCommandGroup(
+            PrintCommand("AUTO UNJAM!"),
+            RepeatCommand(
+                ParallelCommandGroup(
+                    robotContainer.indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
+                    robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
+                )
+            ).withTimeout(0.25),
+            stopFeed(),
+            robotContainer.shooter.setFlywheelVelocity(ShooterConstants.HUB_FLYWHEEL_VEL),
+        )
+
+    fun autonUnjamAndShoot(): Command =
+        SequentialCommandGroup(
+            PrintCommand("AUTO UNJAM!"),
+            RepeatCommand(
+                ParallelCommandGroup(
+                    robotContainer.indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
+                    robotContainer.shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
+                )
+            ).withTimeout(0.25),
+            stopFeed(),
+            robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TOWER_FLYWHEEL_VEL),
+            checkAndFeed()
         )
 
     fun stopFeed(): Command = indexer.stop()
@@ -82,10 +173,18 @@ class RobotActions(
 
     fun homeHood(): Command = shooter.homeHood()
 
+    fun outtakeIntakeAndReverseIndex(): Command =
+        ParallelCommandGroup(
+            intake.outtake(),
+            indexer.index(RadiansPerSecond.of(-30.0)),
+        )
+
     fun autoTrenchShot(): Command =
         SequentialCommandGroup(
             prepTrenchShot(),
-            checkAndFeed(),
+            checkAndFeed().alongWith(
+                shuffleIntakeRoller(), // should add pivot shuffle?
+            ),
         )
 
     fun autoHubShot(): Command =
@@ -93,4 +192,6 @@ class RobotActions(
             prepHubShot(),
             checkAndFeed(),
         )
+
+    fun systemCheckCommand(): Command = SystemCheckCommand(robotContainer)
 }
