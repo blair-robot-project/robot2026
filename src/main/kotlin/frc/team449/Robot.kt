@@ -19,8 +19,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 
-/** The main class of the robot, constructs all the subsystems
- * and initializes default commands . */
 class Robot : LoggedRobot() {
     init {
         println("Initializing Robot!")

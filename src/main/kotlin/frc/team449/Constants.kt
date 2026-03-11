@@ -23,7 +23,7 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-    const val TUNING_MODE: Boolean = false
+    const val TUNING_MODE: Boolean = true
 
     // --- SYSTEM TIMING ---
     const val LOOP_TIME = 0.02

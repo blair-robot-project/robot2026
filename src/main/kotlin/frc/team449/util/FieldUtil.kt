@@ -64,7 +64,10 @@ object FieldUtil {
     fun updateAutoWinner() {
         val autoWinner = DriverStation.getGameSpecificMessage()
 
-        if (autoWinner.isBlank()) return
+        // recursive method -- FMS takes ~5 seconds after teleopInit to updateAutoWinner
+        if (autoWinner.isBlank()) {
+            updateAutoWinner()
+        }
 
         if (autoWinner == "R") Logger.recordOutput("Auto Winner", Color.kRed.toHexString())
         if (autoWinner == "B") Logger.recordOutput("Auto Winner", Color.kBlue.toHexString())

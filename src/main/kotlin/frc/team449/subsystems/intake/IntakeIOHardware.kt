@@ -109,6 +109,7 @@ open class IntakeIOHardware : IntakeIO {
 
     private val pivotVoltageRequest = VoltageOut(0.0)
     private val rollerVelocityRequest = VelocityVoltage(0.0)
+    private val rollerVoltageRequest = VoltageOut(0.0)
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(leftPivotLeader, rightPivotFollower, leftRollerLeader, rightRollerFollower)
@@ -167,7 +168,7 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     override fun setRollerVoltage(volts: Double) {
-        leftRollerLeader.setControl(pivotVoltageRequest.withOutput(volts))
+        leftRollerLeader.setControl(rollerVoltageRequest.withOutput(volts))
     }
 
     companion object {

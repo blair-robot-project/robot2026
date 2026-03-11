@@ -50,13 +50,13 @@ class RobotActions(
     fun deployAndRunIntake(): Command =
         SequentialCommandGroup(
             shooter.stopFlywheel(),
+            intake.deploy(),
             intake.intake(),
             indexer.index(
                 IndexerConstants.INTAKING_INDEXER_SPEED,
                 IndexerConstants.INTAKING_INDEXER_SPEED,
                 RadiansPerSecond.of(0.0),
             ),
-            intake.deploy(),
         )
 
     fun autoDeployAndRunIntake(): Command =

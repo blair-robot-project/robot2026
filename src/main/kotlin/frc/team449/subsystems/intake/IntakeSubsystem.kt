@@ -15,11 +15,11 @@ import kotlin.math.abs
 class IntakeSubsystem(
     private val io: IntakeIO
 ) : SubsystemBase() {
-    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() // should not be public
+    private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged() 
 
     // boolean over position logging increases speed and is easier to read
     var pivotIsDeployed: Boolean = false
-    var rollerTargetVelocityRadPerSec: Double = 0.0
+    var rollerTargetVolts: Double = 0.0
 
     val intakeSimAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
@@ -29,59 +29,49 @@ class IntakeSubsystem(
         Logger.processInputs("Intake", inputs)
 
         Logger.recordOutput("Intake/PivotIsDeployed", pivotIsDeployed)
-        Logger.recordOutput("Intake/RollerTargetVelocityRadPerSec", rollerTargetVelocityRadPerSec)
+        Logger.recordOutput("Intake/RollerTargetVolts", rollerTargetVolts)
         Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadPerSec > 10.0))
     }
 
-    // roller commands
     fun intake(): Command =
         this
             .runOnce {
-                rollerTargetVelocityRadPerSec = IntakeConstants.INTAKE_VELOCITY.`in`(RadiansPerSecond)
-                io.setRollerVelocity(IntakeConstants.INTAKE_VELOCITY)
-            }.withName("Intake")
+                rollerTargetVolts = 11.0
+                io.setRollerVoltage(11.0)
+            }
+                .withName("Intake")
 
     fun outtake(): Command =
         this
             .runOnce {
-                rollerTargetVelocityRadPerSec = IntakeConstants.OUTTAKE_VELOCITY.`in`(RadiansPerSecond)
-                io.setRollerVelocity(IntakeConstants.OUTTAKE_VELOCITY)
-            }.withName("Outtake")
+                rollerTargetVolts = -4.0
+                io.setRollerVoltage(-4.0)
+            }
+                .withName("Outtake")
 
     fun stopRollers(): Command =
         this
             .runOnce {
-                rollerTargetVelocityRadPerSec = 0.0
+                rollerTargetVolts = 0.0
                 io.setRollerVoltage(0.0)
-            }.withName("Stop Rollers")
+            }
+                .withName("StopRoller")
 
-    // slam commands
     fun deploy(): Command =
         slamHoming(
             true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
-        ).withName("Deploy")
-
-    fun repeatedlyDeploy(): Command =
-        RepeatCommand(
-            SequentialCommandGroup(
-                deploy()
-                    .withTimeout(1.0),
-                ConditionalCommand(
-                    stow()
-                        .withTimeout(0.5),
-                    InstantCommand(),
-                ) { abs(inputs.leftPivotLeaderPositionRad - IntakeConstants.DEPLOY_POS_RADS) < 0.12 },
-            ),
-        ).withName("Repeated Deploy")
+        )
+            .withName("Deploy")
 
     fun stow(): Command =
         slamHoming(
             false,
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
-        ).withName("Stow")
+        )
+            .withName("Stow")
 
     private fun slamHoming(
         isDeployed: Boolean,
