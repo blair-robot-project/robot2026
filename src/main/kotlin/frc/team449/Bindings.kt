@@ -1,9 +1,11 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.commands.ShootAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
@@ -18,6 +20,12 @@ class Bindings(
             abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
                 abs(driver.rightX) > 0.25
         }
+    val aimbotExitTrigger: Trigger =
+        Trigger {
+            abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
+                abs(driver.rightX) > 0.25 || driver.rightBumper().asBoolean
+        } // exit if the right bumper stops being held down or driver moves
+
     val shooterJamTrigger = robotContainer.shooter.shooterJamTrigger
 
     fun setDefaultCommands() {
@@ -50,36 +58,31 @@ class Bindings(
 
             )
 
+        driver
+            .rightBumper()
+            .onTrue(
+                Commands.sequence(
+                    ShootAtTargetCommand(
+                        robotContainer.drive,
+                        actions,
+                        aimbotExitTrigger
+                    ) { FieldUtil.HUB_TRANSLATION },
+                    actions.stopFeedAndShooter()
+                )
+            )
 //        driver
 //            .rightBumper()
 //            .whileTrue(
 //                ParallelCommandGroup(
-//                    AimAtTargetCommand(
-//                        robotContainer.drive,
-//                        { -robotContainer.driveController.leftY },
-//                        { -robotContainer.driveController.leftX },
-//                        { FieldUtil.HUB_TRANSLATION },
-//                    ),
-//                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
 //                    actions.checkAndFeed(),
+//                    actions.shuffleIntakeRoller(),
 //                ),
 //            ).onFalse(
-//                actions.stopFeedAndShooter(),
+//                SequentialCommandGroup(
+//                    actions.stopFeed(),
+//                    actions.stopIntake(),
+//                ),
 //            )
-
-        driver
-            .rightBumper()
-            .whileTrue(
-                ParallelCommandGroup(
-                    actions.checkAndFeed(),
-                    actions.shuffleIntakeRoller(),
-                ),
-            ).onFalse(
-                SequentialCommandGroup(
-                    actions.stopFeed(),
-                    actions.stopIntake(),
-                ),
-            )
 
         driver
             .leftBumper()
