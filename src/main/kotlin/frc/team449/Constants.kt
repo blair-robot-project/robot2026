@@ -313,6 +313,8 @@ object Constants {
         const val AIMBOT_KP = 10.0
         const val AIMBOT_KI = 0.0
         const val AIMBOT_KD = 0.5
+
+        const val AIMBOT_HEADING_TOLERANCE = 0.07 // in radians, 4 degrees
     }
 
     object LEDConstants {
