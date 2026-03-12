@@ -111,10 +111,9 @@ open class DriveIOHardware(
         super<SwerveDrivetrain>.setStateStdDevs(visionMeasurementStdDevs)
     }
 
+    val driveCurrentLimitConfig = CurrentLimitsConfigs()
+    val steerCurrentLimitConfig = CurrentLimitsConfigs()
     override fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
-        val driveCurrentLimitConfig = CurrentLimitsConfigs()
-        val steerCurrentLimitConfig = CurrentLimitsConfigs()
-
         for (i in 0 until modules.count()) {
             driveCurrentLimitConfig.SupplyCurrentLimit = driveSupplyLimitAmps
             steerCurrentLimitConfig.SupplyCurrentLimit = steerSupplyLimitAmps

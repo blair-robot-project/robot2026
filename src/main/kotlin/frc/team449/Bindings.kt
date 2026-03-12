@@ -1,13 +1,17 @@
 package frc.team449
 
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.DeferredCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.Subsystem
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import frc.team449.commands.ShootAtTargetCommand
+import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.subsystems.power.PowerProfile
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -64,16 +68,25 @@ class Bindings(
             .whileTrue(
                 DeferredCommand(
                     {
-                        ShootAtTargetCommand(
-                            robotContainer.drive,
-                            robotContainer.power,
-                            actions,
-                            FieldUtil.HUB_TRANSLATION
+                        SequentialCommandGroup(
+                            AimAtTargetCommand(
+                                robotContainer.drive,
+                                robotContainer.power,
+                                actions,
+                                FieldUtil.HUB_TRANSLATION
+                            ),
+                            PrintCommand("Align Complete!"),
+                            ParallelCommandGroup(
+                                robotContainer.drive.xLock(),
+                                actions.checkAndFeed(),
+                                actions.shuffleIntakePivot()
+                            )
                         )
                     },
-                    setOf<Subsystem>(robotContainer.drive, robotContainer.intake, robotContainer.indexer, robotContainer.shooter)
+                    setOf<Subsystem>(robotContainer.intake, robotContainer.indexer)
                 )
                     .until(joysticksMovedPastDeadbandTrigger)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(robotContainer.power.requestProfile(PowerProfile.DRIVING)) }
             )
 
         driver

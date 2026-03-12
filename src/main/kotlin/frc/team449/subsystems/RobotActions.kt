@@ -80,9 +80,9 @@ class RobotActions(
     fun checkAndFeed(): Command =
         RepeatCommand(
             ConditionalCommand(
-                indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+                indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).withTimeout(0.25),
                 indexer.stop()
-            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() }
+            ) { shooter.isFlywheelAtTolerance() && shooter.isFlywheelAtTolerance() }
         )
 
     fun autoUnjam(): Command =

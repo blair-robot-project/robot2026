@@ -157,17 +157,17 @@ open class IndexerIOHardware : IndexerIO {
         topIndexer.setControl(topVoltageRequest.withOutput(topVolts))
     }
 
+    val floorCurrentConfig = CurrentLimitsConfigs()
+    val wedgeCurrentConfig = CurrentLimitsConfigs()
+    val topCurrentConfig = CurrentLimitsConfigs()
     override fun setSupplyLimits(
         floorSupplyLimitAmps: Double,
         wedgeSupplyLimitAmps: Double,
         topSupplyLimitAmps: Double
     ) {
-        val floorCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(floorSupplyLimitAmps)
-        val wedgeCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(wedgeSupplyLimitAmps)
-        val topCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(topSupplyLimitAmps)
+        floorCurrentConfig.SupplyCurrentLimit = floorSupplyLimitAmps
+        wedgeCurrentConfig.SupplyCurrentLimit = wedgeSupplyLimitAmps
+        topCurrentConfig.SupplyCurrentLimit = topSupplyLimitAmps
 
         floorIndexer.configurator.apply(floorCurrentConfig, 0.0)
         wedgeIndexer.configurator.apply(wedgeCurrentConfig, 0.0)

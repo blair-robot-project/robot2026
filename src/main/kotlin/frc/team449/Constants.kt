@@ -266,10 +266,10 @@ object Constants {
         const val WEDGE_STATOR_LIMIT = 30.0
         const val WEDGE_SUPPLY_LIMIT = 10.0
 
-        const val FLOOR_STATOR_LIMIT = 20.0
+        const val FLOOR_STATOR_LIMIT = 30.0
         const val FLOOR_SUPPLY_LIMIT = 10.0
 
-        const val TOP_STATOR_LIMIT = 60.0
+        const val TOP_STATOR_LIMIT = 80.0
         const val TOP_SUPPLY_LIMIT = 30.0
 
         // --- PHYSICAL SPECS & GEARING ---

@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.Constants.AimbotConstants
 import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.RobotActions
@@ -15,9 +14,10 @@ import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import org.littletonrobotics.junction.Logger
+import kotlin.math.PI
 import kotlin.math.abs
 
-class ShootAtTargetCommand(
+class AimAtTargetCommand(
     private val drive: DriveSubsystem,
     private val power: PowerSubsystem,
     private val actions: RobotActions,
@@ -29,7 +29,7 @@ class ShootAtTargetCommand(
         .withDriveRequestType(SwerveModule.DriveRequestType.Velocity,)
         .withHeadingPID(AimbotConstants.AIMBOT_KP, AimbotConstants.AIMBOT_KI, AimbotConstants.AIMBOT_KD,)
 
-    private var shootingSequenceStarted = false
+    var headingErrorRad: Double = 2 * PI
 
     init {
         addRequirements(drive)
@@ -37,6 +37,7 @@ class ShootAtTargetCommand(
 
     override fun initialize() {
         power.requestProfile(PowerProfile.SHOOTING)
+        println("Initializing AimAtTargetCommand")
     }
 
     override fun execute() {
@@ -47,28 +48,24 @@ class ShootAtTargetCommand(
         val isRed = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
         val targetHeading = if (isRed) translationToTarget.angle.plus(Rotation2d.fromDegrees(180.0)) else translationToTarget.angle
 
-        val headingErrorRad = abs(currentPose.rotation.minus(targetHeading).radians)
-        if (headingErrorRad < AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS && !shootingSequenceStarted) {
-            CommandScheduler.getInstance().schedule(
-                SequentialCommandGroup(
-                    drive.xLock(),
-                    actions.prepShotFromAnywhere(distance),
-                    actions.checkAndFeed(),
-                    actions.shuffleIntakePivot()
-                )
-            )
+        drive.setControl(
+            request
+                .withVelocityX(0.0)
+                .withVelocityY(0.0)
+                .withTargetDirection(targetHeading)
+        )
 
-            shootingSequenceStarted = true
-        } else {
-            drive.setControl(
-                request
-                    .withVelocityX(0.0)
-                    .withVelocityY(0.0)
-                    .withTargetDirection(targetHeading)
-            )
-        }
+        CommandScheduler.getInstance().schedule(
+            actions.prepShotFromAnywhere(distance)
+        )
+
+        headingErrorRad = abs(currentPose.rotation.minus(targetHeading).radians)
 
         Logger.recordOutput("Aimbot/HeadingErrorRads", headingErrorRad)
         Logger.recordOutput("Aimbot/DistanceToHubMeters", distance)
     }
+
+    override fun isFinished(): Boolean = (headingErrorRad < AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS)
+
+    override fun end(interrupted: Boolean) = println("AimAtTargetCommand interrupted: $interrupted")
 }

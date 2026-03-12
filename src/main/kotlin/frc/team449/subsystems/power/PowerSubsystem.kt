@@ -14,7 +14,7 @@ class PowerSubsystem(
     private val indexer: IndexerSubsystem,
     private val shooter: ShooterSubsystem
 ) : SubsystemBase() {
-    var lastProfile: PowerProfile = PowerProfile.DRIVING
+    var lastProfile: PowerProfile = PowerProfile.LOW_BATTERY
     var currentProfile: PowerProfile = PowerProfile.DRIVING
 
     override fun periodic() {
@@ -31,14 +31,19 @@ class PowerSubsystem(
         )
         shooter.setSupplyLimits(currentProfileLimits.flywheelSupplyLimit, currentProfileLimits.hoodSupplyLimit)
 
-        Logger.recordOutput("/Power/DriveSupplyLimit", currentProfileLimits.driveSupplyLimit)
-        Logger.recordOutput("/Power/PivotSupplyLimit", currentProfileLimits.pivotSupplyLimit)
-        Logger.recordOutput("/Power/RollerSupplyLimit", currentProfileLimits.rollerSupplyLimit)
-        Logger.recordOutput("/Power/FloorSupplyLimit", currentProfileLimits.floorIndexerSupplyLimit)
-        Logger.recordOutput("/Power/WedgeSupplyLimit", currentProfileLimits.wedgeIndexerSupplyLimit)
-        Logger.recordOutput("/Power/TopSupplyLimit", currentProfileLimits.topIndexerSupplyLimit)
-        Logger.recordOutput("/Power/FlywheelSupplyLimit", currentProfileLimits.flywheelSupplyLimit)
-        Logger.recordOutput("/Power/HoodSupplyLimit", currentProfileLimits.hoodSupplyLimit)
+        Logger.recordOutput(
+            "Power/CurrentLimits",
+            doubleArrayOf(
+                currentProfileLimits.driveSupplyLimit,
+                currentProfileLimits.pivotSupplyLimit,
+                currentProfileLimits.rollerSupplyLimit,
+                currentProfileLimits.floorIndexerSupplyLimit,
+                currentProfileLimits.wedgeIndexerSupplyLimit,
+                currentProfileLimits.topIndexerSupplyLimit,
+                currentProfileLimits.flywheelSupplyLimit,
+                currentProfileLimits.hoodSupplyLimit,
+            )
+        )
     }
 
     fun requestProfile(requestedProfile: PowerProfile): Command =

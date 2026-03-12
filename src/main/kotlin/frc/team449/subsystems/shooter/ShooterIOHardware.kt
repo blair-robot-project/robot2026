@@ -246,13 +246,13 @@ open class ShooterIOHardware : ShooterIO {
         hoodMotor.configurator.apply(hoodSlot0Config)
     }
 
+    val flywheelCurrentConfig = CurrentLimitsConfigs()
+    val hoodCurrentConfig = CurrentLimitsConfigs()
     override fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {
-        val flywheelCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(flywheelSupplyLimitAmps)
-            .withStatorCurrentLimit(ShooterConstants.FLYWHEEL_STATOR_LIM)
-        val hoodCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(hoodSupplyLimitAmps)
-            .withStatorCurrentLimit(ShooterConstants.HOOD_STATOR_LIM)
+        flywheelCurrentConfig.SupplyCurrentLimit = flywheelSupplyLimitAmps
+        flywheelCurrentConfig.StatorCurrentLimit = ShooterConstants.FLYWHEEL_STATOR_LIM
+        hoodCurrentConfig.SupplyCurrentLimit = hoodSupplyLimitAmps
+        hoodCurrentConfig.StatorCurrentLimit = ShooterConstants.HOOD_STATOR_LIM
 
         leftLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
         leftFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)

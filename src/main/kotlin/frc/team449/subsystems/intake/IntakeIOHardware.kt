@@ -172,19 +172,19 @@ open class IntakeIOHardware : IntakeIO {
         leftRollerLeader.setControl(rollerVoltageRequest.withOutput(volts))
     }
 
+    val pivotCurrentConfig = CurrentLimitsConfigs()
+    val rollerCurrentConfig = CurrentLimitsConfigs()
     override fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
-        val pivotCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(pivotSupplyLimitAmps)
-            .withStatorCurrentLimit(IntakeConstants.PIVOT_STATOR_LIMIT)
-        val rollerCurrentConfig = CurrentLimitsConfigs()
-            .withSupplyCurrentLimit(rollerSupplyLimitAmps)
-            .withStatorCurrentLimit(IntakeConstants.ROLLER_STATOR_LIMIT)
+        pivotCurrentConfig.SupplyCurrentLimit = pivotSupplyLimitAmps
+        pivotCurrentConfig.StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
+        rollerCurrentConfig.SupplyCurrentLimit = rollerSupplyLimitAmps
+        rollerCurrentConfig.StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
 
         leftPivotLeader.configurator.apply(pivotCurrentConfig, 0.0)
         rightPivotFollower.configurator.apply(pivotCurrentConfig, 0.0)
 
-        leftRollerLeader.configurator.refresh(rollerCurrentConfig, 0.0)
-        rightRollerFollower.configurator.refresh(rollerCurrentConfig, 0.0)
+        leftRollerLeader.configurator.apply(rollerCurrentConfig, 0.0)
+        rightRollerFollower.configurator.apply(rollerCurrentConfig, 0.0)
     }
 
     companion object {
