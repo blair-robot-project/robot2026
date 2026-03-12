@@ -48,5 +48,7 @@ interface DriveIO {
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}
 
+    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {}
+
     fun logModules(driveState: SwerveDriveState) {}
 }

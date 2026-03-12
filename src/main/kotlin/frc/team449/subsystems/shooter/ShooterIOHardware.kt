@@ -1,6 +1,8 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
 import com.ctre.phoenix6.controls.PositionVoltage
@@ -18,6 +20,7 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.ShooterConstants
 import frc.team449.util.PhoenixUtil
+import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class ShooterIOHardware : ShooterIO {
     val leftLeaderMotor = TalonFX(ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
@@ -26,12 +29,9 @@ open class ShooterIOHardware : ShooterIO {
     val rightFollowerMotor = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID)
     val hoodMotor = TalonFX(ShooterConstants.HOOD_MOTOR_ID)
 
-    private val flywheelVelocityRequest =
-        VelocityVoltage(0.0)
-            .withEnableFOC(false)
-            .withSlot(0)
+    private val flywheelVelocityRequest = VelocityVoltage(0.0)
     private val flywheelVoltageRequest = VoltageOut(0.0)
-    private val hoodPositionRequest = PositionVoltage(0.0)
+    private val hoodAngleRequest = PositionVoltage(0.0)
     private val hoodVoltageRequest = VoltageOut(0.0)
 
     private val leftLeaderVelocity = leftLeaderMotor.velocity
@@ -56,9 +56,8 @@ open class ShooterIOHardware : ShooterIO {
     private val rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
     private val rightFollowerTemperature = rightFollowerMotor.deviceTemp
 
-    private val hoodPosition = hoodMotor.position
+    private val hoodAngle = hoodMotor.position
     private val hoodVelocity = hoodMotor.velocity
-    private val hoodTargetPosition = hoodMotor.closedLoopReference
     private val hoodMotorVoltage = hoodMotor.motorVoltage
     private val hoodSupplyCurrent = hoodMotor.supplyCurrent
     private val hoodStatorCurrent = hoodMotor.statorCurrent
@@ -79,7 +78,6 @@ open class ShooterIOHardware : ShooterIO {
             rightFollowerStatorCurrent,
             rightFollowerTemperature,
             hoodVelocity,
-            hoodTargetPosition,
             hoodMotorVoltage,
             hoodSupplyCurrent,
             hoodTemperature,
@@ -93,42 +91,41 @@ open class ShooterIOHardware : ShooterIO {
             rightLeaderVelocity,
             rightLeaderMotorVoltage,
             rightLeaderStatorCurrent,
-            hoodPosition,
+            hoodAngle,
             hoodStatorCurrent,
         )
 
-    private val hoodMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
-            hoodPosition,
+    private val hoodMotorConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
+            hoodAngle,
             hoodVelocity,
             hoodMotorVoltage,
             hoodSupplyCurrent,
             hoodStatorCurrent,
         )
 
-    private val leftLeaderShooterMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
+    private val leftLeaderShooterMotorConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
             leftLeaderVelocity,
             leftLeaderMotorVoltage,
             leftLeaderStatorCurrent,
         )
 
-    private val leftFollowerShooterMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
+    private val leftFollowerShooterMotorConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
             leftFollowerMotorVoltage,
             leftFollowerSupplyCurrent,
             leftFollowerStatorCurrent,
         )
 
-    private val rightLeaderShooterMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
-            rightLeaderVelocity,
-            rightLeaderMotorVoltage,
-            rightLeaderStatorCurrent,
-        )
+    private val rightLeaderShooterMotorConnected: Boolean get() = BaseStatusSignal.isAllGood(
+        rightLeaderVelocity,
+        rightLeaderMotorVoltage,
+        rightLeaderStatorCurrent,
+    )
 
-    private val rightFollowerShooterMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
+    private val rightFollowerShooterMotorConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
             leftFollowerMotorVoltage,
             rightFollowerSupplyCurrent,
             rightFollowerStatorCurrent,
@@ -142,14 +139,15 @@ open class ShooterIOHardware : ShooterIO {
         Alert("Left Leader Flywheel Motor Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
     private val rightFollowerDisconnectedAlert =
         Alert("Right Leader Flywheel Motor Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
-    private val hoodDisconnectedAlert = Alert("Hood Motor Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
+    private val hoodDisconnectedAlert =
+        Alert("Hood Motor Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
 
     init {
-        leftLeaderMotor.configurator.apply(leftFlywheelConfig)
-        leftFollowerMotor.configurator.apply(leftFlywheelConfig)
-        rightLeaderMotor.configurator.apply(rightFlywheelConfig)
-        rightFollowerMotor.configurator.apply(rightFlywheelConfig)
-        hoodMotor.configurator.apply(hoodConfig)
+        tryUntilOk(5) { leftLeaderMotor.configurator.apply(leftFlywheelConfig) }
+        tryUntilOk(5) { leftFollowerMotor.configurator.apply(leftFlywheelConfig) }
+        tryUntilOk(5) { rightLeaderMotor.configurator.apply(rightFlywheelConfig) }
+        tryUntilOk(5) { rightFollowerMotor.configurator.apply(rightFlywheelConfig) }
+        tryUntilOk(5) { hoodMotor.configurator.apply(hoodConfig) }
 
         leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT))
         rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT))
@@ -160,10 +158,9 @@ open class ShooterIOHardware : ShooterIO {
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
 
         PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
-        resetHoodPosition(ShooterConstants.MIN_HOOD_ANGLE)
-    }
 
-    private var isAliveCounter = 0
+        resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+    }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
@@ -190,7 +187,7 @@ open class ShooterIOHardware : ShooterIO {
         inputs.rightFollowerStatorCurrentAmps = rightFollowerStatorCurrent.value.`in`(Amps)
         inputs.rightFollowerTempCelsius = rightFollowerTemperature.value.`in`(Celsius)
 
-        inputs.hoodPositionRad = hoodPosition.value.`in`(Radians)
+        inputs.hoodAngleRad = hoodAngle.value.`in`(Radians)
         inputs.hoodVelocityRadPerSec = hoodVelocity.value.`in`(RadiansPerSecond)
         inputs.hoodAppliedVolts = hoodMotorVoltage.value.`in`(Volts)
         inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
@@ -204,27 +201,64 @@ open class ShooterIOHardware : ShooterIO {
         rightFollowerDisconnectedAlert.set(!rightFollowerShooterMotorConnected)
     }
 
-    override fun setFlywheelVelocity(velocity: AngularVelocity) {
-        leftLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
-        rightLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
-    }
-
-    // probably used for characterization
     override fun setFlywheelVoltage(volts: Double) {
         leftLeaderMotor.setControl(flywheelVoltageRequest.withOutput(volts))
         rightLeaderMotor.setControl(flywheelVoltageRequest.withOutput(volts))
     }
 
-    override fun setHoodAngle(angle: Angle) {
-        hoodMotor.setControl(hoodPositionRequest.withPosition(angle))
+    override fun setFlywheelVelocity(velocity: AngularVelocity) {
+        leftLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
+        rightLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
+    }
+
+    override fun setFlywheelGains(leftKP: Double, leftKD: Double, rightKP: Double, rightKD: Double) {
+        val leftSlot0Config = Slot0Configs()
+        val rightSlot0Config = Slot0Configs()
+
+        leftLeaderMotor.configurator.refresh(leftSlot0Config)
+        rightLeaderMotor.configurator.refresh(rightSlot0Config)
+        leftSlot0Config.kP = leftKP
+        leftSlot0Config.kV = leftKD
+        rightSlot0Config.kP = rightKP
+        rightSlot0Config.kV = rightKD
+        leftLeaderMotor.configurator.apply(leftSlot0Config)
+        rightLeaderMotor.configurator.apply(rightSlot0Config)
     }
 
     override fun setHoodVoltage(voltage: Double) {
         hoodMotor.setVoltage(voltage)
     }
 
-    override fun resetHoodPosition(angle: Angle) {
+    override fun setHoodAngle(angle: Angle) {
+        hoodMotor.setControl(hoodAngleRequest.withPosition(angle))
+    }
+
+    override fun resetHoodAngle(angle: Angle) {
         hoodMotor.setPosition(angle)
+    }
+
+    override fun setHoodGains(kP: Double, kD: Double) {
+        val hoodSlot0Config = Slot0Configs()
+
+        hoodMotor.configurator.refresh(hoodSlot0Config)
+        hoodSlot0Config.kP = kP
+        hoodSlot0Config.kD = kD
+        hoodMotor.configurator.apply(hoodSlot0Config)
+    }
+
+    override fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {
+        val flywheelCurrentConfig = CurrentLimitsConfigs()
+            .withSupplyCurrentLimit(flywheelSupplyLimitAmps)
+            .withStatorCurrentLimit(ShooterConstants.FLYWHEEL_STATOR_LIM)
+        val hoodCurrentConfig = CurrentLimitsConfigs()
+            .withSupplyCurrentLimit(hoodSupplyLimitAmps)
+            .withStatorCurrentLimit(ShooterConstants.HOOD_STATOR_LIM)
+
+        leftLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        leftFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        rightLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        rightFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        hoodMotor.configurator.apply(hoodCurrentConfig, 0.0)
     }
 
     companion object {

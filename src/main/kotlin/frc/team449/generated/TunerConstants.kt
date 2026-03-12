@@ -70,7 +70,7 @@ object TunerConstants {
         TalonFXConfiguration()
             .withCurrentLimits(
                 CurrentLimitsConfigs() // Swerve azimuth does not require much torque output, so we can set a relatively low
-                    .withSupplyCurrentLimit(Units.Amps.of(30.0))
+                    .withSupplyCurrentLimit(Units.Amps.of(60.0))
                     .withSupplyCurrentLimitEnable(true),
             )
 

@@ -35,10 +35,11 @@ class IndexerSubsystem(
         wedgeSpeed: AngularVelocity,
         topSpeed: AngularVelocity
     ): Command =
-        this.runOnce {
+        this.run {
             floorTargetVelocityRadPerSec = floorSpeed.`in`(RadiansPerSecond)
             wedgeTargetVelocityRadPerSec = wedgeSpeed.`in`(RadiansPerSecond)
             topTargetVelocityRadPerSec = topSpeed.`in`(RadiansPerSecond)
+
             io.setFloorSpeed(floorSpeed)
             io.setWedgeSpeed(wedgeSpeed)
             io.setTopSpeed(topSpeed)
@@ -59,4 +60,8 @@ class IndexerSubsystem(
             topTargetVelocityRadPerSec = 0.0
             io.setIndexerVoltage(0.0, 0.0, 0.0)
         }
+
+    fun setSupplyLimits(floorSupplyLimitAmps: Double, wedgeSupplyLimitAmps: Double, topSupplyLimitAmps: Double) {
+        io.setSupplyLimits(floorSupplyLimitAmps, wedgeSupplyLimitAmps, topSupplyLimitAmps)
+    }
 }

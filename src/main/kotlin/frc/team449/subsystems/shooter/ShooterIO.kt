@@ -42,7 +42,7 @@ interface ShooterIO {
 
         @JvmField var rightFollowerTempCelsius: Double = 0.0
 
-        @JvmField var hoodPositionRad: Double = 0.0
+        @JvmField var hoodAngleRad: Double = 0.0
 
         @JvmField var hoodVelocityRadPerSec: Double = 0.0
 
@@ -57,13 +57,19 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun setFlywheelVelocity(velocity: AngularVelocity) {}
-
     fun setFlywheelVoltage(volts: Double) {}
 
-    fun setHoodAngle(angle: Angle) {}
+    fun setFlywheelVelocity(velocity: AngularVelocity) {}
+
+    fun setFlywheelGains(leftKP: Double, leftKD: Double, rightKP: Double, rightKD: Double) {}
 
     fun setHoodVoltage(voltage: Double) {}
 
-    fun resetHoodPosition(angle: Angle) {}
+    fun setHoodAngle(angle: Angle) {}
+
+    fun resetHoodAngle(angle: Angle) {}
+
+    fun setHoodGains(kP: Double, kD: Double) {}
+
+    fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {}
 }
