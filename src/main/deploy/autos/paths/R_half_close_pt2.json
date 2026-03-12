@@ -30,11 +30,7 @@
       "y_meters": 0.534,
       "intermediate_handoff_radius_meters": 0.2
     },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.2090520991411164,
-      "lib_key": "end_intake"
-    },
+
     {
       "type": "event_trigger",
       "t_ratio": 0.9065851943915644,

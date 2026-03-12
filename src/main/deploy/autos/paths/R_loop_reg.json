@@ -12,11 +12,7 @@
         "profiled_rotation": true
       }
     },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.061503558633070665,
-      "lib_key": "stop_shooting"
-    },
+
     {
       "type": "event_trigger",
       "t_ratio": 0.5804216954298655,
@@ -82,11 +78,7 @@
       "y_meters": 7.444665236051502,
       "intermediate_handoff_radius_meters": 0.2
     },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.3984524657802711,
-      "lib_key": "end_intake"
-    },
+
     {
       "type": "event_trigger",
       "t_ratio": 0.9466278266019946,

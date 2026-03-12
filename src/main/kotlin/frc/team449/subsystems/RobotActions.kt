@@ -42,9 +42,8 @@ class RobotActions(
                     IndexerConstants.INTAKING_INDEXER_SPEED,
                     RadiansPerSecond.of(0.0),
                 ),
-            )
-        )
-            .finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
+            ),
+        ).finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
@@ -57,15 +56,15 @@ class RobotActions(
                     RadiansPerSecond.of(0.0),
                 ),
                 intake.stow(),
-            )
+            ),
         )
 
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
             SequentialCommandGroup(
                 intake.stow(),
-                intake.deploy()
-            )
+                intake.deploy(),
+            ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -73,16 +72,16 @@ class RobotActions(
             power.requestProfile(PowerProfile.SHOOTING),
             shooter.setAimCommand(
                 Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
-                RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
-            )
+                RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
+            ),
         )
 
     fun checkAndFeed(): Command =
         RepeatCommand(
             ConditionalCommand(
                 indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
-                indexer.stop()
-            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() }
+                indexer.stop(),
+            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
         )
 
     fun autoUnjam(): Command =
@@ -100,14 +99,14 @@ class RobotActions(
                     shooter.setFlywheelVelocity(RadiansPerSecond.of(currentSetpoint)),
                 )
             },
-            setOf(indexer, shooter)
+            setOf(indexer, shooter),
         )
 
     fun reverseAll(): Command =
         ParallelCommandGroup(
             intake.outtake(),
             indexer.index(RadiansPerSecond.of(-30.0)),
-            shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL)
+            shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
         )
 
     fun stopAllAndHomeHood(): Command =

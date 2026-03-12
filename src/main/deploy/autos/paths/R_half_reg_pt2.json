@@ -24,11 +24,7 @@
         "profiled_rotation": true
       }
     },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.4753848015351741,
-      "lib_key": "end_intake"
-    },
+
     {
       "type": "translation",
       "x_meters": 6.029888067567394,

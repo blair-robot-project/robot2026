@@ -6,12 +6,13 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
+import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
+import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
 import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME_SEC
 import frc.team449.Constants.AutoConstants.CTE_D
 import frc.team449.Constants.AutoConstants.CTE_I
@@ -25,6 +26,7 @@ import frc.team449.Constants.AutoConstants.TRANSLATION_P
 import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveSubsystem
 import org.littletonrobotics.junction.Logger
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import java.util.function.Consumer
 
@@ -93,27 +95,38 @@ class BLineRoutines(
             .withShouldMirror { mirror }
 
     private fun pathBuilderWithReset(mirror: Boolean): FollowPath.Builder =
-        pathBuilder(mirror)
+        FollowPath
+            .Builder(
+                drive,
+                drive::pose,
+                drive::getRobotRelativeSpeeds,
+                { speeds: ChassisSpeeds ->
+                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
+                },
+                translationController,
+                rotationController,
+                crossTrackController,
+            ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
+            .withShouldMirror { mirror }
 
     private fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger("start_intake", actions.deployAndToggleIntake())
-        FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
-        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
-        FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
-        FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
+        FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
+        FollowPath.registerEventTrigger("start_shooting", actions.prepShotFromAnywhere(TRENCH_TO_HUB_DISTANCE_METERS))
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopAllAndHomeHood())
+        FollowPath.registerEventTrigger("start_shooting_hub", actions.prepShotFromAnywhere(HUB_DISTANCE_METERS))
     }
 
     private fun preloadHubShot(): Command {
-        val path1 = Path("hub")
-        val path2 = Path("end_hub")
+        val path1 = Path("hub_start")
+        val path2 = Path("hub_end")
 
         eventTriggerCommands()
 
         return Commands.sequence(
             pathBuilderWithReset(false).build(path1),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(false).build(path2),
+            pathBuilder(false).build(path2),
         )
     }
 
@@ -131,12 +144,12 @@ class BLineRoutines(
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset(mirror).build(path1),
-            pathBuilderWithReset(mirror).build(path2),
+            pathBuilder(mirror).build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(mirror).build(path3),
-            pathBuilderWithReset(mirror).build(path4),
+            pathBuilder(mirror).build(path3),
+            pathBuilder(mirror).build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(mirror).build(path5),
+            pathBuilder(mirror).build(path5),
         )
     }
 
@@ -152,12 +165,12 @@ class BLineRoutines(
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset(mirror).build(path3),
-            pathBuilderWithReset(mirror).build(path4),
+            pathBuilder(mirror).build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(mirror).build(path1),
-            pathBuilderWithReset(mirror).build(path2),
+            pathBuilder(mirror).build(path1),
+            pathBuilder(mirror).build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(false).build(path5),
+            pathBuilder(false).build(path5),
         )
     }
 
@@ -172,20 +185,22 @@ class BLineRoutines(
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset(mirror).build(path1),
-            pathBuilderWithReset(mirror).build(path2),
+            pathBuilder(mirror).build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(mirror).build(path3),
+            pathBuilder(mirror).build(path3),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(mirror).build(path4),
+            pathBuilder(mirror).build(path4),
         )
     }
 
-    fun addAutoOptions(autoChooser: SendableChooser<Command>) {
-        autoChooser.setDefaultOption("Do Nothing", nothing())
+    fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
+        autoChooser.addDefaultOption("Do Nothing", nothing())
         autoChooser.addOption("Preload Hub", preloadHubShot())
+
         autoChooser.addOption("R Half Close", halfClose(false))
         autoChooser.addOption("R Half Far", halfFar(false))
         autoChooser.addOption("R Half Loop", halfAndLoop(false))
+
         autoChooser.addOption("L Half Close", halfClose(true))
         autoChooser.addOption("L Half Far", halfFar(true))
         autoChooser.addOption("L Half Loop", halfAndLoop(true))
