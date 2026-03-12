@@ -77,8 +77,6 @@ open class ShooterIOHardware : ShooterIO {
             rightFollowerSupplyCurrent,
             rightFollowerStatorCurrent,
             rightFollowerTemperature,
-            hoodVelocity,
-            hoodMotorVoltage,
             hoodSupplyCurrent,
             hoodTemperature,
         )
@@ -91,6 +89,8 @@ open class ShooterIOHardware : ShooterIO {
             rightLeaderVelocity,
             rightLeaderMotorVoltage,
             rightLeaderStatorCurrent,
+            hoodVelocity,
+            hoodMotorVoltage,
             hoodAngle,
             hoodStatorCurrent,
         )
