@@ -1,6 +1,5 @@
 package frc.team449.subsystems.vision
 
-
 import com.ctre.phoenix6.Utils
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
@@ -61,10 +60,10 @@ class VisionSubsystem(
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
                     observation.tagCount == 0 ||
-                            (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
-                            abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
-                            observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
-                            observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
+                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
+                        abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
+                        observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
+                        observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
 
                 if (rejectPose) {
                     robotPosesRejected.add(observation.pose)
@@ -117,10 +116,10 @@ class VisionSubsystem(
                 println("chop")
                 val rejectPose =
                     observation.tagCount == 0 ||
-                            (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
-                            abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
-                            observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
-                            observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
+                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
+                        abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
+                        observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
+                        observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
 
                 if (rejectPose) {
                     logsPosesRejected.add(observation.pose)
@@ -199,4 +198,3 @@ class VisionSubsystem(
         Logger.recordOutput("Vision/Summary/RobotPosesRejected", *allRobotPosesRejected.toTypedArray())
     }
 }
-

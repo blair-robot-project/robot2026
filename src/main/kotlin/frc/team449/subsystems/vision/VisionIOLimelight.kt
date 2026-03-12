@@ -1,6 +1,5 @@
 package frc.team449.subsystems.vision
 
-
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
@@ -20,7 +19,6 @@ import limelight.networktables.Orientation3d
 import limelight.networktables.PoseEstimate
 import java.util.Optional
 import java.util.function.Supplier
-
 
 /** IO implementation for real Limelight hardware.  */
 /**
@@ -84,7 +82,6 @@ class VisionIOLimelight(
                     PoseObservationType.MEGATAG_1
                 )
             )
-
         } else {
             inputs.connected = false
             inputs.poseObservations = emptyArray()

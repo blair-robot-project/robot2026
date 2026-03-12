@@ -211,18 +211,17 @@ open class ShooterIOHardware : ShooterIO {
         rightLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
     }
 
+    val leftSlot0Config = Slot0Configs()
+    val rightSlot0Config = Slot0Configs()
     override fun setFlywheelGains(leftKP: Double, leftKD: Double, rightKP: Double, rightKD: Double) {
-        val leftSlot0Config = Slot0Configs()
-        val rightSlot0Config = Slot0Configs()
-
         leftLeaderMotor.configurator.refresh(leftSlot0Config)
         rightLeaderMotor.configurator.refresh(rightSlot0Config)
         leftSlot0Config.kP = leftKP
         leftSlot0Config.kV = leftKD
         rightSlot0Config.kP = rightKP
         rightSlot0Config.kV = rightKD
-        leftLeaderMotor.configurator.apply(leftSlot0Config)
-        rightLeaderMotor.configurator.apply(rightSlot0Config)
+        leftLeaderMotor.configurator.apply(leftSlot0Config, 0.0)
+        rightLeaderMotor.configurator.apply(rightSlot0Config, 0.0)
     }
 
     override fun setHoodVoltage(voltage: Double) {
@@ -237,13 +236,12 @@ open class ShooterIOHardware : ShooterIO {
         hoodMotor.setPosition(angle)
     }
 
+    val hoodSlot0Config = Slot0Configs()
     override fun setHoodGains(kP: Double, kD: Double) {
-        val hoodSlot0Config = Slot0Configs()
-
         hoodMotor.configurator.refresh(hoodSlot0Config)
         hoodSlot0Config.kP = kP
         hoodSlot0Config.kD = kD
-        hoodMotor.configurator.apply(hoodSlot0Config)
+        hoodMotor.configurator.apply(hoodSlot0Config, 0.0)
     }
 
     val flywheelCurrentConfig = CurrentLimitsConfigs()

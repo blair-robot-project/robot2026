@@ -186,4 +186,23 @@ class ShooterSubsystem(
                 this,
             ),
         )
+
+    val sysIDHood =
+        SysIdRoutine(
+            SysIdRoutine.Config(
+                null,
+                Volts.of(6.0),
+                Seconds.of(20.0),
+            ) { state: SysIdRoutineLog.State ->
+                Logger.recordOutput(
+                    "SysIdHood",
+                    state.toString(),
+                )
+            },
+            Mechanism(
+                { voltage: Voltage -> io.setHoodVoltage(voltage.`in`(Volts)) },
+                null,
+                this,
+            ),
+        )
 }
