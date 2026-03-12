@@ -241,7 +241,7 @@ object Constants {
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
-        const val HOMING_DEBOUNCE_TIME = 0.3
+        const val HOMING_DEBOUNCE_TIME = 0.2
         const val VIZ_OFFSET_DEG = 33.873
     }
 

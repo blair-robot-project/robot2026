@@ -49,7 +49,7 @@ class Bindings(
     fun bindControls() {
         driver
             .rightTrigger()
-            .onTrue(
+            .whileTrue(
                 actions.deployAndRunIntake(),
             )
 
