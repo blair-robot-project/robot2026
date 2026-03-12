@@ -15,7 +15,7 @@ class PowerSubsystem(
     private val shooter: ShooterSubsystem
 ) : SubsystemBase() {
     var lastProfile: PowerProfile = PowerProfile.LOW_BATTERY
-    var currentProfile: PowerProfile = PowerProfile.DRIVING
+    var currentProfile: PowerProfile = PowerProfile.SHOOTING
 
     override fun periodic() {
         if (currentProfile == lastProfile) return

@@ -164,14 +164,14 @@ class Bindings(
             )
 
         // for hood control on shoot from anywhere
-        operator
-            .povDown()
-            .onTrue(robotContainer.shooter.setHoodVoltage(-2.0))
-            .onFalse(robotContainer.shooter.setHoodVoltage(0.0))
-
-        operator
-            .povUp()
-            .onTrue(robotContainer.shooter.setHoodVoltage(2.0))
-            .onFalse(robotContainer.shooter.setHoodVoltage(0.0))
+//        operator
+//            .povDown()
+//            .onTrue(robotContainer.shooter.setHoodVoltage(-2.0))
+//            .onFalse(robotContainer.shooter.setHoodVoltage(0.0))
+//
+//        operator
+//            .povUp()
+//            .onTrue(robotContainer.shooter.setHoodVoltage(2.0))
+//            .onFalse(robotContainer.shooter.setHoodVoltage(0.0))
     }
 }
