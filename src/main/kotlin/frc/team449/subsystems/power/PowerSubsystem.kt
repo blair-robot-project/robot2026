@@ -1,10 +1,12 @@
 package frc.team449.subsystems.power
 
-import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.intake.IntakeSubsystem
-import frc.team449.subsystems.indexer.IndexerSubsystem
-import frc.team449.subsystems.shooter.ShooterSubsystem
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.indexer.IndexerSubsystem
+import frc.team449.subsystems.intake.IntakeSubsystem
+import frc.team449.subsystems.shooter.ShooterSubsystem
+import org.littletonrobotics.junction.Logger
 
 class PowerSubsystem(
     private val drive: DriveSubsystem,
@@ -17,39 +19,30 @@ class PowerSubsystem(
 
     override fun periodic() {
         if (currentProfile == lastProfile) return
+        lastProfile = currentProfile
 
         val currentProfileLimits = currentProfile.limits
         drive.setSupplyLimits(currentProfileLimits.driveSupplyLimit, 20.0) // 20.0 steer supply limit
         intake.setSupplyLimits(currentProfileLimits.pivotSupplyLimit, currentProfileLimits.rollerSupplyLimit)
         indexer.setSupplyLimits(
-            currentProfileLimits.floorIndexerSupplyLimit, 
-            currentProfileLimits.wedgeIndexerSupplyLimit, 
+            currentProfileLimits.floorIndexerSupplyLimit,
+            currentProfileLimits.wedgeIndexerSupplyLimit,
             currentProfileLimits.topIndexerSupplyLimit,
         )
         shooter.setSupplyLimits(currentProfileLimits.flywheelSupplyLimit, currentProfileLimits.hoodSupplyLimit)
-    } 
 
-    fun requestProfile(requestedProfile: PowerProfile) {
-        this.currentProfile = requestedProfile
+        Logger.recordOutput("/Power/DriveSupplyLimit", currentProfileLimits.driveSupplyLimit)
+        Logger.recordOutput("/Power/PivotSupplyLimit", currentProfileLimits.pivotSupplyLimit)
+        Logger.recordOutput("/Power/RollerSupplyLimit", currentProfileLimits.rollerSupplyLimit)
+        Logger.recordOutput("/Power/FloorSupplyLimit", currentProfileLimits.floorIndexerSupplyLimit)
+        Logger.recordOutput("/Power/WedgeSupplyLimit", currentProfileLimits.wedgeIndexerSupplyLimit)
+        Logger.recordOutput("/Power/TopSupplyLimit", currentProfileLimits.topIndexerSupplyLimit)
+        Logger.recordOutput("/Power/FlywheelSupplyLimit", currentProfileLimits.flywheelSupplyLimit)
+        Logger.recordOutput("/Power/HoodSupplyLimit", currentProfileLimits.hoodSupplyLimit)
     }
-}
 
-data class PowerLimits(
-    val driveSupplyLimit: Double,
-    val pivotSupplyLimit: Double,
-    val rollerSupplyLimit: Double,
-    val floorIndexerSupplyLimit: Double,
-    val wedgeIndexerSupplyLimit: Double,
-    val topIndexerSupplyLimit: Double,
-    val flywheelSupplyLimit: Double,
-    val hoodSupplyLimit: Double
-)
-
-enum class PowerProfile(
-    val limits: PowerLimits
-) {
-    LOW_BATTERY(PowerLimits(20.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
-    DRIVING(PowerLimits(60.0, 15.0, 5.0, 5.0, 0.0, 0.0, 0.0, 0.0)),
-    INTAKING(PowerLimits(30.0, 10.0, 40.0, 10.0, 5.0, 5.0, 0.0, 0.0)),
-    SHOOTING(PowerLimits(10.0, 15.0, 5.0, 10.0, 10.0, 30.0, 30.0, 20.0)) 
+    fun requestProfile(requestedProfile: PowerProfile): Command =
+        runOnce {
+            this.currentProfile = requestedProfile
+        }
 }

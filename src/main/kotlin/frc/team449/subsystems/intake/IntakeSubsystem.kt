@@ -16,7 +16,7 @@ class IntakeSubsystem(
     var pivotIsDeployed: Boolean = false
     var rollerTargetVolts: Double = 0.0
 
-    val intakeSimAngle: Double
+    val pivotAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
 
     override fun periodic() {
@@ -30,7 +30,7 @@ class IntakeSubsystem(
 
     fun intake(): Command =
         this
-            .runOnce {
+            .run {
                 rollerTargetVolts = 11.0
                 io.setRollerVoltage(11.0)
             }
@@ -38,7 +38,7 @@ class IntakeSubsystem(
 
     fun outtake(): Command =
         this
-            .runOnce {
+            .run {
                 rollerTargetVolts = -4.0
                 io.setRollerVoltage(-4.0)
             }

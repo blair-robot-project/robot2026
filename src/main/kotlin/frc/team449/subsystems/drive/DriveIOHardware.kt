@@ -3,9 +3,9 @@ package frc.team449.subsystems.drive
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.configs.TalonFXSConfiguration
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
@@ -115,15 +115,12 @@ open class DriveIOHardware(
         val driveCurrentLimitConfig = CurrentLimitsConfigs()
         val steerCurrentLimitConfig = CurrentLimitsConfigs()
 
-        for (i in 0 until modules.count()) {    
-            modules[i].driveMotor.configurator.refresh(driveCurrentLimitConfig)
-            modules[i].steerMotor.configurator.refresh(steerCurrentLimitConfig)
-
+        for (i in 0 until modules.count()) {
             driveCurrentLimitConfig.SupplyCurrentLimit = driveSupplyLimitAmps
             steerCurrentLimitConfig.SupplyCurrentLimit = steerSupplyLimitAmps
 
-            modules[i].driveMotor.configurator.apply(driveCurrentLimitConfig)
-            modules[i].steerMotor.configurator.apply(steerCurrentLimitConfig)
+            modules[i].driveMotor.configurator.apply(driveCurrentLimitConfig, 0.0)
+            modules[i].steerMotor.configurator.apply(steerCurrentLimitConfig, 0.0)
         }
     }
 

@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.util.FieldUtil
 import frc.team449.util.PhoenixUtil
@@ -70,6 +69,29 @@ class Robot : LoggedRobot() {
 
         // return thread to low priority (standard)
 //        Threads.setCurrentThreadPriority(false, 10)
+
+        Logger.recordOutput(
+            "FinalComponentPoses",
+            *arrayOf(
+                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.pivotAngle, 0.0)),
+                Pose3d(
+                    MathUtil.inverseInterpolate(
+                        Constants.IntakeConstants.STOW_POS_RADS,
+                        Constants.IntakeConstants.DEPLOY_POS_RADS,
+                        robotContainer.intake.pivotAngle,
+                    ) * 0.3,
+                    0.0,
+                    0.0,
+                    Rotation3d(),
+                ),
+                Pose3d(
+                    -0.1,
+                    0.0,
+                    0.4,
+                    Rotation3d(0.0, robotContainer.shooter.hoodAngle + 0.2591940418, 0.0),
+                ),
+            ),
+        )
     }
 
     override fun autonomousInit() {
@@ -84,10 +106,13 @@ class Robot : LoggedRobot() {
     }
 
     override fun teleopInit() {
-        robotContainer.autonomousCommand?.cancel()
+        robotContainer.autonomousCommand.cancel()
+        robotContainer.drive.setOperatorPerspectiveForward()
+
         FieldUtil.updateAutoWinner()
-        robotContainer.actions.stopIntake()
-        robotContainer.actions.stopFeedAndShooter()
+        FieldUtil.updateKeyPositions()
+
+        robotContainer.actions.stopAllAndHomeHood()
     }
 
     override fun teleopPeriodic() {}
@@ -102,28 +127,5 @@ class Robot : LoggedRobot() {
 
     override fun simulationInit() {}
 
-    override fun simulationPeriodic() {
-        Logger.recordOutput(
-            "FinalComponentPoses",
-            *arrayOf(
-                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
-                Pose3d(
-                    MathUtil.inverseInterpolate(
-                        Constants.IntakeConstants.STOW_POS_RADS,
-                        Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle,
-                    ) * 0.3,
-                    0.0,
-                    0.0,
-                    Rotation3d(),
-                ),
-                Pose3d(
-                    -0.1,
-                    0.0,
-                    0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle + 0.2591940418, 0.0),
-                ),
-            ),
-        )
-    }
+    override fun simulationPeriodic() {}
 }

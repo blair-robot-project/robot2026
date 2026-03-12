@@ -230,7 +230,7 @@ object Constants {
         const val DEPLOY_POS_RADS = 2.269
 
         const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.0
+        const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 
@@ -263,8 +263,8 @@ object Constants {
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val WEDGE_STATOR_LIMIT = 60.0
-        const val WEDGE_SUPPLY_LIMIT = 30.0
+        const val WEDGE_STATOR_LIMIT = 30.0
+        const val WEDGE_SUPPLY_LIMIT = 10.0
 
         const val FLOOR_STATOR_LIMIT = 20.0
         const val FLOOR_SUPPLY_LIMIT = 10.0
@@ -304,7 +304,7 @@ object Constants {
         const val TOP_KV = 0.34
 
         // --- SETPOINTS ---
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(120.0)
+        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(160.0)
         val INTAKING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
     }
 
@@ -314,7 +314,7 @@ object Constants {
         const val AIMBOT_KI = 0.0
         const val AIMBOT_KD = 0.5
 
-        const val AIMBOT_HEADING_TOLERANCE = 0.07 // in radians, 4 degrees
+        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.07 // in radians, 4 degrees
     }
 
     object LEDConstants {

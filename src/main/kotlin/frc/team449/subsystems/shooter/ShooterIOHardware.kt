@@ -1,6 +1,7 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
@@ -19,6 +20,7 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.ShooterConstants
 import frc.team449.util.PhoenixUtil
+import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class ShooterIOHardware : ShooterIO {
     val leftLeaderMotor = TalonFX(ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
@@ -141,11 +143,11 @@ open class ShooterIOHardware : ShooterIO {
         Alert("Hood Motor Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
 
     init {
-        leftLeaderMotor.configurator.apply(leftFlywheelConfig)
-        leftFollowerMotor.configurator.apply(leftFlywheelConfig)
-        rightLeaderMotor.configurator.apply(rightFlywheelConfig)
-        rightFollowerMotor.configurator.apply(rightFlywheelConfig)
-        hoodMotor.configurator.apply(hoodConfig)
+        tryUntilOk(5) { leftLeaderMotor.configurator.apply(leftFlywheelConfig) }
+        tryUntilOk(5) { leftFollowerMotor.configurator.apply(leftFlywheelConfig) }
+        tryUntilOk(5) { rightLeaderMotor.configurator.apply(rightFlywheelConfig) }
+        tryUntilOk(5) { rightFollowerMotor.configurator.apply(rightFlywheelConfig) }
+        tryUntilOk(5) { hoodMotor.configurator.apply(hoodConfig) }
 
         leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT))
         rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT))
@@ -156,6 +158,7 @@ open class ShooterIOHardware : ShooterIO {
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
 
         PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
+
         resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
     }
 
@@ -214,12 +217,10 @@ open class ShooterIOHardware : ShooterIO {
 
         leftLeaderMotor.configurator.refresh(leftSlot0Config)
         rightLeaderMotor.configurator.refresh(rightSlot0Config)
-
         leftSlot0Config.kP = leftKP
         leftSlot0Config.kV = leftKD
         rightSlot0Config.kP = rightKP
         rightSlot0Config.kV = rightKD
-
         leftLeaderMotor.configurator.apply(leftSlot0Config)
         rightLeaderMotor.configurator.apply(rightSlot0Config)
     }
@@ -240,11 +241,24 @@ open class ShooterIOHardware : ShooterIO {
         val hoodSlot0Config = Slot0Configs()
 
         hoodMotor.configurator.refresh(hoodSlot0Config)
-
         hoodSlot0Config.kP = kP
         hoodSlot0Config.kD = kD
-
         hoodMotor.configurator.apply(hoodSlot0Config)
+    }
+
+    override fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {
+        val flywheelCurrentConfig = CurrentLimitsConfigs()
+            .withSupplyCurrentLimit(flywheelSupplyLimitAmps)
+            .withStatorCurrentLimit(ShooterConstants.FLYWHEEL_STATOR_LIM)
+        val hoodCurrentConfig = CurrentLimitsConfigs()
+            .withSupplyCurrentLimit(hoodSupplyLimitAmps)
+            .withStatorCurrentLimit(ShooterConstants.HOOD_STATOR_LIM)
+
+        leftLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        leftFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        rightLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        rightFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)
+        hoodMotor.configurator.apply(hoodCurrentConfig, 0.0)
     }
 
     companion object {
