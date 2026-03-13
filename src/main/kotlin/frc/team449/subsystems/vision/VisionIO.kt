@@ -16,6 +16,12 @@ interface VisionIO {
 
         @JvmField var poseObservations: Array<PoseObservation> = emptyArray()
 
+        @JvmField var poseObservationsLen = poseObservations.size
+
+        @JvmField var logsObservations: Array<PoseObservation> = emptyArray()
+
+        @JvmField var logsObservationsLen = logsObservations.size
+
         @JvmField var tagIds: IntArray = IntArray(0)
     }
 

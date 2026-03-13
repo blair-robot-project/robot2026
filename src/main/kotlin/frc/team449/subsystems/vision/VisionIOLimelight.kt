@@ -1,5 +1,6 @@
 package frc.team449.subsystems.vision
 
+
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
@@ -20,6 +21,7 @@ import limelight.networktables.PoseEstimate
 import java.util.Optional
 import java.util.function.Supplier
 
+
 /** IO implementation for real Limelight hardware.  */
 /**
  * Creates a new VisionIOLimelight.
@@ -37,10 +39,11 @@ class VisionIOLimelight(
     private var poseObservationType = PoseObservationType.MEGATAG_1
     private val poseEstimator = limelight.createPoseEstimator(estimationMode)
 
+    private val logsEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2)
+
     init {
         limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
-            .withCameraOffset(offset)
-            .save()
+            .withCameraOffset(offset).save()
         limelight.settings.withImuMode(LimelightSettings.ImuMode.InternalImuExternalAssist)
     }
 
@@ -61,6 +64,9 @@ class VisionIOLimelight(
         NetworkTableInstance.getDefault().flush()
 
         val visionEstimateOpt: Optional<PoseEstimate> = poseEstimator.poseEstimate
+
+        val logsEstimateOpt: Optional<PoseEstimate> = logsEstimator.poseEstimate
+
         val resultsOpt: Optional<LimelightResults> = limelight.data.results
 
         if (visionEstimateOpt.isPresent) {
@@ -75,12 +81,30 @@ class VisionIOLimelight(
                     est.avgTagAmbiguity,
                     est.tagCount,
                     est.avgTagDist,
+                    PoseObservationType.MEGATAG_1
+                )
+            )
+
+        } else {
+            inputs.connected = false
+            inputs.poseObservations = emptyArray()
+        }
+
+        if (visionEstimateOpt.isPresent) {
+            val logsest = logsEstimateOpt.get()
+
+            inputs.logsObservations = arrayOf(
+                PoseObservation(
+                    logsest.timestampSeconds,
+                    logsest.pose,
+                    logsest.avgTagAmbiguity,
+                    logsest.tagCount,
+                    logsest.avgTagDist,
                     PoseObservationType.MEGATAG_2
                 )
             )
         } else {
-            inputs.connected = false
-            inputs.poseObservations = emptyArray()
+            inputs.logsObservations = emptyArray()
         }
 
         if (resultsOpt.isPresent) {
