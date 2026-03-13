@@ -12,7 +12,6 @@
         "profiled_rotation": true
       }
     },
-
     {
       "type": "event_trigger",
       "t_ratio": 0.6000000000000001,
