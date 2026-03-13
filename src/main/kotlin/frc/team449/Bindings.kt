@@ -127,7 +127,7 @@ class Bindings(
         driver
             .start()
             .onTrue(
-                robotContainer.drive.seedFieldCentric(),
+                robotContainer.drive.seedFieldCentric()
             )
 
         shooterJamTrigger

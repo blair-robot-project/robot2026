@@ -309,11 +309,12 @@ object Constants {
     }
 
     object AimbotConstants {
-        // Aimbot PID Constants
+        // --- AIMBOT GAINS ---
         const val AIMBOT_KP = 10.0
         const val AIMBOT_KI = 0.0
         const val AIMBOT_KD = 0.5
 
+        // --- AIMBOT CONFIGURATION ---
         const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.07 // in radians, 4 degrees
     }
 
@@ -324,17 +325,15 @@ object Constants {
     object VisionConstants {
         // --- CHS ANDYMARK REBUILT FIELD ---
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
-//        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout(frc.team449.subsystems.vision.field_map_mar_07_08_28_22.json)
 
+        // --- CAMERA IDENTIFIERS ---
         const val CAMERA_RIGHT_NAME: String = "limelight-right"
         const val CAMERA_LEFT_NAME: String = "limelight-left"
 
-        // Robot to camera transforms
-
-        var ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        // --- ROBOT TO CAMERA TRANSFORMS ---
+        var ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, -0.523599))
         var ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
-        // TODO CHECK ROTATION - see if poses are accurate on actual field
-        // fyi i think right camera might actually be the left one on the actual camera configs
+        // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
 
         // --- FILTERING THRESHOLDS --
         const val MAX_AMBIGUITY: Double = 0.3
@@ -345,15 +344,14 @@ object Constants {
         const val LINEAR_STD_DEV_BASELINE_METERS: Double = 0.02
         const val ANGULAR_STD_DEV_BASELINE_RADIANS: Double = 0.06
 
-        // Standard deviation multipliers for each camera
-        // (Adjust to trust some cameras more than others)
-        val cameraStdDevFactors: DoubleArray =
+        // --- CAMERA STANDARD DEVIATION MULTIPLIERS ---
+        val CAMERA_STD_DEV_FACTORS: DoubleArray =
             doubleArrayOf(
                 1.0, // Camera 0
                 1.0, // Camera 1
             )
 
-        // Multipliers to apply for MegaTag 2 observations
+        // TODO: can we name this group and apply if (if necessary?)
         const val linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
         const val angularStdDevMegatag2Factor: Double = Double.POSITIVE_INFINITY // No rotation data available
     }

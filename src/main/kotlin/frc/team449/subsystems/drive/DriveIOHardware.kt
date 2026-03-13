@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
+import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.LinearAcceleration
@@ -81,14 +82,17 @@ open class DriveIOHardware(
         inputs.fromSwerveDriveState(telemetryCache.get())
 
         inputs.gyroAngle = inputs.Pose.rotation.degrees
+        inputs.rollVelocityDegreesPerSecond = angularRollVelocity.value.`in`(DegreesPerSecond)
+        inputs.pitchVelocityDegreesPerSecond = angularPitchVelocity.value.`in`(DegreesPerSecond)
+        inputs.yawVelocityDegreesPerSecond = angularYawVelocity.value.`in`(DegreesPerSecond)
     }
 
     override fun setControl(request: SwerveRequest) {
         super<SwerveDrivetrain>.setControl(request)
     }
 
-    override fun seedFieldCentric(yaw: Rotation2d) {
-        super<SwerveDrivetrain>.seedFieldCentric(yaw)
+    override fun seedFieldCentric() {
+        super<SwerveDrivetrain>.seedFieldCentric()
     }
 
     override fun resetOdometry(pose: Pose2d) {

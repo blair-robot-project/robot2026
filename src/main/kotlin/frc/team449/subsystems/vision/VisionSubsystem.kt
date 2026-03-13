@@ -40,9 +40,6 @@ class VisionSubsystem(
         val allRobotPosesAccepted = mutableListOf<Pose3d>()
         val allRobotPosesRejected = mutableListOf<Pose3d>()
 
-        val allLogsPosesAccepted = mutableListOf<Pose3d>()
-        val allLogsPosesRejected = mutableListOf<Pose3d>()
-
         for (cameraIndex in io.indices) {
             io[cameraIndex].updateInputs(inputs[cameraIndex])
             Logger.processInputs("Vision/Camera$cameraIndex", inputs[cameraIndex])
@@ -51,9 +48,6 @@ class VisionSubsystem(
 
             val robotPosesAccepted = mutableListOf<Pose3d>()
             val robotPosesRejected = mutableListOf<Pose3d>()
-
-            val logsPosesAccepted = mutableListOf<Pose3d>()
-            val logsPosesRejected = mutableListOf<Pose3d>()
 
             var observationID = 0
 
@@ -76,24 +70,11 @@ class VisionSubsystem(
                 var linearStdDev = VisionConstants.LINEAR_STD_DEV_BASELINE_METERS * stdDevFactor
                 var angularStdDev = VisionConstants.ANGULAR_STD_DEV_BASELINE_RADIANS * stdDevFactor
 
-                if (cameraIndex < VisionConstants.cameraStdDevFactors.size) {
-                    linearStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
-                    angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
+                if (cameraIndex < VisionConstants.CAMERA_STD_DEV_FACTORS.size) {
+                    linearStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
+                    angularStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                 }
 
-                // at 20in away should be reporting 13.428599m = x
-                // 13.376m reporting -> closer than it should be
-                // -> 2.0708267717 in error
-
-                // at flush w hub should be reporting 12.920599m = x
-                // 12.87m reporting -> closer than it should be
-                // -> 1.9920866142 in error
-
-                // 20 in at the very end -> 36.625 in to center
-                // 34.554173228 in -> 2.070826772 in error
-                // 0 in at some point where we went in and out and its the more in one
-                // 1.1329133858 in error
-                // where the bumper was p much exactly in the hub
                 consumeVisionMeasurement(
                     observation.pose.toPose2d(),
                     Utils.fpgaToCurrentTime(observation.timestamp),
@@ -112,87 +93,13 @@ class VisionSubsystem(
                 observationID++
             }
 
-            for (observation in inputs[cameraIndex].logsObservations) {
-                println("chop")
-                val rejectPose =
-                    observation.tagCount == 0 ||
-                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
-                        abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
-                        observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
-                        observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
-
-                if (rejectPose) {
-                    logsPosesRejected.add(observation.pose)
-                    continue
-                }
-
-                logsPosesAccepted.add(observation.pose)
-
-                val stdDevFactor = observation.averageTagDistance.pow(2.0) / observation.tagCount
-                var linearStdDev = VisionConstants.LINEAR_STD_DEV_BASELINE_METERS * stdDevFactor
-                var angularStdDev = VisionConstants.ANGULAR_STD_DEV_BASELINE_RADIANS * stdDevFactor
-
-                if (cameraIndex < VisionConstants.cameraStdDevFactors.size) {
-                    linearStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
-                    angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
-                }
-
-//                consumeVisionMeasurement(
-//                    observation.pose.toPose2d(),
-//                    Utils.fpgaToCurrentTime(observation.timestamp),
-//                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
-//                )
-                linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
-                angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
-
-                // at 20in away should be reporting 13.428599m = x
-                // 13.376m reporting -> closer than it should be
-                // -> 2.0708267717 in error
-
-                // at flush w hub should be reporting 12.920599m = x
-                // 12.87m reporting -> closer than it should be
-                // -> 1.9920866142 in error
-
-// 20 in at the very end -> 36.625 in to center
-                // 34.554173228 in -> 2.070826772 in error
-                // 0 in at some point where we went in and out and its the more in one
-                // 1.1329133858 in error
-                // where the bumper was p much exactly in the hub
-//                consumeVisionMeasurement( <-------------------------- no
-//                    observation.pose.toPose2d(),
-//                    Utils.fpgaToCurrentTime(observation.timestamp),
-//                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
-//                )
-
-                Logger.recordOutput(
-                    "Vision/Camera$cameraIndex/Observation$observationID/2/LinearStandardDeviation",
-                    linearStdDev
-                )
-                Logger.recordOutput(
-                    "Vision/Camera$cameraIndex/Observation$observationID/2/AngularStandardDeviation",
-                    angularStdDev
-                )
-
-                observationID++
-            }
-
-            Logger.recordOutput("Vision/Camera$cameraIndex/Yaw", inputs[cameraIndex].latestTargetObservation.tx)
-            Logger.recordOutput("Vision/Camera$cameraIndex/LogsPosesAccepted", *logsPosesAccepted.toTypedArray())
-            Logger.recordOutput("Vision/Camera$cameraIndex/LogsPosesRejected", *logsPosesRejected.toTypedArray())
-
             Logger.recordOutput("Vision/Camera$cameraIndex/Yaw", inputs[cameraIndex].latestTargetObservation.tx)
             Logger.recordOutput("Vision/Camera$cameraIndex/RobotPosesAccepted", *robotPosesAccepted.toTypedArray())
             Logger.recordOutput("Vision/Camera$cameraIndex/RobotPosesRejected", *robotPosesRejected.toTypedArray())
 
-            allLogsPosesAccepted.addAll(logsPosesAccepted)
-            allLogsPosesRejected.addAll(logsPosesRejected)
-
             allRobotPosesAccepted.addAll(robotPosesAccepted)
             allRobotPosesRejected.addAll(robotPosesRejected)
         }
-
-        Logger.recordOutput("Vision/Summary/LogsPosesAccepted", *allLogsPosesAccepted.toTypedArray())
-        Logger.recordOutput("Vision/Summary/LogsPosesRejected", *allLogsPosesRejected.toTypedArray())
 
         Logger.recordOutput("Vision/Summary/RobotPosesAccepted", *allRobotPosesAccepted.toTypedArray())
         Logger.recordOutput("Vision/Summary/RobotPosesRejected", *allRobotPosesRejected.toTypedArray())

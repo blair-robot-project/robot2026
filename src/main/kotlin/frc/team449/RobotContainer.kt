@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
+import frc.team449.Constants.VisionConstants
 import frc.team449.auto.BLineRoutines
 import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.RobotActions
@@ -76,14 +77,30 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.ROBOT_TO_CAMERA_RIGHT.translation, Constants.VisionConstants.ROBOT_TO_CAMERA_RIGHT.rotation)),
-                    VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.ROBOT_TO_CAMERA_LEFT.translation, Constants.VisionConstants.ROBOT_TO_CAMERA_LEFT.rotation))
+                    VisionIOLimelight(
+                        VisionConstants.CAMERA_RIGHT_NAME,
+                        { drive.pose.rotation },
+                        drive::getAngularVelocity,
+                        Pose3d(
+                            VisionConstants.ROBOT_TO_CAMERA_RIGHT.translation,
+                            VisionConstants.ROBOT_TO_CAMERA_RIGHT.rotation
+                        )
+                    ),
+                    VisionIOLimelight(
+                        VisionConstants.CAMERA_LEFT_NAME,
+                        { drive.pose.rotation },
+                        drive::getAngularVelocity,
+                        Pose3d(
+                            VisionConstants.ROBOT_TO_CAMERA_LEFT.translation,
+                            VisionConstants.ROBOT_TO_CAMERA_LEFT.rotation
+                        )
+                    )
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT) { drive.pose },
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_LEFT_NAME, Constants.VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
+                    VisionIOPhotonVisionSim(VisionConstants.CAMERA_RIGHT_NAME, VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
+                    VisionIOPhotonVisionSim(VisionConstants.CAMERA_LEFT_NAME, VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             Mode.REPLAY ->
                 VisionSubsystem(

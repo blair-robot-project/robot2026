@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
+import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.DriverStation
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
+import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
@@ -58,23 +60,11 @@ class DriveSubsystem(
         io.resetOdometry(pose)
     }
 
-    fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
-
-    fun getFieldRelativeSpeeds(): ChassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            inputs.Speeds,
-            inputs.Pose.rotation,
-        )
-
     fun seedFieldCentric(): Command = runOnce {
-        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-            io.seedFieldCentric(Rotation2d.kZero)
-        } else {
-            io.seedFieldCentric(Rotation2d.k180deg)
-        }
+        io.seedFieldCentric()
     }
 
-    // should only be called in autoInit() to prevent null alliance
+    // call in autoInit() and teleopInit()
     fun setOperatorPerspectiveForward() {
         var forward: Rotation2d = Rotation2d.kZero
 
@@ -85,6 +75,21 @@ class DriveSubsystem(
         io.setOperatorPerspectiveForward(forward)
         CommandScheduler.getInstance().schedule(PrintCommand(forward.toString()))
     }
+
+    fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
+
+    fun getFieldRelativeSpeeds(): ChassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(
+            inputs.Speeds,
+            inputs.Pose.rotation,
+        )
+
+    fun getAngularVelocity(): AngularVelocity3d =
+        AngularVelocity3d(
+            DegreesPerSecond.of(inputs.rollVelocityDegreesPerSecond),
+            DegreesPerSecond.of(inputs.pitchVelocityDegreesPerSecond),
+            DegreesPerSecond.of(inputs.yawVelocityDegreesPerSecond)
+        )
 
     fun xLock(): Command = run { io.setControl(SwerveRequest.SwerveDriveBrake()) }
 

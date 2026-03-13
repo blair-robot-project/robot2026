@@ -14,6 +14,12 @@ interface DriveIO {
     open class DriveIOInputs : SwerveDriveState() {
         @JvmField var gyroAngle: Double = 0.0
 
+        @JvmField var rollVelocityDegreesPerSecond: Double = 0.0
+
+        @JvmField var pitchVelocityDegreesPerSecond: Double = 0.0
+
+        @JvmField var yawVelocityDegreesPerSecond: Double = 0.0
+
         init {
             this.Pose = Pose2d()
         }
@@ -36,7 +42,7 @@ interface DriveIO {
 
     fun setControl(request: SwerveRequest) {}
 
-    fun seedFieldCentric(yaw: Rotation2d) {}
+    fun seedFieldCentric() {}
 
     fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
 
