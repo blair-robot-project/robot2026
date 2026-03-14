@@ -47,8 +47,8 @@ class Bindings(
         robotContainer.indexer.defaultCommand =
             robotContainer.indexer.stop()
 
-        robotContainer.shooter.defaultCommand =
-            robotContainer.shooter.stopFlywheel()
+//        robotContainer.shooter.defaultCommand =
+//            robotContainer.shooter.stopFlywheel()
     }
 
     fun bindControls() {
@@ -122,6 +122,12 @@ class Bindings(
             .povRight()
             .onTrue(
                 robotContainer.shooter.stopFlywheel()
+            )
+
+        driver
+            .povUp()
+            .whileTrue(
+                actions.checkAndFeed()
             )
 
         driver

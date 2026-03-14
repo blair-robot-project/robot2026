@@ -118,11 +118,12 @@ open class ShooterIOHardware : ShooterIO {
             leftFollowerStatorCurrent,
         )
 
-    private val rightLeaderShooterMotorConnected: Boolean get() = BaseStatusSignal.isAllGood(
-        rightLeaderVelocity,
-        rightLeaderMotorVoltage,
-        rightLeaderStatorCurrent,
-    )
+    private val rightLeaderShooterMotorConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
+            rightLeaderVelocity,
+            rightLeaderMotorVoltage,
+            rightLeaderStatorCurrent,
+        )
 
     private val rightFollowerShooterMotorConnected: Boolean
         get() = BaseStatusSignal.isAllGood(

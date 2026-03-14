@@ -10,7 +10,6 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -61,12 +60,10 @@ class ShooterSubsystem(
             if (tunableFlywheelVelocity.hasChanged(hashCode()) || tunableHoodAngle.hasChanged(hashCode())) {
                 flywheelTargetVelocityRadPerSec = tunableFlywheelVelocity.get()
                 hoodTargetAngleRad = tunableHoodAngle.get()
-            }
 
-            CommandScheduler.getInstance().schedule(
-                setFlywheelVelocity(RadiansPerSecond.of(flywheelTargetVelocityRadPerSec)),
-                setHoodAngle(Radians.of(hoodTargetAngleRad))
-            )
+                io.setFlywheelVelocity(RadiansPerSecond.of(flywheelTargetVelocityRadPerSec))
+                io.setHoodAngle(Radians.of(hoodTargetAngleRad))
+            }
         }
 
         Logger.recordOutput("Shooter/FlywheelTargetRadPerSec", flywheelTargetVelocityRadPerSec)
