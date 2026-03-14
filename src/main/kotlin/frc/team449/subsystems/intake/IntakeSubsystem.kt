@@ -21,6 +21,8 @@ class IntakeSubsystem(
     var pivotIsDeployed: Boolean = false
     var rollerTargetVelocityRadPerSec: Double = 0.0
 
+    val rollerVelocityRadPerSec: Double
+        get() = inputs.leftRollerLeaderVelocityRadPerSec
     val intakeSimAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
 
