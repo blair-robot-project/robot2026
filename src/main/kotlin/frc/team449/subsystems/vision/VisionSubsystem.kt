@@ -43,13 +43,13 @@ class VisionSubsystem(
         for (cameraIndex in io.indices) {
             io[cameraIndex].updateInputs(inputs[cameraIndex])
             Logger.processInputs("Vision/Camera$cameraIndex", inputs[cameraIndex])
-
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected)
 
             val robotPosesAccepted = mutableListOf<Pose3d>()
             val robotPosesRejected = mutableListOf<Pose3d>()
 
-            var observationID = 0
+            val linearStdDevs = mutableListOf<Double>()
+            val angularStdDevs = mutableListOf<Double>()
 
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
@@ -81,17 +81,12 @@ class VisionSubsystem(
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                 )
 
-                Logger.recordOutput(
-                    "Vision/Camera$cameraIndex/Observation$observationID/1/LinearStandardDeviation",
-                    linearStdDev
-                )
-                Logger.recordOutput(
-                    "Vision/Camera$cameraIndex/Observation$observationID/1/AngularStandardDeviation",
-                    angularStdDev
-                )
-
-                observationID++
+                linearStdDevs.add(linearStdDev)
+                angularStdDevs.add(angularStdDev)
             }
+
+            Logger.recordOutput("Vision/Camera$cameraIndex/LinearStdDevs", linearStdDevs.toDoubleArray())
+            Logger.recordOutput("Vision/Camera$cameraIndex/AngularStdDevs", angularStdDevs.toDoubleArray())
 
             Logger.recordOutput("Vision/Camera$cameraIndex/Yaw", inputs[cameraIndex].latestTargetObservation.tx)
             Logger.recordOutput("Vision/Camera$cameraIndex/RobotPosesAccepted", *robotPosesAccepted.toTypedArray())

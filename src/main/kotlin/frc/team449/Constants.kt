@@ -207,7 +207,7 @@ object Constants {
         val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
         val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
-        val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Brake
         val LEFT_ROLLER_INVERSION = InvertedValue.Clockwise_Positive
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
@@ -229,9 +229,9 @@ object Constants {
         const val STOW_POS_RADS = 0.0
         const val DEPLOY_POS_RADS = 2.269
 
-        const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.5
-        const val STOW_VOLTS = -4.0
+        const val DEPLOY_VOLTS = 6.0
+        const val DEPLOY_HOLD_VOLTS = 0.0
+        const val STOW_VOLTS = -6.0
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- ROLLER VELOCITY SETPOINTS ---
@@ -312,10 +312,10 @@ object Constants {
         // --- AIMBOT GAINS ---
         const val AIMBOT_KP = 10.0
         const val AIMBOT_KI = 0.0
-        const val AIMBOT_KD = 0.5
+        const val AIMBOT_KD = 0.0
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.07 // in radians, 4 degrees
+        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.02 // in radians, 4 degrees
     }
 
     object LEDConstants {

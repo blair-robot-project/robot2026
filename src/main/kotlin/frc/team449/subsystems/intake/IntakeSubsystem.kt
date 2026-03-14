@@ -31,8 +31,8 @@ class IntakeSubsystem(
     fun intake(): Command =
         this
             .run {
-                rollerTargetVolts = 11.0
-                io.setRollerVoltage(11.0)
+                rollerTargetVolts = 12.0
+                io.setRollerVoltage(12.0)
             }
             .withName("Intake")
 

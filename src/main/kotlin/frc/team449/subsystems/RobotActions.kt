@@ -63,8 +63,9 @@ class RobotActions(
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
             SequentialCommandGroup(
-                intake.stow(),
-                intake.deploy()
+                intake.intake(),
+                intake.stow().withTimeout(0.3),
+                intake.deploy().withTimeout(0.3)
             )
         )
 

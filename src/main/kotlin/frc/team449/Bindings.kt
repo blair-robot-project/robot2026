@@ -75,7 +75,7 @@ class Bindings(
                                 robotContainer.power,
                                 actions,
                                 FieldUtil.HUB_TRANSLATION
-                            ),
+                            ).withTimeout(3.0),
                             PrintCommand("Align Complete!"),
                             ParallelCommandGroup(
                                 robotContainer.drive.xLock(),

@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.util.struct.Struct
 import edu.wpi.first.util.struct.StructSerializable
+import frc.team449.Constants
 import org.littletonrobotics.junction.AutoLog
 import java.nio.ByteBuffer
 
@@ -12,17 +13,11 @@ interface VisionIO {
     open class VisionIOInputs {
         @JvmField var connected: Boolean = false
 
-        @JvmField var latestTargetObservation = TargetObservation(Rotation2d(), Rotation2d())
+        @JvmField var latestTargetObservation: TargetObservation = TargetObservation(Rotation2d.kZero, Rotation2d.kZero)
 
         @JvmField var poseObservations: Array<PoseObservation> = emptyArray()
 
-        @JvmField var poseObservationsLen = poseObservations.size
-
-        @JvmField var logsObservations: Array<PoseObservation> = emptyArray()
-
-        @JvmField var logsObservationsLen = logsObservations.size
-
-        @JvmField var tagIds: IntArray = IntArray(0)
+        @JvmField var tagIds = IntArray(0)
     }
 
     data class TargetObservation(
@@ -33,23 +28,22 @@ interface VisionIO {
             @JvmField
             val struct = object : Struct<TargetObservation> {
                 override fun getTypeClass(): Class<TargetObservation> = TargetObservation::class.java
+
                 override fun getTypeName(): String = "TargetObservation"
 
-                // two Rotation2d
                 override fun getSize(): Int = Rotation2d.struct.size * 2
-                override fun getSchema(): String = "Rotation2d tx; Rotation2d ty"
-                override fun getNested(): Array<Struct<*>> = arrayOf(Rotation2d.struct)
 
-                override fun pack(bb: ByteBuffer, value: TargetObservation) {
-                    Rotation2d.struct.pack(bb, value.tx)
-                    Rotation2d.struct.pack(bb, value.ty)
+                override fun getSchema(): String = "Rotation2d tx; Rotation2d ty"
+
+                override fun pack(buffer: ByteBuffer, value: TargetObservation) {
+                    Rotation2d.struct.pack(buffer, value.tx)
+                    Rotation2d.struct.pack(buffer, value.ty)
                 }
 
-                override fun unpack(bb: ByteBuffer): TargetObservation {
-                    return TargetObservation(
-                        tx = Rotation2d.struct.unpack(bb),
-                        ty = Rotation2d.struct.unpack(bb)
-                    )
+                override fun unpack(buffer: ByteBuffer): TargetObservation {
+                    val newTx = Rotation2d.struct.unpack(buffer)
+                    val newTy = Rotation2d.struct.unpack(buffer)
+                    return TargetObservation(newTx, newTy)
                 }
             }
         }
@@ -65,37 +59,38 @@ interface VisionIO {
     ) : StructSerializable {
         companion object {
             @JvmField
-            val struct = object : Struct<PoseObservation> {
+            val struct: Struct<PoseObservation> = object : Struct<PoseObservation> {
                 override fun getTypeClass(): Class<PoseObservation> = PoseObservation::class.java
+
                 override fun getTypeName(): String = "PoseObservation"
 
-                // timestamp (8) + pose (Pose3d.size) + ambiguity (8) + tagCount (4) + avgDist (8) + enum ordinal (4)
-                override fun getSize(): Int = 8 + Pose3d.struct.size + 8 + 4 + 8 + 4
+                override fun getSize(): Int = 8 + Pose3d.struct.size + 8 + 4 + 8 + PoseObservationType.entries.size
 
-                // save the Enum as 'int'
-                override fun getSchema(): String =
-                    "double timestamp; Pose3d pose; double ambiguity; int tagCount; double averageTagDistance; int type"
+                // ggs if this has to be formatted
+                override fun getSchema(): String = "Double timestamp; Pose3d pose; Double ambiguity; Int tagCount; Double averageTagDistance; PoseObservationType type"
 
-                override fun getNested(): Array<Struct<*>> = arrayOf(Pose3d.struct)
-
-                override fun pack(bb: ByteBuffer, value: PoseObservation) {
-                    bb.putDouble(value.timestamp)
-                    Pose3d.struct.pack(bb, value.pose)
-                    bb.putDouble(value.ambiguity)
-                    bb.putInt(value.tagCount)
-                    bb.putDouble(value.averageTagDistance)
-                    bb.putInt(value.type.ordinal) // save enum as int
+                override fun pack(buffer: ByteBuffer, value: PoseObservation) {
+                    buffer.putDouble(value.timestamp)
+                    Pose3d.struct.pack(buffer, value.pose)
+                    buffer.putDouble(value.ambiguity)
+                    buffer.putInt(value.tagCount)
+                    buffer.putDouble(value.averageTagDistance)
+                    // don't put the pose observation type in the buffer bc in some case it causes it to overflow
+                    // pose observation type will always be megatag2 if not sim and photonvision if sim anyway
                 }
 
-                override fun unpack(bb: ByteBuffer): PoseObservation {
-                    return PoseObservation(
-                        timestamp = bb.double,
-                        pose = Pose3d.struct.unpack(bb),
-                        ambiguity = bb.double,
-                        tagCount = bb.int,
-                        averageTagDistance = bb.double,
-                        type = PoseObservationType.entries[bb.int] // restore enum from int
-                    )
+                override fun unpack(buffer: ByteBuffer): PoseObservation {
+                    val newTimestamp = buffer.getDouble()
+                    val newPose = Pose3d.struct.unpack(buffer)
+                    val newAmbiguity = buffer.getDouble()
+                    val newCount = buffer.getInt()
+                    val newAvgDist = buffer.getDouble()
+                    val newType: PoseObservationType = if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
+                        PoseObservationType.PHOTONVISION
+                    } else {
+                        PoseObservationType.MEGATAG_2
+                    }
+                    return PoseObservation(newTimestamp, newPose, newAmbiguity, newCount, newAvgDist, newType)
                 }
             }
         }

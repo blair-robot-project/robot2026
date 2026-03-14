@@ -1,6 +1,5 @@
 package frc.team449
 
-import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
@@ -77,37 +76,20 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight(
-                        VisionConstants.CAMERA_RIGHT_NAME,
-                        { drive.pose.rotation },
-                        drive::getAngularVelocity,
-                        Pose3d(
-                            VisionConstants.ROBOT_TO_CAMERA_RIGHT.translation,
-                            VisionConstants.ROBOT_TO_CAMERA_RIGHT.rotation
-                        )
-                    ),
-                    VisionIOLimelight(
-                        VisionConstants.CAMERA_LEFT_NAME,
-                        { drive.pose.rotation },
-                        drive::getAngularVelocity,
-                        Pose3d(
-                            VisionConstants.ROBOT_TO_CAMERA_LEFT.translation,
-                            VisionConstants.ROBOT_TO_CAMERA_LEFT.rotation
-                        )
-                    )
+                    VisionIOLimelight("limelight-right", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose.rotation }),
+                    VisionIOLimelight("limelight-left", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose.rotation })
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOPhotonVisionSim(VisionConstants.CAMERA_RIGHT_NAME, VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
-                    VisionIOPhotonVisionSim(VisionConstants.CAMERA_LEFT_NAME, VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
+                    VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose }),
+                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_RIGHT, { drive.pose }),
                 )
-            Mode.REPLAY ->
-                VisionSubsystem(
-                    drive::addVisionMeasurement,
-                    object : VisionIO {},
-//                    object : VisionIO {},
-                )
+            Mode.REPLAY -> VisionSubsystem(
+                drive::addVisionMeasurement,
+                object : VisionIO {},
+                object : VisionIO {}
+            ).also { vision = it }
         }
 
     val intake: IntakeSubsystem =

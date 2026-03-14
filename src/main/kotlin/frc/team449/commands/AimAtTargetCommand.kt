@@ -36,7 +36,7 @@ class AimAtTargetCommand(
     }
 
     override fun initialize() {
-        power.requestProfile(PowerProfile.SHOOTING)
+        CommandScheduler.getInstance().schedule(power.requestProfile(PowerProfile.SHOOTING))
         println("Initializing AimAtTargetCommand")
     }
 
