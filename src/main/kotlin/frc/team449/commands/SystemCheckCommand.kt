@@ -23,24 +23,7 @@ class SystemCheckCommand(
             robotContainer.indexer,
             robotContainer.shooter,
         )
-
-        // Checks Left Pivot Leader to see if it's in a tolerable range
-        fun verifyPivot(): Boolean {
-            val target: Double =
-                if (robotContainer.intake.pivotIsDeployed) {
-                    IntakeConstants.DEPLOY_POS_RADS
-                } else {
-                    IntakeConstants.STOW_POS_RADS
-                }
-            return abs(robotContainer.intake.intakeSimAngle - target) <=
-                0.175 // Rads ~ 10 degrees
-        }
-
-        // Checks the rollerVelocity is in a tolerable range
-        fun verifyRoller(): Boolean =
-            abs(robotContainer.intake.rollerVelocityRadPerSec - robotContainer.intake.rollerTargetVelocityRadPerSec) <=
-                20 // Rad/s
-
+        
         addCommands(
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
@@ -96,4 +79,22 @@ class SystemCheckCommand(
             robotContainer.shooter.homeHood()
         )
     }
+
+    // Checks Left Pivot Leader to see if it's in a tolerable range
+    fun verifyPivot(): Boolean {
+        val target: Double =
+            if (robotContainer.intake.pivotIsDeployed) {
+                IntakeConstants.DEPLOY_POS_RADS
+            } else {
+                IntakeConstants.STOW_POS_RADS
+            }
+        return abs(robotContainer.intake.intakeSimAngle - target) <=
+            0.175 // Rads ~ 10 degrees
+    }
+
+    // Checks the rollerVelocity is in a tolerable range
+    fun verifyRoller(): Boolean =
+        abs(robotContainer.intake.rollerVelocityRadPerSec - robotContainer.intake.rollerTargetVelocityRadPerSec) <=
+            20 // Rad/s
+
 }
