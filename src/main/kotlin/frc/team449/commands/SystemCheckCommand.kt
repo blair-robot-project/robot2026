@@ -23,7 +23,7 @@ class SystemCheckCommand(
             robotContainer.indexer,
             robotContainer.shooter,
         )
-        
+
         addCommands(
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
@@ -57,11 +57,15 @@ class SystemCheckCommand(
             robotContainer.intake.intake(),
             robotContainer.intake.deploy(),
             WaitCommand(1.5),
-            Commands.runOnce({ Alert("BAD PIVOT", Alert.AlertType.kError) }).onlyIf { verifyPivot() },
-            Commands.runOnce({ Alert("BAD ROLLER", Alert.AlertType.kError) }).onlyIf { verifyRoller() },
+            Commands.waitUntil { pivotInTolerance() }.withTimeout(0.5),
+            Commands.runOnce({ Alert("BAD PIVOT", Alert.AlertType.kError).set(!pivotInTolerance()) }),
+            Commands.waitUntil { rollerInTolerance() }.withTimeout(0.5),
+            Commands.runOnce({ Alert("BAD ROLLER", Alert.AlertType.kError).set(!rollerInTolerance()) }),
+
             robotContainer.intake.stopRollers(),
             robotContainer.intake.stow(),
-            Commands.runOnce({ Alert("BAD PIVOT", Alert.AlertType.kError) }).onlyIf { verifyPivot() },
+            Commands.waitUntil { pivotInTolerance() }.withTimeout(0.5),
+            Commands.runOnce({ Alert("BAD PIVOT", Alert.AlertType.kError).set(!pivotInTolerance()) }),
 
             robotContainer.indexer.index(Constants.IndexerConstants.SHOOTING_INDEXER_SPEED),
             WaitCommand(1.0),
@@ -81,20 +85,20 @@ class SystemCheckCommand(
     }
 
     // Checks Left Pivot Leader to see if it's in a tolerable range
-    fun verifyPivot(): Boolean {
+    fun pivotInTolerance(): Boolean {
         val target: Double =
             if (robotContainer.intake.pivotIsDeployed) {
                 IntakeConstants.DEPLOY_POS_RADS
             } else {
                 IntakeConstants.STOW_POS_RADS
             }
-        return abs(robotContainer.intake.intakeSimAngle - target) <=
-            0.175 // Rads ~ 10 degrees
+        return abs(robotContainer.intake.intakeAngle - target) <=
+            IntakeConstants.PIVOT_TOLERANCE_POS_RADS
     }
 
     // Checks the rollerVelocity is in a tolerable range
-    fun verifyRoller(): Boolean =
+    fun rollerInTolerance(): Boolean =
         abs(robotContainer.intake.rollerVelocityRadPerSec - robotContainer.intake.rollerTargetVelocityRadPerSec) <=
-            20 // Rad/s
+            IntakeConstants.ROLLER_TOLERANCE_VELOCITY_RAD_SEC
 
 }

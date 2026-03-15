@@ -23,7 +23,7 @@ class IntakeSubsystem(
 
     val rollerVelocityRadPerSec: Double
         get() = inputs.leftRollerLeaderVelocityRadPerSec
-    val intakeSimAngle: Double
+    val intakeAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
 
     override fun periodic() {
