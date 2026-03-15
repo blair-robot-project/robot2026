@@ -1,6 +1,8 @@
 package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveRequest
+import edu.wpi.first.wpilibj.Alert
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants
@@ -64,13 +66,21 @@ class SystemCheckCommand(
             robotContainer.shooter.setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL),
             robotContainer.shooter.homeHood(),
             robotContainer.shooter.setHoodAngle(ShooterConstants.TOWER_HOOD_ANGLE),
-            WaitCommand(0.75),
+            Commands
+                .waitUntil {
+                    robotContainer.shooter.isFlywheelAtTolerance() && robotContainer.shooter.isHoodAtTolerance()
+                }.withTimeout(0.75),
+            Commands.run({ Alert("BAD FLYWHEEL", Alert.AlertType.kError).set(!robotContainer.shooter.isFlywheelAtTolerance()) }),
+            Commands.run({ Alert("BAD TOWER HOOD ANGLE", Alert.AlertType.kError).set(!robotContainer.shooter.isHoodAtTolerance()) }),
             robotContainer.shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE),
-            WaitCommand(0.75),
+            Commands.waitUntil { robotContainer.shooter.isHoodAtTolerance() }.withTimeout(0.75),
+            Commands.run({ Alert("BAD TRENCH HOOD ANGLE", Alert.AlertType.kError).set(!robotContainer.shooter.isHoodAtTolerance()) }),
             robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-            WaitCommand(0.75),
+            Commands.waitUntil { robotContainer.shooter.isHoodAtTolerance() }.withTimeout(0.75),
+            Commands.run({ Alert("BAD MAX HOOD ANGLE", Alert.AlertType.kError).set(!robotContainer.shooter.isHoodAtTolerance()) }),
             robotContainer.shooter.stopFlywheel(),
-            robotContainer.shooter.homeHood()
+            robotContainer.shooter.homeHood(),
+
         )
     }
 }
