@@ -129,23 +129,23 @@ object Constants {
         const val LEFT_FLYWHEEL_KI = 0.0
         const val LEFT_FLYWHEEL_KD = 0.0
         const val LEFT_FLYWHEEL_KS = 0.286
-        const val LEFT_FLYWHEEL_KV = 0.2067
+        const val LEFT_FLYWHEEL_KV = 0.2073
         // const val LEFT_FLYWHEEL_KA = ...
 
         const val RIGHT_FLYWHEEL_KP = 0.5
         const val RIGHT_FLYWHEEL_KI = 0.0
         const val RIGHT_FLYWHEEL_KD = 0.0
         const val RIGHT_FLYWHEEL_KS = 0.271
-        const val RIGHT_FLYWHEEL_KV = 0.2055
+        const val RIGHT_FLYWHEEL_KV = 0.2042
         // const val RIGHT_FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
-        const val HOOD_KP = 200.0
+        const val HOOD_KP = 5000.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
-        const val HOOD_KS = 0.1
-        const val HOOD_KG = 0.14 // 0.14
-        const val HOOD_KV = 3.5
+        const val HOOD_KS = 0.2102
+        const val HOOD_KG = 0.14
+        const val HOOD_KV = 3.4683
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
@@ -180,18 +180,24 @@ object Constants {
 
         val FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.041, HUB_FLYWHEEL_VEL.`in`(RadiansPerSecond))
-                put(2.032, 200.5)
-                put(3.59511479485, 200.5)
-                put(5.0, 220.5)
+                put(1.294, 165.0)
+                put(1.671, 180.0)
+                put(2.08, 210.0)
+                put(2.57, 210.0)
+                put(3.43, 210.0)
+                put(4.92, 220.0)
+                put(5.90, 280.5)
             }
 
         val HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.041, HUB_HOOD_ANGLE.`in`(Radians))
-                put(2.032, 0.04)
-                put(3.59511479485, TRENCH_HOOD_ANGLE.`in`(Radians))
-                put(5.0, 0.2806)
+                put(1.294, 0.0)
+                put(1.671, 0.0)
+                put(2.08, .01)
+                put(2.57, .07)
+                put(3.43, 0.15)
+                put(4.92, 0.27)
+                put(5.90, 0.27)
             }
     }
 
@@ -229,9 +235,9 @@ object Constants {
         const val STOW_POS_RADS = 0.0
         const val DEPLOY_POS_RADS = 2.269
 
-        const val DEPLOY_VOLTS = 6.0
+        const val DEPLOY_VOLTS = 4.0
         const val DEPLOY_HOLD_VOLTS = 0.0
-        const val STOW_VOLTS = -6.0
+        const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- ROLLER VELOCITY SETPOINTS ---
@@ -310,12 +316,12 @@ object Constants {
 
     object AimbotConstants {
         // --- AIMBOT GAINS ---
-        const val AIMBOT_KP = 10.0
-        const val AIMBOT_KI = 0.0
-        const val AIMBOT_KD = 0.0
+        const val AIMBOT_KP = 5.0
+        const val AIMBOT_KI = 0.1
+        const val AIMBOT_KD = 0.00
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.02 // in radians, 4 degrees
+        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.01
     }
 
     object LEDConstants {
@@ -331,12 +337,12 @@ object Constants {
         const val CAMERA_LEFT_NAME: String = "limelight-left"
 
         // --- ROBOT TO CAMERA TRANSFORMS ---
-        var ROBOT_TO_CAMERA_RIGHT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, -0.523599))
-        var ROBOT_TO_CAMERA_LEFT: Transform3d = Transform3d(-0.2514092 - 0.079375 + 0.0516, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, -0.523599))
+        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.2514092 - 0.079375 + 0.0516, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
         // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
 
         // --- FILTERING THRESHOLDS --
-        const val MAX_AMBIGUITY: Double = 0.3
+        const val MAX_AMBIGUITY: Double = 0.15
         const val MAX_Z_ERROR_METERS: Double = 0.5
 
         // --- STANDARD DEVIATION BASELINES ---

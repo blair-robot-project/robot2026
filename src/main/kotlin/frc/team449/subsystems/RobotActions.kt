@@ -5,6 +5,7 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.DeferredCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
@@ -20,6 +21,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import org.littletonrobotics.junction.Logger
 import kotlin.text.get
 
 class RobotActions(
@@ -63,15 +65,19 @@ class RobotActions(
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
             SequentialCommandGroup(
-                intake.intake(),
-                intake.stow().withTimeout(0.3),
-                intake.deploy().withTimeout(0.3)
+                intake.intake().withTimeout(0.1),
+                intake.stow().withTimeout(0.5),
+                intake.deploy().withTimeout(0.1)
             )
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
         SequentialCommandGroup(
             power.requestProfile(PowerProfile.SHOOTING),
+            InstantCommand({
+                Logger.recordOutput("Aimbot/FlywheelEstimatedVel", ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
+                Logger.recordOutput("Aimbot/HoodEstimatedAngle", ShooterConstants.HOOD_ANGLE_MAP.get(distance))
+            }),
             shooter.setAimCommand(
                 Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
                 RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))

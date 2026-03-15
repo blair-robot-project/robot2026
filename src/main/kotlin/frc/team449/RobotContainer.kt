@@ -27,7 +27,6 @@ import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
-import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 import frc.team449.subsystems.vision.VisionSubsystem
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 
@@ -76,16 +75,16 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight("limelight-right", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose.rotation }),
-                    VisionIOLimelight("limelight-left", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose.rotation })
+                    VisionIOLimelight("limelight-right", { drive.pose.rotation }, drive::getAngularVelocity, VisionConstants.ROBOT_TO_CAMERA_RIGHT),
+                    VisionIOLimelight("limelight-left", { drive.pose.rotation }, drive::getAngularVelocity, VisionConstants.ROBOT_TO_CAMERA_LEFT)
                 )
-            Mode.SIM ->
-                VisionSubsystem(
-                    drive::addVisionMeasurement,
-                    VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose }),
-                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_RIGHT, { drive.pose }),
-                )
-            Mode.REPLAY -> VisionSubsystem(
+//            Mode.SIM ->
+//                VisionSubsystem(
+//                    drive::addVisionMeasurement,
+//                    VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT, { drive.pose }),
+//                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose }),
+//                )
+            else -> VisionSubsystem(
                 drive::addVisionMeasurement,
                 object : VisionIO {},
                 object : VisionIO {}

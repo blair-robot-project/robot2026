@@ -2,20 +2,18 @@ package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
-import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.Constants.AimbotConstants
-import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import org.littletonrobotics.junction.Logger
 import kotlin.math.PI
-import kotlin.math.abs
 
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
@@ -23,13 +21,21 @@ class AimAtTargetCommand(
     private val actions: RobotActions,
     private val target: Translation2d
 ) : Command() {
-    private val request = SwerveRequest.FieldCentricFacingAngle()
-        .withDeadband(DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND * DriveConstants.TRANSLATION_DEADBAND,)
-        .withRotationalDeadband(DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * DriveConstants.ANGULAR_DEADBAND,)
-        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity,)
-        .withHeadingPID(AimbotConstants.AIMBOT_KP, AimbotConstants.AIMBOT_KI, AimbotConstants.AIMBOT_KD,)
+    private val request = SwerveRequest.FieldCentric()
+        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
-    var headingErrorRad: Double = 2 * PI
+    private val headingController = ProfiledPIDController(
+        AimbotConstants.AIMBOT_KP,
+        AimbotConstants.AIMBOT_KI,
+        AimbotConstants.AIMBOT_KD,
+        TrapezoidProfile.Constraints(
+            4.0,
+            8.0
+        )
+    ).apply {
+        enableContinuousInput(-PI, PI)
+        setTolerance(AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS)
+    }
 
     init {
         addRequirements(drive)
@@ -37,7 +43,8 @@ class AimAtTargetCommand(
 
     override fun initialize() {
         CommandScheduler.getInstance().schedule(power.requestProfile(PowerProfile.SHOOTING))
-        println("Initializing AimAtTargetCommand")
+        headingController.reset(drive.pose.rotation.radians)
+        println("Initializing AimAtTargetCommand.")
     }
 
     override fun execute() {
@@ -45,27 +52,26 @@ class AimAtTargetCommand(
         val translationToTarget = target.minus(currentPose.translation)
         val distance = translationToTarget.norm
 
-        val isRed = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-        val targetHeading = if (isRed) translationToTarget.angle.plus(Rotation2d.fromDegrees(180.0)) else translationToTarget.angle
+        val targetHeading = translationToTarget.angle
+        val omegaRadPerSec = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
 
         drive.setControl(
             request
                 .withVelocityX(0.0)
                 .withVelocityY(0.0)
-                .withTargetDirection(targetHeading)
+                .withRotationalRate(omegaRadPerSec)
         )
 
         CommandScheduler.getInstance().schedule(
             actions.prepShotFromAnywhere(distance)
         )
 
-        headingErrorRad = abs(currentPose.rotation.minus(targetHeading).radians)
-
-        Logger.recordOutput("Aimbot/HeadingErrorRads", headingErrorRad)
+        Logger.recordOutput("Aimbot/HeadingErrorRads", headingController.positionError)
+        Logger.recordOutput("Aimbot/ProfiledTargetVelocity", headingController.setpoint.velocity)
         Logger.recordOutput("Aimbot/DistanceToHubMeters", distance)
     }
 
-    override fun isFinished(): Boolean = (headingErrorRad < AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS)
+    override fun isFinished(): Boolean = headingController.atGoal()
 
     override fun end(interrupted: Boolean) = println("AimAtTargetCommand interrupted: $interrupted")
 }

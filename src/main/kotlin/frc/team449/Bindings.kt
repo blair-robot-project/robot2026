@@ -87,7 +87,7 @@ class Bindings(
                     setOf<Subsystem>(robotContainer.intake, robotContainer.indexer)
                 )
                     .until(joysticksMovedPastDeadbandTrigger)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(robotContainer.power.requestProfile(PowerProfile.DRIVING)) }
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(robotContainer.power.requestProfile(PowerProfile.DRIVING), actions.stopAllAndHomeHood()) }
             )
 
         driver
@@ -131,6 +131,12 @@ class Bindings(
             )
 
         driver
+            .povLeft()
+            .onTrue(
+                actions.stopAllAndHomeHood()
+            )
+
+        driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric()
@@ -149,12 +155,14 @@ class Bindings(
             .a()
             .whileTrue(
                 robotContainer.shooter.sysIDFlywheel.quasistatic(SysIdRoutine.Direction.kForward)
+                    .beforeStarting(robotContainer.power.requestProfile(PowerProfile.SHOOTING))
             )
 
         operator
             .b()
             .whileTrue(
                 robotContainer.shooter.sysIDFlywheel.dynamic(SysIdRoutine.Direction.kForward)
+                    .beforeStarting(robotContainer.power.requestProfile(PowerProfile.SHOOTING))
             )
 
         operator

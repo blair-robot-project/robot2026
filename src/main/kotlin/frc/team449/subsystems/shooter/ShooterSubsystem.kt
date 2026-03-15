@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
@@ -55,7 +56,7 @@ class ShooterSubsystem(
         Logger.processInputs("Shooter", inputs)
 
         if (tuningModeActive.get() == 1.0) {
-            updateTunableGains()
+//            updateTunableGains()
 
             if (tunableFlywheelVelocity.hasChanged(hashCode()) || tunableHoodAngle.hasChanged(hashCode())) {
                 flywheelTargetVelocityRadPerSec = tunableFlywheelVelocity.get()
@@ -73,19 +74,19 @@ class ShooterSubsystem(
         Logger.recordOutput("Shooter/HoodAtTolerance", isHoodAtTolerance())
     }
 
-    fun updateTunableGains() {
-        if (tunableLeftFlywheelKP.hasChanged(hashCode()) ||
-            tunableLeftFlywheelKD.hasChanged(hashCode()) ||
-            tunableRightFlywheelKP.hasChanged(hashCode()) ||
-            tunableRightFlywheelKD.hasChanged(hashCode())
-        ) {
-            io.setFlywheelGains(tunableLeftFlywheelKP.get(), tunableLeftFlywheelKD.get(), tunableRightFlywheelKP.get(), tunableRightFlywheelKD.get())
-        }
-
-        if (tunableHoodKP.hasChanged(hashCode()) || tunableHoodKD.hasChanged(hashCode())) {
-            io.setHoodGains(tunableHoodKP.get(), tunableHoodKD.get())
-        }
-    }
+//    fun updateTunableGains() {
+//        if (tunableLeftFlywheelKP.hasChanged(hashCode()) ||
+//            tunableLeftFlywheelKD.hasChanged(hashCode()) ||
+//            tunableRightFlywheelKP.hasChanged(hashCode()) ||
+//            tunableRightFlywheelKD.hasChanged(hashCode())
+//        ) {
+//            io.setFlywheelGains(tunableLeftFlywheelKP.get(), tunableLeftFlywheelKD.get(), tunableRightFlywheelKP.get(), tunableRightFlywheelKD.get())
+//        }
+//
+//        if (tunableHoodKP.hasChanged(hashCode()) || tunableHoodKD.hasChanged(hashCode())) {
+//            io.setHoodGains(tunableHoodKP.get(), tunableHoodKD.get())
+//        }
+//    }
 
     fun setAimCommand(hoodAngle: Angle, flywheelVelocity: AngularVelocity): Command =
         run {
@@ -148,15 +149,16 @@ class ShooterSubsystem(
             val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME)
 
             SequentialCommandGroup(
-                setHoodVoltage(ShooterConstants.HOMING_VOLTAGE),
+                setHoodVoltage(ShooterConstants.HOMING_VOLTAGE).withTimeout(0.1),
+                PrintCommand("i am here"),
                 WaitUntilCommand {
                     val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
                     val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
                     homingDebouncer.calculate(highCurrent && lowVelocity)
                 },
-                setHoodVoltage(0.0),
+                setHoodVoltage(0.0).withTimeout(0.1),
                 resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
-                setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+                setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE).withTimeout(0.1)
             )
         }
             .withName("Home Hood")
