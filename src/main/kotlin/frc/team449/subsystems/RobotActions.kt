@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
@@ -44,9 +45,8 @@ class RobotActions(
                     IndexerConstants.INTAKING_INDEXER_SPEED,
                     RadiansPerSecond.of(0.0),
                 ),
-            )
-        )
-            .finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
+            ),
+        ).finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
@@ -59,16 +59,15 @@ class RobotActions(
                     RadiansPerSecond.of(0.0),
                 ),
                 intake.stow(),
-            )
+            ),
         )
 
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
             SequentialCommandGroup(
-                intake.intake().withTimeout(0.1),
-                intake.stow().withTimeout(0.5),
-                intake.deploy().withTimeout(0.1)
-            )
+                intake.intake().withTimeout(0.580424),
+                intake.outtake().withTimeout(0.1678),
+            ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -78,18 +77,19 @@ class RobotActions(
                 Logger.recordOutput("Aimbot/FlywheelEstimatedVel", ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
                 Logger.recordOutput("Aimbot/HoodEstimatedAngle", ShooterConstants.HOOD_ANGLE_MAP.get(distance))
             }),
-            shooter.setAimCommand(
-                Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
-                RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
-            )
+            shooter
+                .setAimCommand(
+                    Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
+                    RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
+                ).withTimeout(0.2),
         )
 
     fun checkAndFeed(): Command =
         RepeatCommand(
             ConditionalCommand(
                 indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).withTimeout(0.25),
-                indexer.stop()
-            ) { shooter.isFlywheelAtTolerance() && shooter.isFlywheelAtTolerance() }
+                indexer.stop(),
+            ) { shooter.isFlywheelAtTolerance() && shooter.isFlywheelAtTolerance() },
         )
 
     fun autoUnjam(): Command =
@@ -107,14 +107,14 @@ class RobotActions(
                     shooter.setFlywheelVelocity(RadiansPerSecond.of(currentSetpoint)),
                 )
             },
-            setOf(indexer, shooter)
+            setOf(indexer, shooter),
         )
 
     fun reverseAll(): Command =
         ParallelCommandGroup(
             intake.outtake(),
             indexer.index(RadiansPerSecond.of(-30.0)),
-            shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL)
+            shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
         )
 
     fun stopAllAndHomeHood(): Command =
@@ -123,6 +123,36 @@ class RobotActions(
             indexer.stop(),
             shooter.stopFlywheel(),
             shooter.homeHood(),
+        )
+
+    fun stopAll(): Command =
+        SequentialCommandGroup(
+            intake.stopRollers(),
+            indexer.stop(),
+            shooter.stopFlywheel(),
+        )
+
+    fun autoTrenchShot(): Command =
+        SequentialCommandGroup(
+            prepShotFromAnywhere(3.43),
+            ParallelCommandGroup(
+                checkAndFeed(),
+                WaitCommand(0.5).andThen(
+                    shuffleIntakePivot().withTimeout(0.5).andThen(
+                        intake.stow().withTimeout(0.2).andThen(
+                            intake.deploy().withTimeout(0.3),
+                        ),
+                    ),
+                ),
+            ),
+        ).withTimeout(4.0).andThen(
+            intake.stow().withTimeout(0.1),
+        )
+
+    fun autoHubShot(): Command =
+        SequentialCommandGroup(
+            prepShotFromAnywhere(1.294),
+            checkAndFeed(),
         )
 
     fun systemCheckCommand(): Command = SystemCheckCommand(robotContainer)
