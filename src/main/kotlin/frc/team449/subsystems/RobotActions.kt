@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
@@ -64,9 +65,8 @@ class RobotActions(
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
             SequentialCommandGroup(
-                intake.intake().withTimeout(0.1),
-                intake.stow().withTimeout(0.5),
-                intake.deploy().withTimeout(0.1),
+                intake.intake().withTimeout(0.580424),
+                intake.outtake().withTimeout(0.1678),
             ),
         )
 
@@ -77,10 +77,11 @@ class RobotActions(
                 Logger.recordOutput("Aimbot/FlywheelEstimatedVel", ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
                 Logger.recordOutput("Aimbot/HoodEstimatedAngle", ShooterConstants.HOOD_ANGLE_MAP.get(distance))
             }),
-            shooter.setAimCommand(
-                Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
-                RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
-            ),
+            shooter
+                .setAimCommand(
+                    Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
+                    RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
+                ).withTimeout(0.2),
         )
 
     fun checkAndFeed(): Command =
@@ -134,7 +135,18 @@ class RobotActions(
     fun autoTrenchShot(): Command =
         SequentialCommandGroup(
             prepShotFromAnywhere(3.43),
-            checkAndFeed(),
+            ParallelCommandGroup(
+                checkAndFeed(),
+                WaitCommand(0.5).andThen(
+                    shuffleIntakePivot().withTimeout(0.5).andThen(
+                        intake.stow().withTimeout(0.2).andThen(
+                            intake.deploy().withTimeout(0.3),
+                        ),
+                    ),
+                ),
+            ),
+        ).withTimeout(4.0).andThen(
+            intake.stow().withTimeout(0.1),
         )
 
     fun autoHubShot(): Command =
