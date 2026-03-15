@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
+import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
+import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
 import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME_SEC
 import frc.team449.Constants.AutoConstants.CTE_D
 import frc.team449.Constants.AutoConstants.CTE_I
@@ -30,7 +32,7 @@ import java.util.function.Consumer
 
 class BLineRoutines(
     private val drive: DriveSubsystem,
-    private val actions: RobotActions
+    private val actions: RobotActions,
 ) {
     private val translationP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val translationI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
@@ -71,12 +73,13 @@ class BLineRoutines(
         )
     }
 
-    val translationController = PIDController(TRANSLATION_P, TRANSLATION_I, TRANSLATION_D)
-    val rotationController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
-    val crossTrackController = PIDController(CTE_P, CTE_I, CTE_D)
+    private val translationController = PIDController(TRANSLATION_P, TRANSLATION_I, TRANSLATION_D)
+    private val rotationController = PIDController(ROTATION_P, ROTATION_I, ROTATION_D)
+    private val crossTrackController = PIDController(CTE_P, CTE_I, CTE_D)
 
     private val applyRobotSpeedsRequest = SwerveRequest.ApplyRobotSpeeds()
-    var pathBuilder: FollowPath.Builder =
+
+    private fun pathBuilder(mirror: Boolean): FollowPath.Builder =
         FollowPath
             .Builder(
                 drive,
@@ -89,8 +92,9 @@ class BLineRoutines(
                 rotationController,
                 crossTrackController,
             ).withDefaultShouldFlip()
+            .withShouldMirror { mirror }
 
-    var pathBuilderWithReset: FollowPath.Builder =
+    private fun pathBuilderWithReset(mirror: Boolean): FollowPath.Builder =
         FollowPath
             .Builder(
                 drive,
@@ -104,16 +108,31 @@ class BLineRoutines(
                 crossTrackController,
             ).withDefaultShouldFlip()
             .withPoseReset(drive::resetOdometry)
+            .withShouldMirror { mirror }
 
-    fun eventTriggerCommands() {
-//        FollowPath.registerEventTrigger("start_intake", actions.autoDeployAndRunIntake())
-//        FollowPath.registerEventTrigger("end_intake", actions.stopIntake())
-//        FollowPath.registerEventTrigger("start_shooting", actions.autonUnjamAndShoot())
-//        FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
-//        FollowPath.registerEventTrigger("stop_shooting", actions.stopFeedAndShooter())
+    private fun eventTriggerCommands() {
+        FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
+        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopAll())
+        FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
 
-    fun rHalfClose(): Command {
+    private fun preloadHubShot(): Command {
+        val path1 = Path("hub_start")
+        val path2 = Path("hub_end")
+
+        eventTriggerCommands()
+
+        return Commands.sequence(
+            pathBuilderWithReset(false).build(path1),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilder(false).build(path2),
+        )
+    }
+
+    private fun nothing(): Command = Commands.none()
+
+    private fun halfClose(mirror: Boolean): Command {
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_half_closer_pt1")
@@ -123,18 +142,18 @@ class BLineRoutines(
         eventTriggerCommands()
 
         return Commands.sequence(
-            // drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset.build(path1),
-            pathBuilder.build(path2),
+            drive.alignModules(Rotation2d.kCW_90deg),
+            pathBuilderWithReset(mirror).build(path1),
+            pathBuilder(mirror).build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilder.build(path3),
-            pathBuilder.build(path4),
+            pathBuilder(mirror).build(path3),
+            pathBuilder(mirror).build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilder.build(path5),
+            pathBuilder(mirror).build(path5),
         )
     }
 
-    fun rHalfFar(): Command {
+    private fun halfFar(mirror: Boolean): Command {
         val path1 = Path("R_half_close_pt1")
         val path2 = Path("R_half_close_pt2")
         val path3 = Path("R_half_far_pt1")
@@ -145,119 +164,45 @@ class BLineRoutines(
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset.build(path3),
-            pathBuilderWithReset.build(path4),
+            pathBuilderWithReset(mirror).build(path3),
+            pathBuilder(mirror).build(path4),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
+            pathBuilder(mirror).build(path1),
+            pathBuilder(mirror).build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path5),
+            pathBuilder(false).build(path5),
         )
     }
 
-    fun rHalfAndLoop(): Command {
+    private fun halfAndLoop(mirror: Boolean): Command {
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_loop_reg")
-        val path4 = Path("l_end")
-
-        eventTriggerCommands()
-
-        return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path3),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path4),
-        )
-    }
-
-    fun lHalfClose(): Command {
-        val path1 = Path("L_half_reg_pt1")
-        val path2 = Path("L_half_reg_pt2")
-        val path3 = Path("L_half_closer_pt1")
-        val path4 = Path("L_half_closer_pt2")
-        val path5 = Path("l_end")
-
-        eventTriggerCommands()
-
-        return Commands.sequence(
-            //   drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset.build(path1),
-            pathBuilder.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilder.build(path3),
-            pathBuilder.build(path4),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilder.build(path5),
-        )
-    }
-
-    fun lHalfFar(): Command {
-        val path1 = Path("L_half_close_pt1")
-        val path2 = Path("L_half_close_pt2")
-        val path3 = Path("L_half_far_pt1")
-        val path4 = Path("L_half_far_pt2")
-        val path5 = Path("l_end")
-
-        eventTriggerCommands()
-
-        return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset.build(path3),
-            pathBuilderWithReset.build(path4),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path5),
-        )
-    }
-
-    fun lHalfAndLoop(): Command {
-        val path1 = Path("L_half_reg_pt1")
-        val path2 = Path("L_half_reg_pt2")
-        val path3 = Path("L_loop_reg")
         val path4 = Path("r_end")
 
         eventTriggerCommands()
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset.build(path1),
-            pathBuilderWithReset.build(path2),
+            pathBuilderWithReset(mirror).build(path1),
+            pathBuilder(mirror).build(path2),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path3),
+            pathBuilder(mirror).build(path3),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path4),
-        )
-    }
-
-    fun nothing(): Command = Commands.none()
-
-    private fun preloadHubShot(): Command {
-        val path1 = Path("hub_start")
-        val path2 = Path("hub_end")
-
-        eventTriggerCommands()
-
-        return Commands.sequence(
-            pathBuilderWithReset.build(path1),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset.build(path2),
+            pathBuilder(!mirror).build(path4),
         )
     }
 
     fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
         autoChooser.addDefaultOption("Do Nothing", nothing())
         autoChooser.addOption("Preload Hub", preloadHubShot())
-        autoChooser.addOption("R Half Close", rHalfClose())
-        autoChooser.addOption("R Half Far", rHalfFar())
-        autoChooser.addOption("R Half Loop", rHalfAndLoop())
-        autoChooser.addOption("L Half Close", lHalfClose())
-        autoChooser.addOption("L Half Far", lHalfFar())
-        autoChooser.addOption("L Half Loop", lHalfAndLoop())
+
+        autoChooser.addOption("R Half Close", halfClose(false))
+        autoChooser.addOption("R Half Far", halfFar(false))
+        autoChooser.addOption("R Half Loop", halfAndLoop(false))
+
+        autoChooser.addOption("L Half Close", halfClose(true))
+        autoChooser.addOption("L Half Far", halfFar(true))
+        autoChooser.addOption("L Half Loop", halfAndLoop(true))
     }
 }

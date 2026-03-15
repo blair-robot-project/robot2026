@@ -71,7 +71,7 @@ object Constants {
         const val CTE_I = 0.0
         const val CTE_D = 0.0
 
-        const val AUTO_SHOOTING_TIME_SEC = 6.0
+        const val AUTO_SHOOTING_TIME_SEC = 5.0
 
         const val AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
         const val AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND = 4 * PI
