@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
+import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
 import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
@@ -23,7 +25,7 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    private val robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -115,6 +117,25 @@ class RobotActions(
             indexer.stop(),
             shooter.stopFlywheel(),
             shooter.homeHood(),
+        )
+
+    fun stopAll(): Command =
+        ParallelCommandGroup(
+            intake.stopRollers(),
+            indexer.stop(),
+            shooter.stopFlywheel(),
+        )
+
+    fun autoTrenchShot(): Command =
+        SequentialCommandGroup(
+            prepShotFromAnywhere(TRENCH_TO_HUB_DISTANCE_METERS),
+            checkAndFeed(),
+        )
+
+    fun autoHubShot(): Command =
+        SequentialCommandGroup(
+            prepShotFromAnywhere(HUB_DISTANCE_METERS),
+            checkAndFeed(),
         )
 
     fun systemCheckCommand(): Command = SystemCheckCommand(robotContainer)

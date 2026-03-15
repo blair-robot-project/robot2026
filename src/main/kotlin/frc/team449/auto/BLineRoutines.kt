@@ -32,7 +32,7 @@ import java.util.function.Consumer
 
 class BLineRoutines(
     private val drive: DriveSubsystem,
-    private val actions: RobotActions
+    private val actions: RobotActions,
 ) {
     private val translationP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val translationI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
@@ -112,9 +112,9 @@ class BLineRoutines(
 
     private fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
-        FollowPath.registerEventTrigger("start_shooting", actions.prepShotFromAnywhere(TRENCH_TO_HUB_DISTANCE_METERS))
-        FollowPath.registerEventTrigger("stop_shooting", actions.stopAllAndHomeHood())
-        FollowPath.registerEventTrigger("start_shooting_hub", actions.prepShotFromAnywhere(HUB_DISTANCE_METERS))
+        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopAll())
+        FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
 
     private fun preloadHubShot(): Command {
@@ -178,7 +178,7 @@ class BLineRoutines(
         val path1 = Path("R_half_reg_pt1")
         val path2 = Path("R_half_reg_pt2")
         val path3 = Path("R_loop_reg")
-        val path4 = Path("l_end")
+        val path4 = Path("r_end")
 
         eventTriggerCommands()
 
@@ -189,7 +189,7 @@ class BLineRoutines(
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilder(mirror).build(path3),
             WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilder(mirror).build(path4),
+            pathBuilder(!mirror).build(path4),
         )
     }
 
