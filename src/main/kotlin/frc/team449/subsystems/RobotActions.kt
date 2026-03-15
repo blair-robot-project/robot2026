@@ -5,13 +5,12 @@ import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.DeferredCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
-import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
 import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
@@ -22,6 +21,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import org.littletonrobotics.junction.Logger
 import kotlin.text.get
 
 class RobotActions(
@@ -64,14 +64,19 @@ class RobotActions(
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
             SequentialCommandGroup(
-                intake.stow(),
-                intake.deploy(),
+                intake.intake().withTimeout(0.1),
+                intake.stow().withTimeout(0.5),
+                intake.deploy().withTimeout(0.1),
             ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
         SequentialCommandGroup(
             power.requestProfile(PowerProfile.SHOOTING),
+            InstantCommand({
+                Logger.recordOutput("Aimbot/FlywheelEstimatedVel", ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
+                Logger.recordOutput("Aimbot/HoodEstimatedAngle", ShooterConstants.HOOD_ANGLE_MAP.get(distance))
+            }),
             shooter.setAimCommand(
                 Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
                 RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
@@ -81,9 +86,9 @@ class RobotActions(
     fun checkAndFeed(): Command =
         RepeatCommand(
             ConditionalCommand(
-                indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
+                indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).withTimeout(0.25),
                 indexer.stop(),
-            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
+            ) { shooter.isFlywheelAtTolerance() && shooter.isFlywheelAtTolerance() },
         )
 
     fun autoUnjam(): Command =
@@ -120,7 +125,7 @@ class RobotActions(
         )
 
     fun stopAll(): Command =
-        ParallelCommandGroup(
+        SequentialCommandGroup(
             intake.stopRollers(),
             indexer.stop(),
             shooter.stopFlywheel(),
@@ -128,13 +133,13 @@ class RobotActions(
 
     fun autoTrenchShot(): Command =
         SequentialCommandGroup(
-            prepShotFromAnywhere(TRENCH_TO_HUB_DISTANCE_METERS),
+            prepShotFromAnywhere(3.43),
             checkAndFeed(),
         )
 
     fun autoHubShot(): Command =
         SequentialCommandGroup(
-            prepShotFromAnywhere(HUB_DISTANCE_METERS),
+            prepShotFromAnywhere(1.294),
             checkAndFeed(),
         )
 

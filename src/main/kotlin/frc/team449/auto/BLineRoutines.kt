@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
-import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
-import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
 import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME_SEC
 import frc.team449.Constants.AutoConstants.CTE_D
 import frc.team449.Constants.AutoConstants.CTE_I
