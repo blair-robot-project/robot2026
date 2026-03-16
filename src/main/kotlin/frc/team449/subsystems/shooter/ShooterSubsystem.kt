@@ -10,10 +10,8 @@ import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.units.measure.Voltage
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
@@ -104,7 +102,7 @@ class ShooterSubsystem(
         }
 
     fun stopFlywheel(): Command =
-        runOnce {
+        run {
             flywheelTargetVelocityRadPerSec = 0.0
             io.setFlywheelVoltage(0.0)
         }
@@ -149,16 +147,17 @@ class ShooterSubsystem(
             val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME)
 
             SequentialCommandGroup(
-                setHoodVoltage(ShooterConstants.HOMING_VOLTAGE).withTimeout(0.1),
-                PrintCommand("i am here"),
-                WaitUntilCommand {
+                run {
+                    io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)
+                }.until {
                     val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
                     val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
                     homingDebouncer.calculate(highCurrent && lowVelocity)
                 },
-                setHoodVoltage(0.0).withTimeout(0.1),
-                resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
-                setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE).withTimeout(0.1)
+                runOnce {
+                    io.setHoodVoltage(0.0)
+                    io.resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+                }
             )
         }
             .withName("Home Hood")

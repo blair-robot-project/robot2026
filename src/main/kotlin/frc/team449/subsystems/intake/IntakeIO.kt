@@ -50,6 +50,10 @@ interface IntakeIO {
 
     fun setPivotVoltage(volts: Double) {}
 
+    fun setPivotAngle(angle: Angle) {}
+
+    fun resetPivotAngle(angle: Angle) {}
+
     fun setRollerVelocity(velocity: AngularVelocity) {}
 
     fun setRollerVoltage(volts: Double) {}

@@ -1,7 +1,6 @@
 package frc.team449.subsystems.shooter
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
@@ -225,8 +224,8 @@ open class ShooterIOHardware : ShooterIO {
         rightLeaderMotor.configurator.apply(rightSlot0Config, 0.0)
     }
 
-    override fun setHoodVoltage(voltage: Double) {
-        hoodMotor.setVoltage(voltage)
+    override fun setHoodVoltage(volts: Double) {
+        hoodMotor.setControl(hoodVoltageRequest.withOutput(volts))
     }
 
     override fun setHoodAngle(angle: Angle) {
@@ -243,21 +242,6 @@ open class ShooterIOHardware : ShooterIO {
         hoodSlot0Config.kP = kP
         hoodSlot0Config.kD = kD
         hoodMotor.configurator.apply(hoodSlot0Config, 0.0)
-    }
-
-    val flywheelCurrentConfig = CurrentLimitsConfigs()
-    val hoodCurrentConfig = CurrentLimitsConfigs()
-    override fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {
-        flywheelCurrentConfig.SupplyCurrentLimit = flywheelSupplyLimitAmps
-        flywheelCurrentConfig.StatorCurrentLimit = ShooterConstants.FLYWHEEL_STATOR_LIM
-        hoodCurrentConfig.SupplyCurrentLimit = hoodSupplyLimitAmps
-        hoodCurrentConfig.StatorCurrentLimit = ShooterConstants.HOOD_STATOR_LIM
-
-        leftLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
-        leftFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)
-        rightLeaderMotor.configurator.apply(flywheelCurrentConfig, 0.0)
-        rightFollowerMotor.configurator.apply(flywheelCurrentConfig, 0.0)
-        hoodMotor.configurator.apply(hoodCurrentConfig, 0.0)
     }
 
     companion object {

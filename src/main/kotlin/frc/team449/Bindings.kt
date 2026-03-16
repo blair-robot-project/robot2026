@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.Subsystem
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.subsystems.power.PowerProfile
@@ -150,42 +149,5 @@ class Bindings(
                 )
                     .finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }
             )
-
-        operator
-            .a()
-            .whileTrue(
-                robotContainer.shooter.sysIDFlywheel.quasistatic(SysIdRoutine.Direction.kForward)
-                    .beforeStarting(robotContainer.power.requestProfile(PowerProfile.SHOOTING))
-            )
-
-        operator
-            .b()
-            .whileTrue(
-                robotContainer.shooter.sysIDFlywheel.dynamic(SysIdRoutine.Direction.kForward)
-                    .beforeStarting(robotContainer.power.requestProfile(PowerProfile.SHOOTING))
-            )
-
-        operator
-            .x()
-            .whileTrue(
-                robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kForward)
-            )
-
-        operator
-            .y()
-            .whileTrue(
-                robotContainer.shooter.sysIDHood.dynamic(SysIdRoutine.Direction.kForward)
-            )
-
-        // for hood control on shoot from anywhere
-//        operator
-//            .povDown()
-//            .onTrue(robotContainer.shooter.setHoodVoltage(-2.0))
-//            .onFalse(robotContainer.shooter.setHoodVoltage(0.0))
-//
-//        operator
-//            .povUp()
-//            .onTrue(robotContainer.shooter.setHoodVoltage(2.0))
-//            .onFalse(robotContainer.shooter.setHoodVoltage(0.0))
     }
 }

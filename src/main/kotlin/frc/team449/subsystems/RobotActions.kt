@@ -64,10 +64,14 @@ class RobotActions(
 
     fun shuffleIntakePivot(): Command =
         RepeatCommand(
+//            SequentialCommandGroup(
+//                intake.intake().withTimeout(0.580424),
+//                intake.outtake().withTimeout(0.1678),
+//            ),
             SequentialCommandGroup(
-                intake.intake().withTimeout(0.580424),
-                intake.outtake().withTimeout(0.1678),
-            ),
+                intake.setPivotAngle(Radians.of(1.74)).withTimeout(.58042024),
+                intake.setPivotAngle(Radians.of(1.04)).withTimeout(.58042024)
+            )
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -119,9 +123,9 @@ class RobotActions(
 
     fun stopAllAndHomeHood(): Command =
         SequentialCommandGroup(
-            intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel(),
+            intake.stopRollers().withTimeout(0.1),
+            indexer.stop().withTimeout(0.1),
+            shooter.stopFlywheel().withTimeout(0.1),
             shooter.homeHood(),
         )
 

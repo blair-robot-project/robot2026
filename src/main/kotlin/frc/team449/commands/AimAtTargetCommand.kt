@@ -37,6 +37,13 @@ class AimAtTargetCommand(
         setTolerance(AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS)
     }
 
+    var currentPose = drive.pose
+    var translationToTarget = target.minus(currentPose.translation)
+    var distance = translationToTarget.norm
+
+    var targetHeading = translationToTarget.angle
+    var omegaRadPerSec = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
+
     init {
         addRequirements(drive)
     }
@@ -44,16 +51,19 @@ class AimAtTargetCommand(
     override fun initialize() {
         CommandScheduler.getInstance().schedule(power.requestProfile(PowerProfile.SHOOTING))
         headingController.reset(drive.pose.rotation.radians)
+        CommandScheduler.getInstance().schedule(
+            actions.prepShotFromAnywhere(distance)
+        )
         println("Initializing AimAtTargetCommand.")
     }
 
     override fun execute() {
-        val currentPose = drive.pose
-        val translationToTarget = target.minus(currentPose.translation)
-        val distance = translationToTarget.norm
+        currentPose = drive.pose
+        translationToTarget = target.minus(currentPose.translation)
+        distance = translationToTarget.norm
 
-        val targetHeading = translationToTarget.angle
-        val omegaRadPerSec = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
+        targetHeading = translationToTarget.angle
+        omegaRadPerSec = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
 
         drive.setControl(
             request

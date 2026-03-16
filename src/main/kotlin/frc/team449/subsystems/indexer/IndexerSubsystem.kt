@@ -54,7 +54,7 @@ class IndexerSubsystem(
     }
 
     fun stop(): Command =
-        this.runOnce {
+        this.run {
             floorTargetVelocityRadPerSec = 0.0
             wedgeTargetVelocityRadPerSec = 0.0
             topTargetVelocityRadPerSec = 0.0

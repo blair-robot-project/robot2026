@@ -1,7 +1,6 @@
 package frc.team449.subsystems.indexer
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
@@ -155,23 +154,6 @@ open class IndexerIOHardware : IndexerIO {
         floorIndexer.setControl(floorVoltageRequest.withOutput(floorVolts))
         wedgeIndexer.setControl(wedgeVoltageRequest.withOutput(wedgeVolts))
         topIndexer.setControl(topVoltageRequest.withOutput(topVolts))
-    }
-
-    val floorCurrentConfig = CurrentLimitsConfigs()
-    val wedgeCurrentConfig = CurrentLimitsConfigs()
-    val topCurrentConfig = CurrentLimitsConfigs()
-    override fun setSupplyLimits(
-        floorSupplyLimitAmps: Double,
-        wedgeSupplyLimitAmps: Double,
-        topSupplyLimitAmps: Double
-    ) {
-        floorCurrentConfig.SupplyCurrentLimit = floorSupplyLimitAmps
-        wedgeCurrentConfig.SupplyCurrentLimit = wedgeSupplyLimitAmps
-        topCurrentConfig.SupplyCurrentLimit = topSupplyLimitAmps
-
-        floorIndexer.configurator.apply(floorCurrentConfig, 0.0)
-        wedgeIndexer.configurator.apply(wedgeCurrentConfig, 0.0)
-        topIndexer.configurator.apply(topCurrentConfig, 0.0)
     }
 
     companion object {

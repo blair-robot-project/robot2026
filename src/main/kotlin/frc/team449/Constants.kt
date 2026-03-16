@@ -149,9 +149,9 @@ object Constants {
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 10.0
+        const val HOMING_CURRENT_AMPS = 20.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
-        const val HOMING_DEBOUNCE_TIME = 0.1
+        const val HOMING_DEBOUNCE_TIME = 0.4
 
         const val HOOD_TOLERANCE_RAD = 0.02
         const val FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC = 10.0
@@ -211,7 +211,9 @@ object Constants {
         // --- HARDWARE CONFIGURATION ---
         val LEFT_PIVOT_NEUTRAL_MODE = NeutralModeValue.Brake
         val LEFT_PIVOT_INVERSION = InvertedValue.Clockwise_Positive
-        val RIGHT_PIVOT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
+
+        val RIGHT_PIVOT_NEUTRAL_MODE = NeutralModeValue.Brake
+        val RIGHT_PIVOT_INVERSION = InvertedValue.CounterClockwise_Positive
 
         val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Brake
         val LEFT_ROLLER_INVERSION = InvertedValue.Clockwise_Positive
@@ -236,7 +238,7 @@ object Constants {
         const val DEPLOY_POS_RADS = 2.269
 
         const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.0
+        const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 

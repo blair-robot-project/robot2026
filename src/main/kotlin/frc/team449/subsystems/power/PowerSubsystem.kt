@@ -17,20 +17,19 @@ class PowerSubsystem(
     var lastProfile: PowerProfile = PowerProfile.LOW_BATTERY
     var currentProfile: PowerProfile = PowerProfile.SHOOTING
 
-    var driveSpeedMultiplier: Double = 1.0
-        get() = currentProfile.limits.driveSpeedMultiplier
-
-    var intakeSpeedMultiplier: Double = 1.0
-        get() = currentProfile.limits.intakeSpeedMultiplier
-
-    var indexerSpeedMultiplier: Double = 1.0
-        get() = currentProfile.limits.indexerSpeedMultiplier
-
     override fun periodic() {
         if (currentProfile == lastProfile) return
         lastProfile = currentProfile
 
         val currentProfileLimits = currentProfile.limits
+        drive.setSupplyLimits(currentProfileLimits.driveSupplyLimit, 20.0) // 20.0 steer supply limit
+        intake.setSupplyLimits(currentProfileLimits.pivotSupplyLimit, currentProfileLimits.rollerSupplyLimit)
+        indexer.setSupplyLimits(
+            currentProfileLimits.floorIndexerSupplyLimit,
+            currentProfileLimits.wedgeIndexerSupplyLimit,
+            currentProfileLimits.topIndexerSupplyLimit,
+        )
+        shooter.setSupplyLimits(currentProfileLimits.flywheelSupplyLimit, currentProfileLimits.hoodSupplyLimit)
 
         Logger.recordOutput(
             "Power/CurrentLimits",
