@@ -11,6 +11,9 @@ import frc.team449.subsystems.drive.DriveIO
 import frc.team449.subsystems.drive.DriveIOHardware
 import frc.team449.subsystems.drive.DriveIOSim
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.fueldetection.FuelDetectionIO
+import frc.team449.subsystems.fueldetection.FuelDetectionIOLimelight
+import frc.team449.subsystems.fueldetection.FuelDetectionSubsystem
 import frc.team449.subsystems.fuelsimulator.FuelSimulationSubsystem
 import frc.team449.subsystems.indexer.IndexerIO
 import frc.team449.subsystems.indexer.IndexerIOHardware
@@ -91,6 +94,18 @@ object RobotContainer {
 //                    object : VisionIO {},
                 )
         }
+
+    val fuelDetection: FuelDetectionSubsystem =
+        FuelDetectionSubsystem(
+            when (Constants.CURRENT_MODE) {
+                Mode.REAL -> FuelDetectionIOLimelight(
+                    Constants.FuelDetectionConstants.CAMERA_NAME,
+                    Constants.FuelDetectionConstants.DETECTOR_PIPELINE_INDEX
+                )
+                Mode.SIM -> object : FuelDetectionIO {}
+                Mode.REPLAY -> object : FuelDetectionIO {}
+            }
+        )
 
     val intake: IntakeSubsystem =
         IntakeSubsystem(

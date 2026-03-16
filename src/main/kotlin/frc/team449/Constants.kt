@@ -319,6 +319,17 @@ object Constants {
         // led constants
     }
 
+    object FuelDetectionConstants {
+        const val DETECTOR_PIPELINE_INDEX = 1
+        const val MIN_CONFIDENCE = 0.5
+        const val CAMERA_NAME = "limelight-right"
+
+        // Camera geometry for distance estimation (derived from VisionConstants right camera transform)
+        const val CAMERA_HEIGHT_METERS = 0.53594
+        const val CAMERA_PITCH_RAD = 0.523599 // positive = above horizontal (~30 deg)
+        const val FUEL_CENTER_HEIGHT_METERS = 0.0889 // ~3.5 in ball radius above ground
+    }
+
     object VisionConstants {
         // --- CHS ANDYMARK REBUILT FIELD ---
         val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
