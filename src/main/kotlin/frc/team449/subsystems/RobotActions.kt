@@ -26,7 +26,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    private val robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -71,8 +71,8 @@ class RobotActions(
             SequentialCommandGroup(
                 intake.setPivotAngle(Radians.of(1.6)).withTimeout(.1),
                 intake.setPivotAngle(Radians.of(1.04)).withTimeout(.1),
-                intake.intake().withTimeout(0.35)
-            )
+                intake.intake().withTimeout(0.35),
+            ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -92,11 +92,12 @@ class RobotActions(
     fun checkAndFeed(): Command =
         RepeatCommand(
             ConditionalCommand(
-                indexer.index(
-                    IndexerConstants.SHOOTING_INDEXER_SPEED,
-                    RadiansPerSecond.of(30.0),
-                    IndexerConstants.SHOOTING_INDEXER_SPEED,
-                ).withTimeout(0.25),
+                indexer
+                    .index(
+                        IndexerConstants.SHOOTING_INDEXER_SPEED,
+                        RadiansPerSecond.of(30.0),
+                        IndexerConstants.SHOOTING_INDEXER_SPEED,
+                    ).withTimeout(0.25),
                 indexer.stop().withTimeout(0.01),
             ) { shooter.isFlywheelAtTolerance() },
         )
@@ -146,16 +147,8 @@ class RobotActions(
             prepShotFromAnywhere(3.43),
             ParallelCommandGroup(
                 checkAndFeed(),
-                WaitCommand(0.5).andThen(
-                    shuffleIntakePivot().withTimeout(0.5).andThen(
-                        intake.stow().withTimeout(0.2).andThen(
-                            intake.deploy().withTimeout(0.3),
-                        ),
-                    ),
-                ),
+                shuffleIntakePivot(),
             ),
-        ).withTimeout(4.0).andThen(
-            intake.stow().withTimeout(0.1),
         )
 
     fun autoHubShot(): Command =
