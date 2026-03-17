@@ -149,5 +149,17 @@ class Bindings(
                 )
                     .finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }
             )
+
+        operator
+            .a()
+            .whileTrue(
+                SequentialCommandGroup(
+                    actions.prepShotFromAnywhere(1.61),
+                    ParallelCommandGroup(
+                        actions.checkAndFeed(),
+                        actions.shuffleIntakePivot()
+                    )
+                )
+            )
     }
 }

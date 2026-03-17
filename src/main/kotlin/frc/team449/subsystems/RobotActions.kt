@@ -69,8 +69,9 @@ class RobotActions(
 //                intake.outtake().withTimeout(0.1678),
 //            ),
             SequentialCommandGroup(
-                intake.setPivotAngle(Radians.of(1.74)).withTimeout(.58042024),
-                intake.setPivotAngle(Radians.of(1.04)).withTimeout(.58042024)
+                intake.setPivotAngle(Radians.of(1.6)).withTimeout(.1),
+                intake.setPivotAngle(Radians.of(1.04)).withTimeout(.1),
+                intake.intake().withTimeout(0.35)
             )
         )
 
@@ -85,15 +86,19 @@ class RobotActions(
                 .setAimCommand(
                     Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
                     RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
-                ).withTimeout(0.2),
+                ).withTimeout(0.1),
         )
 
     fun checkAndFeed(): Command =
         RepeatCommand(
             ConditionalCommand(
-                indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED).withTimeout(0.25),
-                indexer.stop(),
-            ) { shooter.isFlywheelAtTolerance() && shooter.isFlywheelAtTolerance() },
+                indexer.index(
+                    IndexerConstants.SHOOTING_INDEXER_SPEED,
+                    RadiansPerSecond.of(30.0),
+                    IndexerConstants.SHOOTING_INDEXER_SPEED,
+                ).withTimeout(0.25),
+                indexer.stop().withTimeout(0.01),
+            ) { shooter.isFlywheelAtTolerance() },
         )
 
     fun autoUnjam(): Command =

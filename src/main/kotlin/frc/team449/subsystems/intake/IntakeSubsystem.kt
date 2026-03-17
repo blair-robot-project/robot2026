@@ -115,7 +115,7 @@ class IntakeSubsystem(
                     runOnce {
                         val pivotAngleRads: Double = if (pivotIsDeployed) IntakeConstants.DEPLOY_POS_RADS else IntakeConstants.STOW_POS_RADS
                         io.resetPivotAngle(Radians.of(pivotAngleRads))
-                        io.setPivotAngle(Radians.of(pivotAngleRads))
+                        io.setPivotVoltage(holdVolts)
                     },
                 )
         }

@@ -43,7 +43,6 @@ class ShooterSubsystem(
     val hoodAngle: Double
         get() = inputs.hoodAngleRad
 
-    private val flywheelDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME)
     private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME)
 
     val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) || abs(inputs.rightLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
@@ -132,7 +131,7 @@ class ShooterSubsystem(
             leftError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC &&
                 rightError < ShooterConstants.FLYWHEEL_VELOCITY_TOLERANCE_RAD_PER_SEC
 
-        return flywheelDebouncer.calculate(isAtSpeed)
+        return isAtSpeed
     }
 
     fun isHoodAtTolerance(): Boolean {
