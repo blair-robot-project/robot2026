@@ -321,13 +321,22 @@ object Constants {
 
     object FuelDetectionConstants {
         const val DETECTOR_PIPELINE_INDEX = 1
+        #Pretty low rn, for testing, fine tune where a good value is later to avoid false positives
         const val MIN_CONFIDENCE = 0.5
+        #Change based on which limelight we are acutally gonna use for OD
         const val CAMERA_NAME = "limelight-right"
 
-        // Camera geometry for distance estimation (derived from VisionConstants right camera transform)
         const val CAMERA_HEIGHT_METERS = 0.53594
         const val CAMERA_PITCH_RAD = 0.523599 // positive = above horizontal (~30 deg)
         const val FUEL_CENTER_HEIGHT_METERS = 0.0889 // ~3.5 in ball radius above ground
+
+        // Heuristics for clustering detections into clumps of fuel
+        const val CLUSTER_MAX_TX_DEG = 6.0     // max horizontal angle difference within a clump
+        const val CLUSTER_MAX_TY_DEG = 6.0     // max vertical angle difference within a clump
+        const val CLUSTER_MAX_DISTANCE_METERS = 1.5 // max range difference within a clump
+
+        // Approximate intake heading in camera frame (deg). 0 = straight ahead.
+        const val INTAKE_FORWARD_ANGLE_DEG = 0.0
     }
 
     object VisionConstants {
