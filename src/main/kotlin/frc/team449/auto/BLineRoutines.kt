@@ -111,7 +111,7 @@ class BLineRoutines(
     private fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
         FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
-        FollowPath.registerEventTrigger("stop_shooting", actions.stopAll())
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopAllAndHomeHood())
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
 

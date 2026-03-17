@@ -26,7 +26,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer,
+    private val robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -70,7 +70,7 @@ class RobotActions(
 //            ),
             SequentialCommandGroup(
                 intake.setPivotAngle(Radians.of(1.6)).withTimeout(.1),
-                intake.setPivotAngle(Radians.of(1.04)).withTimeout(.1),
+                intake.setPivotAngle(Radians.of(0.85)).withTimeout(.1),
                 intake.intake().withTimeout(0.35),
             ),
         )
@@ -147,7 +147,9 @@ class RobotActions(
             prepShotFromAnywhere(3.43),
             ParallelCommandGroup(
                 checkAndFeed(),
-                shuffleIntakePivot(),
+                WaitCommand(1.8).andThen(
+                    shuffleIntakePivot(),
+                )
             ),
         )
 
