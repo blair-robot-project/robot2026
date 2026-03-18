@@ -45,6 +45,13 @@ class IntakeSubsystem(
             }
             .withName("Intake")
 
+    fun intakeSlow(): Command =
+        this.run {
+            rollerTargetVolts = 4.0
+            io.setRollerVoltage(4.0)
+        }
+            .withName("IntakeSlow")
+
     fun outtake(): Command =
         this
             .run {

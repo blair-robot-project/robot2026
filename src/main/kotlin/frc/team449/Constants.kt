@@ -270,8 +270,8 @@ object Constants {
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val WEDGE_STATOR_LIMIT = 30.0
-        const val WEDGE_SUPPLY_LIMIT = 10.0
+        const val WEDGE_STATOR_LIMIT = 40.0
+        const val WEDGE_SUPPLY_LIMIT = 5.0
 
         const val FLOOR_STATOR_LIMIT = 30.0
         const val FLOOR_SUPPLY_LIMIT = 10.0

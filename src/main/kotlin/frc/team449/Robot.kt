@@ -99,7 +99,6 @@ class Robot : LoggedRobot() {
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
         FieldUtil.updateKeyPositions()
-        robotContainer.shooter.homeHood()
     }
 
     override fun autonomousPeriodic() {

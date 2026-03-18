@@ -63,15 +63,13 @@ class RobotActions(
         )
 
     fun shuffleIntakePivot(): Command =
-        RepeatCommand(
-//            SequentialCommandGroup(
-//                intake.intake().withTimeout(0.580424),
-//                intake.outtake().withTimeout(0.1678),
-//            ),
-            SequentialCommandGroup(
-                intake.setPivotAngle(Radians.of(1.6)).withTimeout(.1),
-                intake.setPivotAngle(Radians.of(0.85)).withTimeout(.1),
-                intake.intake().withTimeout(0.35),
+        SequentialCommandGroup(
+            intake.intakeSlow().withTimeout(0.01),
+            RepeatCommand(
+                SequentialCommandGroup(
+                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.1),
+                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.1),
+                )
             ),
         )
 
@@ -95,7 +93,7 @@ class RobotActions(
                 indexer
                     .index(
                         IndexerConstants.SHOOTING_INDEXER_SPEED,
-                        RadiansPerSecond.of(30.0),
+                        RadiansPerSecond.of(10.0),
                         IndexerConstants.SHOOTING_INDEXER_SPEED,
                     ).withTimeout(0.25),
                 indexer.stop().withTimeout(0.01),
