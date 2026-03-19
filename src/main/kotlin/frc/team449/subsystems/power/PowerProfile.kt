@@ -30,8 +30,8 @@ enum class PowerProfile(
     INTAKING(
         PowerLimits(
             30.0,
-            15.0,
-            40.0,
+            10.0,
+            10.0,
             10.0,
             5.0,
             5.0,

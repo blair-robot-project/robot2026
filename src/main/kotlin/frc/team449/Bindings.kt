@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.Subsystem
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
@@ -43,11 +44,11 @@ class Bindings(
         robotContainer.intake.defaultCommand =
             robotContainer.intake.stopRollers()
 
-        robotContainer.indexer.defaultCommand =
-            robotContainer.indexer.stop()
+//        robotContainer.indexer.defaultCommand =
+//            robotContainer.indexer.stop()
 
-        robotContainer.shooter.defaultCommand =
-            robotContainer.shooter.stopFlywheel()
+//        robotContainer.shooter.defaultCommand =
+//            robotContainer.shooter.stopFlywheel()
     }
 
     fun bindControls() {
@@ -79,7 +80,10 @@ class Bindings(
                             ParallelCommandGroup(
                                 robotContainer.drive.xLock(),
                                 actions.checkAndFeed(),
-                                actions.shuffleIntakePivot()
+                                SequentialCommandGroup(
+                                    WaitCommand(1.0),
+                                    actions.shuffleIntakePivot()
+                                )
                             )
                         )
                     },

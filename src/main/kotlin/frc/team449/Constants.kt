@@ -124,14 +124,14 @@ object Constants {
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
-        const val LEFT_FLYWHEEL_KP = 0.75
+        const val LEFT_FLYWHEEL_KP = 0.55
         const val LEFT_FLYWHEEL_KI = 0.0
         const val LEFT_FLYWHEEL_KD = 0.0
         const val LEFT_FLYWHEEL_KS = 0.286
         const val LEFT_FLYWHEEL_KV = 0.2073
         // const val LEFT_FLYWHEEL_KA = ...
 
-        const val RIGHT_FLYWHEEL_KP = 0.75
+        const val RIGHT_FLYWHEEL_KP = 0.55
         const val RIGHT_FLYWHEEL_KI = 0.0
         const val RIGHT_FLYWHEEL_KD = 0.0
         const val RIGHT_FLYWHEEL_KS = 0.271
@@ -229,7 +229,7 @@ object Constants {
         // --- CURRENT LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 10.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 30.0
+        const val ROLLER_SUPPLY_LIMIT = 10.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -317,12 +317,12 @@ object Constants {
 
     object AimbotConstants {
         // --- AIMBOT GAINS ---
-        const val AIMBOT_KP = 5.0
-        const val AIMBOT_KI = 0.1
-        const val AIMBOT_KD = 0.00
+        const val AIMBOT_KP = 10.0
+        const val AIMBOT_KI = 0.0
+        const val AIMBOT_KD = 0.1
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.01
+        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.035
     }
 
     object LEDConstants {

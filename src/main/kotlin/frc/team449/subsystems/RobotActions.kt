@@ -66,10 +66,28 @@ class RobotActions(
             intake.intakeSlow().withTimeout(0.01),
             RepeatCommand(
                 SequentialCommandGroup(
-                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.1),
-                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.1),
+                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.4),
+                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.4),
                 )
             ),
+        )
+
+    fun shuffleHopper(): Command =
+        RepeatCommand(
+            SequentialCommandGroup(
+                indexer.index(
+                    12.0,
+                    1.0,
+                    12.0
+                ).withTimeout(0.5),
+                PrintCommand("i am running backwards"),
+                indexer.index(
+                    -1.0,
+                    1.0,
+                    12.0
+                ).withTimeout(0.05)
+            )
+
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -96,7 +114,7 @@ class RobotActions(
                         12.0,
                     ).withTimeout(0.25),
                 indexer.stop().withTimeout(0.01),
-            ) { shooter.isFlywheelAtTolerance() },
+            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
         )
 
     fun autoUnjam(): Command =

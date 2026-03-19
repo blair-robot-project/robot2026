@@ -35,8 +35,6 @@ class ShooterSubsystem(
     val hoodAngle: Double
         get() = inputs.hoodAngleRad
 
-    private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME)
-
     val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) || abs(inputs.rightLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
         .debounce(0.25)
 
@@ -114,7 +112,7 @@ class ShooterSubsystem(
         val error = abs(inputs.hoodAngleRad - hoodTargetAngleRad)
         val isAtPos = error < ShooterConstants.HOOD_TOLERANCE_RAD
 
-        return hoodDebouncer.calculate(isAtPos)
+        return isAtPos
     }
 
     fun homeHood(): Command =
