@@ -85,7 +85,7 @@ class RobotActions(
                     -1.0,
                     1.0,
                     12.0
-                ).withTimeout(0.05)
+                ).withTimeout(1.0)
             )
 
         )

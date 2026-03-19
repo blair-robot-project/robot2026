@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.Subsystem
-import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
@@ -44,8 +43,8 @@ class Bindings(
         robotContainer.intake.defaultCommand =
             robotContainer.intake.stopRollers()
 
-//        robotContainer.indexer.defaultCommand =
-//            robotContainer.indexer.stop()
+        robotContainer.indexer.defaultCommand =
+            robotContainer.indexer.stop()
 
 //        robotContainer.shooter.defaultCommand =
 //            robotContainer.shooter.stopFlywheel()
@@ -67,30 +66,35 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                DeferredCommand(
-                    {
-                        SequentialCommandGroup(
-                            AimAtTargetCommand(
-                                robotContainer.drive,
-                                robotContainer.power,
-                                actions,
-                                FieldUtil.HUB_TRANSLATION
-                            ).withTimeout(3.0),
-                            PrintCommand("Align Complete!"),
-                            ParallelCommandGroup(
-                                robotContainer.drive.xLock(),
-                                actions.checkAndFeed(),
-                                SequentialCommandGroup(
-                                    WaitCommand(1.0),
-                                    actions.shuffleIntakePivot()
-                                )
-                            )
+                DeferredCommand({
+                    val aimPhase = AimAtTargetCommand(
+                        robotContainer.drive,
+                        robotContainer.power,
+                        actions,
+                        FieldUtil.HUB_TRANSLATION
+                    ).withTimeout(2.0)
+
+                    val shuffleSequence = actions.checkAndFeed()
+                        .withTimeout(1.0)
+                        .andThen(
+                            actions.shuffleIntakePivot()
+                                .alongWith(actions.shuffleHopper())
                         )
-                    },
-                    setOf<Subsystem>(robotContainer.intake, robotContainer.indexer)
-                )
+
+                    val shootingPhase = robotContainer.drive.xLock()
+                        .alongWith(shuffleSequence)
+
+                    aimPhase
+                        .andThen(PrintCommand("Align Complete."))
+                        .andThen(shootingPhase)
+                }, setOf<Subsystem>(robotContainer.intake, robotContainer.indexer))
                     .until(joysticksMovedPastDeadbandTrigger)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(robotContainer.power.requestProfile(PowerProfile.DRIVING), actions.stopAllAndHomeHood()) }
+                    .finallyDo { _ ->
+                        CommandScheduler.getInstance().schedule(
+                            robotContainer.power.requestProfile(PowerProfile.DRIVING),
+                            actions.stopAllAndHomeHood()
+                        )
+                    }
             )
 
         driver
