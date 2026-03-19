@@ -24,12 +24,6 @@ class PowerSubsystem(
         val currentProfileLimits = currentProfile.limits
         drive.setSupplyLimits(currentProfileLimits.driveSupplyLimit, 20.0) // 20.0 steer supply limit
         intake.setSupplyLimits(currentProfileLimits.pivotSupplyLimit, currentProfileLimits.rollerSupplyLimit)
-        indexer.setSupplyLimits(
-            currentProfileLimits.floorIndexerSupplyLimit,
-            currentProfileLimits.wedgeIndexerSupplyLimit,
-            currentProfileLimits.topIndexerSupplyLimit,
-        )
-        shooter.setSupplyLimits(currentProfileLimits.flywheelSupplyLimit, currentProfileLimits.hoodSupplyLimit)
 
         Logger.recordOutput(
             "Power/CurrentLimits",

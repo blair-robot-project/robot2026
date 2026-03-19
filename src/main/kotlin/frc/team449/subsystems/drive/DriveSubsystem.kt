@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
@@ -64,16 +62,15 @@ class DriveSubsystem(
         io.seedFieldCentric()
     }
 
-    // call in autoInit() and teleopInit()
     fun setOperatorPerspectiveForward() {
-        var forward: Rotation2d = Rotation2d.kZero
-
-        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-            forward = Rotation2d.k180deg
-        }
+        val forward: Rotation2d =
+            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+                Rotation2d.k180deg
+            } else {
+                Rotation2d.kZero
+            }
 
         io.setOperatorPerspectiveForward(forward)
-        CommandScheduler.getInstance().schedule(PrintCommand(forward.toString()))
     }
 
     fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds

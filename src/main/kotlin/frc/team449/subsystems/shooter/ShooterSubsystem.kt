@@ -32,29 +32,19 @@ class ShooterSubsystem(
     private val tunableHoodAngle = LoggedTunableNumber("Shooter/Tuning/HoodTargetRads", 0.0)
     private val tuningModeActive = LoggedTunableNumber("Shooter/Tuning/ModeActive", 0.0) // 1.0 = active
 
-    private val tunableLeftFlywheelKP = LoggedTunableNumber("Shooter/Tuning/LeftKP", ShooterConstants.LEFT_FLYWHEEL_KP)
-    private val tunableLeftFlywheelKD = LoggedTunableNumber("Shooter/Tuning/LeftKD", ShooterConstants.LEFT_FLYWHEEL_KD)
-    private val tunableRightFlywheelKP = LoggedTunableNumber("Shooter/Tuning/RightKP", ShooterConstants.RIGHT_FLYWHEEL_KP)
-    private val tunableRightFlywheelKD = LoggedTunableNumber("Shooter/Tuning/RightKD", ShooterConstants.RIGHT_FLYWHEEL_KD)
-
-    private val tunableHoodKP = LoggedTunableNumber("Shooter/Tuning/HoodKP", ShooterConstants.HOOD_KP)
-    private val tunableHoodKD = LoggedTunableNumber("Shooter/Tuning/HoodKD", ShooterConstants.HOOD_KD)
-
     val hoodAngle: Double
         get() = inputs.hoodAngleRad
 
     private val hoodDebouncer: Debouncer = Debouncer(ShooterConstants.TOLERANCE_DEBOUNCE_TIME)
 
     val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) || abs(inputs.rightLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
-        .debounce(0.5)
+        .debounce(0.25)
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Shooter", inputs)
 
         if (tuningModeActive.get() == 1.0) {
-//            updateTunableGains()
-
             if (tunableFlywheelVelocity.hasChanged(hashCode()) || tunableHoodAngle.hasChanged(hashCode())) {
                 flywheelTargetVelocityRadPerSec = tunableFlywheelVelocity.get()
                 hoodTargetAngleRad = tunableHoodAngle.get()
@@ -70,20 +60,6 @@ class ShooterSubsystem(
         Logger.recordOutput("Shooter/FlywheelAtTolerance", isFlywheelAtTolerance())
         Logger.recordOutput("Shooter/HoodAtTolerance", isHoodAtTolerance())
     }
-
-//    fun updateTunableGains() {
-//        if (tunableLeftFlywheelKP.hasChanged(hashCode()) ||
-//            tunableLeftFlywheelKD.hasChanged(hashCode()) ||
-//            tunableRightFlywheelKP.hasChanged(hashCode()) ||
-//            tunableRightFlywheelKD.hasChanged(hashCode())
-//        ) {
-//            io.setFlywheelGains(tunableLeftFlywheelKP.get(), tunableLeftFlywheelKD.get(), tunableRightFlywheelKP.get(), tunableRightFlywheelKD.get())
-//        }
-//
-//        if (tunableHoodKP.hasChanged(hashCode()) || tunableHoodKD.hasChanged(hashCode())) {
-//            io.setHoodGains(tunableHoodKP.get(), tunableHoodKD.get())
-//        }
-//    }
 
     fun setAimCommand(hoodAngle: Angle, flywheelVelocity: AngularVelocity): Command =
         run {
@@ -160,10 +136,6 @@ class ShooterSubsystem(
             )
         }
             .withName("Home Hood")
-
-    fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {
-        io.setSupplyLimits(flywheelSupplyLimitAmps, hoodSupplyLimitAmps)
-    }
 
     val sysIDFlywheel =
         SysIdRoutine(

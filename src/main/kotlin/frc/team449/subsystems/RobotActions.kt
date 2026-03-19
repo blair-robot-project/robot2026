@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
-import frc.team449.Constants.IndexerConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 import frc.team449.commands.SystemCheckCommand
@@ -41,9 +40,9 @@ class RobotActions(
             ParallelCommandGroup(
                 intake.intake(),
                 indexer.index(
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    RadiansPerSecond.of(0.0),
+                    2.0,
+                    1.0,
+                    0.0,
                 ),
             ),
         ).finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
@@ -51,12 +50,12 @@ class RobotActions(
     fun stopAndStow(): Command =
         SequentialCommandGroup(
             power.requestProfile(PowerProfile.DRIVING),
-            intake.stopRollers(),
+            intake.stopRollers().withTimeout(0.01),
             ParallelRaceGroup(
                 indexer.index(
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    RadiansPerSecond.of(0.0),
+                    2.0,
+                    1.0,
+                    0.0,
                 ),
                 intake.stow(),
             ),
@@ -92,9 +91,9 @@ class RobotActions(
             ConditionalCommand(
                 indexer
                     .index(
-                        IndexerConstants.SHOOTING_INDEXER_SPEED,
-                        RadiansPerSecond.of(10.0),
-                        IndexerConstants.SHOOTING_INDEXER_SPEED,
+                        12.0,
+                        1.0,
+                        12.0,
                     ).withTimeout(0.25),
                 indexer.stop().withTimeout(0.01),
             ) { shooter.isFlywheelAtTolerance() },
@@ -108,7 +107,11 @@ class RobotActions(
                 SequentialCommandGroup(
                     PrintCommand("AUTO UNJAM!"),
                     ParallelCommandGroup(
-                        indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
+                        indexer.index(
+                            -2.0,
+                            0.0,
+                            2.0
+                        ),
                         shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
                     ).withTimeout(0.25),
                     indexer.stop(),
@@ -121,7 +124,11 @@ class RobotActions(
     fun reverseAll(): Command =
         ParallelCommandGroup(
             intake.outtake(),
-            indexer.index(RadiansPerSecond.of(-30.0)),
+            indexer.index(
+                -2.0,
+                -1.0,
+                -2.0
+            ),
             shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
         )
 

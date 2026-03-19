@@ -75,8 +75,18 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    VisionIOLimelight("limelight-right", { drive.pose.rotation }, drive::getAngularVelocity, VisionConstants.ROBOT_TO_CAMERA_RIGHT),
-                    VisionIOLimelight("limelight-left", { drive.pose.rotation }, drive::getAngularVelocity, VisionConstants.ROBOT_TO_CAMERA_LEFT)
+                    VisionIOLimelight(
+                        VisionConstants.CAMERA_RIGHT_NAME,
+                        { drive.pose.rotation },
+                        drive::getAngularVelocity,
+                        VisionConstants.ROBOT_TO_CAMERA_RIGHT
+                    ),
+                    VisionIOLimelight(
+                        VisionConstants.CAMERA_LEFT_NAME,
+                        { drive.pose.rotation },
+                        drive::getAngularVelocity,
+                        VisionConstants.ROBOT_TO_CAMERA_LEFT
+                    )
                 )
 //            Mode.SIM ->
 //                VisionSubsystem(

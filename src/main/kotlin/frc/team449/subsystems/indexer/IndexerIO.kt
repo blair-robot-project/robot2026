@@ -64,6 +64,4 @@ interface IndexerIO {
         wedgeVolts: Double,
         topVolts: Double
     ) {}
-
-    fun setSupplyLimits(floorSupplyLimitAmps: Double, wedgeSupplyLimitAmps: Double, topSupplyLimitAmps: Double) {}
 }

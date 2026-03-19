@@ -124,14 +124,14 @@ object Constants {
         val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
-        const val LEFT_FLYWHEEL_KP = 0.55
+        const val LEFT_FLYWHEEL_KP = 0.75
         const val LEFT_FLYWHEEL_KI = 0.0
         const val LEFT_FLYWHEEL_KD = 0.0
         const val LEFT_FLYWHEEL_KS = 0.286
         const val LEFT_FLYWHEEL_KV = 0.2073
         // const val LEFT_FLYWHEEL_KA = ...
 
-        const val RIGHT_FLYWHEEL_KP = 0.5
+        const val RIGHT_FLYWHEEL_KP = 0.75
         const val RIGHT_FLYWHEEL_KI = 0.0
         const val RIGHT_FLYWHEEL_KD = 0.0
         const val RIGHT_FLYWHEEL_KS = 0.271
@@ -227,9 +227,9 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 15.0
+        const val PIVOT_SUPPLY_LIMIT = 10.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 20.0
+        const val ROLLER_SUPPLY_LIMIT = 30.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -273,10 +273,10 @@ object Constants {
         const val WEDGE_STATOR_LIMIT = 40.0
         const val WEDGE_SUPPLY_LIMIT = 5.0
 
-        const val FLOOR_STATOR_LIMIT = 30.0
-        const val FLOOR_SUPPLY_LIMIT = 10.0
+        const val FLOOR_STATOR_LIMIT = 60.0
+        const val FLOOR_SUPPLY_LIMIT = 30.0
 
-        const val TOP_STATOR_LIMIT = 80.0
+        const val TOP_STATOR_LIMIT = 60.0
         const val TOP_SUPPLY_LIMIT = 30.0
 
         // --- PHYSICAL SPECS & GEARING ---
