@@ -68,26 +68,27 @@ class RobotActions(
                 SequentialCommandGroup(
                     intake.setPivotAngle(Radians.of(1.6)).withTimeout(.4),
                     intake.setPivotAngle(Radians.of(0.85)).withTimeout(.4),
-                )
+                ),
             ),
         )
 
     fun shuffleHopper(): Command =
         RepeatCommand(
             SequentialCommandGroup(
-                indexer.index(
-                    12.0,
-                    1.0,
-                    12.0
-                ).withTimeout(0.5),
+                indexer
+                    .index(
+                        12.0,
+                        1.0,
+                        12.0,
+                    ).withTimeout(0.5),
                 PrintCommand("i am running backwards"),
-                indexer.index(
-                    -1.0,
-                    1.0,
-                    12.0
-                ).withTimeout(0.05)
-            )
-
+                indexer
+                    .index(
+                        -1.0,
+                        1.0,
+                        12.0,
+                    ).withTimeout(0.05),
+            ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -128,7 +129,7 @@ class RobotActions(
                         indexer.index(
                             -2.0,
                             0.0,
-                            2.0
+                            2.0,
                         ),
                         shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
                     ).withTimeout(0.25),
@@ -145,7 +146,7 @@ class RobotActions(
             indexer.index(
                 -2.0,
                 -1.0,
-                -2.0
+                -2.0,
             ),
             shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
         )
@@ -170,11 +171,11 @@ class RobotActions(
             prepShotFromAnywhere(3.43),
             ParallelCommandGroup(
                 checkAndFeed(),
-                WaitCommand(1.8).andThen(
+                WaitCommand(0.8).andThen(
                     shuffleIntakePivot(),
-                )
+                ),
             ),
-        )
+        ).withTimeout(4.0)
 
     fun autoHubShot(): Command =
         SequentialCommandGroup(
