@@ -188,7 +188,11 @@ open class IntakeIOHardware : IntakeIO {
 
     val pivotCurrentConfig = CurrentLimitsConfigs()
     val rollerCurrentConfig = CurrentLimitsConfigs()
-    override fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
+
+    override fun setSupplyLimits(
+        pivotSupplyLimitAmps: Double,
+        rollerSupplyLimitAmps: Double,
+    ) {
         pivotCurrentConfig.SupplyCurrentLimit = pivotSupplyLimitAmps
         pivotCurrentConfig.StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
         rollerCurrentConfig.SupplyCurrentLimit = rollerSupplyLimitAmps
@@ -202,12 +206,13 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     companion object {
-        val pivotSlot0Config = Slot0Configs().apply {
-            kP = 100.0
-            kI = 0.0
-            kD = 0.1
-            kS = 0.2
-        }
+        val pivotSlot0Config =
+            Slot0Configs().apply {
+                kP = 100.0
+                kI = 0.0
+                kD = 0.1
+                kS = 0.2
+            }
 
         val leftPivotConfig =
             TalonFXConfiguration().apply {

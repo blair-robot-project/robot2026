@@ -1,7 +1,7 @@
 package frc.team449.subsystems.power
 
 enum class PowerProfile(
-    val limits: PowerLimits
+    val limits: PowerLimits,
 ) {
     LOW_BATTERY(
         PowerLimits(
@@ -31,7 +31,7 @@ enum class PowerProfile(
         PowerLimits(
             30.0,
             10.0,
-            10.0,
+            15.0,
             10.0,
             5.0,
             5.0,
@@ -50,5 +50,5 @@ enum class PowerProfile(
             30.0,
             20.0,
         ),
-    )
+    ),
 }

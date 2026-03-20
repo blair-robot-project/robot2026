@@ -17,7 +17,7 @@ import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer
+    val robotContainer: RobotContainer,
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
@@ -74,7 +74,7 @@ class Bindings(
                                 robotContainer.drive,
                                 robotContainer.power,
                                 actions,
-                                FieldUtil.HUB_TRANSLATION
+                                FieldUtil.HUB_TRANSLATION,
                             ).withTimeout(3.0),
                             PrintCommand("Align Complete!"),
                             ParallelCommandGroup(
@@ -82,15 +82,19 @@ class Bindings(
                                 actions.checkAndFeed(),
                                 SequentialCommandGroup(
                                     WaitCommand(1.0),
-                                    actions.shuffleIntakePivot()
-                                )
-                            )
+                                    actions.shuffleIntakePivot(),
+                                ),
+                            ),
                         )
                     },
-                    setOf<Subsystem>(robotContainer.intake, robotContainer.indexer)
-                )
-                    .until(joysticksMovedPastDeadbandTrigger)
-                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(robotContainer.power.requestProfile(PowerProfile.DRIVING), actions.stopAllAndHomeHood()) }
+                    setOf<Subsystem>(robotContainer.intake, robotContainer.indexer),
+                ).until(joysticksMovedPastDeadbandTrigger)
+                    .finallyDo { _ ->
+                        CommandScheduler.getInstance().schedule(
+                            robotContainer.power.requestProfile(PowerProfile.DRIVING),
+                            actions.stopAllAndHomeHood(),
+                        )
+                    },
             )
 
         driver
@@ -124,34 +128,34 @@ class Bindings(
         driver
             .povRight()
             .onTrue(
-                robotContainer.shooter.stopFlywheel()
+                robotContainer.shooter.stopFlywheel(),
             )
 
         driver
             .povUp()
             .whileTrue(
-                actions.checkAndFeed()
+                actions.checkAndFeed(),
             )
 
         driver
             .povLeft()
             .onTrue(
-                actions.stopAllAndHomeHood()
+                actions.stopAllAndHomeHood(),
             )
 
         driver
             .start()
             .onTrue(
-                robotContainer.drive.seedFieldCentric()
+                robotContainer.drive.seedFieldCentric(),
             )
 
         shooterJamTrigger
             .onTrue(
                 SequentialCommandGroup(
                     InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
-                    actions.autoUnjam()
-                )
-                    .finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }
+                    actions.autoUnjam(),
+                    actions.autoTrenchShot(0.0),
+                ).finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) },
             )
 
         operator
@@ -161,9 +165,9 @@ class Bindings(
                     actions.prepShotFromAnywhere(1.61),
                     ParallelCommandGroup(
                         actions.checkAndFeed(),
-                        actions.shuffleIntakePivot()
-                    )
-                )
+                        actions.shuffleIntakePivot(),
+                    ),
+                ),
             )
     }
 }

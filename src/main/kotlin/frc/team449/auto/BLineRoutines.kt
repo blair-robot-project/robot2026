@@ -30,7 +30,7 @@ import java.util.function.Consumer
 
 class BLineRoutines(
     private val drive: DriveSubsystem,
-    private val actions: RobotActions
+    private val actions: RobotActions,
 ) {
     private val translationP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val translationI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)
@@ -110,8 +110,9 @@ class BLineRoutines(
 
     private fun eventTriggerCommands() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
-        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
-        FollowPath.registerEventTrigger("stop_shooting", actions.stopAllAndHomeHood())
+        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot(0.8))
+        FollowPath.registerEventTrigger("second_start_shooting", actions.autoTrenchShot(0.0))
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopAll()) // end of auto
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
 

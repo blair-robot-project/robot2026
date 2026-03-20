@@ -22,10 +22,9 @@ import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import org.littletonrobotics.junction.Logger
-import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    private val robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -66,8 +65,8 @@ class RobotActions(
             intake.intakeSlow().withTimeout(0.01),
             RepeatCommand(
                 SequentialCommandGroup(
-                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.4),
-                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.4),
+                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.2),
+                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.2),
                 ),
             ),
         )
@@ -161,21 +160,25 @@ class RobotActions(
 
     fun stopAll(): Command =
         SequentialCommandGroup(
-            intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel(),
+            intake.stopRollers().withTimeout(0.1),
+            indexer.stop().withTimeout(0.1),
+            shooter.stopFlywheel().withTimeout(0.1),
         )
 
-    fun autoTrenchShot(): Command =
+    fun stopShooter(): Command =
+        SequentialCommandGroup(
+            shooter.stopFlywheel().withTimeout(0.1),
+        )
+
+    fun autoTrenchShot(time: Double): Command =
         SequentialCommandGroup(
             prepShotFromAnywhere(3.43),
             ParallelCommandGroup(
-                checkAndFeed(),
-                WaitCommand(0.8).andThen(
-                    shuffleIntakePivot(),
-                ),
+                checkAndFeed().withTimeout(4.5),
+                WaitCommand(time).andThen(shuffleIntakePivot().withTimeout(3.5)),
             ),
-        ).withTimeout(4.0)
+            shooter.stopFlywheel().withTimeout(0.1),
+        )
 
     fun autoHubShot(): Command =
         SequentialCommandGroup(

@@ -2,6 +2,7 @@ package frc.team449.subsystems.intake
 
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
@@ -16,7 +17,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO
+    private val io: IntakeIO,
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -42,31 +43,28 @@ class IntakeSubsystem(
             .run {
                 rollerTargetVolts = 11.0
                 io.setRollerVoltage(11.0)
-            }
-            .withName("Intake")
+            }.withName("Intake")
 
     fun intakeSlow(): Command =
-        this.run {
-            rollerTargetVolts = 4.0
-            io.setRollerVoltage(4.0)
-        }
-            .withName("IntakeSlow")
+        this
+            .run {
+                rollerTargetVolts = 4.0
+                io.setRollerVoltage(4.0)
+            }.withName("IntakeSlow")
 
     fun outtake(): Command =
         this
             .run {
                 rollerTargetVolts = -4.0
                 io.setRollerVoltage(-4.0)
-            }
-            .withName("Outtake")
+            }.withName("Outtake")
 
     fun stopRollers(): Command =
         this
             .run {
                 rollerTargetVolts = 0.0
                 io.setRollerVoltage(0.0)
-            }
-            .withName("StopRoller")
+            }.withName("StopRoller")
 
     fun setPivotAngle(angle: Angle): Command =
         this
@@ -87,25 +85,26 @@ class IntakeSubsystem(
             true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
-        )
-            .withName("Deploy")
+        ).withName("Deploy")
 
     fun stow(): Command =
         slamHoming(
             false,
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
-        )
-            .withName("Stow")
+        ).withName("Stow")
 
-    fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
+    fun setSupplyLimits(
+        pivotSupplyLimitAmps: Double,
+        rollerSupplyLimitAmps: Double,
+    ) {
         io.setSupplyLimits(pivotSupplyLimitAmps, rollerSupplyLimitAmps)
     }
 
     private fun slamHoming(
         isDeployed: Boolean,
         moveVolts: Double,
-        holdVolts: Double
+        holdVolts: Double,
     ): Command =
         this.defer {
             pivotIsDeployed = isDeployed

@@ -14,13 +14,13 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.10853419190630822,
+      "t_ratio": 0.000999999999999809,
       "lib_key": "start_intake"
     },
     {
       "type": "translation",
-      "x_meters": 6.473771400580458,
-      "y_meters": 0.6853525404628753,
+      "x_meters": 6.473771400580457,
+      "y_meters": 0.6853525404628762,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -51,7 +51,7 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 1.7,
+        "value": 1.0,
         "start_ordinal": 3,
         "end_ordinal": 3
       },
