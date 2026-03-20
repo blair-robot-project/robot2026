@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    private val robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -165,13 +165,13 @@ class RobotActions(
             shooter.stopFlywheel(),
         )
 
-    fun autoTrenchShot(): Command =
+    fun autoTrenchShot(time: Double): Command =
         SequentialCommandGroup(
             prepShotFromAnywhere(3.43),
             ParallelCommandGroup(
-                checkAndFeed(),
-                WaitCommand(0.8).andThen(
-                    shuffleIntakePivot(),
+                checkAndFeed().withTimeout(4.5),
+                WaitCommand(time).andThen(
+                    shuffleIntakePivot().withTimeout(3.5),
                 ),
             ),
         ).withTimeout(4.0)
