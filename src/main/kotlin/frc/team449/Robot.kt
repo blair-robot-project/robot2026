@@ -115,12 +115,12 @@ class Robot : LoggedRobot() {
         Logger.recordOutput(
             "FinalComponentPoses",
             *arrayOf(
-                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
+                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeAngle, 0.0)),
                 Pose3d(
                     MathUtil.inverseInterpolate(
                         Constants.IntakeConstants.STOW_POS_RADS,
                         Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle,
+                        robotContainer.intake.intakeAngle,
                     ) * 0.3,
                     0.0,
                     0.0,

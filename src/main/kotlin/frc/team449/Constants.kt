@@ -234,9 +234,15 @@ object Constants {
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 
+        // --- PIVOT TOLERANCE ---
+        const val PIVOT_TOLERANCE_POS_RADS = 0.175
+
         // --- ROLLER VELOCITY SETPOINTS ---
         val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
         val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
+
+        // -- ROLLER TOLERANCE ---
+        const val ROLLER_TOLERANCE_VELOCITY_RAD_SEC = 20
 
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
