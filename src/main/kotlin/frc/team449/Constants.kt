@@ -237,7 +237,7 @@ object Constants {
         const val DEPLOY_POS_RADS = 2.269
 
         const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.5
+        const val DEPLOY_HOLD_VOLTS = 0.118
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 

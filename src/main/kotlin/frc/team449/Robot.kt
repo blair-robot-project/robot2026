@@ -98,7 +98,7 @@ class Robot : LoggedRobot() {
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
 
-        CommandScheduler.getInstance().schedule(robotContainer.shooter.homeHood())
+        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)

@@ -31,7 +31,7 @@ enum class PowerProfile(
         PowerLimits(
             30.0,
             10.0,
-            15.0,
+            18.0,
             10.0,
             5.0,
             5.0,
