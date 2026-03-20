@@ -1,9 +1,19 @@
 package frc.team449
 
+import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.DeferredCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.Subsystem
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
+import frc.team449.subsystems.power.PowerProfile
+import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
@@ -18,17 +28,27 @@ class Bindings(
             abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
                 abs(driver.rightX) > 0.25
         }
-    val shooterJamTrigger = robotContainer.shooter.shooterJamTrigger
+
+    val shooterJamTrigger: Trigger = robotContainer.shooter.shooterJamTrigger
 
     fun setDefaultCommands() {
-        // set default commands for systems here
         robotContainer.drive.defaultCommand =
             SwerveRequestCommand(
                 robotContainer.drive,
+                robotContainer.power,
                 { -driver.leftY },
                 { -driver.leftX },
                 { -driver.rightX },
             )
+
+        robotContainer.intake.defaultCommand =
+            robotContainer.intake.stopRollers()
+
+//        robotContainer.indexer.defaultCommand =
+//            robotContainer.indexer.stop()
+
+//        robotContainer.shooter.defaultCommand =
+//            robotContainer.shooter.stopFlywheel()
     }
 
     fun bindControls() {
@@ -36,49 +56,41 @@ class Bindings(
             .rightTrigger()
             .whileTrue(
                 actions.deployAndRunIntake(),
-            ).onFalse(
-                SequentialCommandGroup(
-                    actions.stopIntake(),
-                    actions.stopFeed(),
-                ),
             )
 
         driver
             .leftTrigger()
             .onTrue(
                 actions.stopAndStow(),
-
             )
-
-//        driver
-//            .rightBumper()
-//            .whileTrue(
-//                ParallelCommandGroup(
-//                    AimAtTargetCommand(
-//                        robotContainer.drive,
-//                        { -robotContainer.driveController.leftY },
-//                        { -robotContainer.driveController.leftX },
-//                        { FieldUtil.HUB_TRANSLATION },
-//                    ),
-//                    actions.prepShotFromAnywhere { FieldUtil.HUB_TRANSLATION.getDistance(robotContainer.drive.pose.translation) },
-//                    actions.checkAndFeed(),
-//                ),
-//            ).onFalse(
-//                actions.stopFeedAndShooter(),
-//            )
 
         driver
             .rightBumper()
             .whileTrue(
-                ParallelCommandGroup(
-                    actions.checkAndFeed(),
-                    actions.shuffleIntakeRoller(),
-                ),
-            ).onFalse(
-                SequentialCommandGroup(
-                    actions.stopFeed(),
-                    actions.stopIntake(),
-                ),
+                DeferredCommand(
+                    {
+                        SequentialCommandGroup(
+                            AimAtTargetCommand(
+                                robotContainer.drive,
+                                robotContainer.power,
+                                actions,
+                                FieldUtil.HUB_TRANSLATION
+                            ).withTimeout(3.0),
+                            PrintCommand("Align Complete!"),
+                            ParallelCommandGroup(
+                                robotContainer.drive.xLock(),
+                                actions.checkAndFeed(),
+                                SequentialCommandGroup(
+                                    WaitCommand(1.0),
+                                    actions.shuffleIntakePivot()
+                                )
+                            )
+                        )
+                    },
+                    setOf<Subsystem>(robotContainer.intake, robotContainer.indexer)
+                )
+                    .until(joysticksMovedPastDeadbandTrigger)
+                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(robotContainer.power.requestProfile(PowerProfile.DRIVING), actions.stopAllAndHomeHood()) }
             )
 
         driver
@@ -86,6 +98,7 @@ class Bindings(
             .whileTrue(
                 SwerveRequestCommand(
                     robotContainer.drive,
+                    robotContainer.power,
                     { -driver.leftY },
                     { -driver.leftX },
                     { -driver.rightX },
@@ -103,67 +116,9 @@ class Bindings(
             )
 
         driver
-            .y()
-            .onTrue(
-                actions.prepHubShot(),
-            )
-
-//        driver
-//            .x()
-//            .onTrue(
-//                SequentialCommandGroup(
-//                    actions.prepTrenchShot(),
-//                    PoseAlignCommand(
-//                        robotContainer.drive,
-//                        { FieldUtil.getClosestTrenchPose(robotContainer.drive.pose) },
-//                        driver.povUp()
-//                    ),
-//                    actions.checkAndFeed(),
-//                    ParallelCommandGroup(
-//                        robotContainer.drive.xLock(),
-//                        actions.shuffleIntakePivot()
-//                    ),
-//                ).until(joysticksMovedPastDeadband)
-//                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
-//            )
-
-        driver
-            .x()
-            .onTrue(
-                actions.prepTrenchShot(),
-            )
-
-        driver
-            .b()
-            .onTrue(
-                actions.prepTowerShot(),
-            )
-
-//        driver
-//            .b()
-//            .onTrue(
-//                SequentialCommandGroup(
-//                    actions.prepTowerShot(),
-//                    PoseAlignCommand(
-//                        robotContainer.drive,
-//                        { FieldUtil.TOWER_POSE },
-//                        driver.povUp()
-//                    ),
-//                    actions.checkAndFeed(),
-//                    ParallelCommandGroup(
-//                        robotContainer.drive.xLock(),
-//                        actions.shuffleIntakePivot()
-//                    ),
-//                ).until(joysticksMovedPastDeadband)
-//                    .finallyDo { _ -> CommandScheduler.getInstance().schedule(actions.stopFeedAndShooter(), actions.stopAndStow()) },
-//            )
-
-        driver
             .povDown()
             .onTrue(
-                actions.outtakeIntakeAndReverseIndex(),
-            ).onFalse(
-                actions.stopIntake(),
+                actions.reverseAll(),
             )
 
         driver
@@ -173,86 +128,42 @@ class Bindings(
             )
 
         driver
+            .povUp()
+            .whileTrue(
+                actions.checkAndFeed()
+            )
+
+        driver
+            .povLeft()
+            .onTrue(
+                actions.stopAllAndHomeHood()
+            )
+
+        driver
             .start()
             .onTrue(
-                robotContainer.drive.seedFieldCentric(),
+                robotContainer.drive.seedFieldCentric()
             )
 
         shooterJamTrigger
             .onTrue(
-                actions.autoUnjam(),
-            )
-
-        operator
-            .leftBumper()
-            .whileTrue(
-                actions.outtakeIntakeAndReverseIndex(),
+                SequentialCommandGroup(
+                    InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
+                    actions.autoUnjam()
+                )
+                    .finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }
             )
 
         operator
             .a()
-            .onTrue(
-                actions.systemCheckCommand(),
-            )
-
-        operator
-            .rightTrigger()
-            .onTrue(
-                actions.deployAndRunIntake(),
-            )
-
-        operator
-            .leftTrigger()
-            .onTrue(
-                actions.stopAndStow(),
-            )
-
-        operator
-            .rightBumper()
-            .onTrue(
-                actions.checkAndFeed(),
-            )
-
-        operator
-            .x()
-            .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TRENCH_FLYWHEEL_VEL),
-            )
-
-        operator
-            .y()
-            .onTrue(
-                robotContainer.shooter.setFlywheelVelocity(Constants.ShooterConstants.TEST_FLYWHEEL_VEL),
-            )
-
-        operator
-            .povDown()
-            .onTrue(
-                actions.homeHood(),
-            )
-
-        operator
-            .povLeft()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TOWER_HOOD_ANGLE),
-            )
-
-        operator
-            .povUp()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.TRENCH_HOOD_ANGLE),
-            )
-
-        operator
-            .povRight()
-            .onTrue(
-                robotContainer.shooter.setHoodAngle(Constants.ShooterConstants.MAX_HOOD_ANGLE),
-            )
-
-        operator
-            .povDownRight()
-            .onTrue(
-                actions.stopFeedAndShooter(),
+            .whileTrue(
+                SequentialCommandGroup(
+                    actions.prepShotFromAnywhere(1.61),
+                    ParallelCommandGroup(
+                        actions.checkAndFeed(),
+                        actions.shuffleIntakePivot()
+                    )
+                )
             )
     }
 }

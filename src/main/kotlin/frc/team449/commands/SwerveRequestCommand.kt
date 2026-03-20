@@ -3,8 +3,11 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.power.PowerProfile
+import frc.team449.subsystems.power.PowerSubsystem
 import java.util.function.DoubleSupplier
 import kotlin.math.abs
 import kotlin.math.pow
@@ -12,6 +15,7 @@ import kotlin.math.sign
 
 class SwerveRequestCommand(
     private val drive: DriveSubsystem,
+    private val power: PowerSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val turnSupplier: DoubleSupplier,
@@ -36,9 +40,7 @@ class SwerveRequestCommand(
     override fun initialize() {
         println("Initializing SwerveRequestCommand")
 
-        if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
-            driveNoHeading.withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
-        }
+        CommandScheduler.getInstance().schedule(power.requestProfile(PowerProfile.DRIVING))
     }
 
     override fun execute() {

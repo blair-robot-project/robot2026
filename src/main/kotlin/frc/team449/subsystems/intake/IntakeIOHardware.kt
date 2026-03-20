@@ -1,13 +1,17 @@
 package frc.team449.subsystems.intake
 
 import com.ctre.phoenix6.BaseStatusSignal
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs
+import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.controls.PositionVoltage
 import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.Units
+import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
@@ -108,18 +112,19 @@ open class IntakeIOHardware : IntakeIO {
         )
 
     private val pivotVoltageRequest = VoltageOut(0.0)
+    private val pivotPositionRequest = PositionVoltage(0.0)
     private val rollerVelocityRequest = VelocityVoltage(0.0)
+    private val rollerVoltageRequest = VoltageOut(0.0)
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(leftPivotLeader, rightPivotFollower, leftRollerLeader, rightRollerFollower)
 
-        tryUntilOk(5) { leftPivotLeader.configurator.apply(pivotConfig, 0.25) }
-        tryUntilOk(5) { rightPivotFollower.configurator.apply(pivotConfig, 0.25) }
+        tryUntilOk(5) { leftPivotLeader.configurator.apply(leftPivotConfig, 0.25) }
+        tryUntilOk(5) { rightPivotFollower.configurator.apply(rightPivotConfig, 0.25) }
         tryUntilOk(5) { leftRollerLeader.configurator.apply(rollerConfig, 0.25) }
         tryUntilOk(5) { rightRollerFollower.configurator.apply(rollerConfig, 0.25) }
 
         rightRollerFollower.setControl(Follower(leftRollerLeader.deviceID, IntakeConstants.RIGHT_ROLLER_FOLLOWER_ALIGNMENT))
-        rightPivotFollower.setControl(Follower(leftPivotLeader.deviceID, IntakeConstants.RIGHT_PIVOT_FOLLOWER_ALIGNMENT))
 
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *allSignals)
 
@@ -160,6 +165,17 @@ open class IntakeIOHardware : IntakeIO {
 
     override fun setPivotVoltage(volts: Double) {
         leftPivotLeader.setControl(pivotVoltageRequest.withOutput(volts))
+        rightPivotFollower.setControl(pivotVoltageRequest.withOutput(volts))
+    }
+
+    override fun setPivotAngle(angle: Angle) {
+        leftPivotLeader.setControl(pivotPositionRequest.withPosition(angle))
+        rightPivotFollower.setControl(pivotPositionRequest.withPosition(angle))
+    }
+
+    override fun resetPivotAngle(angle: Angle) {
+        leftPivotLeader.setPosition(angle)
+        rightPivotFollower.setPosition(angle)
     }
 
     override fun setRollerVelocity(velocity: AngularVelocity) {
@@ -167,11 +183,33 @@ open class IntakeIOHardware : IntakeIO {
     }
 
     override fun setRollerVoltage(volts: Double) {
-        leftRollerLeader.setControl(pivotVoltageRequest.withOutput(volts))
+        leftRollerLeader.setControl(rollerVoltageRequest.withOutput(volts))
+    }
+
+    val pivotCurrentConfig = CurrentLimitsConfigs()
+    val rollerCurrentConfig = CurrentLimitsConfigs()
+    override fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
+        pivotCurrentConfig.SupplyCurrentLimit = pivotSupplyLimitAmps
+        pivotCurrentConfig.StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
+        rollerCurrentConfig.SupplyCurrentLimit = rollerSupplyLimitAmps
+        rollerCurrentConfig.StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
+
+        leftPivotLeader.configurator.apply(pivotCurrentConfig, 0.0)
+        rightPivotFollower.configurator.apply(pivotCurrentConfig, 0.0)
+
+        leftRollerLeader.configurator.apply(rollerCurrentConfig, 0.0)
+        rightRollerFollower.configurator.apply(rollerCurrentConfig, 0.0)
     }
 
     companion object {
-        val pivotConfig =
+        val pivotSlot0Config = Slot0Configs().apply {
+            kP = 100.0
+            kI = 0.0
+            kD = 0.1
+            kS = 0.2
+        }
+
+        val leftPivotConfig =
             TalonFXConfiguration().apply {
                 CurrentLimits.apply {
                     SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
@@ -185,10 +223,24 @@ open class IntakeIOHardware : IntakeIO {
 
                 Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
 
-                Slot0.apply {
-                    kP = 5.0
-                    kG = 0.1
+                Slot0 = pivotSlot0Config
+            }
+
+        val rightPivotConfig =
+            TalonFXConfiguration().apply {
+                CurrentLimits.apply {
+                    SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
+                    StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
                 }
+
+                MotorOutput.apply {
+                    NeutralMode = IntakeConstants.RIGHT_PIVOT_NEUTRAL_MODE
+                    Inverted = IntakeConstants.RIGHT_PIVOT_INVERSION
+                }
+
+                Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+
+                Slot0 = pivotSlot0Config
             }
 
         val rollerConfig =

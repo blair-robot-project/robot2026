@@ -7,7 +7,7 @@ import java.util.function.Consumer
 import java.util.function.DoubleSupplier
 
 /**
- * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
+ * Class for a Tunable Number. Gets value from dashboard in tuning mode, returns default if not or
  * value not in dashboard.
  */
 @Suppress("unused")
@@ -19,10 +19,10 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
     private val lastHasChangedValues: MutableMap<Int, Double> = HashMap()
 
     /**
-     * Create a new LoggedTunableNumber with the default value
+     * Create a new LoggedTunableNumber with the default value.
      *
-     * @param dashboardKey Key on dashboard
-     * @param defaultValue Default value
+     * @param dashboardKey Key on Network Table Dashboard.
+     * @param defaultValue Default value.
      */
     constructor(dashboardKey: String, defaultValue: Double) : this(dashboardKey) {
         initDefault(defaultValue)
@@ -31,7 +31,7 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
     /**
      * Set the default value of the number. The default value can only be set once.
      *
-     * @param defaultValue The default value
+     * @param defaultValue The default value.
      */
     fun initDefault(defaultValue: Double) {
         if (!hasDefault) {
@@ -46,7 +46,7 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
     /**
      * Get the current value, from dashboard if available and in tuning mode.
      *
-     * @return The current value
+     * @return The current value.
      */
     fun get(): Double {
         return if (!hasDefault) {
@@ -57,10 +57,10 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
     }
 
     /**
-     * Checks whether the number has changed since our last check
+     * Checks whether the number has changed since the last check.
      *
      * @param id Unique identifier for the caller to avoid conflicts when shared between multiple
-     * objects. Recommended approach is to pass the result of "hashCode()"
+     * objects. Recommended approach is to pass the result of "hashCode()."
      * @return True if the number has changed since the last time this method was called, false
      * otherwise.
      */
@@ -83,13 +83,13 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
         private const val TABLE_KEY = "/Tuning"
 
         /**
-         * Runs action if any of the tunableNumbers have changed
+         * Runs action if any of the tunableNumbers have changed.
          *
          * @param id Unique identifier for the caller to avoid conflicts when shared between multiple *
-         * objects. Recommended approach is to pass the result of "hashCode()"
+         * objects. Recommended approach is to pass the result of "hashCode()."
          * @param action Callback to run when any of the tunable numbers have changed. Access tunable
-         * numbers in order inputted in method
-         * @param tunableNumbers All tunable numbers to check
+         * numbers in order inputted in method.
+         * @param tunableNumbers All tunable numbers to check.
          */
         fun ifChanged(
             id: Int,
@@ -101,7 +101,7 @@ class LoggedTunableNumber(dashboardKey: String) : DoubleSupplier {
             }
         }
 
-        /** Runs action if any of the tunableNumbers have changed  */
+        /** Runs action if any of the tunableNumbers have changed.  */
         fun ifChanged(id: Int, action: Runnable, vararg tunableNumbers: LoggedTunableNumber) {
             ifChanged(id, { values: DoubleArray -> action.run() }, *tunableNumbers)
         }

@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.networktables.NetworkTableInstance
-import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.wpilibj.Timer
 import frc.team449.subsystems.vision.VisionIO.PoseObservation
 import frc.team449.subsystems.vision.VisionIO.PoseObservationType
@@ -30,6 +29,7 @@ import java.util.function.Supplier
 class VisionIOLimelight(
     name: String,
     private val rotationSupplier: Supplier<Rotation2d>,
+    private val angularVelocitySupplier: Supplier<AngularVelocity3d>,
     offset: Pose3d
 ) : VisionIO {
     private val limelight = Limelight(name)
@@ -49,11 +49,7 @@ class VisionIOLimelight(
             .withRobotOrientation(
                 Orientation3d(
                     Rotation3d(rotationSupplier.get()),
-                    AngularVelocity3d(
-                        DegreesPerSecond.of(0.0),
-                        DegreesPerSecond.of(0.0),
-                        DegreesPerSecond.of(0.0),
-                    )
+                    angularVelocitySupplier.get(),
                 )
             )
             .save()

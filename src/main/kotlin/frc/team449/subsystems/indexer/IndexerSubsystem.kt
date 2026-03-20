@@ -1,6 +1,4 @@
 package frc.team449.subsystems.indexer
-import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
@@ -17,46 +15,45 @@ class IndexerSubsystem(
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
-    var wedgeTargetVelocityRadPerSec: Double = 0.0
-    var floorTargetVelocityRadPerSec: Double = 0.0
-    var topTargetVelocityRadPerSec: Double = 0.0
+    var wedgeTargetVolts: Double = 0.0
+    var floorTargetVolts: Double = 0.0
+    var topTargetVolts: Double = 0.0
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
 
-        Logger.recordOutput("Indexer/FloorTargetRadPerSec", floorTargetVelocityRadPerSec)
-        Logger.recordOutput("Indexer/WedgeTargetRadPerSec", wedgeTargetVelocityRadPerSec)
-        Logger.recordOutput("Indexer/TopTargetVelocityRadPerSec", topTargetVelocityRadPerSec)
+        Logger.recordOutput("Indexer/FloorTargetVolts", floorTargetVolts)
+        Logger.recordOutput("Indexer/WedgeTargetVolts", wedgeTargetVolts)
+        Logger.recordOutput("Indexer/TopTargetVolts", topTargetVolts)
     }
 
     fun index(
-        floorSpeed: AngularVelocity,
-        wedgeSpeed: AngularVelocity,
-        topSpeed: AngularVelocity
+        floorVolts: Double,
+        wedgeVolts: Double,
+        topVolts: Double
     ): Command =
-        this.runOnce {
-            floorTargetVelocityRadPerSec = floorSpeed.`in`(RadiansPerSecond)
-            wedgeTargetVelocityRadPerSec = wedgeSpeed.`in`(RadiansPerSecond)
-            topTargetVelocityRadPerSec = topSpeed.`in`(RadiansPerSecond)
-            io.setFloorSpeed(floorSpeed)
-            io.setWedgeSpeed(wedgeSpeed)
-            io.setTopSpeed(topSpeed)
+        this.run {
+            floorTargetVolts = floorVolts
+            wedgeTargetVolts = wedgeVolts
+            topTargetVolts = topVolts
+
+            io.setIndexerVoltage(floorVolts, wedgeVolts, topVolts)
         }
 
-    fun index(surfaceSpeed: AngularVelocity): Command {
+    fun index(volts: Double): Command {
         return index(
-            surfaceSpeed,
-            surfaceSpeed,
-            surfaceSpeed,
+            volts,
+            volts,
+            volts
         )
     }
 
     fun stop(): Command =
-        this.runOnce {
-            floorTargetVelocityRadPerSec = 0.0
-            wedgeTargetVelocityRadPerSec = 0.0
-            topTargetVelocityRadPerSec = 0.0
+        this.run {
+            floorTargetVolts = 0.0
+            wedgeTargetVolts = 0.0
+            topTargetVolts = 0.0
             io.setIndexerVoltage(0.0, 0.0, 0.0)
         }
 }
