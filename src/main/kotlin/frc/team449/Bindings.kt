@@ -2,16 +2,16 @@ package frc.team449
 
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.DeferredCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import edu.wpi.first.wpilibj2.command.Subsystem
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.subsystems.power.PowerProfile
+import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
@@ -34,7 +34,6 @@ class Bindings(
         robotContainer.drive.defaultCommand =
             SwerveRequestCommand(
                 robotContainer.drive,
-                robotContainer.power,
                 { -driver.leftY },
                 { -driver.leftX },
                 { -driver.rightX },
@@ -66,33 +65,23 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                DeferredCommand({
-                    val aimPhase = AimAtTargetCommand(
-                        robotContainer.drive,
-                        robotContainer.power,
-                        actions,
-                        FieldUtil.HUB_TRANSLATION
-                    ).withTimeout(2.0)
-
-                    val shuffleSequence = actions.checkAndFeed()
-                        .withTimeout(1.0)
-                        .andThen(
-                            actions.shuffleIntakePivot()
-                                .alongWith(actions.shuffleHopper())
-                        )
-
-                    val shootingPhase = robotContainer.drive.xLock()
-                        .alongWith(shuffleSequence)
-
-                    aimPhase
-                        .andThen(PrintCommand("Align Complete."))
-                        .andThen(shootingPhase)
-                }, setOf<Subsystem>(robotContainer.intake, robotContainer.indexer))
+                AimAtTargetCommand(
+                    robotContainer.drive,
+                    actions,
+                    { FieldUtil.HUB_TRANSLATION }
+                )
+                    .withTimeout(2.0)
+                    .andThen(PrintCommand("Align Complete."))
+                    .andThen(
+                        robotContainer.drive.xLock()
+                            .alongWith(actions.checkAndFeed())
+                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
+                    )
                     .until(joysticksMovedPastDeadbandTrigger)
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
-                            robotContainer.power.requestProfile(PowerProfile.DRIVING),
-                            actions.stopAllAndHomeHood()
+                            actions.stopAllAndHomeHood(),
+                            PowerSubsystem.requestProfile(PowerProfile.DRIVING)
                         )
                     }
             )
@@ -102,7 +91,6 @@ class Bindings(
             .whileTrue(
                 SwerveRequestCommand(
                     robotContainer.drive,
-                    robotContainer.power,
                     { -driver.leftY },
                     { -driver.leftX },
                     { -driver.rightX },

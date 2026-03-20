@@ -20,7 +20,6 @@ import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
 import frc.team449.subsystems.intake.IntakeSubsystem
-import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
@@ -126,14 +125,6 @@ object RobotContainer {
                 Mode.SIM -> ShooterIOSim()
                 Mode.REPLAY -> object : ShooterIO {}
             },
-        )
-
-    val power: PowerSubsystem =
-        PowerSubsystem(
-            this.drive,
-            this.intake,
-            this.indexer,
-            this.shooter
         )
 
     val actions = RobotActions(this)

@@ -1,7 +1,6 @@
 package frc.team449.subsystems.intake
 
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.Slot0Configs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
@@ -184,21 +183,6 @@ open class IntakeIOHardware : IntakeIO {
 
     override fun setRollerVoltage(volts: Double) {
         leftRollerLeader.setControl(rollerVoltageRequest.withOutput(volts))
-    }
-
-    val pivotCurrentConfig = CurrentLimitsConfigs()
-    val rollerCurrentConfig = CurrentLimitsConfigs()
-    override fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
-        pivotCurrentConfig.SupplyCurrentLimit = pivotSupplyLimitAmps
-        pivotCurrentConfig.StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
-        rollerCurrentConfig.SupplyCurrentLimit = rollerSupplyLimitAmps
-        rollerCurrentConfig.StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
-
-        leftPivotLeader.configurator.apply(pivotCurrentConfig, 0.0)
-        rightPivotFollower.configurator.apply(pivotCurrentConfig, 0.0)
-
-        leftRollerLeader.configurator.apply(rollerCurrentConfig, 0.0)
-        rightRollerFollower.configurator.apply(rollerCurrentConfig, 0.0)
     }
 
     companion object {

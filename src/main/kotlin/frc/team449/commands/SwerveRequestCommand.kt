@@ -15,7 +15,6 @@ import kotlin.math.sign
 
 class SwerveRequestCommand(
     private val drive: DriveSubsystem,
-    private val power: PowerSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val turnSupplier: DoubleSupplier,
@@ -40,7 +39,7 @@ class SwerveRequestCommand(
     override fun initialize() {
         println("Initializing SwerveRequestCommand")
 
-        CommandScheduler.getInstance().schedule(power.requestProfile(PowerProfile.DRIVING))
+        CommandScheduler.getInstance().schedule(PowerSubsystem.requestProfile(PowerProfile.SHOOTING))
     }
 
     override fun execute() {

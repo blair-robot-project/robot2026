@@ -1,6 +1,8 @@
 package frc.team449.subsystems.indexer
+import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.team449.subsystems.power.PowerSubsystem
 import org.littletonrobotics.junction.Logger
 
 /**
@@ -15,9 +17,12 @@ class IndexerSubsystem(
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
-    var wedgeTargetVolts: Double = 0.0
     var floorTargetVolts: Double = 0.0
+    var wedgeTargetVolts: Double = 0.0
     var topTargetVolts: Double = 0.0
+
+    private var floorVoltageLimiter = SlewRateLimiter(24.0)
+    private var topVoltageLimiter = SlewRateLimiter(24.0)
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -38,8 +43,22 @@ class IndexerSubsystem(
             wedgeTargetVolts = wedgeVolts
             topTargetVolts = topVolts
 
-            io.setIndexerVoltage(floorVolts, wedgeVolts, topVolts)
+            val slewedFloorVolts = floorVoltageLimiter.calculate(floorTargetVolts)
+            val slewedTopVolts = topVoltageLimiter.calculate(topTargetVolts)
+
+            io.setIndexerVoltage(slewedFloorVolts, wedgeTargetVolts, slewedTopVolts)
         }
+            .beforeStarting(
+                runOnce {
+                    val indexerSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
+
+                    floorVoltageLimiter = SlewRateLimiter(indexerSlewRate)
+                    topVoltageLimiter = SlewRateLimiter(indexerSlewRate)
+
+                    floorVoltageLimiter.reset(inputs.floorAppliedVolts)
+                    topVoltageLimiter.reset(inputs.topAppliedVolts)
+                }
+            )
 
     fun index(volts: Double): Command {
         return index(

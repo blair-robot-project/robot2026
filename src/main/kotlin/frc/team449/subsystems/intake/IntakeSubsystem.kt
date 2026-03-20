@@ -1,6 +1,7 @@
 package frc.team449.subsystems.intake
 
 import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.units.Units.Volts
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.IntakeConstants
+import frc.team449.subsystems.power.PowerSubsystem
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
@@ -28,6 +30,8 @@ class IntakeSubsystem(
     val pivotAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
 
+    private var voltageLimiter = SlewRateLimiter(24.0)
+
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
@@ -40,9 +44,19 @@ class IntakeSubsystem(
     fun intake(): Command =
         this
             .run {
-                rollerTargetVolts = 11.0
-                io.setRollerVoltage(11.0)
+                rollerTargetVolts = 12.0
+
+                val slewedVolts = voltageLimiter.calculate(rollerTargetVolts)
+                io.setRollerVoltage(slewedVolts)
             }
+            .beforeStarting(
+                runOnce {
+                    val intakeSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+                    voltageLimiter = SlewRateLimiter(intakeSlewRate)
+
+                    voltageLimiter.reset(inputs.leftRollerLeaderAppliedVolts)
+                }
+            )
             .withName("Intake")
 
     fun intakeSlow(): Command =
@@ -97,10 +111,6 @@ class IntakeSubsystem(
             IntakeConstants.STOW_HOLD_VOLTS,
         )
             .withName("Stow")
-
-    fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
-        io.setSupplyLimits(pivotSupplyLimitAmps, rollerSupplyLimitAmps)
-    }
 
     private fun slamHoming(
         isDeployed: Boolean,

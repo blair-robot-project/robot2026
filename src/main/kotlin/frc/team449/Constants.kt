@@ -227,9 +227,9 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 10.0
+        const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 10.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
