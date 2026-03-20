@@ -1,8 +1,8 @@
 package frc.team449.subsystems.intake
 
 import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
@@ -13,11 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.IntakeConstants
+import frc.team449.subsystems.power.PowerSubsystem
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO,
+    private val io: IntakeIO
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -28,6 +29,8 @@ class IntakeSubsystem(
 
     val pivotAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
+
+    private var voltageLimiter = SlewRateLimiter(24.0)
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -41,30 +44,43 @@ class IntakeSubsystem(
     fun intake(): Command =
         this
             .run {
-                rollerTargetVolts = 11.0
-                io.setRollerVoltage(11.0)
-            }.withName("Intake")
+                rollerTargetVolts = 12.0
+
+                val slewedVolts = voltageLimiter.calculate(rollerTargetVolts)
+                io.setRollerVoltage(slewedVolts)
+            }
+            .beforeStarting(
+                runOnce {
+                    val intakeSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+                    voltageLimiter = SlewRateLimiter(intakeSlewRate)
+
+                    voltageLimiter.reset(inputs.leftRollerLeaderAppliedVolts)
+                }
+            )
+            .withName("Intake")
 
     fun intakeSlow(): Command =
-        this
-            .run {
-                rollerTargetVolts = 4.0
-                io.setRollerVoltage(4.0)
-            }.withName("IntakeSlow")
+        this.run {
+            rollerTargetVolts = 4.0
+            io.setRollerVoltage(4.0)
+        }
+            .withName("IntakeSlow")
 
     fun outtake(): Command =
         this
             .run {
                 rollerTargetVolts = -4.0
                 io.setRollerVoltage(-4.0)
-            }.withName("Outtake")
+            }
+            .withName("Outtake")
 
     fun stopRollers(): Command =
         this
             .run {
                 rollerTargetVolts = 0.0
                 io.setRollerVoltage(0.0)
-            }.withName("StopRoller")
+            }
+            .withName("StopRoller")
 
     fun setPivotAngle(angle: Angle): Command =
         this
@@ -85,26 +101,21 @@ class IntakeSubsystem(
             true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
-        ).withName("Deploy")
+        )
+            .withName("Deploy")
 
     fun stow(): Command =
         slamHoming(
             false,
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
-        ).withName("Stow")
-
-    fun setSupplyLimits(
-        pivotSupplyLimitAmps: Double,
-        rollerSupplyLimitAmps: Double,
-    ) {
-        io.setSupplyLimits(pivotSupplyLimitAmps, rollerSupplyLimitAmps)
-    }
+        )
+            .withName("Stow")
 
     private fun slamHoming(
         isDeployed: Boolean,
         moveVolts: Double,
-        holdVolts: Double,
+        holdVolts: Double
     ): Command =
         this.defer {
             pivotIsDeployed = isDeployed

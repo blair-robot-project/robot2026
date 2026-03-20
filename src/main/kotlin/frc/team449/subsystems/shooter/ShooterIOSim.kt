@@ -81,6 +81,10 @@ class ShooterIOSim : ShooterIOHardware() {
         hoodMotor.configurator.apply(
             MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
         )
+
+        hoodMotor.configurator.apply(
+            Slot0Configs().withKP(250.0).withKV(ShooterConstants.HOOD_KV)
+        )
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {

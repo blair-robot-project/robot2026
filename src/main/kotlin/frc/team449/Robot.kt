@@ -19,6 +19,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 
 class Robot : LoggedRobot() {
+    private val robotContainer = RobotContainer
+
     init {
         println("Initializing Robot!")
 
@@ -47,62 +49,32 @@ class Robot : LoggedRobot() {
         Logger.start()
     }
 
-    private val robotContainer = RobotContainer
-
-    override fun driverStationConnected() {}
-
     override fun robotInit() {
         FieldUtil.initialize()
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
 
+        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
     }
 
     override fun robotPeriodic() {
-        Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
-        Logger.recordOutput("Match Time", DriverStation.getMatchTime())
+        CommandScheduler.getInstance().run()
         PhoenixUtil.refreshAll()
 
-        // high priority (real-time) thread for loop timing
-//        Threads.setCurrentThreadPriority(true, 99)
-        CommandScheduler.getInstance().run()
+        Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
+        Logger.recordOutput("MatchTime", DriverStation.getMatchTime())
 
-        // return thread to low priority (standard)
-//        Threads.setCurrentThreadPriority(false, 10)
-
-        Logger.recordOutput(
-            "FinalComponentPoses",
-            *arrayOf(
-                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.pivotAngle, 0.0)),
-                Pose3d(
-                    MathUtil.inverseInterpolate(
-                        Constants.IntakeConstants.STOW_POS_RADS,
-                        Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.pivotAngle,
-                    ) * 0.3,
-                    0.0,
-                    0.0,
-                    Rotation3d(),
-                ),
-                Pose3d(
-                    -0.1,
-                    0.0,
-                    0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodAngle + 0.2591940418, 0.0),
-                ),
-            ),
-        )
+        logComponentPoses()
     }
 
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
-
+        FieldUtil.updateKeyPositions()
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
-        CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
-        FieldUtil.updateKeyPositions()
+
+
     }
 
     override fun autonomousPeriodic() {
@@ -112,24 +84,30 @@ class Robot : LoggedRobot() {
     override fun teleopInit() {
         robotContainer.autonomousCommand.cancel()
         robotContainer.drive.setOperatorPerspectiveForward()
-
-        FieldUtil.updateAutoWinner()
         FieldUtil.updateKeyPositions()
 
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
     }
 
-    override fun teleopPeriodic() {}
+    override fun teleopPeriodic() {
+        if (!FieldUtil.autoWinnerLogged) FieldUtil.autoWinnerLogged = FieldUtil.updateAutoWinner()
+    }
 
-    override fun disabledInit() {}
+    private fun logComponentPoses() {
+        val pivotAngle = robotContainer.intake.pivotAngle
+        val hoodAngle = robotContainer.shooter.hoodAngle
 
-    override fun disabledPeriodic() {}
+        val hopperTranslationX = MathUtil.inverseInterpolate(
+            Constants.IntakeConstants.STOW_POS_RADS,
+            Constants.IntakeConstants.DEPLOY_POS_RADS,
+            pivotAngle
+        ) * 0.3
 
-    override fun testInit() {}
-
-    override fun testPeriodic() {}
-
-    override fun simulationInit() {}
-
-    override fun simulationPeriodic() {}
+        Logger.recordOutput(
+            "FinalComponentPoses",
+            Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, pivotAngle, 0.0)),
+            Pose3d(hopperTranslationX, 0.0, 0.0, Rotation3d()),
+            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0))
+        )
+    }
 }

@@ -77,8 +77,7 @@ object TunerConstants {
     private val steerInitialConfigs: TalonFXSConfiguration =
         TalonFXSConfiguration()
             .withCurrentLimits(
-                CurrentLimitsConfigs() // Swerve azimuth does not require much torque output, so we can set a relatively low
-                    // stator current limit to help avoid brownouts without impacting performance.
+                CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Units.Amps.of(40.0))
                     .withStatorCurrentLimitEnable(true)
                     .withSupplyCurrentLimit(Units.Amps.of(20.0))

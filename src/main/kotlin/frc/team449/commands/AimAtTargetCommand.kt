@@ -3,6 +3,8 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj2.command.Command
@@ -13,13 +15,13 @@ import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import org.littletonrobotics.junction.Logger
+import java.util.function.Supplier
 import kotlin.math.PI
 
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
-    private val power: PowerSubsystem,
     private val actions: RobotActions,
-    private val target: Translation2d
+    private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
     private val request = SwerveRequest.FieldCentric()
         .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
@@ -37,29 +39,26 @@ class AimAtTargetCommand(
         setTolerance(AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS)
     }
 
-    var currentPose = drive.pose
-    var translationToTarget = target.minus(currentPose.translation)
-    var distance = translationToTarget.norm
+    var currentPose: Pose2d = drive.pose
+    var translationToTarget: Translation2d = targetSupplier.get().minus(currentPose.translation)
+    var distance: Double = translationToTarget.norm
 
-    var targetHeading = translationToTarget.angle
-    var omegaRadPerSec = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
+    var targetHeading: Rotation2d = translationToTarget.angle
+    var omegaRadPerSec: Double = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
 
     init {
         addRequirements(drive)
     }
 
     override fun initialize() {
-        CommandScheduler.getInstance().schedule(power.requestProfile(PowerProfile.SHOOTING))
         headingController.reset(drive.pose.rotation.radians)
-        CommandScheduler.getInstance().schedule(
-            actions.prepShotFromAnywhere(distance)
-        )
+        CommandScheduler.getInstance().schedule(PowerSubsystem.requestProfile(PowerProfile.SHOOTING))
         println("Initializing AimAtTargetCommand.")
     }
 
     override fun execute() {
         currentPose = drive.pose
-        translationToTarget = target.minus(currentPose.translation)
+        translationToTarget = targetSupplier.get().minus(currentPose.translation)
         distance = translationToTarget.norm
 
         targetHeading = translationToTarget.angle
@@ -83,5 +82,5 @@ class AimAtTargetCommand(
 
     override fun isFinished(): Boolean = headingController.atGoal()
 
-    override fun end(interrupted: Boolean) = println("AimAtTargetCommand interrupted: $interrupted")
+    override fun end(interrupted: Boolean) = println("AimAtTargetCommand Interrupted: $interrupted")
 }

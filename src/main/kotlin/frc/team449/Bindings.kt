@@ -2,22 +2,21 @@ package frc.team449
 
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.DeferredCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import edu.wpi.first.wpilibj2.command.Subsystem
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.subsystems.power.PowerProfile
+import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.opController
@@ -35,7 +34,6 @@ class Bindings(
         robotContainer.drive.defaultCommand =
             SwerveRequestCommand(
                 robotContainer.drive,
-                robotContainer.power,
                 { -driver.leftY },
                 { -driver.leftX },
                 { -driver.rightX },
@@ -44,8 +42,8 @@ class Bindings(
         robotContainer.intake.defaultCommand =
             robotContainer.intake.stopRollers()
 
-//        robotContainer.indexer.defaultCommand =
-//            robotContainer.indexer.stop()
+        robotContainer.indexer.defaultCommand =
+            robotContainer.indexer.stop()
 
 //        robotContainer.shooter.defaultCommand =
 //            robotContainer.shooter.stopFlywheel()
@@ -67,34 +65,25 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                DeferredCommand(
-                    {
-                        SequentialCommandGroup(
-                            AimAtTargetCommand(
-                                robotContainer.drive,
-                                robotContainer.power,
-                                actions,
-                                FieldUtil.HUB_TRANSLATION,
-                            ).withTimeout(3.0),
-                            PrintCommand("Align Complete!"),
-                            ParallelCommandGroup(
-                                robotContainer.drive.xLock(),
-                                actions.checkAndFeed(),
-                                SequentialCommandGroup(
-                                    WaitCommand(1.0),
-                                    actions.shuffleIntakePivot(),
-                                ),
-                            ),
-                        )
-                    },
-                    setOf<Subsystem>(robotContainer.intake, robotContainer.indexer),
-                ).until(joysticksMovedPastDeadbandTrigger)
+                AimAtTargetCommand(
+                    robotContainer.drive,
+                    actions,
+                    { FieldUtil.HUB_TRANSLATION }
+                )
+                    .withTimeout(2.0)
+                    .andThen(PrintCommand("Align Complete."))
+                    .andThen(
+                        robotContainer.drive.xLock()
+                            .alongWith(actions.checkAndFeed())
+                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
+                    )
+                    .until(joysticksMovedPastDeadbandTrigger)
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
-                            robotContainer.power.requestProfile(PowerProfile.DRIVING),
                             actions.stopAllAndHomeHood(),
+                            PowerSubsystem.requestProfile(PowerProfile.DRIVING)
                         )
-                    },
+                    }
             )
 
         driver
@@ -102,7 +91,6 @@ class Bindings(
             .whileTrue(
                 SwerveRequestCommand(
                     robotContainer.drive,
-                    robotContainer.power,
                     { -driver.leftY },
                     { -driver.leftX },
                     { -driver.rightX },
@@ -128,34 +116,34 @@ class Bindings(
         driver
             .povRight()
             .onTrue(
-                robotContainer.shooter.stopFlywheel(),
+                robotContainer.shooter.stopFlywheel()
             )
 
         driver
             .povUp()
             .whileTrue(
-                actions.checkAndFeed(),
+                actions.checkAndFeed()
             )
 
         driver
             .povLeft()
             .onTrue(
-                actions.stopAllAndHomeHood(),
+                actions.stopAllAndHomeHood()
             )
 
         driver
             .start()
             .onTrue(
-                robotContainer.drive.seedFieldCentric(),
+                robotContainer.drive.seedFieldCentric()
             )
 
         shooterJamTrigger
             .onTrue(
                 SequentialCommandGroup(
                     InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
-                    actions.autoUnjam(),
-                    actions.autoTrenchShot(0.0),
-                ).finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) },
+                    actions.autoUnjam()
+                )
+                    .finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }
             )
 
         operator
@@ -165,9 +153,9 @@ class Bindings(
                     actions.prepShotFromAnywhere(1.61),
                     ParallelCommandGroup(
                         actions.checkAndFeed(),
-                        actions.shuffleIntakePivot(),
-                    ),
-                ),
+                        actions.shuffleIntakePivot()
+                    )
+                )
             )
     }
 }

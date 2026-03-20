@@ -22,19 +22,19 @@ import frc.team449.subsystems.power.PowerProfile
 import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import org.littletonrobotics.junction.Logger
+import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer,
+    private val robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
     private val indexer: IndexerSubsystem = robotContainer.indexer
     private val shooter: ShooterSubsystem = robotContainer.shooter
-    private val power: PowerSubsystem = robotContainer.power
 
     fun deployAndRunIntake(): Command =
         SequentialCommandGroup(
-            power.requestProfile(PowerProfile.INTAKING),
+            PowerSubsystem.requestProfile(PowerProfile.INTAKING),
             intake.deploy(),
             ParallelCommandGroup(
                 intake.intake(),
@@ -44,11 +44,11 @@ class RobotActions(
                     0.0,
                 ),
             ),
-        ).finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
+        ).finallyDo { _ -> PowerSubsystem.requestProfile(PowerProfile.DRIVING) }
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
-            power.requestProfile(PowerProfile.DRIVING),
+            PowerSubsystem.requestProfile(PowerProfile.DRIVING),
             intake.stopRollers().withTimeout(0.01),
             ParallelRaceGroup(
                 indexer.index(
@@ -65,8 +65,8 @@ class RobotActions(
             intake.intakeSlow().withTimeout(0.01),
             RepeatCommand(
                 SequentialCommandGroup(
-                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.2),
-                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.2),
+                    intake.setPivotAngle(Radians.of(1.6)).withTimeout(.15),
+                    intake.setPivotAngle(Radians.of(0.85)).withTimeout(.15),
                 ),
             ),
         )
@@ -92,7 +92,7 @@ class RobotActions(
 
     fun prepShotFromAnywhere(distance: Double): Command =
         SequentialCommandGroup(
-            power.requestProfile(PowerProfile.SHOOTING),
+            PowerSubsystem.requestProfile(PowerProfile.SHOOTING),
             InstantCommand({
                 Logger.recordOutput("Aimbot/FlywheelEstimatedVel", ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
                 Logger.recordOutput("Aimbot/HoodEstimatedAngle", ShooterConstants.HOOD_ANGLE_MAP.get(distance))
@@ -160,29 +160,25 @@ class RobotActions(
 
     fun stopAll(): Command =
         SequentialCommandGroup(
-            intake.stopRollers().withTimeout(0.1),
-            indexer.stop().withTimeout(0.1),
-            shooter.stopFlywheel().withTimeout(0.1),
+            intake.stopRollers(),
+            indexer.stop(),
+            shooter.stopFlywheel(),
         )
 
-    fun stopShooter(): Command =
-        SequentialCommandGroup(
-            shooter.stopFlywheel().withTimeout(0.1),
-        )
-
-    fun autoTrenchShot(time: Double): Command =
+    fun autoTrenchShot(): Command =
         SequentialCommandGroup(
             prepShotFromAnywhere(3.43),
             ParallelCommandGroup(
-                checkAndFeed().withTimeout(4.5),
-                WaitCommand(time).andThen(shuffleIntakePivot().withTimeout(3.5)),
+                checkAndFeed(),
+                WaitCommand(0.8).andThen(
+                    shuffleIntakePivot(),
+                ),
             ),
-            shooter.stopFlywheel().withTimeout(0.1),
-        )
+        ).withTimeout(4.0)
 
     fun autoHubShot(): Command =
         SequentialCommandGroup(
-            prepShotFromAnywhere(1.294),
+            prepShotFromAnywhere(3.43),
             checkAndFeed(),
         )
 
