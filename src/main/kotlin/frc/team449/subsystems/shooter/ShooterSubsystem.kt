@@ -35,8 +35,11 @@ class ShooterSubsystem(
     val hoodAngle: Double
         get() = inputs.hoodAngleRad
 
-    val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) || abs(inputs.rightLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
-        .debounce(0.25)
+    val shooterJamTrigger: Trigger =
+        Trigger {
+            abs(inputs.leftLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) ||
+                abs(inputs.rightLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0)
+        }.debounce(0.25)
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -59,7 +62,10 @@ class ShooterSubsystem(
         Logger.recordOutput("Shooter/HoodAtTolerance", isHoodAtTolerance())
     }
 
-    fun setAimCommand(hoodAngle: Angle, flywheelVelocity: AngularVelocity): Command =
+    fun setAimCommand(
+        hoodAngle: Angle,
+        flywheelVelocity: AngularVelocity
+    ): Command =
         run {
             hoodTargetAngleRad = hoodAngle.`in`(Radians)
             flywheelTargetVelocityRadPerSec = flywheelVelocity.`in`(RadiansPerSecond)
@@ -116,24 +122,24 @@ class ShooterSubsystem(
     }
 
     fun homeHood(): Command =
-        this.defer {
-            val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME)
+        this
+            .defer {
+                val homingDebouncer = Debouncer(ShooterConstants.HOMING_DEBOUNCE_TIME)
 
-            SequentialCommandGroup(
-                run {
-                    io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)
-                }.until {
-                    val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
-                    val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
-                    homingDebouncer.calculate(highCurrent && lowVelocity)
-                },
-                runOnce {
-                    io.setHoodVoltage(0.0)
-                    io.resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
-                }
-            )
-        }
-            .withName("Home Hood")
+                SequentialCommandGroup(
+                    run {
+                        io.setHoodVoltage(ShooterConstants.HOMING_VOLTAGE)
+                    }.until {
+                        val highCurrent = abs(inputs.hoodStatorCurrentAmps) > ShooterConstants.HOMING_CURRENT_AMPS
+                        val lowVelocity = abs(inputs.hoodVelocityRadPerSec) < ShooterConstants.HOMING_VELOCITY_RAD_PER_SEC
+                        homingDebouncer.calculate(highCurrent && lowVelocity)
+                    },
+                    runOnce {
+                        io.setHoodVoltage(0.0)
+                        io.resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
+                    },
+                )
+            }.withName("Home Hood")
 
     val sysIDFlywheel =
         SysIdRoutine(

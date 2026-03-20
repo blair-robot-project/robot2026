@@ -42,31 +42,28 @@ class IntakeSubsystem(
             .run {
                 rollerTargetVolts = 11.0
                 io.setRollerVoltage(11.0)
-            }
-            .withName("Intake")
+            }.withName("Intake")
 
     fun intakeSlow(): Command =
-        this.run {
-            rollerTargetVolts = 4.0
-            io.setRollerVoltage(4.0)
-        }
-            .withName("IntakeSlow")
+        this
+            .run {
+                rollerTargetVolts = 4.0
+                io.setRollerVoltage(4.0)
+            }.withName("IntakeSlow")
 
     fun outtake(): Command =
         this
             .run {
                 rollerTargetVolts = -4.0
                 io.setRollerVoltage(-4.0)
-            }
-            .withName("Outtake")
+            }.withName("Outtake")
 
     fun stopRollers(): Command =
         this
             .run {
                 rollerTargetVolts = 0.0
                 io.setRollerVoltage(0.0)
-            }
-            .withName("StopRoller")
+            }.withName("StopRoller")
 
     fun setPivotAngle(angle: Angle): Command =
         this
@@ -87,18 +84,19 @@ class IntakeSubsystem(
             true,
             IntakeConstants.DEPLOY_VOLTS,
             IntakeConstants.DEPLOY_HOLD_VOLTS,
-        )
-            .withName("Deploy")
+        ).withName("Deploy")
 
     fun stow(): Command =
         slamHoming(
             false,
             IntakeConstants.STOW_VOLTS,
             IntakeConstants.STOW_HOLD_VOLTS,
-        )
-            .withName("Stow")
+        ).withName("Stow")
 
-    fun setSupplyLimits(pivotSupplyLimitAmps: Double, rollerSupplyLimitAmps: Double) {
+    fun setSupplyLimits(
+        pivotSupplyLimitAmps: Double,
+        rollerSupplyLimitAmps: Double
+    ) {
         io.setSupplyLimits(pivotSupplyLimitAmps, rollerSupplyLimitAmps)
     }
 
@@ -126,6 +124,23 @@ class IntakeSubsystem(
                     },
                 )
         }
+
+    // Checks Left Pivot Leader to see if it's in a tolerable range
+    fun pivotAtTolerance(): Boolean {
+        val target: Double =
+            if (pivotIsDeployed) {
+                IntakeConstants.DEPLOY_POS_RADS
+            } else {
+                IntakeConstants.STOW_POS_RADS
+            }
+        return abs(pivotAngle - target) <=
+            IntakeConstants.PIVOT_TOLERANCE_POS_RADS
+    }
+
+    // Checks the rollerVelocity is in a tolerable range
+    fun rollerAtTolerance(): Boolean =
+        abs(inputs.leftRollerLeaderAppliedVolts - rollerTargetVolts) <= 1.0 &&
+            abs(inputs.rightRollerFollowerAppliedVolts - rollerTargetVolts) <= 1.0
 
     val sysIDPivot =
         SysIdRoutine(

@@ -2,6 +2,7 @@ package frc.team449.subsystems.indexer
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
+import kotlin.math.abs
 
 /**
  * @file Indexer.kt
@@ -41,13 +42,12 @@ class IndexerSubsystem(
             io.setIndexerVoltage(floorVolts, wedgeVolts, topVolts)
         }
 
-    fun index(volts: Double): Command {
-        return index(
+    fun index(volts: Double): Command =
+        index(
             volts,
             volts,
-            volts
+            volts,
         )
-    }
 
     fun stop(): Command =
         this.run {
@@ -56,4 +56,14 @@ class IndexerSubsystem(
             topTargetVolts = 0.0
             io.setIndexerVoltage(0.0, 0.0, 0.0)
         }
+
+    fun indexerAtTolerance(): Boolean {
+        val floor = abs(inputs.floorAppliedVolts - floorTargetVolts)
+        val wedge = abs(inputs.wedgeAppliedVolts - wedgeTargetVolts)
+        val top = abs(inputs.topAppliedVolts - topTargetVolts)
+
+        val isAtTarget = floor < 1.0 && wedge < 1.0 && top < 1.0
+
+        return isAtTarget
+    }
 }
