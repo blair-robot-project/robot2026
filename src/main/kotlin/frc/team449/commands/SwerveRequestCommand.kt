@@ -33,7 +33,7 @@ class SwerveRequestCommand(
             .withRotationalDeadband(maxAngularSpeedRadiansPerSecond * Constants.DriveConstants.ANGULAR_DEADBAND)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
-    val translationLimiter = SlewRateLimiter(8.0, -12.0, 0.0)
+    val translationLimiter = SlewRateLimiter(8.0, -100.0, 0.0)
 
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
