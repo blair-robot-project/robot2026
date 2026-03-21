@@ -14,13 +14,8 @@ object PowerSubsystem : SubsystemBase() {
 
         val currentProfileLimits = currentProfile.limits
 
-        Logger.recordOutput(
-            "Power/CurrentLimits",
-            doubleArrayOf(
-                currentProfileLimits.intakeSlewRate,
-                currentProfileLimits.hopperSlewRate,
-            )
-        )
+        Logger.recordOutput("Power/IntakeSlewRateVoltsPerSecond", currentProfileLimits.intakeSlewRate)
+        Logger.recordOutput("Power/HopperSlewRateVoltsPerSecond", currentProfileLimits.hopperSlewRate)
     }
 
     fun requestProfile(requestedProfile: PowerProfile): Command =
