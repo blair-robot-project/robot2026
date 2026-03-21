@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.Logger
 
 object PowerSubsystem : SubsystemBase() {
     var lastProfile: PowerProfile = PowerProfile.LOW_BATTERY
-    var currentProfile: PowerProfile = PowerProfile.SHOOTING
+    var currentProfile: PowerProfile = PowerProfile.DRIVING
 
     override fun periodic() {
         if (currentProfile == lastProfile) return

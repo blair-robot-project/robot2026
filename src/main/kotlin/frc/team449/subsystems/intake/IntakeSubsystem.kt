@@ -1,7 +1,6 @@
 package frc.team449.subsystems.intake
 
 import edu.wpi.first.math.filter.Debouncer
-import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.units.Units.Volts
@@ -14,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.IntakeConstants
 import frc.team449.subsystems.power.PowerSubsystem
+import frc.team449.util.MathExtensions.slewTowards
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
@@ -30,8 +30,6 @@ class IntakeSubsystem(
     val pivotAngle: Double
         get() = inputs.leftPivotLeaderPositionRad
 
-    private var voltageLimiter = SlewRateLimiter(24.0)
-
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
@@ -46,24 +44,23 @@ class IntakeSubsystem(
             .run {
                 rollerTargetVolts = 12.0
 
-                val slewedVolts = voltageLimiter.calculate(rollerTargetVolts)
+                val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+                val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)
+
                 io.setRollerVoltage(slewedVolts)
             }
-            .beforeStarting(
-                runOnce {
-                    val intakeSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
-                    voltageLimiter = SlewRateLimiter(intakeSlewRate)
-
-                    voltageLimiter.reset(inputs.leftRollerLeaderAppliedVolts)
-                }
-            )
             .withName("Intake")
 
     fun intakeSlow(): Command =
-        this.run {
-            rollerTargetVolts = 4.0
-            io.setRollerVoltage(4.0)
-        }
+        this
+            .run {
+                rollerTargetVolts = 4.0
+
+                val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+                val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)
+
+                io.setRollerVoltage(slewedVolts)
+            }
             .withName("IntakeSlow")
 
     fun outtake(): Command =
@@ -71,6 +68,10 @@ class IntakeSubsystem(
             .run {
                 rollerTargetVolts = -4.0
                 io.setRollerVoltage(-4.0)
+            }
+            .finallyDo { _ ->
+                rollerTargetVolts = 0.0
+                io.setRollerVoltage(0.0)
             }
             .withName("Outtake")
 

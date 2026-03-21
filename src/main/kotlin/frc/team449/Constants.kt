@@ -19,7 +19,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY,
+        REPLAY
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -229,8 +229,8 @@ object Constants {
         // --- CURRENT LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 20.0
-        const val ROLLER_STATOR_LIMIT = 60.0
+        const val ROLLER_SUPPLY_LIMIT = 18.0
+        const val ROLLER_STATOR_LIMIT = 40.0
 
         // --- PIVOT STATE SETTINGS ---
         const val STOW_POS_RADS = 0.0
@@ -241,14 +241,10 @@ object Constants {
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 
-        // --- ROLLER VELOCITY SETPOINTS ---
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
-        val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
-
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
-        const val HOMING_DEBOUNCE_TIME = 0.2
+        const val HOMING_DEBOUNCE_TIME = 0.1
         const val VIZ_OFFSET_DEG = 33.873
     }
 
@@ -309,10 +305,6 @@ object Constants {
         const val TOP_KD = 0.0
         const val TOP_KS = 0.05
         const val TOP_KV = 0.34
-
-        // --- SETPOINTS ---
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(240.0)
-        val INTAKING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
     }
 
     object AimbotConstants {
@@ -322,7 +314,7 @@ object Constants {
         const val AIMBOT_KD = 0.1
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.035
+        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.02617
     }
 
     object LEDConstants {

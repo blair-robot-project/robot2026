@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer,
+    private val robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -62,7 +62,7 @@ class RobotActions(
 
     fun shuffleIntakePivot(): Command =
         SequentialCommandGroup(
-            intake.intakeSlow().withTimeout(0.01),
+            intake.intakeSlow().withTimeout(0.1),
             RepeatCommand(
                 SequentialCommandGroup(
                     intake.setPivotAngle(Radians.of(1.6)).withTimeout(.15),

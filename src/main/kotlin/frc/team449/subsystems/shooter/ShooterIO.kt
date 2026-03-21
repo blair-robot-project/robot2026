@@ -61,15 +61,9 @@ interface ShooterIO {
 
     fun setFlywheelVelocity(velocity: AngularVelocity) {}
 
-    fun setFlywheelGains(leftKP: Double, leftKD: Double, rightKP: Double, rightKD: Double) {}
-
     fun setHoodVoltage(volts: Double) {}
 
     fun setHoodAngle(angle: Angle) {}
 
     fun resetHoodAngle(angle: Angle) {}
-
-    fun setHoodGains(kP: Double, kD: Double) {}
-
-    fun setSupplyLimits(flywheelSupplyLimitAmps: Double, hoodSupplyLimitAmps: Double) {}
 }

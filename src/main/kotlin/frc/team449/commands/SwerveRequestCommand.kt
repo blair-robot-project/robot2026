@@ -38,8 +38,7 @@ class SwerveRequestCommand(
 
     override fun initialize() {
         println("Initializing SwerveRequestCommand")
-
-        CommandScheduler.getInstance().schedule(PowerSubsystem.requestProfile(PowerProfile.SHOOTING))
+        CommandScheduler.getInstance().schedule(PowerSubsystem.requestProfile(PowerProfile.DRIVING))
     }
 
     override fun execute() {

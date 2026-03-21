@@ -1,8 +1,8 @@
 package frc.team449.subsystems.indexer
-import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.subsystems.power.PowerSubsystem
+import frc.team449.util.MathExtensions.slewTowards
 import org.littletonrobotics.junction.Logger
 
 /**
@@ -21,9 +21,6 @@ class IndexerSubsystem(
     var wedgeTargetVolts: Double = 0.0
     var topTargetVolts: Double = 0.0
 
-    private var floorVoltageLimiter = SlewRateLimiter(24.0)
-    private var topVoltageLimiter = SlewRateLimiter(24.0)
-
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
@@ -38,35 +35,18 @@ class IndexerSubsystem(
         wedgeVolts: Double,
         topVolts: Double
     ): Command =
-        this.run {
-            floorTargetVolts = floorVolts
-            wedgeTargetVolts = wedgeVolts
-            topTargetVolts = topVolts
+        this
+            .run {
+                floorTargetVolts = floorVolts
+                wedgeTargetVolts = wedgeVolts
+                topTargetVolts = topVolts
 
-            val slewedFloorVolts = floorVoltageLimiter.calculate(floorTargetVolts)
-            val slewedTopVolts = topVoltageLimiter.calculate(topTargetVolts)
+                val voltageSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
+                val floorSlewedVolts = inputs.floorAppliedVolts.slewTowards(floorTargetVolts, voltageSlewRate)
+                val topSlewedVolts = inputs.topAppliedVolts.slewTowards(topTargetVolts, voltageSlewRate)
 
-            io.setIndexerVoltage(slewedFloorVolts, wedgeTargetVolts, slewedTopVolts)
-        }
-            .beforeStarting(
-                runOnce {
-                    val indexerSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
-
-                    floorVoltageLimiter = SlewRateLimiter(indexerSlewRate)
-                    topVoltageLimiter = SlewRateLimiter(indexerSlewRate)
-
-                    floorVoltageLimiter.reset(inputs.floorAppliedVolts)
-                    topVoltageLimiter.reset(inputs.topAppliedVolts)
-                }
-            )
-
-    fun index(volts: Double): Command {
-        return index(
-            volts,
-            volts,
-            volts
-        )
-    }
+                io.setIndexerVoltage(floorSlewedVolts, wedgeTargetVolts, topSlewedVolts)
+            }
 
     fun stop(): Command =
         this.run {
