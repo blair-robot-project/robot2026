@@ -72,6 +72,7 @@ class Robot : LoggedRobot() {
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
+        CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
     override fun autonomousPeriodic() {

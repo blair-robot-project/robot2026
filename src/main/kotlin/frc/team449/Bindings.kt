@@ -108,6 +108,60 @@ class Bindings(
             )
 
         driver
+            .x()
+            .whileTrue(
+                actions.prepShotFromAnywhere(3.43)
+                    .andThen(
+                        robotContainer.drive.xLock()
+                            .alongWith(actions.checkAndFeed())
+                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
+                    )
+                    .until(joysticksMovedPastDeadbandTrigger)
+                    .finallyDo { _ ->
+                        CommandScheduler.getInstance().schedule(
+                            actions.stopAllAndHomeHood(),
+                            PowerSubsystem.requestProfile(PowerProfile.DRIVING)
+                        )
+                    }
+            )
+
+        driver
+            .y()
+            .whileTrue(
+                actions.prepShotFromAnywhere(1.3)
+                    .andThen(
+                        robotContainer.drive.xLock()
+                            .alongWith(actions.checkAndFeed())
+                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
+                    )
+                    .until(joysticksMovedPastDeadbandTrigger)
+                    .finallyDo { _ ->
+                        CommandScheduler.getInstance().schedule(
+                            actions.stopAllAndHomeHood(),
+                            PowerSubsystem.requestProfile(PowerProfile.DRIVING)
+                        )
+                    }
+            )
+
+        driver
+            .b()
+            .whileTrue(
+                actions.prepShotFromAnywhere(2.92)
+                    .andThen(
+                        robotContainer.drive.xLock()
+                            .alongWith(actions.checkAndFeed())
+                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
+                    )
+                    .until(joysticksMovedPastDeadbandTrigger)
+                    .finallyDo { _ ->
+                        CommandScheduler.getInstance().schedule(
+                            actions.stopAllAndHomeHood(),
+                            PowerSubsystem.requestProfile(PowerProfile.DRIVING)
+                        )
+                    }
+            )
+
+        driver
             .povDown()
             .onTrue(
                 actions.reverseAll(),

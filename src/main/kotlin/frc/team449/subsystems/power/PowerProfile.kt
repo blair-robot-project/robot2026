@@ -17,14 +17,14 @@ enum class PowerProfile(
     ),
     INTAKING(
         PowerLimits(
-            48.0,
+            24.0,
             6.0,
         ),
     ),
     SHOOTING(
         PowerLimits(
             6.0,
-            48.0,
+            24.0,
         ),
     )
 }

@@ -42,7 +42,7 @@ class IntakeSubsystem(
     fun intake(): Command =
         this
             .run {
-                rollerTargetVolts = 12.0
+                rollerTargetVolts = 10.0
 
                 val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
                 val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)

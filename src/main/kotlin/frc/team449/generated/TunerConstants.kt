@@ -69,8 +69,8 @@ object TunerConstants {
     private val driveInitialConfigs: TalonFXConfiguration =
         TalonFXConfiguration()
             .withCurrentLimits(
-                CurrentLimitsConfigs() // Swerve azimuth does not require much torque output, so we can set a relatively low
-                    .withSupplyCurrentLimit(Units.Amps.of(60.0))
+                CurrentLimitsConfigs()
+                    .withSupplyCurrentLimit(Units.Amps.of(20.0))
                     .withSupplyCurrentLimitEnable(true),
             )
 

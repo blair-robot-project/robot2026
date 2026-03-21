@@ -39,8 +39,8 @@ class RobotActions(
             ParallelCommandGroup(
                 intake.intake(),
                 indexer.index(
-                    2.0,
-                    1.0,
+                    0.5,
+                    0.5,
                     0.0,
                 ),
             ),
@@ -52,8 +52,8 @@ class RobotActions(
             intake.stopRollers().withTimeout(0.01),
             ParallelRaceGroup(
                 indexer.index(
-                    2.0,
-                    1.0,
+                    0.5,
+                    0.5,
                     0.0,
                 ),
                 intake.stow(),

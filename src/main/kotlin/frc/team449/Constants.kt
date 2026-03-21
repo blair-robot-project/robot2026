@@ -148,7 +148,7 @@ object Constants {
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 20.0
+        const val HOMING_CURRENT_AMPS = 18.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
         const val HOMING_DEBOUNCE_TIME = 0.4
 
@@ -229,7 +229,7 @@ object Constants {
         // --- CURRENT LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 18.0
+        const val ROLLER_SUPPLY_LIMIT = 15.0
         const val ROLLER_STATOR_LIMIT = 40.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -270,10 +270,10 @@ object Constants {
         const val WEDGE_SUPPLY_LIMIT = 5.0
 
         const val FLOOR_STATOR_LIMIT = 60.0
-        const val FLOOR_SUPPLY_LIMIT = 30.0
+        const val FLOOR_SUPPLY_LIMIT = 20.0
 
         const val TOP_STATOR_LIMIT = 60.0
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_SUPPLY_LIMIT = 20.0
 
         // --- PHYSICAL SPECS & GEARING ---
         const val WEDGE_GEARING = 1.5
