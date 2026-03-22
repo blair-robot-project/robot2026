@@ -116,7 +116,6 @@ class Bindings(
                             .alongWith(actions.checkAndFeed())
                             .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
                     )
-                    .until(joysticksMovedPastDeadbandTrigger)
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
                             actions.stopAllAndHomeHood(),
@@ -134,7 +133,6 @@ class Bindings(
                             .alongWith(actions.checkAndFeed())
                             .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
                     )
-                    .until(joysticksMovedPastDeadbandTrigger)
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
                             actions.stopAllAndHomeHood(),
@@ -152,7 +150,6 @@ class Bindings(
                             .alongWith(actions.checkAndFeed())
                             .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot()))
                     )
-                    .until(joysticksMovedPastDeadbandTrigger)
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
                             actions.stopAllAndHomeHood(),
@@ -195,9 +192,10 @@ class Bindings(
             .onTrue(
                 SequentialCommandGroup(
                     InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
-                    actions.autoUnjam()
+                    actions.autoUnjam(),
+                    InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }),
+                    actions.checkAndFeed()
                 )
-                    .finallyDo { _ -> driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }
             )
 
         operator

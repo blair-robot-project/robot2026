@@ -44,7 +44,9 @@ class Robot : LoggedRobot() {
             }
         }
 
-        SignalLogger.enableAutoLogging(false)
+        // SignalLogger.enableAutoLogging(true)
+        SignalLogger.setPath("/home/lvuser/logs/")
+        SignalLogger.start()
         Logger.start()
     }
 

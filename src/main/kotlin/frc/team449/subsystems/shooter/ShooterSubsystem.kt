@@ -97,7 +97,7 @@ class ShooterSubsystem(
         }
 
     fun isFlywheelAtTolerance(): Boolean {
-        // if (target == 0.0) return false
+        if (flywheelTargetVelocityRadPerSec == 0.0) return false
         val leftError = abs(inputs.leftLeaderVelocityRadPerSec - flywheelTargetVelocityRadPerSec)
         val rightError = abs(inputs.rightLeaderVelocityRadPerSec - flywheelTargetVelocityRadPerSec)
 

@@ -23,7 +23,7 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-    const val TUNING_MODE: Boolean = true
+    const val TUNING_MODE: Boolean = false
 
     // --- SYSTEM TIMING ---
     const val LOOP_TIME = 0.02
@@ -229,7 +229,7 @@ object Constants {
         // --- CURRENT LIMITS ---
         const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 15.0
+        const val ROLLER_SUPPLY_LIMIT = 30.0
         const val ROLLER_STATOR_LIMIT = 40.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -237,7 +237,7 @@ object Constants {
         const val DEPLOY_POS_RADS = 2.269
 
         const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.118
+        const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 
@@ -270,10 +270,10 @@ object Constants {
         const val WEDGE_SUPPLY_LIMIT = 5.0
 
         const val FLOOR_STATOR_LIMIT = 60.0
-        const val FLOOR_SUPPLY_LIMIT = 20.0
+        const val FLOOR_SUPPLY_LIMIT = 30.0
 
         const val TOP_STATOR_LIMIT = 60.0
-        const val TOP_SUPPLY_LIMIT = 20.0
+        const val TOP_SUPPLY_LIMIT = 30.0
 
         // --- PHYSICAL SPECS & GEARING ---
         const val WEDGE_GEARING = 1.5
@@ -311,10 +311,10 @@ object Constants {
         // --- AIMBOT GAINS ---
         const val AIMBOT_KP = 10.0
         const val AIMBOT_KI = 0.0
-        const val AIMBOT_KD = 0.1
+        const val AIMBOT_KD = 0.05
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.02617
+        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.05
     }
 
     object LEDConstants {

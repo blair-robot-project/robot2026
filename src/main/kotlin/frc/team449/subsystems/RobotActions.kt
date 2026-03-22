@@ -3,6 +3,7 @@ package frc.team449.subsystems
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.DeferredCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
@@ -44,7 +45,12 @@ class RobotActions(
                     0.0,
                 ),
             ),
-        ).finallyDo { _ -> PowerSubsystem.requestProfile(PowerProfile.DRIVING) }
+        ).finallyDo { _ ->
+            CommandScheduler.getInstance().schedule(
+                PowerSubsystem.requestProfile(PowerProfile.DRIVING),
+                intake.setPivotVoltage(0.0).withTimeout(0.01)
+            )
+        }
 
     fun stopAndStow(): Command =
         SequentialCommandGroup(
@@ -132,8 +138,9 @@ class RobotActions(
                         ),
                         shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
                     ).withTimeout(0.25),
-                    indexer.stop(),
-                    shooter.setFlywheelVelocity(RadiansPerSecond.of(currentSetpoint)),
+                    indexer.stop().withTimeout(0.01),
+                    PrintCommand("POST-UNJAM SETPOINT$currentSetpoint"),
+                    shooter.setFlywheelVelocity(RadiansPerSecond.of(currentSetpoint)).withTimeout(0.01),
                 )
             },
             setOf(indexer, shooter),

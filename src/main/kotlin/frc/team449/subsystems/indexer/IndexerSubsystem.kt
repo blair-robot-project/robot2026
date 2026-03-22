@@ -1,8 +1,6 @@
 package frc.team449.subsystems.indexer
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.subsystems.power.PowerSubsystem
-import frc.team449.util.MathExtensions.slewTowards
 import org.littletonrobotics.junction.Logger
 
 /**
@@ -41,11 +39,12 @@ class IndexerSubsystem(
                 wedgeTargetVolts = wedgeVolts
                 topTargetVolts = topVolts
 
-                val voltageSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
-                val floorSlewedVolts = inputs.floorAppliedVolts.slewTowards(floorTargetVolts, voltageSlewRate)
-                val topSlewedVolts = inputs.topAppliedVolts.slewTowards(topTargetVolts, voltageSlewRate)
-
-                io.setIndexerVoltage(floorSlewedVolts, wedgeTargetVolts, topSlewedVolts)
+//                val voltageSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
+//                val floorSlewedVolts = inputs.floorAppliedVolts.slewTowards(floorTargetVolts, voltageSlewRate)
+//                val topSlewedVolts = inputs.topAppliedVolts.slewTowards(topTargetVolts, voltageSlewRate)
+//
+//                io.setIndexerVoltage(floorSlewedVolts, wedgeTargetVolts, topSlewedVolts)
+                io.setIndexerVoltage(floorTargetVolts, wedgeTargetVolts, topTargetVolts)
             }
 
     fun stop(): Command =

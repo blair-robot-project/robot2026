@@ -42,12 +42,13 @@ class IntakeSubsystem(
     fun intake(): Command =
         this
             .run {
-                rollerTargetVolts = 10.0
+                rollerTargetVolts = 12.0
 
-                val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
-                val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)
-
-                io.setRollerVoltage(slewedVolts)
+//                val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+//                val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)
+//
+//                io.setRollerVoltage(slewedVolts)
+                io.setRollerVoltage(12.0)
             }
             .withName("Intake")
 
@@ -89,6 +90,11 @@ class IntakeSubsystem(
                 pivotTargetAngleRads = angle.`in`(Radians)
                 io.setPivotAngle(angle)
             }
+
+    fun setPivotVoltage(volts: Double): Command =
+        this.run {
+            io.setPivotVoltage(volts)
+        }
 
     fun resetPivotAngle(angle: Angle) {
         this
