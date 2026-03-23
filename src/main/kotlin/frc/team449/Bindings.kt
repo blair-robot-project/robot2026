@@ -80,7 +80,7 @@ class Bindings(
                     .until(joysticksMovedPastDeadbandTrigger)
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
-                            actions.stopAllAndHomeHood(),
+                            actions.stopAll(),
                             PowerSubsystem.requestProfile(PowerProfile.DRIVING)
                         )
                     }
@@ -118,7 +118,7 @@ class Bindings(
                     )
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
-                            actions.stopAllAndHomeHood(),
+                            actions.stopAll(),
                             PowerSubsystem.requestProfile(PowerProfile.DRIVING)
                         )
                     }
@@ -135,7 +135,7 @@ class Bindings(
                     )
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
-                            actions.stopAllAndHomeHood(),
+                            actions.stopAll(),
                             PowerSubsystem.requestProfile(PowerProfile.DRIVING)
                         )
                     }
@@ -152,7 +152,7 @@ class Bindings(
                     )
                     .finallyDo { _ ->
                         CommandScheduler.getInstance().schedule(
-                            actions.stopAllAndHomeHood(),
+                            actions.stopAll(),
                             PowerSubsystem.requestProfile(PowerProfile.DRIVING)
                         )
                     }
@@ -194,6 +194,7 @@ class Bindings(
                     InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
                     actions.autoUnjam(),
                     InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }),
+                    PrintCommand("RUMBLE COMPLETE."),
                     actions.checkAndFeed()
                 )
             )

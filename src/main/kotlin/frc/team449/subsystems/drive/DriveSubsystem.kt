@@ -100,7 +100,7 @@ class DriveSubsystem(
 
                 abs(target.minus(state).degrees) <= MODULE_ALIGN_TOLERANCE
             }
-        }
+        }.withTimeout(0.5)
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
@@ -112,10 +112,6 @@ class DriveSubsystem(
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
-    }
-
-    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
-        io.setSupplyLimits(driveSupplyLimitAmps, steerSupplyLimitAmps)
     }
 
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()

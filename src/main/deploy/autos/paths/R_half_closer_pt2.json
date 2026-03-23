@@ -20,13 +20,13 @@
     },
     {
       "type": "translation",
-      "x_meters": 5.203490145286334,
-      "y_meters": 0.47133146018096106,
+      "x_meters": 5.236859947628949,
+      "y_meters": 0.5213861636948813,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.9000000000000012,
+      "t_ratio": 0.9000000000000008,
       "lib_key": "second_start_shooting"
     },
     {

@@ -4,7 +4,6 @@ import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.DeferredCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
@@ -13,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RepeatCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 import frc.team449.commands.SystemCheckCommand
@@ -112,15 +112,10 @@ class RobotActions(
 
     fun checkAndFeed(): Command =
         RepeatCommand(
-            ConditionalCommand(
-                indexer
-                    .index(
-                        12.0,
-                        1.0,
-                        12.0,
-                    ).withTimeout(0.25),
-                indexer.stop().withTimeout(0.01),
-            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
+            SequentialCommandGroup(
+                WaitUntilCommand { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
+                indexer.index(12.0, 3.0, 12.0).withTimeout(0.01)
+            )
         )
 
     fun autoUnjam(): Command =
@@ -139,7 +134,7 @@ class RobotActions(
                         shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
                     ).withTimeout(0.25),
                     indexer.stop().withTimeout(0.01),
-                    PrintCommand("POST-UNJAM SETPOINT$currentSetpoint"),
+                    PrintCommand("POST-UNJAM SETPOINT: $currentSetpoint"),
                     shooter.setFlywheelVelocity(RadiansPerSecond.of(currentSetpoint)).withTimeout(0.01),
                 )
             },
@@ -159,17 +154,17 @@ class RobotActions(
 
     fun stopAllAndHomeHood(): Command =
         SequentialCommandGroup(
-            intake.stopRollers().withTimeout(0.1),
-            indexer.stop().withTimeout(0.1),
-            shooter.stopFlywheel().withTimeout(0.1),
+            intake.stopRollers().withTimeout(0.01),
+            indexer.stop().withTimeout(0.01),
+            shooter.stopFlywheel().withTimeout(0.01),
             shooter.homeHood(),
         )
 
     fun stopAll(): Command =
         SequentialCommandGroup(
-            intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel(),
+            intake.stopRollers().withTimeout(0.01),
+            indexer.stop().withTimeout(0.01),
+            shooter.stopFlywheel().withTimeout(0.01),
         )
 
     fun autoTrenchShot(time: Double): Command =
@@ -182,6 +177,7 @@ class RobotActions(
                 ),
             ),
         ).withTimeout(4.0)
+            .finallyDo { _ -> CommandScheduler.getInstance().schedule(stopAll()) }
 
     fun autoHubShot(): Command =
         SequentialCommandGroup(

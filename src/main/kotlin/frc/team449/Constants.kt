@@ -63,7 +63,7 @@ object Constants {
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.1
 
-        const val ROTATION_P = 2.8
+        const val ROTATION_P = 3.2
         const val ROTATION_I = 0.0
         const val ROTATION_D = 0.0
 
@@ -270,10 +270,10 @@ object Constants {
         const val WEDGE_SUPPLY_LIMIT = 5.0
 
         const val FLOOR_STATOR_LIMIT = 60.0
-        const val FLOOR_SUPPLY_LIMIT = 30.0
+        const val FLOOR_SUPPLY_LIMIT = 20.0
 
-        const val TOP_STATOR_LIMIT = 60.0
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_STATOR_LIMIT = 80.0
+        const val TOP_SUPPLY_LIMIT = 40.0
 
         // --- PHYSICAL SPECS & GEARING ---
         const val WEDGE_GEARING = 1.5

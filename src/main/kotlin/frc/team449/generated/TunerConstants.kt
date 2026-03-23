@@ -70,8 +70,7 @@ object TunerConstants {
         TalonFXConfiguration()
             .withCurrentLimits(
                 CurrentLimitsConfigs()
-                    .withSupplyCurrentLimit(Units.Amps.of(20.0))
-                    .withSupplyCurrentLimitEnable(true),
+                    .withSupplyCurrentLimit(25.0)
             )
 
     private val steerInitialConfigs: TalonFXSConfiguration =
