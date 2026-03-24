@@ -3,7 +3,6 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
-import frc.team449.Constants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 
@@ -57,7 +56,11 @@ class SystemCheckCommand(
             robotContainer.intake.stopRollers(),
             robotContainer.intake.stow(),
 
-            robotContainer.indexer.index(Constants.IndexerConstants.SHOOTING_INDEXER_SPEED),
+            robotContainer.indexer.index(
+                12.0,
+                1.0,
+                12.0
+            ),
             WaitCommand(1.0),
             robotContainer.indexer.stop(),
 

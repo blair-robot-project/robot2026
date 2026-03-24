@@ -7,21 +7,21 @@ import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.team449.RobotContainer.fuelSimulator
 import frc.team449.util.FieldUtil
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
+import org.littletonrobotics.junction.LoggedPowerDistribution
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 
-/** The main class of the robot, constructs all the subsystems
- * and initializes default commands . */
 class Robot : LoggedRobot() {
+    private val robotContainer = RobotContainer
+
     init {
         println("Initializing Robot!")
 
@@ -46,40 +46,39 @@ class Robot : LoggedRobot() {
             }
         }
 
-        SignalLogger.enableAutoLogging(false)
+        LoggedPowerDistribution.getInstance(49, PowerDistribution.ModuleType.kRev)
+
+        // SignalLogger.enableAutoLogging(true)
+        SignalLogger.setPath("/home/lvuser/logs/")
+        SignalLogger.start()
         Logger.start()
     }
 
-    private val robotContainer = RobotContainer
-
-    override fun driverStationConnected() {}
-
     override fun robotInit() {
         FieldUtil.initialize()
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
 
+        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
     }
 
     override fun robotPeriodic() {
-        Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
-        Logger.recordOutput("Match Time", DriverStation.getMatchTime())
+        CommandScheduler.getInstance().run()
         PhoenixUtil.refreshAll()
 
-        // high priority (real-time) thread for loop timing
-//        Threads.setCurrentThreadPriority(true, 99)
-        CommandScheduler.getInstance().run()
+        Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
+        Logger.recordOutput("MatchTime", DriverStation.getMatchTime())
 
-        // return thread to low priority (standard)
-//        Threads.setCurrentThreadPriority(false, 10)
+        logComponentPoses()
     }
 
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
+        FieldUtil.updateKeyPositions()
+        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
+
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
-        FieldUtil.updateKeyPositions()
     }
 
     override fun autonomousPeriodic() {
@@ -87,52 +86,32 @@ class Robot : LoggedRobot() {
     }
 
     override fun teleopInit() {
-        robotContainer.autonomousCommand?.cancel()
-        FieldUtil.updateAutoWinner()
-        robotContainer.actions.stopIntake()
-        robotContainer.actions.stopFeedAndShooter()
+        robotContainer.autonomousCommand.cancel()
+        robotContainer.drive.setOperatorPerspectiveForward()
+        FieldUtil.updateKeyPositions()
+
+        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
     }
 
-    override fun teleopPeriodic() {}
-
-    override fun disabledInit() {}
-
-    override fun disabledPeriodic() {}
-
-    override fun testInit() {}
-
-    override fun testPeriodic() {}
-
-    override fun simulationInit() {
-        SmartDashboard.putData(
-            (fuelSimulator?.resetFuel())
-                ?.withName("Reset Fuel")
-                ?.ignoringDisable(true),
-        )
+    override fun teleopPeriodic() {
+        if (!FieldUtil.autoWinnerLogged) FieldUtil.autoWinnerLogged = FieldUtil.updateAutoWinner()
     }
 
-    override fun simulationPeriodic() {
+    private fun logComponentPoses() {
+        val pivotAngle = robotContainer.intake.pivotAngle
+        val hoodAngle = robotContainer.shooter.hoodAngle
+
+        val hopperTranslationX = MathUtil.inverseInterpolate(
+            Constants.IntakeConstants.STOW_POS_RADS,
+            Constants.IntakeConstants.DEPLOY_POS_RADS,
+            pivotAngle
+        ) * 0.3
+
         Logger.recordOutput(
             "FinalComponentPoses",
-            *arrayOf(
-                Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, robotContainer.intake.intakeSimAngle, 0.0)),
-                Pose3d(
-                    MathUtil.inverseInterpolate(
-                        Constants.IntakeConstants.STOW_POS_RADS,
-                        Constants.IntakeConstants.DEPLOY_POS_RADS,
-                        robotContainer.intake.intakeSimAngle,
-                    ) * 0.3,
-                    0.0,
-                    0.0,
-                    Rotation3d(),
-                ),
-                Pose3d(
-                    -0.1,
-                    0.0,
-                    0.4,
-                    Rotation3d(0.0, robotContainer.shooter.hoodSimAngle + 0.2591940418, 0.0),
-                ),
-            ),
+            Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, pivotAngle, 0.0)),
+            Pose3d(hopperTranslationX, 0.0, 0.0, Rotation3d()),
+            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0))
         )
     }
 }

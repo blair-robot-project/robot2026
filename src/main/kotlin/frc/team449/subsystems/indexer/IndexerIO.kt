@@ -5,36 +5,53 @@ import org.littletonrobotics.junction.AutoLog
 interface IndexerIO {
     @AutoLog
     open class IndexerInputs {
-        @JvmField var wedgeVelocityRadPerSec: Double = 0.0
+        @JvmField
+        var wedgeVelocityRadPerSec: Double = 0.0
 
-        @JvmField var wedgeAppliedVolts: Double = 0.0
+        @JvmField
+        var wedgeAppliedVolts: Double = 0.0
 
-        @JvmField var wedgeSupplyCurrentAmps: Double = 0.0
+        @JvmField
+        var wedgeSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var wedgeStatorCurrentAmps: Double = 0.0
+        @JvmField
+        var wedgeStatorCurrentAmps: Double = 0.0
 
-        @JvmField var wedgeTempCelsius: Double = 0.0
+        @JvmField
+        var wedgeTempCelsius: Double = 0.0
 
-        @JvmField var floorVelocityRadPerSec: Double = 0.0
+        @JvmField
+        var floorVelocityRadPerSec: Double = 0.0
 
-        @JvmField var floorAppliedVolts: Double = 0.0
+        @JvmField
+        var floorAppliedVolts: Double = 0.0
 
-        @JvmField var floorSupplyCurrentAmps: Double = 0.0
+        @JvmField
+        var floorSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var floorStatorCurrentAmps: Double = 0.0
+        @JvmField
+        var floorStatorCurrentAmps: Double = 0.0
 
-        @JvmField var floorTempCelsius: Double = 0.0
+        @JvmField
+        var floorTempCelsius: Double = 0.0
 
-        @JvmField var topVelocityRadPerSec: Double = 0.0
+        @JvmField
+        var topVelocityRadPerSec: Double = 0.0
 
-        @JvmField var topAppliedVolts: Double = 0.0
+        @JvmField
+        var topAppliedVolts: Double = 0.0
 
-        @JvmField var topSupplyCurrentAmps: Double = 0.0
+        @JvmField
+        var topSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var topStatorCurrentAmps: Double = 0.0
+        @JvmField
+        var topStatorCurrentAmps: Double = 0.0
 
-        @JvmField var topTempCelsius: Double = 0.0
+        @JvmField
+        var topTempCelsius: Double = 0.0
     }
+
+    fun updateInputs(inputs: IndexerInputs) {}
 
     fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {}
 
@@ -47,8 +64,4 @@ interface IndexerIO {
         wedgeVolts: Double,
         topVolts: Double
     ) {}
-
-    fun simPeriodic() {}
-
-    fun updateInputs(inputs: IndexerInputs) {}
 }

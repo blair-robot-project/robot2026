@@ -1,11 +1,25 @@
 {
-  "robot_length_meters": 0.867,
-  "robot_width_meters": 0.889,
-  "default_max_velocity_meters_per_sec": 4.7,
-  "default_max_acceleration_meters_per_sec2": 10.0,
-  "default_intermediate_handoff_radius_meters": 0.2,
-  "default_max_velocity_deg_per_sec": 130.0,
-  "default_max_acceleration_deg_per_sec2": 180.0,
-  "default_end_translation_tolerance_meters": 0.1,
-  "default_end_rotation_tolerance_deg": 3.0
+  "gui": {
+    "robot": {
+      "length_meters": 0.867,
+      "width_meters": 0.889
+    },
+    "protrusions": {
+      "enabled": true,
+      "distance_meters": 0.3048,
+      "side": "front",
+      "default_state": "shown",
+      "show_on_event_keys": [],
+      "hide_on_event_keys": []
+    }
+  },
+  "kinematic_constraints": {
+    "default_max_velocity_meters_per_sec": 4.7,
+    "default_max_acceleration_meters_per_sec2": 10.0,
+    "default_intermediate_handoff_radius_meters": 0.2,
+    "default_max_velocity_deg_per_sec": 130.0,
+    "default_max_acceleration_deg_per_sec2": 180.0,
+    "default_end_translation_tolerance_meters": 0.05,
+    "default_end_rotation_tolerance_deg": 5.0
+  }
 }

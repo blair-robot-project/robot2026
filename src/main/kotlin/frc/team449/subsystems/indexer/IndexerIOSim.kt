@@ -4,11 +4,9 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import frc.team449.Constants
 import frc.team449.Constants.IndexerConstants.FLOOR_GEARING
-import frc.team449.Constants.IndexerConstants.FLOOR_MOI_KG_MM
 import frc.team449.Constants.IndexerConstants.TOP_GEARING
 import frc.team449.Constants.IndexerConstants.TOP_MOI_KG_MM
 import frc.team449.Constants.IndexerConstants.WEDGE_GEARING
@@ -29,7 +27,7 @@ class IndexerIOSim : IndexerIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(1),
-                FLOOR_MOI_KG_MM,
+                0.00000000001,
                 FLOOR_GEARING,
             ),
             DCMotor.getKrakenX60(1),
@@ -50,17 +48,17 @@ class IndexerIOSim : IndexerIOHardware() {
     private val topMotorSim = topIndexer.simState
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        wedgeMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        wedgeMotorSim.setSupplyVoltage(12.0)
         wedgeSim.setInput(wedgeMotorSim.motorVoltage)
         wedgeSim.update(Constants.LOOP_TIME)
         wedgeMotorSim.setRotorVelocity(Units.radiansToRotations(wedgeSim.angularVelocity.`in`(RadiansPerSecond)) * WEDGE_GEARING)
 
-        floorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        floorMotorSim.setSupplyVoltage(12.0)
         floorSim.setInput(floorMotorSim.motorVoltage)
         floorSim.update(Constants.LOOP_TIME)
         floorMotorSim.setRotorVelocity(Units.radiansToRotations(floorSim.angularVelocity.`in`(RadiansPerSecond)) * FLOOR_GEARING)
 
-        topMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        topMotorSim.setSupplyVoltage(12.0)
         topSim.setInput(topMotorSim.motorVoltage)
         topSim.update(Constants.LOOP_TIME)
         topMotorSim.setRotorVelocity(Units.radiansToRotations(topSim.angularVelocity.`in`(RadiansPerSecond)) * TOP_GEARING)
