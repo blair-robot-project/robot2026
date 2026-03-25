@@ -3,15 +3,19 @@ package frc.team449
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.firecontrol.FuelPhysicsSim
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
+import java.util.function.Supplier
+import frc.team449.firecontrol.*
 
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
@@ -43,7 +47,7 @@ class Robot : LoggedRobot() {
         SignalLogger.enableAutoLogging(false)
         Logger.start()
     }
-
+    private lateinit var ballSim: FuelPhysicsSim
     private val robotContainer = RobotContainer
 
     override fun driverStationConnected() {
@@ -56,14 +60,32 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotPeriodic() {
-        // high priority (real-time) thread for loop timing
         Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()
-
-        // return thread to low priority (standard)
         Threads.setCurrentThreadPriority(false, 10)
-    }
 
+        val speeds = RobotContainer.drive.getRobotRelativeSpeeds()
+        val pose = RobotContainer.drive.getPose()
+        val robotVel = Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond)
+        val fieldVel = robotVel.rotateBy(pose.rotation)
+
+        val shotInputs = ShotCalculator.ShotInputs(
+            pose,
+            fieldVel,
+            robotVel,
+            RobotContainer.hubCenter,
+            RobotContainer.hubForward,
+            0.9,
+            0.0,
+            0.0
+        )
+
+        val shot = RobotContainer.shotCalc.calculate(shotInputs)
+        if (shot.isValid && shot.confidence() > 50) {
+            RobotContainer.shooter.setRPM(shot.rpm())
+            RobotContainer.drive.aimAt(shot.driveAngle())
+        }
+    }
     override fun autonomousInit() {
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
@@ -82,7 +104,18 @@ class Robot : LoggedRobot() {
 
     override fun testPeriodic() {}
 
-    override fun simulationInit() {}
+    override fun simulationInit() {
+        ballSim = FuelPhysicsSim("Sim/Fuel")
+        ballSim.enable()
+        ballSim.placeFieldBalls()
+        //these parameters need to be changed
+        ballSim.configureRobot(robotWidth, robotLength, bumperHeight,
+            Supplier { robotContainer.drive.pose },
+            Supplier { robotContainer.drive.chassisSpeeds }
+        )
+    }
 
-    override fun simulationPeriodic() {}
+    override fun simulationPeriodic() {
+        ballSim.tick()
+    }
 }
