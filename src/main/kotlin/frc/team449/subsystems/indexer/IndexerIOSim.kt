@@ -9,20 +9,8 @@ import frc.team449.Constants
 import frc.team449.Constants.IndexerConstants.FLOOR_GEARING
 import frc.team449.Constants.IndexerConstants.TOP_GEARING
 import frc.team449.Constants.IndexerConstants.TOP_MOI_KG_MM
-import frc.team449.Constants.IndexerConstants.WEDGE_GEARING
-import frc.team449.Constants.IndexerConstants.WEDGE_MOI_KG_MM
 
 class IndexerIOSim : IndexerIOHardware() {
-    var wedgeSim =
-        FlywheelSim(
-            LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX60(1),
-                WEDGE_MOI_KG_MM,
-                WEDGE_GEARING,
-            ),
-            DCMotor.getKrakenX60(1),
-        )
-
     var floorSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
@@ -43,16 +31,10 @@ class IndexerIOSim : IndexerIOHardware() {
             DCMotor.getKrakenX60(1),
         )
 
-    private val wedgeMotorSim = wedgeIndexer.simState
-    private val floorMotorSim = floorIndexer.simState
-    private val topMotorSim = topIndexer.simState
+    private val floorMotorSim = floor.simState
+    private val topMotorSim = top.simState
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        wedgeMotorSim.setSupplyVoltage(12.0)
-        wedgeSim.setInput(wedgeMotorSim.motorVoltage)
-        wedgeSim.update(Constants.LOOP_TIME)
-        wedgeMotorSim.setRotorVelocity(Units.radiansToRotations(wedgeSim.angularVelocity.`in`(RadiansPerSecond)) * WEDGE_GEARING)
-
         floorMotorSim.setSupplyVoltage(12.0)
         floorSim.setInput(floorMotorSim.motorVoltage)
         floorSim.update(Constants.LOOP_TIME)

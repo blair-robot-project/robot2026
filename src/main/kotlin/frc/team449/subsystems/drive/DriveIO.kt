@@ -38,6 +38,8 @@ interface DriveIO {
 
     fun updateInputs(inputs: DriveIOInputs) {}
 
+    fun logModules(driveState: SwerveDriveState) {}
+
     fun resetOdometry(pose: Pose2d) {}
 
     fun setControl(request: SwerveRequest) {}
@@ -46,15 +48,7 @@ interface DriveIO {
 
     fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
 
-    fun addVisionMeasurement(
-        visionRobotPoseMeters: Pose2d,
-        timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>
-    ) {}
+    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {}
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}
-
-    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {}
-
-    fun logModules(driveState: SwerveDriveState) {}
 }

@@ -55,16 +55,16 @@ class IntakeIOSim : IntakeIOHardware() {
             ),
         )
 
-    private val pivotLeaderSim = leftPivotLeader.simState
-    private val pivotFollowerSim = rightPivotFollower.simState
+    private val pivotLeaderSim = leftPivot.simState
+    private val pivotFollowerSim = rightPivot.simState
     private val rollerLeaderSim = leftRollerLeader.simState
     private val rollerFollowerSim = rightRollerFollower.simState
 
     init {
-        leftPivotLeader.configurator.apply(
+        leftPivot.configurator.apply(
             MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
         )
-        leftPivotLeader.configurator.apply(
+        leftPivot.configurator.apply(
             CurrentLimitsConfigs().withSupplyCurrentLimit(20.0).withStatorCurrentLimit(40.0)
         )
 
@@ -106,7 +106,7 @@ class IntakeIOSim : IntakeIOHardware() {
         }
 
         isDeployed =
-            if (inputs.leftPivotLeaderPositionRad >= 1.13) {
+            if (inputs.leftPivotPositionRads >= 1.13) {
                 true
             } else {
                 false

@@ -3,7 +3,6 @@ package frc.team449.subsystems.vision
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.Timer
 import frc.team449.subsystems.vision.VisionIO.PoseObservation
 import frc.team449.subsystems.vision.VisionIO.PoseObservationType
@@ -53,8 +52,6 @@ class VisionIOLimelight(
                 )
             )
             .save()
-
-        NetworkTableInstance.getDefault().flush()
 
         val visionEstimateOpt: Optional<PoseEstimate> = poseEstimator.poseEstimate
         val resultsOpt: Optional<LimelightResults> = limelight.data.results

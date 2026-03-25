@@ -2,185 +2,114 @@ package frc.team449.subsystems.indexer
 
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.configs.TalonFXConfiguration
-import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.Units
-import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IndexerConstants
 import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IndexerIOHardware : IndexerIO {
-    val wedgeIndexer: TalonFX = TalonFX(IndexerConstants.WEDGE_INDEXER_ID) // kraken x44
-    val wedgeVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
-    val wedgeVoltageRequest: VoltageOut = VoltageOut(0.0)
+    val floor: TalonFX = TalonFX(IndexerConstants.FLOOR_INDEXER_ID) // x60
+    val top: TalonFX = TalonFX(IndexerConstants.TOP_INDEXER_ID) // x44
 
-    val floorIndexer: TalonFX = TalonFX(IndexerConstants.FLOOR_INDEXER_ID) // kraken x60
-    val floorVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val floorVoltageRequest: VoltageOut = VoltageOut(0.0)
-
-    val topIndexer: TalonFX = TalonFX(IndexerConstants.TOP_INDEXER_ID) // kraken x44
-    val topVelocityRequest: VelocityVoltage = VelocityVoltage(0.0)
     val topVoltageRequest: VoltageOut = VoltageOut(0.0)
 
-    private val wedgeVelocity = wedgeIndexer.velocity
-    private val wedgeVoltage = wedgeIndexer.motorVoltage
-    private val wedgeSupplyCurrent = wedgeIndexer.supplyCurrent
-    private val wedgeStatorCurrent = wedgeIndexer.statorCurrent
-    private val wedgeTemperature = wedgeIndexer.deviceTemp
+    private val floorVoltage = floor.motorVoltage
+    private val floorVelocity = floor.velocity
+    private val floorSupplyCurrent = floor.supplyCurrent
+    private val floorStatorCurrent = floor.statorCurrent
+    private val floorTemp = floor.deviceTemp
 
-    private val floorVelocity = floorIndexer.velocity
-    private val floorVoltage = floorIndexer.motorVoltage
-    private val floorSupplyCurrent = floorIndexer.supplyCurrent
-    private val floorStatorCurrent = floorIndexer.statorCurrent
-    private val floorTemperature = floorIndexer.deviceTemp
+    private val topVoltage = top.motorVoltage
+    private val topVelocity = top.velocity
+    private val topSupplyCurrent = top.supplyCurrent
+    private val topStatorCurrent = top.statorCurrent
+    private val topTemp = top.deviceTemp
 
-    private val topVelocity = topIndexer.velocity
-    private val topVoltage = topIndexer.motorVoltage
-    private val topSupplyCurrent = topIndexer.supplyCurrent
-    private val topStatorCurrent = topIndexer.statorCurrent
-    private val topTemperature = topIndexer.deviceTemp
-
-    private val lowPrioritySignals =
+    private val lowPrioSignals =
         arrayOf(
-            wedgeSupplyCurrent,
-            wedgeTemperature,
+            floorTemp,
+            topTemp
+        )
+
+    private val highPrioSignals =
+        arrayOf(
+            floorVoltage,
+            floorVelocity,
             floorSupplyCurrent,
-            floorTemperature,
-            topTemperature,
-            topSupplyCurrent,
-        )
-    private val highPrioritySignals =
-        arrayOf(
-            wedgeVelocity,
-            wedgeVoltage,
-            wedgeStatorCurrent,
-            floorVelocity,
-            floorVoltage,
             floorStatorCurrent,
-            topVelocity,
             topVoltage,
-            topStatorCurrent,
-        )
-
-    private val wedgeMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
-            wedgeVelocity,
-            wedgeVoltage,
-            wedgeStatorCurrent,
-            wedgeSupplyCurrent,
-        )
-
-    private val topMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
             topVelocity,
-            topVoltage,
-            topStatorCurrent,
             topSupplyCurrent,
+            topStatorCurrent,
         )
 
-    private val floorMotorConnected: Boolean =
-        BaseStatusSignal.isAllGood(
-            floorVelocity,
+    private val floorConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
             floorVoltage,
+            floorVelocity,
             floorStatorCurrent,
             floorSupplyCurrent,
         )
 
-    private val wedgeIndexerDisconnectedAlert =
-        Alert("Wedge Indexing Motor Disconnected (ID ${IndexerConstants.WEDGE_INDEXER_ID}).", Alert.AlertType.kError)
-    private val floorIndexerDisconnectedAlert =
-        Alert("Floor Indexing Motor Disconnected (ID ${IndexerConstants.FLOOR_INDEXER_ID}).", Alert.AlertType.kError)
-    private val topIndexerDisconnectedAlert =
-        Alert("Top Indexing Motor Disconnected (ID ${IndexerConstants.TOP_INDEXER_ID}).", Alert.AlertType.kError)
+    private val topConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
+            topVoltage,
+            topVelocity,
+            topStatorCurrent,
+            topSupplyCurrent,
+        )
+
+    private val floorDisconnectedAlert =
+        Alert("Floor Indexer Disconnected (ID ${IndexerConstants.FLOOR_INDEXER_ID}).", Alert.AlertType.kError)
+    private val topDisconnectedAlert =
+        Alert("Top Indexer Disconnected (ID ${IndexerConstants.TOP_INDEXER_ID}).", Alert.AlertType.kError)
 
     init {
-        ParentDevice.optimizeBusUtilizationForAll(wedgeIndexer, floorIndexer, topIndexer)
+        ParentDevice.optimizeBusUtilizationForAll(floor, top)
 
-        tryUntilOk(5) { wedgeIndexer.configurator.apply(leftWedgeConfig) }
-        tryUntilOk(5) { floorIndexer.configurator.apply(rightFloorConfig) }
-        tryUntilOk(5) { topIndexer.configurator.apply(topFloorConfig) }
+        tryUntilOk(5) { floor.configurator.apply(floorConfig) }
+        tryUntilOk(5) { top.configurator.apply(topConfig) }
 
-        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioritySignals)
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioritySignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
 
-        PhoenixUtil.registerSignals(*lowPrioritySignals, *highPrioritySignals)
+        PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
     }
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        inputs.wedgeVelocityRadPerSec = wedgeVelocity.value.`in`(Units.RadiansPerSecond)
-        inputs.wedgeAppliedVolts = wedgeVoltage.valueAsDouble
-        inputs.wedgeStatorCurrentAmps = wedgeStatorCurrent.value.`in`(Units.Amps)
-        inputs.wedgeSupplyCurrentAmps = wedgeSupplyCurrent.value.`in`(Units.Amps)
-        inputs.wedgeTempCelsius = wedgeTemperature.value.`in`(Units.Celsius)
+        BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
 
-        inputs.floorVelocityRadPerSec = floorVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.floorAppliedVolts = floorVoltage.valueAsDouble
-        inputs.floorStatorCurrentAmps = floorStatorCurrent.value.`in`(Units.Amps)
+        inputs.floorVelocityRadsPerSec = floorVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.floorSupplyCurrentAmps = floorSupplyCurrent.value.`in`(Units.Amps)
-        inputs.floorTempCelsius = floorTemperature.value.`in`(Units.Celsius)
+        inputs.floorStatorCurrentAmps = floorStatorCurrent.value.`in`(Units.Amps)
+        inputs.floorTempCelsius = floorTemp.value.`in`(Units.Celsius)
 
-        inputs.topVelocityRadPerSec = topVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.topAppliedVolts = topVoltage.valueAsDouble
-        inputs.topStatorCurrentAmps = topStatorCurrent.value.`in`(Units.Amps)
+        inputs.topVelocityRadsPerSec = topVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.topSupplyCurrentAmps = topSupplyCurrent.value.`in`(Units.Amps)
-        inputs.topTempCelsius = topTemperature.value.`in`(Units.Celsius)
+        inputs.topStatorCurrentAmps = topStatorCurrent.value.`in`(Units.Amps)
+        inputs.topTempCelsius = topTemp.value.`in`(Units.Celsius)
 
-        wedgeIndexerDisconnectedAlert.set(!wedgeMotorConnected)
-        floorIndexerDisconnectedAlert.set(!floorMotorConnected)
-        topIndexerDisconnectedAlert.set(!topMotorConnected)
-    }
-
-    override fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {
-        floorIndexer.setControl(floorVelocityRequest.withVelocity(floorSurfaceSpeed))
-    }
-
-    override fun setWedgeSpeed(wedgeSurfaceSpeed: AngularVelocity) {
-        wedgeIndexer.setControl(wedgeVelocityRequest.withVelocity(wedgeSurfaceSpeed))
-    }
-
-    override fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {
-        topIndexer.setControl(topVelocityRequest.withVelocity(topSurfaceSpeed))
+        floorDisconnectedAlert.set(!floorConnected)
+        topDisconnectedAlert.set(!topConnected)
     }
 
     override fun setIndexerVoltage(
         floorVolts: Double,
-        wedgeVolts: Double,
         topVolts: Double
     ) {
-        floorIndexer.setControl(floorVoltageRequest.withOutput(floorVolts))
-        wedgeIndexer.setControl(wedgeVoltageRequest.withOutput(wedgeVolts))
-        topIndexer.setControl(topVoltageRequest.withOutput(topVolts))
+        floor.setControl(floorVoltageRequest.withOutput(floorVolts))
+        top.setControl(topVoltageRequest.withOutput(topVolts))
     }
 
     companion object {
-        val leftWedgeConfig =
-            TalonFXConfiguration().apply {
-                CurrentLimits.apply {
-                    SupplyCurrentLimit = IndexerConstants.WEDGE_SUPPLY_LIMIT
-                    StatorCurrentLimit = IndexerConstants.WEDGE_STATOR_LIMIT
-                }
-
-                MotorOutput.apply {
-                    NeutralMode = IndexerConstants.WEDGE_NEUTRAL_MODE
-                    Inverted = IndexerConstants.WEDGE_INVERSION
-                }
-
-                Feedback.SensorToMechanismRatio = IndexerConstants.WEDGE_GEARING
-
-                Slot0.apply {
-                    kP = IndexerConstants.WEDGE_KP
-                    kI = IndexerConstants.WEDGE_KI
-                    kD = IndexerConstants.WEDGE_KD
-                    kS = IndexerConstants.WEDGE_KS
-                    kV = IndexerConstants.WEDGE_KV
-                }
-            }
-
-        val rightFloorConfig =
+        val floorConfig =
             TalonFXConfiguration().apply {
                 CurrentLimits.apply {
                     SupplyCurrentLimit = IndexerConstants.FLOOR_SUPPLY_LIMIT
@@ -203,7 +132,7 @@ open class IndexerIOHardware : IndexerIO {
                 }
             }
 
-        val topFloorConfig =
+        val topConfig =
             TalonFXConfiguration().apply {
                 CurrentLimits.apply {
                     SupplyCurrentLimit = IndexerConstants.TOP_SUPPLY_LIMIT

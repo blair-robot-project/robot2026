@@ -2,85 +2,80 @@ package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
-import edu.wpi.first.math.controller.ProfiledPIDController
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants
-import frc.team449.subsystems.RobotActions
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.power.PowerProfile
-import frc.team449.subsystems.power.PowerSubsystem
+import frc.team449.util.FieldUtil
 import org.littletonrobotics.junction.Logger
+import java.util.function.DoubleSupplier
 import java.util.function.Supplier
-import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.pow
+import kotlin.math.sign
 
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
-    private val actions: RobotActions,
+    private val throttleSupplier: DoubleSupplier,
+    private val strafeSupplier: DoubleSupplier,
+    private val maxLinearSpeedMetersPerSecond: Double = Constants.DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+    private val maxAngularSpeedRadiansPerSecond: Double = Constants.DriveConstants.SLOW_ANGULAR_SPEED_RADS_PER_SEC,
     private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
-    private val request = SwerveRequest.FieldCentric()
-        .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+    private val driveWithHeading =
+        SwerveRequest
+            .FieldCentricFacingAngle()
+            .withHeadingPID(AimbotConstants.AIMBOT_KP, AimbotConstants.AIMBOT_KI, AimbotConstants.AIMBOT_KD)
+            .withDeadband(maxLinearSpeedMetersPerSecond * Constants.DriveConstants.TRANSLATION_DEADBAND)
+            .withRotationalDeadband(maxAngularSpeedRadiansPerSecond * Constants.DriveConstants.ANGULAR_DEADBAND)
+            .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
-    private val headingController = ProfiledPIDController(
-        AimbotConstants.AIMBOT_KP,
-        AimbotConstants.AIMBOT_KI,
-        AimbotConstants.AIMBOT_KD,
-        TrapezoidProfile.Constraints(
-            4.0,
-            8.0
-        )
-    ).apply {
-        enableContinuousInput(-PI, PI)
-        setTolerance(AimbotConstants.AIMBOT_HEADING_TOLERANCE_RADIANS)
-    }
-
-    var currentPose: Pose2d = drive.pose
-    var translationToTarget: Translation2d = targetSupplier.get().minus(currentPose.translation)
-    var distance: Double = translationToTarget.norm
-
-    var targetHeading: Rotation2d = translationToTarget.angle
-    var omegaRadPerSec: Double = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
+    private var throttle: Double = 0.0
+    private var strafe: Double = 0.0
 
     init {
         addRequirements(drive)
+        driveWithHeading.HeadingController.setTolerance(AimbotConstants.POSITION_TOLERANCE_RAD, AimbotConstants.VELOCITY_TOLERANCE_RADS_PER_SEC)
     }
 
     override fun initialize() {
-        headingController.reset(drive.pose.rotation.radians)
-        CommandScheduler.getInstance().schedule(PowerSubsystem.requestProfile(PowerProfile.SHOOTING))
-        println("Initializing AimAtTargetCommand.")
+        println("Initializing AimAtTargetCommand!")
     }
 
     override fun execute() {
-        currentPose = drive.pose
-        translationToTarget = targetSupplier.get().minus(currentPose.translation)
-        distance = translationToTarget.norm
+        val currentPose = drive.pose
+        val targetTranslation = targetSupplier.get()
+        val translationToTarget = targetTranslation.minus(currentPose.translation)
+        val targetRotation = translationToTarget.angle
 
-        targetHeading = translationToTarget.angle
-        omegaRadPerSec = headingController.calculate(currentPose.rotation.radians, targetHeading.radians)
+        FieldUtil.distanceToHub = translationToTarget.norm
+
+        throttle =
+            abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
+            maxLinearSpeedMetersPerSecond
+        strafe =
+            abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
+            maxLinearSpeedMetersPerSecond
 
         drive.setControl(
-            request
-                .withVelocityX(0.0)
-                .withVelocityY(0.0)
-                .withRotationalRate(omegaRadPerSec)
+            driveWithHeading
+                .withVelocityX(throttle)
+                .withVelocityY(strafe)
+                .withTargetDirection(targetRotation)
         )
 
-        CommandScheduler.getInstance().schedule(
-            actions.prepShotFromAnywhere(distance)
-        )
-
-        Logger.recordOutput("Aimbot/HeadingErrorRads", headingController.positionError)
-        Logger.recordOutput("Aimbot/ProfiledTargetVelocity", headingController.setpoint.velocity)
-        Logger.recordOutput("Aimbot/DistanceToHubMeters", distance)
+        Logger.recordOutput("Aimbot/HeadingErrorRads", driveWithHeading.HeadingController.positionError)
+        Logger.recordOutput("Aimbot/DistanceToHubMeters", FieldUtil.distanceToHub)
     }
 
-    override fun isFinished(): Boolean = headingController.atGoal()
+    private fun isStationary(driveSpeeds: ChassisSpeeds): Boolean = abs(driveSpeeds.vxMetersPerSecond) < 0.1 && abs(driveSpeeds.vyMetersPerSecond) < 0.1
 
-    override fun end(interrupted: Boolean) = println("AimAtTargetCommand Interrupted: $interrupted")
+    override fun isFinished(): Boolean = driveWithHeading.HeadingController.atSetpoint() && isStationary(drive.getRobotRelativeSpeeds())
+
+    override fun end(interrupted: Boolean) {
+        drive.setControl(SwerveRequest.Idle())
+        println("AimAtTargetCommand Complete!")
+    }
 }

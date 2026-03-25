@@ -21,137 +21,142 @@ import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class ShooterIOHardware : ShooterIO {
-    val leftLeaderMotor = TalonFX(ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
-    val leftFollowerMotor = TalonFX(ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID)
-    val rightLeaderMotor = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID)
-    val rightFollowerMotor = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID)
-    val hoodMotor = TalonFX(ShooterConstants.HOOD_MOTOR_ID)
+    val leftTopLeader = TalonFX(ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
+    val leftBottomFollower = TalonFX(ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID)
+    val rightTopFollower = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID)
+    val rightBottomFollower = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID)
+    val hood = TalonFX(ShooterConstants.HOOD_MOTOR_ID)
 
     private val flywheelVelocityRequest = VelocityVoltage(0.0)
     private val flywheelVoltageRequest = VoltageOut(0.0)
     private val hoodAngleRequest = PositionVoltage(0.0)
     private val hoodVoltageRequest = VoltageOut(0.0)
 
-    private val leftLeaderVelocity = leftLeaderMotor.velocity
-    private val leftLeaderMotorVoltage = leftLeaderMotor.motorVoltage
-    private val leftLeaderSupplyCurrent = leftLeaderMotor.supplyCurrent
-    private val leftLeaderStatorCurrent = leftLeaderMotor.statorCurrent
-    private val leftLeaderTemperature = leftLeaderMotor.deviceTemp
+    private val leftTopLeaderVoltage = leftTopLeader.motorVoltage
+    private val leftTopLeaderVelocity = leftTopLeader.velocity
+    private val leftTopLeaderSupplyCurrent = leftTopLeader.supplyCurrent
+    private val leftTopLeaderStatorCurrent = leftTopLeader.statorCurrent
+    private val leftTopLeaderTemp = leftTopLeader.deviceTemp
 
-    private val leftFollowerMotorVoltage = leftFollowerMotor.motorVoltage
-    private val leftFollowerSupplyCurrent = leftFollowerMotor.supplyCurrent
-    private val leftFollowerStatorCurrent = leftFollowerMotor.statorCurrent
-    private val leftFollowerTemperature = leftFollowerMotor.deviceTemp
+    private val leftBottomFollowerVoltage = leftBottomFollower.motorVoltage
+    private val leftBottomFollowerVelocity = leftBottomFollower.velocity
+    private val leftBottomFollowerSupplyCurrent = leftBottomFollower.supplyCurrent
+    private val leftBottomFollowerStatorCurrent = leftBottomFollower.statorCurrent
+    private val leftBottomFollowerTemp = leftBottomFollower.deviceTemp
 
-    private val rightLeaderVelocity = rightLeaderMotor.velocity
-    private val rightLeaderMotorVoltage = rightLeaderMotor.motorVoltage
-    private val rightLeaderSupplyCurrent = rightLeaderMotor.supplyCurrent
-    private val rightLeaderStatorCurrent = rightLeaderMotor.statorCurrent
-    private val rightLeaderTemperature = rightLeaderMotor.deviceTemp
+    private val rightTopFollowerVoltage = rightTopFollower.motorVoltage
+    private val rightTopFollowerVelocity = rightTopFollower.velocity
+    private val rightTopFollowerSupplyCurrent = rightTopFollower.supplyCurrent
+    private val rightTopFollowerStatorCurrent = rightTopFollower.statorCurrent
+    private val rightTopFollowerTemp = rightTopFollower.deviceTemp
 
-    private val rightFollowerMotorVoltage = rightFollowerMotor.motorVoltage
-    private val rightFollowerSupplyCurrent = rightFollowerMotor.supplyCurrent
-    private val rightFollowerStatorCurrent = rightFollowerMotor.statorCurrent
-    private val rightFollowerTemperature = rightFollowerMotor.deviceTemp
+    private val rightBottomFollowerVoltage = rightBottomFollower.motorVoltage
+    private val rightBottomFollowerVelocity = rightBottomFollower.velocity
+    private val rightBottomFollowerSupplyCurrent = rightBottomFollower.supplyCurrent
+    private val rightBottomFollowerStatorCurrent = rightBottomFollower.statorCurrent
+    private val rightBottomFollowerTemp = rightBottomFollower.deviceTemp
 
-    private val hoodAngle = hoodMotor.position
-    private val hoodVelocity = hoodMotor.velocity
-    private val hoodMotorVoltage = hoodMotor.motorVoltage
-    private val hoodSupplyCurrent = hoodMotor.supplyCurrent
-    private val hoodStatorCurrent = hoodMotor.statorCurrent
-    private val hoodTemperature = hoodMotor.deviceTemp
+    private val hoodVoltage = hood.motorVoltage
+    private val hoodAngle = hood.position
+    private val hoodVelocity = hood.velocity
+    private val hoodSupplyCurrent = hood.supplyCurrent
+    private val hoodStatorCurrent = hood.statorCurrent
+    private val hoodTemp = hood.deviceTemp
 
     private val lowPrioSignals =
         arrayOf(
-            leftLeaderSupplyCurrent,
-            leftLeaderTemperature,
-            leftFollowerMotorVoltage,
-            leftFollowerSupplyCurrent,
-            leftFollowerStatorCurrent,
-            leftFollowerTemperature,
-            rightLeaderSupplyCurrent,
-            rightLeaderTemperature,
-            rightFollowerMotorVoltage,
-            rightFollowerSupplyCurrent,
-            rightFollowerStatorCurrent,
-            rightFollowerTemperature,
-            hoodSupplyCurrent,
-            hoodTemperature,
+            leftTopLeaderTemp,
+            hoodTemp,
+            leftBottomFollowerVoltage,
+            leftBottomFollowerVelocity,
+            leftBottomFollowerSupplyCurrent,
+            leftBottomFollowerStatorCurrent,
+            leftBottomFollowerTemp,
+            rightTopFollowerVoltage,
+            rightTopFollowerVelocity,
+            rightTopFollowerSupplyCurrent,
+            rightTopFollowerStatorCurrent,
+            rightTopFollowerTemp,
+            rightBottomFollowerVoltage,
+            rightBottomFollowerVelocity,
+            rightBottomFollowerSupplyCurrent,
+            rightBottomFollowerStatorCurrent,
+            rightBottomFollowerTemp,
         )
 
     private val highPrioSignals =
         arrayOf(
-            leftLeaderVelocity,
-            leftLeaderMotorVoltage,
-            leftLeaderStatorCurrent,
-            rightLeaderVelocity,
-            rightLeaderMotorVoltage,
-            rightLeaderStatorCurrent,
-            hoodVelocity,
-            hoodMotorVoltage,
-            hoodAngle,
-            hoodStatorCurrent,
-        )
-
-    private val hoodMotorConnected: Boolean
-        get() = BaseStatusSignal.isAllGood(
+            leftTopLeaderVoltage,
+            leftTopLeaderVelocity,
+            leftTopLeaderSupplyCurrent,
+            leftTopLeaderStatorCurrent,
+            hoodVoltage,
             hoodAngle,
             hoodVelocity,
-            hoodMotorVoltage,
             hoodSupplyCurrent,
             hoodStatorCurrent,
         )
 
-    private val leftLeaderShooterMotorConnected: Boolean
+    private val hoodConnected: Boolean
         get() = BaseStatusSignal.isAllGood(
-            leftLeaderVelocity,
-            leftLeaderMotorVoltage,
-            leftLeaderStatorCurrent,
+            hoodVoltage,
+            hoodAngle,
+            hoodVelocity,
+            hoodSupplyCurrent,
+            hoodStatorCurrent,
         )
 
-    private val leftFollowerShooterMotorConnected: Boolean
+    private val leftTopLeaderConnected: Boolean
         get() = BaseStatusSignal.isAllGood(
-            leftFollowerMotorVoltage,
-            leftFollowerSupplyCurrent,
-            leftFollowerStatorCurrent,
+            leftTopLeaderVoltage,
+            leftTopLeaderVelocity,
+            leftTopLeaderStatorCurrent,
         )
 
-    private val rightLeaderShooterMotorConnected: Boolean
+    private val leftBottomFollowerConnected: Boolean
         get() = BaseStatusSignal.isAllGood(
-            rightLeaderVelocity,
-            rightLeaderMotorVoltage,
-            rightLeaderStatorCurrent,
+            leftBottomFollowerVoltage,
+            leftBottomFollowerSupplyCurrent,
+            leftBottomFollowerStatorCurrent,
         )
 
-    private val rightFollowerShooterMotorConnected: Boolean
+    private val rightTopFollowerConnected: Boolean
         get() = BaseStatusSignal.isAllGood(
-            rightFollowerMotorVoltage,
-            rightFollowerSupplyCurrent,
-            rightFollowerStatorCurrent,
+            rightTopFollowerVoltage,
+            rightTopFollowerSupplyCurrent,
+            rightTopFollowerStatorCurrent,
         )
 
-    private val leftLeaderDisconnectedAlert =
-        Alert("Left Flywheel Leader Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
-    private val leftFollowerDisconnectedAlert =
-        Alert("Left Flywheel Follower Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID}).", Alert.AlertType.kError)
-    private val rightLeaderDisconnectedAlert =
-        Alert("Right Flywheel Leader Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
-    private val rightFollowerDisconnectedAlert =
-        Alert("Right Flywheel Follower Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID}).", Alert.AlertType.kError)
+    private val rightBottomFollowerConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
+            rightBottomFollowerVoltage,
+            rightBottomFollowerSupplyCurrent,
+            rightBottomFollowerStatorCurrent,
+        )
+
+    private val leftTopLeaderDisconnectedAlert =
+        Alert("Left Top Flywheel Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
+    private val leftBottomFollowerDisconnectedAlert =
+        Alert("Left Bottom Flywheel Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID}).", Alert.AlertType.kError)
+    private val rightTopFollowerDisconnectedAlert =
+        Alert("Right Top Flywheel Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
+    private val rightBottomFollowerDisconnectedAlert =
+        Alert("Right Bottom Flywheel Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID}).", Alert.AlertType.kError)
     private val hoodDisconnectedAlert =
-        Alert("Hood Motor Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
+        Alert("Hood Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
 
     init {
-        tryUntilOk(5) { leftLeaderMotor.configurator.apply(leftFlywheelConfig) }
-        tryUntilOk(5) { leftFollowerMotor.configurator.apply(leftFlywheelConfig) }
-        tryUntilOk(5) { rightLeaderMotor.configurator.apply(rightFlywheelConfig) }
-        tryUntilOk(5) { rightFollowerMotor.configurator.apply(rightFlywheelConfig) }
-        tryUntilOk(5) { hoodMotor.configurator.apply(hoodConfig) }
+        tryUntilOk(5) { leftTopLeader.configurator.apply(flywheelConfig) }
+        tryUntilOk(5) { leftBottomFollower.configurator.apply(flywheelConfig) }
+        tryUntilOk(5) { rightTopFollower.configurator.apply(flywheelConfig) }
+        tryUntilOk(5) { rightBottomFollower.configurator.apply(flywheelConfig) }
+        tryUntilOk(5) { hood.configurator.apply(hoodConfig) }
 
-        leftFollowerMotor.setControl(Follower(leftLeaderMotor.deviceID, ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT))
-        rightFollowerMotor.setControl(Follower(rightLeaderMotor.deviceID, ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT))
+        leftBottomFollower.setControl(Follower(leftTopLeader.deviceID, ShooterConstants.LEFT_FOLLOWER_ALIGNMENT))
+        rightTopFollower.setControl(Follower(leftTopLeader.deviceID, ShooterConstants.RIGHT_FOLLOWER_ALIGNMENT))
+        rightBottomFollower.setControl(Follower(leftTopLeader.deviceID, ShooterConstants.RIGHT_FOLLOWER_ALIGNMENT))
 
-        ParentDevice.optimizeBusUtilizationForAll(leftLeaderMotor, leftFollowerMotor, rightLeaderMotor, rightFollowerMotor, hoodMotor)
+        ParentDevice.optimizeBusUtilizationForAll(leftTopLeader, leftBottomFollower, rightTopFollower, rightBottomFollower, hood)
 
         BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioSignals)
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
@@ -164,66 +169,66 @@ open class ShooterIOHardware : ShooterIO {
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
         BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
 
-        inputs.leftLeaderVelocityRadPerSec = leftLeaderVelocity.value.`in`(RadiansPerSecond)
-        inputs.leftLeaderAppliedVolts = leftLeaderMotorVoltage.value.`in`(Volts)
-        inputs.leftLeaderSupplyCurrentAmps = leftLeaderSupplyCurrent.value.`in`(Amps)
-        inputs.leftLeaderStatorCurrentAmps = leftLeaderStatorCurrent.value.`in`(Amps)
-        inputs.leftLeaderTempCelsius = leftLeaderTemperature.value.`in`(Celsius)
+        inputs.leftTopLeaderAppliedVolts = leftTopLeaderVoltage.value.`in`(Volts)
+        inputs.leftTopLeaderVelocityRadsPerSec = leftTopLeaderVelocity.value.`in`(RadiansPerSecond)
+        inputs.leftTopLeaderSupplyCurrentAmps = leftTopLeaderSupplyCurrent.value.`in`(Amps)
+        inputs.leftTopLeaderStatorCurrentAmps = leftTopLeaderStatorCurrent.value.`in`(Amps)
+        inputs.leftTopLeaderTempCelsius = leftTopLeaderTemp.value.`in`(Celsius)
 
-        inputs.leftFollowerAppliedVolts = leftFollowerMotorVoltage.value.`in`(Volts)
-        inputs.leftFollowerSupplyCurrentAmps = leftFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.leftFollowerStatorCurrentAmps = leftFollowerStatorCurrent.value.`in`(Amps)
-        inputs.leftFollowerTempCelsius = leftFollowerTemperature.value.`in`(Celsius)
+        inputs.leftBottomFollowerAppliedVolts = leftBottomFollowerVoltage.value.`in`(Volts)
+        inputs.leftBottomFollowerVelocityRadsPerSec = leftBottomFollowerVelocity.value.`in`(RadiansPerSecond)
+        inputs.leftBottomFollowerSupplyCurrentAmps = leftBottomFollowerSupplyCurrent.value.`in`(Amps)
+        inputs.leftBottomFollowerStatorCurrentAmps = leftBottomFollowerStatorCurrent.value.`in`(Amps)
+        inputs.leftBottomFollowerTempCelsius = leftBottomFollowerTemp.value.`in`(Celsius)
 
-        inputs.rightLeaderVelocityRadPerSec = rightLeaderVelocity.value.`in`(RadiansPerSecond)
-        inputs.rightLeaderAppliedVolts = rightLeaderMotorVoltage.value.`in`(Volts)
-        inputs.rightLeaderSupplyCurrentAmps = rightLeaderSupplyCurrent.value.`in`(Amps)
-        inputs.rightLeaderStatorCurrentAmps = rightLeaderStatorCurrent.value.`in`(Amps)
-        inputs.rightLeaderTempCelsius = rightLeaderTemperature.value.`in`(Celsius)
+        inputs.rightTopFollowerAppliedVolts = rightTopFollowerVoltage.value.`in`(Volts)
+        inputs.rightTopFollowerVelocityRadsPerSec = rightTopFollowerVelocity.value.`in`(RadiansPerSecond)
+        inputs.rightTopFollowerSupplyCurrentAmps = rightTopFollowerSupplyCurrent.value.`in`(Amps)
+        inputs.rightTopFollowerStatorCurrentAmps = rightTopFollowerStatorCurrent.value.`in`(Amps)
+        inputs.rightTopFollowerTempCelsius = rightTopFollowerTemp.value.`in`(Celsius)
 
-        inputs.rightFollowerAppliedVolts = rightFollowerMotorVoltage.value.`in`(Volts)
-        inputs.rightFollowerSupplyCurrentAmps = rightFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.rightFollowerStatorCurrentAmps = rightFollowerStatorCurrent.value.`in`(Amps)
-        inputs.rightFollowerTempCelsius = rightFollowerTemperature.value.`in`(Celsius)
+        inputs.rightBottomFollowerAppliedVolts = rightBottomFollowerVoltage.value.`in`(Volts)
+        inputs.rightBottomFollowerVelocityRadsPerSec = rightBottomFollowerVelocity.value.`in`(RadiansPerSecond)
+        inputs.rightBottomFollowerSupplyCurrentAmps = rightBottomFollowerSupplyCurrent.value.`in`(Amps)
+        inputs.rightBottomFollowerStatorCurrentAmps = rightBottomFollowerStatorCurrent.value.`in`(Amps)
+        inputs.rightBottomFollowerTempCelsius = rightBottomFollowerTemp.value.`in`(Celsius)
 
+        inputs.hoodAppliedVolts = hoodVoltage.value.`in`(Volts)
         inputs.hoodAngleRad = hoodAngle.value.`in`(Radians)
         inputs.hoodVelocityRadPerSec = hoodVelocity.value.`in`(RadiansPerSecond)
-        inputs.hoodAppliedVolts = hoodMotorVoltage.value.`in`(Volts)
         inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
         inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
-        inputs.hoodTempCelsius = hoodTemperature.value.`in`(Celsius)
+        inputs.hoodTempCelsius = hoodTemp.value.`in`(Celsius)
 
-        hoodDisconnectedAlert.set(!hoodMotorConnected)
-        leftLeaderDisconnectedAlert.set(!leftLeaderShooterMotorConnected)
-        rightLeaderDisconnectedAlert.set(!rightLeaderShooterMotorConnected)
-        leftFollowerDisconnectedAlert.set(!leftFollowerShooterMotorConnected)
-        rightFollowerDisconnectedAlert.set(!rightFollowerShooterMotorConnected)
+        leftTopLeaderDisconnectedAlert.set(!leftTopLeaderConnected)
+        leftBottomFollowerDisconnectedAlert.set(!leftBottomFollowerConnected)
+        rightTopFollowerDisconnectedAlert.set(!rightTopFollowerConnected)
+        rightBottomFollowerDisconnectedAlert.set(!rightBottomFollowerConnected)
+        hoodDisconnectedAlert.set(!hoodConnected)
     }
 
-    override fun setFlywheelVoltage(volts: Double) {
-        leftLeaderMotor.setControl(flywheelVoltageRequest.withOutput(volts))
-        rightLeaderMotor.setControl(flywheelVoltageRequest.withOutput(volts))
+    override fun setFlywheelVoltage(flywheelVolts: Double) {
+        leftTopLeader.setControl(flywheelVoltageRequest.withOutput(flywheelVolts))
     }
 
-    override fun setFlywheelVelocity(velocity: AngularVelocity) {
-        leftLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
-        rightLeaderMotor.setControl(flywheelVelocityRequest.withVelocity(velocity))
+    override fun setFlywheelVelocity(flywheelVelocity: AngularVelocity) {
+        leftTopLeader.setControl(flywheelVelocityRequest.withVelocity(flywheelVelocity))
     }
 
-    override fun setHoodVoltage(volts: Double) {
-        hoodMotor.setControl(hoodVoltageRequest.withOutput(volts))
+    override fun setHoodVoltage(hoodVolts: Double) {
+        hood.setControl(hoodVoltageRequest.withOutput(hoodVolts))
     }
 
-    override fun setHoodAngle(angle: Angle) {
-        hoodMotor.setControl(hoodAngleRequest.withPosition(angle))
+    override fun setHoodAngle(hoodAngle: Angle) {
+        hood.setControl(hoodAngleRequest.withPosition(hoodAngle))
     }
 
-    override fun resetHoodAngle(angle: Angle) {
-        hoodMotor.setPosition(angle)
+    override fun resetHoodAngle(hoodAngle: Angle) {
+        hood.setPosition(hoodAngle)
     }
 
     companion object {
-        val leftFlywheelConfig =
+        val flywheelConfig =
             TalonFXConfiguration().apply {
                 CurrentLimits.apply {
                     SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_LIM
@@ -231,41 +236,18 @@ open class ShooterIOHardware : ShooterIO {
                 }
 
                 MotorOutput.apply {
-                    NeutralMode = ShooterConstants.LEFT_FLYWHEEL_NEUTRAL_MODE
-                    Inverted = ShooterConstants.LEFT_FLYWHEEL_INVERSION
+                    NeutralMode = ShooterConstants.FLYWHEEL_NEUTRAL_MODE
+                    Inverted = ShooterConstants.LEFT_LEADER_INVERSION
                 }
 
                 Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_GEARING
 
                 Slot0.apply {
-                    kP = ShooterConstants.LEFT_FLYWHEEL_KP
-                    kI = ShooterConstants.LEFT_FLYWHEEL_KI
-                    kD = ShooterConstants.LEFT_FLYWHEEL_KD
-                    kS = ShooterConstants.LEFT_FLYWHEEL_KS
-                    kV = ShooterConstants.LEFT_FLYWHEEL_KV
-                }
-            }
-
-        val rightFlywheelConfig =
-            TalonFXConfiguration().apply {
-                CurrentLimits.apply {
-                    SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_LIM
-                    StatorCurrentLimit = ShooterConstants.FLYWHEEL_STATOR_LIM
-                }
-
-                MotorOutput.apply {
-                    NeutralMode = ShooterConstants.RIGHT_FLYWHEEL_NEUTRAL_MODE
-                    Inverted = ShooterConstants.RIGHT_FLYWHEEL_INVERSION
-                }
-
-                Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_GEARING
-
-                Slot0.apply {
-                    kP = ShooterConstants.RIGHT_FLYWHEEL_KP
-                    kI = ShooterConstants.RIGHT_FLYWHEEL_KI
-                    kD = ShooterConstants.RIGHT_FLYWHEEL_KD
-                    kS = ShooterConstants.RIGHT_FLYWHEEL_KS
-                    kV = ShooterConstants.RIGHT_FLYWHEEL_KV
+                    kP = ShooterConstants.FLYWHEEL_KP
+                    kI = ShooterConstants.FLYWHEEL_KI
+                    kD = ShooterConstants.FLYWHEEL_KD
+                    kS = ShooterConstants.FLYWHEEL_KS
+                    kV = ShooterConstants.FLYWHEEL_KV
                 }
             }
 

@@ -44,17 +44,17 @@ object Constants {
         const val WHEEL_COF = 1.4
 
         // --- SPEED LIMITS (STANDARD) ---
-        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.7244
-        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 5.804 / 4 * PI
+        const val MAX_LINEAR_SPEED_METERS_PER_SEC = 4.7244
+        const val MAX_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
 
         // --- SPEED LIMITS (SLOW) ---
-        const val SLOW_LINEAR_SPEED_METERS_PER_SECOND = 1.5
-        const val SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 0.5804
+        const val SLOW_LINEAR_SPEED_METERS_PER_SEC = 1.5
+        const val SLOW_ANGULAR_SPEED_RADS_PER_SEC = 0.5804
 
         // --- DEADBANDS & TOLERANCE ---
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
-        const val MODULE_ALIGN_TOLERANCE = 5.0 // degrees
+        const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
     }
 
     object AutoConstants {
@@ -72,8 +72,8 @@ object Constants {
         const val CTE_D = 0.0
 
         const val AUTO_SHOOTING_TIME_SEC = 4.5
-        const val AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
-        const val AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND = 4 * PI
+        const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
+        const val AUTO_ANGULAR_ACCEL_RADS_PER_SEC_PER_SEC = 4 * PI
     }
 
     object FieldConstants {
@@ -90,13 +90,10 @@ object Constants {
         const val HOOD_MOTOR_ID = 15
 
         // --- HARDWARE CONFIGURATION ---
-        val LEFT_FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
-        val LEFT_FLYWHEEL_INVERSION = InvertedValue.CounterClockwise_Positive
-        val LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
-
-        val RIGHT_FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
-        val RIGHT_FLYWHEEL_INVERSION = InvertedValue.Clockwise_Positive
-        val RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
+        val FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_LEADER_INVERSION = InvertedValue.CounterClockwise_Positive
+        val LEFT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
+        val RIGHT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
         val HOOD_NEUTRAL_MODE = NeutralModeValue.Brake
         val HOOD_INVERSION = InvertedValue.CounterClockwise_Positive
@@ -121,22 +118,14 @@ object Constants {
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
         val MAX_HOOD_ANGLE: Angle = Radians.of(0.5185)
-        val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
-        const val LEFT_FLYWHEEL_KP = 0.55
-        const val LEFT_FLYWHEEL_KI = 0.0
-        const val LEFT_FLYWHEEL_KD = 0.0
-        const val LEFT_FLYWHEEL_KS = 0.286
-        const val LEFT_FLYWHEEL_KV = 0.2073
-        // const val LEFT_FLYWHEEL_KA = ...
-
-        const val RIGHT_FLYWHEEL_KP = 0.55
-        const val RIGHT_FLYWHEEL_KI = 0.0
-        const val RIGHT_FLYWHEEL_KD = 0.0
-        const val RIGHT_FLYWHEEL_KS = 0.271
-        const val RIGHT_FLYWHEEL_KV = 0.2042
-        // const val RIGHT_FLYWHEEL_KA = ...
+        const val FLYWHEEL_KP = 0.55
+        const val FLYWHEEL_KI = 0.0
+        const val FLYWHEEL_KD = 0.0
+        const val FLYWHEEL_KS = 0.286
+        const val FLYWHEEL_KV = 0.2073
+        // const val FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
         const val HOOD_KP = 5000.0
@@ -230,7 +219,7 @@ object Constants {
         const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
         const val ROLLER_SUPPLY_LIMIT = 30.0
-        const val ROLLER_STATOR_LIMIT = 40.0
+        const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
         const val STOW_POS_RADS = 0.0
@@ -243,7 +232,7 @@ object Constants {
 
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
-        const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
+        const val HOMING_VELOCITY_RADS_PER_SEC = 0.5
         const val HOMING_DEBOUNCE_TIME = 0.1
         const val VIZ_OFFSET_DEG = 33.873
     }
@@ -314,7 +303,8 @@ object Constants {
         const val AIMBOT_KD = 0.05
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.05
+        const val POSITION_TOLERANCE_RAD = 0.035
+        const val VELOCITY_TOLERANCE_RADS_PER_SEC = 0.25
     }
 
     object LEDConstants {

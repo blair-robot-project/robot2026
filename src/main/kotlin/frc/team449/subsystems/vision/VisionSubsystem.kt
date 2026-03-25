@@ -3,12 +3,15 @@ package frc.team449.subsystems.vision
 import com.ctre.phoenix6.Utils
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
-import edu.wpi.first.math.geometry.*
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.Alert.AlertType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.team449.Constants
 import frc.team449.Constants.VisionConstants
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
@@ -55,8 +58,8 @@ class VisionSubsystem(
                     observation.tagCount == 0 ||
                         (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
                         abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS
-//                        observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
-//                        observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
+                observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
+                    observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS
 
                 if (rejectPose) {
                     robotPosesRejected.add(observation.pose)

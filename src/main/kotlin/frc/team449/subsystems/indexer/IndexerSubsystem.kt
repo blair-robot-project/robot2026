@@ -16,42 +16,36 @@ class IndexerSubsystem(
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
     var floorTargetVolts: Double = 0.0
-    var wedgeTargetVolts: Double = 0.0
+        private set
     var topTargetVolts: Double = 0.0
+        private set
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
 
         Logger.recordOutput("Indexer/FloorTargetVolts", floorTargetVolts)
-        Logger.recordOutput("Indexer/WedgeTargetVolts", wedgeTargetVolts)
         Logger.recordOutput("Indexer/TopTargetVolts", topTargetVolts)
+        Logger.recordOutput("Indexer/ActiveCommand", currentCommand?.name ?: "None")
     }
 
-    fun index(
+    fun setIndexerVoltage(
         floorVolts: Double,
-        wedgeVolts: Double,
         topVolts: Double
     ): Command =
-        this
-            .run {
-                floorTargetVolts = floorVolts
-                wedgeTargetVolts = wedgeVolts
-                topTargetVolts = topVolts
+        runOnce {
+            floorTargetVolts = floorVolts
+            topTargetVolts = topVolts
 
-//                val voltageSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
-//                val floorSlewedVolts = inputs.floorAppliedVolts.slewTowards(floorTargetVolts, voltageSlewRate)
-//                val topSlewedVolts = inputs.topAppliedVolts.slewTowards(topTargetVolts, voltageSlewRate)
-//
-//                io.setIndexerVoltage(floorSlewedVolts, wedgeTargetVolts, topSlewedVolts)
-                io.setIndexerVoltage(floorTargetVolts, wedgeTargetVolts, topTargetVolts)
-            }
+            io.setIndexerVoltage(floorTargetVolts, topTargetVolts)
+        }
+            .withName("VOLTAGE")
 
     fun stop(): Command =
-        this.run {
+        runOnce {
             floorTargetVolts = 0.0
-            wedgeTargetVolts = 0.0
             topTargetVolts = 0.0
-            io.setIndexerVoltage(0.0, 0.0, 0.0)
+            io.setIndexerVoltage(0.0, 0.0)
         }
+            .withName("STOP")
 }
