@@ -10,7 +10,7 @@ import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import java.util.function.DoubleSupplier
+import java.util.function.Supplier
 
 class RobotActions(
     private val robotContainer: RobotContainer
@@ -61,10 +61,11 @@ class RobotActions(
             )
         )
 
-    fun prepShotFromAnywhere(distanceSupplier: DoubleSupplier): Command =
+    fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
         Commands.sequence(
-            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.asDouble))),
-            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.asDouble)))
+            Commands.print("${distanceSupplier.get()}"),
+            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()))),
+            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())))
         )
 
     fun checkAndFeed(): Command =

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
 import frc.team449.Constants.AimbotConstants
@@ -35,6 +36,8 @@ class AimAtTargetCommand(
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
 
+    var alliance: DriverStation.Alliance? = null
+
     init {
         addRequirements(drive)
         driveWithHeading.HeadingController.setTolerance(AimbotConstants.POSITION_TOLERANCE_RAD, AimbotConstants.VELOCITY_TOLERANCE_RADS_PER_SEC)
@@ -42,15 +45,14 @@ class AimAtTargetCommand(
 
     override fun initialize() {
         println("Initializing AimAtTargetCommand!")
+        alliance = DriverStation.getAlliance().get()
     }
 
     override fun execute() {
         val currentPose = drive.pose
         val targetTranslation = targetSupplier.get()
-        val translationToTarget = targetTranslation.minus(currentPose.translation)
+        val translationToTarget = if (alliance == DriverStation.Alliance.Blue) targetTranslation.minus(currentPose.translation) else currentPose.translation.minus(targetTranslation)
         val targetRotation = translationToTarget.angle
-
-        FieldUtil.distanceToHub = translationToTarget.norm
 
         throttle =
             abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
@@ -67,7 +69,7 @@ class AimAtTargetCommand(
         )
 
         Logger.recordOutput("Aimbot/HeadingErrorRads", driveWithHeading.HeadingController.positionError)
-        Logger.recordOutput("Aimbot/DistanceToHubMeters", FieldUtil.distanceToHub)
+        Logger.recordOutput("Aimbot/DistanceToHubMeters", FieldUtil.getDistanceToHub(drive.pose))
     }
 
     private fun isStationary(driveSpeeds: ChassisSpeeds): Boolean = abs(driveSpeeds.vxMetersPerSecond) < 0.1 && abs(driveSpeeds.vyMetersPerSecond) < 0.1

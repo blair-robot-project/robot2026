@@ -64,7 +64,7 @@ class Bindings(
                             { -driver.leftX },
                             targetSupplier = { FieldUtil.HUB_TRANSLATION }
                         ),
-                        actions.prepShotFromAnywhere { FieldUtil.distanceToHub }.repeatedly()
+                        actions.prepShotFromAnywhere { FieldUtil.getDistanceToHub(robotContainer.drive.pose) }.repeatedly()
                     ),
                     Commands.parallel(
                         robotContainer.drive.xLock(),

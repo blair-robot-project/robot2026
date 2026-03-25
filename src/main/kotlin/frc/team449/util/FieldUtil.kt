@@ -13,7 +13,6 @@ import kotlin.math.PI
 object FieldUtil {
     val BLUE_HUB_TRANSLATION = Translation2d(4.625594, 4.034536)
     var HUB_TRANSLATION = BLUE_HUB_TRANSLATION
-    var distanceToHub = 0.0
 
     val BLUE_TOWER_POSE: Pose2d = Pose2d(1.470, 4.034, Rotation2d(0.0))
     var TOWER_POSE = BLUE_TOWER_POSE
@@ -28,6 +27,10 @@ object FieldUtil {
 
     fun initialize() {
         Logger.recordOutput("Auto Winner", Color.kDimGray.toHexString())
+    }
+
+    fun getDistanceToHub(robotPose: Pose2d): Double {
+        return robotPose.translation.getDistance(HUB_TRANSLATION)
     }
 
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
