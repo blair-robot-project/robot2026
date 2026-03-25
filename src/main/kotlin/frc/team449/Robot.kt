@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.team449.firecontrol.FuelPhysicsSim
+import frc.team449.mrSchaferSim.FuelPhysicsSim
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
 import java.util.function.Supplier
-import frc.team449.firecontrol.*
+import frc.team449.mrSchaferSim.*
 
 /** The main class of the robot, constructs all the subsystems
  * and initializes default commands . */
