@@ -71,6 +71,7 @@ class Bindings(
                         actions.checkAndFeed()
                     )
                 )
+                    .withName("AimAtTarget")
             )
             .onFalse(
                 actions.stopAll()

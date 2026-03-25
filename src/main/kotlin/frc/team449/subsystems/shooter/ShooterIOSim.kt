@@ -62,6 +62,12 @@ class ShooterIOSim : ShooterIOHardware() {
     init {
         SmartDashboard.putData("Hood", mech)
 
+        leftTopLeader.configurator.apply(
+            Slot0Configs()
+                .withKS(ShooterConstants.FLYWHEEL_KS)
+                .withKV(ShooterConstants.FLYWHEEL_KV)
+        )
+
         hood.configurator.apply(
             MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
         )

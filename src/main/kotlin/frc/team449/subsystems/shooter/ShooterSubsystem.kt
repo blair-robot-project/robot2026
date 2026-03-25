@@ -37,7 +37,7 @@ class ShooterSubsystem(
     val hoodAngle: Double
         get() = inputs.hoodAngleRad
 
-    val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftTopLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) || abs(inputs.rightTopFollowerStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
+    val shooterJamTrigger: Trigger = Trigger { abs(inputs.leftTopLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
         .debounce(0.25)
 
     override fun periodic() {
