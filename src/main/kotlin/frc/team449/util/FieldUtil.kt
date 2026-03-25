@@ -29,8 +29,8 @@ object FieldUtil {
         Logger.recordOutput("Auto Winner", Color.kDimGray.toHexString())
     }
 
-    fun getDistanceToHub(robotPose: Pose2d): Double {
-        return robotPose.translation.getDistance(HUB_TRANSLATION)
+    fun getDistanceToHub(pose: Pose2d): Double {
+        return pose.translation.getDistance(HUB_TRANSLATION)
     }
 
     fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {

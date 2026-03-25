@@ -57,14 +57,12 @@ class Bindings(
             .rightBumper()
             .whileTrue(
                 Commands.sequence(
-                    Commands.deadline(
-                        AimAtTargetCommand(
-                            robotContainer.drive,
-                            { -driver.leftY },
-                            { -driver.leftX },
-                            targetSupplier = { FieldUtil.HUB_TRANSLATION }
-                        ),
-                        actions.prepShotFromAnywhere { FieldUtil.getDistanceToHub(robotContainer.drive.pose) }.repeatedly()
+                    AimAtTargetCommand(
+                        robotContainer.drive,
+                        robotContainer.shooter,
+                        { -driver.leftY },
+                        { -driver.leftX },
+                        targetSupplier = { FieldUtil.HUB_TRANSLATION }
                     ),
                     Commands.parallel(
                         robotContainer.drive.xLock(),
@@ -101,7 +99,7 @@ class Bindings(
         driver
             .x()
             .whileTrue(
-                actions.prepShotFromAnywhere { 3.43 }
+                actions.prepShotFromAnywhere(3.43)
                     .andThen(
                         robotContainer.drive.xLock()
                             .alongWith(actions.checkAndFeed())
@@ -115,7 +113,7 @@ class Bindings(
         driver
             .y()
             .whileTrue(
-                actions.prepShotFromAnywhere { 1.3 }
+                actions.prepShotFromAnywhere(1.3)
                     .andThen(
                         robotContainer.drive.xLock()
                             .alongWith(actions.checkAndFeed())
@@ -129,7 +127,7 @@ class Bindings(
         driver
             .b()
             .whileTrue(
-                actions.prepShotFromAnywhere { 2.92 }
+                actions.prepShotFromAnywhere(2.92)
                     .andThen(
                         robotContainer.drive.xLock()
                             .alongWith(actions.checkAndFeed())

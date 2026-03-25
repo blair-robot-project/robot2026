@@ -63,10 +63,14 @@ class ShooterSubsystem(
 
     fun setFlywheelVelocity(flywheelVelocity: AngularVelocity): Command =
         runOnce {
-            flywheelTargetVelocityRadsPerSec = flywheelVelocity.`in`(RadiansPerSecond)
-            io.setFlywheelVelocity(flywheelVelocity)
+            setFlywheelVelocity(flywheelVelocity)
         }
             .withName("FLYWHEEL-VEL")
+
+    fun setFlywheelVelocityInternal(flywheelVelocity: AngularVelocity) {
+        flywheelTargetVelocityRadsPerSec = flywheelVelocity.`in`(RadiansPerSecond)
+        io.setFlywheelVelocity(flywheelVelocity)
+    }
 
     fun stopFlywheel(): Command =
         runOnce {
@@ -77,10 +81,14 @@ class ShooterSubsystem(
 
     fun setHoodAngle(hoodAngle: Angle): Command =
         runOnce {
-            hoodTargetAngleRad = hoodAngle.`in`(Radians)
-            io.setHoodAngle(hoodAngle)
+            setHoodAngleInternal(hoodAngle)
         }
             .withName("HOOD-ANGLE")
+
+    fun setHoodAngleInternal(hoodAngle: Angle) {
+        hoodTargetAngleRad = hoodAngle.`in`(Radians)
+        io.setHoodAngle(hoodAngle)
+    }
 
     fun isFlywheelAtTolerance(): Boolean {
         if (flywheelTargetVelocityRadsPerSec < 5.0) return false

@@ -6,14 +6,16 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
+import frc.team449.RobotContainer.indexer
+import frc.team449.RobotContainer.intake
+import frc.team449.RobotContainer.shooter
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import java.util.function.Supplier
 
 class RobotActions(
-    private val robotContainer: RobotContainer
+    robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -61,11 +63,10 @@ class RobotActions(
             )
         )
 
-    fun prepShotFromAnywhere(distanceSupplier: Supplier<Double>): Command =
+    fun prepShotFromAnywhere(distance: Double): Command =
         Commands.sequence(
-            Commands.print("${distanceSupplier.get()}"),
-            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceSupplier.get()))),
-            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceSupplier.get())))
+            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))),
+            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance))),
         )
 
     fun checkAndFeed(): Command =
@@ -113,13 +114,13 @@ class RobotActions(
 
     fun autoTrenchShot(time: Double): Command =
         Commands.sequence(
-            prepShotFromAnywhere { 3.43 },
+            prepShotFromAnywhere(3.43),
             checkAndFeed(),
         )
 
     fun autoHubShot(): Command =
         Commands.sequence(
-            prepShotFromAnywhere { 1.3 },
+            prepShotFromAnywhere(1.3),
             checkAndFeed(),
         )
 }
