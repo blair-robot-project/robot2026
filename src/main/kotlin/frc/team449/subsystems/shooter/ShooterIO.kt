@@ -1,98 +1,69 @@
 package frc.team449.subsystems.shooter
-import edu.wpi.first.units.Units.Amps
-import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.units.measure.Current
-import frc.team449.Constants.ShooterConstants.HOOD_MIN_ANGLE
 import org.littletonrobotics.junction.AutoLog
 
 interface ShooterIO {
     @AutoLog
     open class ShooterIOInputs {
-        @JvmField
-        var leftVoltage: Double = 0.0
+        @JvmField var leftLeaderVelocityRadPerSec: Double = 0.0
 
-        @JvmField
-        var leftSupplyCurrent: Double = 0.0
+        @JvmField var leftLeaderAppliedVolts: Double = 0.0
 
-        @JvmField
-        var leftStatorCurrent: Double = 0.0
+        @JvmField var leftLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField
-        var leftTemperature: Double = 0.0
+        @JvmField var leftLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField
-        var leftMotorIsConnected: Boolean = false
+        @JvmField var leftLeaderTempCelsius: Double = 0.0
 
-        @JvmField
-        var leftFollowerMotorIsConnected: Boolean = false
+        @JvmField var leftFollowerAppliedVolts: Double = 0.0
 
-        @JvmField
-        var rightVoltage: Double = 0.0
+        @JvmField var leftFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField
-        var rightSupplyCurrent: Double = 0.0
+        @JvmField var leftFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField
-        var rightStatorCurrent: Double = 0.0
+        @JvmField var leftFollowerTempCelsius: Double = 0.0
 
-        @JvmField
-        var rightTemperature: Double = 0.0
+        @JvmField var rightLeaderVelocityRadPerSec: Double = 0.0
 
-        @JvmField
-        var rightMotorIsConnected: Boolean = false
+        @JvmField var rightLeaderAppliedVolts: Double = 0.0
 
-        @JvmField
-        var rightFollowerMotorIsConneted: Boolean = false
+        @JvmField var rightLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField
-        var leftFlywheelVelocity = 0.0
+        @JvmField var rightLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField
-        var rightFlywheelVelocity = 0.0
+        @JvmField var rightLeaderTempCelsius: Double = 0.0
 
-        @JvmField
-        var hoodVoltage: Double = 0.0
+        @JvmField var rightFollowerAppliedVolts: Double = 0.0
 
-        @JvmField
-        var hoodCurrentPos: Double = HOOD_MIN_ANGLE.`in`(Radians)
+        @JvmField var rightFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField
-        var hoodTargetPos: Double = HOOD_MIN_ANGLE.`in`(Radians)
+        @JvmField var rightFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField
-        var hoodSupplyCurrent: Double = 0.0
+        @JvmField var rightFollowerTempCelsius: Double = 0.0
 
-        @JvmField
-        var hoodStatorCurrent: Double = 0.0
+        @JvmField var hoodAngleRad: Double = 0.0
 
-        @JvmField
-        var hoodTemperature: Double = 0.0
+        @JvmField var hoodVelocityRadPerSec: Double = 0.0
 
-        @JvmField
-        var hoodMotorIsConnected: Boolean = false
+        @JvmField var hoodAppliedVolts: Double = 0.0
+
+        @JvmField var hoodSupplyCurrentAmps: Double = 0.0
+
+        @JvmField var hoodStatorCurrentAmps: Double = 0.0
+
+        @JvmField var hoodTempCelsius: Double = 0.0
     }
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun setFlywheelVelocity(velocity: AngularVelocity) { }
+    fun setFlywheelVoltage(volts: Double) {}
 
-    fun setFlywheelVoltage(voltage: Double) { }
+    fun setFlywheelVelocity(velocity: AngularVelocity) {}
 
-    fun setHoodPosition(angle: Angle) { }
+    fun setHoodVoltage(volts: Double) {}
 
-    fun inTolerance(): Boolean { return true }
+    fun setHoodAngle(angle: Angle) {}
 
-    fun simPeriodic() {}
-
-    fun getHoodPosition(): Angle { return Radians.of(0.0) }
-
-    fun setHoodVoltage(voltage: Double) { }
-
-    fun stopHoodVoltage() { }
-
-    fun getHoodStatorCurrent(): Current { return Amps.of(0.0) }
-
-    fun resetHoodPosition(angle: Angle) { }
+    fun resetHoodAngle(angle: Angle) {}
 }

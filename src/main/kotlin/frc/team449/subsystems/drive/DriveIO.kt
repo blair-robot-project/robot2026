@@ -4,6 +4,7 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import org.littletonrobotics.junction.AutoLog
@@ -12,6 +13,12 @@ interface DriveIO {
     @AutoLog
     open class DriveIOInputs : SwerveDriveState() {
         @JvmField var gyroAngle: Double = 0.0
+
+        @JvmField var rollVelocityDegreesPerSecond: Double = 0.0
+
+        @JvmField var pitchVelocityDegreesPerSecond: Double = 0.0
+
+        @JvmField var yawVelocityDegreesPerSecond: Double = 0.0
 
         init {
             this.Pose = Pose2d()
@@ -23,6 +30,7 @@ interface DriveIO {
             this.FailedDaqs = stateIn.FailedDaqs
             this.ModuleStates = stateIn.ModuleStates
             this.ModuleTargets = stateIn.ModuleTargets
+            this.ModulePositions = stateIn.ModulePositions
             this.Speeds = stateIn.Speeds
             this.OdometryPeriod = stateIn.OdometryPeriod
         }
@@ -30,11 +38,13 @@ interface DriveIO {
 
     fun updateInputs(inputs: DriveIOInputs) {}
 
-    fun logModules(driveState: SwerveDriveState) {}
-
     fun resetOdometry(pose: Pose2d) {}
 
     fun setControl(request: SwerveRequest) {}
+
+    fun seedFieldCentric() {}
+
+    fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
@@ -43,4 +53,8 @@ interface DriveIO {
     ) {}
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}
+
+    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {}
+
+    fun logModules(driveState: SwerveDriveState) {}
 }

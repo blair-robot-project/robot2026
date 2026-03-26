@@ -3,8 +3,11 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.Constants
 import frc.team449.subsystems.drive.DriveSubsystem
+import frc.team449.subsystems.power.PowerProfile
+import frc.team449.subsystems.power.PowerSubsystem
 import java.util.function.DoubleSupplier
 import kotlin.math.abs
 import kotlin.math.pow
@@ -14,18 +17,16 @@ class SwerveRequestCommand(
     private val drive: DriveSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
-    private val turnSupplier: DoubleSupplier
+    private val turnSupplier: DoubleSupplier,
+    private val maxLinearSpeedMetersPerSecond: Double = Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND,
+    private val maxAngularSpeedRadiansPerSecond: Double = Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
 ) : Command() {
     private val driveNoHeading: SwerveRequest.FieldCentric =
         SwerveRequest
             .FieldCentric()
-            .withDeadband(
-                Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
-                    * Constants.DriveConstants.TRANSLATION_DEADBAND,
-            ).withRotationalDeadband(
-                Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
-                    * Constants.DriveConstants.ANGULAR_DEADBAND,
-            ).withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+            .withDeadband(maxLinearSpeedMetersPerSecond * Constants.DriveConstants.TRANSLATION_DEADBAND)
+            .withRotationalDeadband(maxAngularSpeedRadiansPerSecond * Constants.DriveConstants.ANGULAR_DEADBAND)
+            .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
@@ -37,21 +38,18 @@ class SwerveRequestCommand(
 
     override fun initialize() {
         println("Initializing SwerveRequestCommand")
-
-        if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
-            driveNoHeading.withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage)
-        }
+        CommandScheduler.getInstance().schedule(PowerSubsystem.requestProfile(PowerProfile.DRIVING))
     }
 
     override fun execute() {
         throttle =
             abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
-            Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+            maxLinearSpeedMetersPerSecond
         strafe =
             abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
-            Constants.DriveConstants.MAX_LINEAR_SPEED_METERS_PER_SECOND
+            maxLinearSpeedMetersPerSecond
         turn =
-            abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND
+            abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * maxAngularSpeedRadiansPerSecond
 
         drive.setControl(
             driveNoHeading

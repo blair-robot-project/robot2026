@@ -5,53 +5,63 @@ import org.littletonrobotics.junction.AutoLog
 interface IndexerIO {
     @AutoLog
     open class IndexerInputs {
-        // Top Indexer
-        @JvmField var topVoltage: Double = 0.0
+        @JvmField
+        var wedgeVelocityRadPerSec: Double = 0.0
 
-        @JvmField var topVelocity: Double = 0.0
+        @JvmField
+        var wedgeAppliedVolts: Double = 0.0
 
-        @JvmField var topVelocityTarget: Double = 0.0
+        @JvmField
+        var wedgeSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var topSupplyCurrent: Double = 0.0
+        @JvmField
+        var wedgeStatorCurrentAmps: Double = 0.0
 
-        @JvmField var topStatorCurrent: Double = 0.0
+        @JvmField
+        var wedgeTempCelsius: Double = 0.0
 
-        // Side Indexer
-        @JvmField var sideVoltage: Double = 0.0
+        @JvmField
+        var floorVelocityRadPerSec: Double = 0.0
 
-        @JvmField var sideVelocity: Double = 0.0
+        @JvmField
+        var floorAppliedVolts: Double = 0.0
 
-        @JvmField var sideVelocityTarget: Double = 0.0
+        @JvmField
+        var floorSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var sideSupplyCurrent: Double = 0.0
+        @JvmField
+        var floorStatorCurrentAmps: Double = 0.0
 
-        @JvmField var sideStatorCurrent: Double = 0.0
+        @JvmField
+        var floorTempCelsius: Double = 0.0
 
-        // Bottom Indexer
-        @JvmField var bottomVoltage: Double = 0.0
+        @JvmField
+        var topVelocityRadPerSec: Double = 0.0
 
-        @JvmField var bottomVelocity: Double = 0.0
+        @JvmField
+        var topAppliedVolts: Double = 0.0
 
-        @JvmField var bottomVelocityTarget: Double = 0.0
+        @JvmField
+        var topSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var bottomSupplyCurrent: Double = 0.0
+        @JvmField
+        var topStatorCurrentAmps: Double = 0.0
 
-        @JvmField var bottomStatorCurrent: Double = 0.0
+        @JvmField
+        var topTempCelsius: Double = 0.0
     }
 
-    fun setVoltage(
-        topVoltage: Double,
-        sideVoltage: Double,
-        bottomVoltage: Double
-    ) {}
-
-    fun setIndexerVelocity(
-        topVel: AngularVelocity,
-        sideVel: AngularVelocity,
-        bottomVel: AngularVelocity
-    ) {}
-
-    fun simPeriodic() {}
-
     fun updateInputs(inputs: IndexerInputs) {}
+
+    fun setFloorSpeed(floorSurfaceSpeed: AngularVelocity) {}
+
+    fun setWedgeSpeed(wedgeSurfaceSpeed: AngularVelocity) {}
+
+    fun setTopSpeed(topSurfaceSpeed: AngularVelocity) {}
+
+    fun setIndexerVoltage(
+        floorVolts: Double,
+        wedgeVolts: Double,
+        topVolts: Double
+    ) {}
 }

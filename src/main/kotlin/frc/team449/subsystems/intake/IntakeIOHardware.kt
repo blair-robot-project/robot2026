@@ -1,164 +1,250 @@
 package frc.team449.subsystems.intake
+
 import com.ctre.phoenix6.BaseStatusSignal
-import com.ctre.phoenix6.controls.ControlRequest
+import com.ctre.phoenix6.configs.Slot0Configs
+import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.controls.Follower
+import com.ctre.phoenix6.controls.PositionVoltage
+import com.ctre.phoenix6.controls.VelocityVoltage
+import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
-import edu.wpi.first.units.measure.*
+import edu.wpi.first.units.Units
+import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
+import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IntakeIOHardware : IntakeIO {
-    val pivotMotor = TalonFX(IntakeConstants.PIVOT_MOTOR_ID)
-    val pivotFollower = TalonFX(IntakeConstants.PIVOT_FOLLOWER_ID)
-    val rollerMotor = TalonFX(IntakeConstants.ROLLER_MOTOR_ID)
-    val rollerFollower = TalonFX(IntakeConstants.ROLLER_FOLLOWER_ID)
+    val leftPivotLeader = TalonFX(IntakeConstants.LEFT_PIVOT_MOTOR_ID)
+    val rightPivotFollower = TalonFX(IntakeConstants.RIGHT_PIVOT_FOLLOWER_ID)
+    val leftRollerLeader = TalonFX(IntakeConstants.LEFT_ROLLER_MOTOR_ID)
+    val rightRollerFollower = TalonFX(IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID)
 
-    val pivotMotorVoltage = pivotMotor.motorVoltage
-    val pivotMotorSupplyCurrent = pivotMotor.supplyCurrent
-    val pivotMotorStatorCurrent = pivotMotor.statorCurrent
-    val pivotMotorPosition = pivotMotor.position
-    val pivotMotorVelocity = pivotMotor.velocity
-    val pivotMotorTemperature = pivotMotor.deviceTemp
+    private val leftPivotLeaderVoltage = leftPivotLeader.motorVoltage
+    private val leftPivotLeaderSupplyCurrent = leftPivotLeader.supplyCurrent
+    private val leftPivotLeaderStatorCurrent = leftPivotLeader.statorCurrent
+    private val leftPivotLeaderPosition = leftPivotLeader.position
+    private val leftPivotLeaderVelocity = leftPivotLeader.velocity
+    private val leftPivotLeaderTemp = leftPivotLeader.deviceTemp
 
-    val pivotFollowerVoltage = pivotMotor.motorVoltage
-    val pivotFollowerSupplyCurrent = pivotMotor.supplyCurrent
-    val pivotFollowerStatorCurrent = pivotMotor.statorCurrent
-    val pivotFollowerPosition = pivotMotor.position
-    val pivotFollowerVelocity = pivotMotor.velocity
-    val pivotFollowerTemperature = pivotMotor.deviceTemp
+    private val rightPivotFollowerVoltage = rightPivotFollower.motorVoltage
+    private val rightPivotFollowerSupplyCurrent = rightPivotFollower.supplyCurrent
+    private val rightPivotFollowerStatorCurrent = rightPivotFollower.statorCurrent
+    private val rightPivotFollowerTemp = rightPivotFollower.deviceTemp
 
-    val rollerMotorVoltage = pivotMotor.motorVoltage
-    val rollerMotorSupplyCurrent = pivotMotor.supplyCurrent
-    val rollerMotorStatorCurrent = pivotMotor.statorCurrent
-    val rollerMotorVelocity = pivotMotor.velocity
-    val rollerMotorTemperature = pivotMotor.deviceTemp
+    private val leftRollerLeaderVoltage = leftRollerLeader.motorVoltage
+    private val leftRollerLeaderSupplyCurrent = leftRollerLeader.supplyCurrent
+    private val leftRollerLeaderStatorCurrent = leftRollerLeader.statorCurrent
+    private val leftRollerLeaderVelocity = leftRollerLeader.velocity
+    private val leftRollerLeaderTemp = leftRollerLeader.deviceTemp
 
-    val rollerFollowerVoltage = pivotMotor.motorVoltage
-    val rollerFollowerSupplyCurrent = pivotMotor.supplyCurrent
-    val rollerFollowerStatorCurrent = pivotMotor.statorCurrent
-    val rollerFollowerVelocity = pivotMotor.velocity
-    val rollerFollowerTemperature = pivotMotor.deviceTemp
+    private val rightRollerFollowerVoltage = rightRollerFollower.motorVoltage
+    private val rightRollerFollowerSupplyCurrent = rightRollerFollower.supplyCurrent
+    private val rightRollerFollowerStatorCurrent = rightRollerFollower.statorCurrent
+    private val rightRollerFollowerTemp = rightRollerFollower.deviceTemp
 
-    val pivotMotorDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_MOTOR_ID})", Alert.AlertType.kError)
-    val pivotFollowerDisconnectedAlert = Alert("Pivot motor disconnected (ID ${IntakeConstants.PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
-    val rollerMotorDisconnectedAlert =
-        Alert("Right Roller motor disconnected (ID ${IntakeConstants.ROLLER_MOTOR_ID})", Alert.AlertType.kError)
-    val rollerFollowerDisconnectedAlert =
-        Alert("Left Roller motor disconnected (ID ${IntakeConstants.ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
+    private val leftRollerMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftRollerLeaderVelocity,
+            leftRollerLeaderVoltage,
+            leftRollerLeaderSupplyCurrent,
+            leftRollerLeaderStatorCurrent,
+        )
+
+    private val rightRollerMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            rightRollerFollowerVoltage,
+            rightRollerFollowerSupplyCurrent,
+            rightRollerFollowerStatorCurrent,
+        )
+
+    private val leftPivotMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            leftPivotLeaderPosition,
+            leftPivotLeaderVelocity,
+            leftPivotLeaderVoltage,
+            leftPivotLeaderSupplyCurrent,
+            leftPivotLeaderStatorCurrent,
+        )
+
+    private val rightPivotMotorConnected: Boolean =
+        BaseStatusSignal.isAllGood(
+            rightPivotFollowerVoltage,
+            rightPivotFollowerSupplyCurrent,
+            rightPivotFollowerStatorCurrent,
+            rightPivotFollowerTemp,
+        )
+
+    val leftPivotLeaderDisconnectedAlert =
+        Alert("left pivot leader disconnected (ID ${IntakeConstants.LEFT_PIVOT_MOTOR_ID})", Alert.AlertType.kError)
+    val rightPivotFollowerDisconnectedAlert =
+        Alert("right pivot follower disconnected (ID ${IntakeConstants.RIGHT_PIVOT_FOLLOWER_ID})", Alert.AlertType.kError)
+    val leftRollerLeaderDisconnectedAlert =
+        Alert("left roller leader motor disconnected (ID ${IntakeConstants.LEFT_ROLLER_MOTOR_ID})", Alert.AlertType.kError)
+    val rightRollerFollowerDisconnectedAlert =
+        Alert("right roller follower motor disconnected (ID ${IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID})", Alert.AlertType.kError)
+
+    private val allSignals =
+        arrayOf(
+            leftPivotLeaderVoltage,
+            leftPivotLeaderSupplyCurrent,
+            leftPivotLeaderStatorCurrent,
+            leftPivotLeaderPosition,
+            leftPivotLeaderVelocity,
+            leftPivotLeaderTemp,
+            rightPivotFollowerVoltage,
+            rightPivotFollowerSupplyCurrent,
+            rightPivotFollowerStatorCurrent,
+            rightPivotFollowerTemp,
+            leftRollerLeaderVoltage,
+            leftRollerLeaderSupplyCurrent,
+            leftRollerLeaderStatorCurrent,
+            leftRollerLeaderVelocity,
+            leftRollerLeaderTemp,
+            rightRollerFollowerVoltage,
+            rightRollerFollowerSupplyCurrent,
+            rightRollerFollowerStatorCurrent,
+            rightRollerFollowerTemp,
+        )
+
+    private val pivotVoltageRequest = VoltageOut(0.0)
+    private val pivotPositionRequest = PositionVoltage(0.0)
+    private val rollerVelocityRequest = VelocityVoltage(0.0)
+    private val rollerVoltageRequest = VoltageOut(0.0)
 
     init {
-        tryUntilOk(5) { pivotMotor.configurator.apply(IntakeConstants.PIVOT_CONFIG, 0.25) }
-        tryUntilOk(5) { pivotFollower.configurator.apply(IntakeConstants.PIVOT_CONFIG, 0.25) }
-        tryUntilOk(5) { rollerMotor.configurator.apply(IntakeConstants.ROLLER_CONFIG, 0.25) }
-        tryUntilOk(5) { rollerFollower.configurator.apply(IntakeConstants.ROLLER_CONFIG, 0.25) }
-        rollerFollower.setControl(Follower(rollerMotor.deviceID, IntakeConstants.ROLLER_FOLLOWER_ALIGNMENT))
-        pivotFollower.setControl(Follower(pivotMotor.deviceID, IntakeConstants.PIVOT_FOLLOWER_ALIGNMENT))
+        ParentDevice.optimizeBusUtilizationForAll(leftPivotLeader, rightPivotFollower, leftRollerLeader, rightRollerFollower)
 
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0,
-            pivotMotorVoltage,
-            pivotMotorSupplyCurrent,
-            pivotMotorStatorCurrent,
-            pivotMotorPosition,
-            pivotMotorVelocity,
-            pivotMotorTemperature,
-            pivotFollowerVoltage,
-            pivotFollowerSupplyCurrent,
-            pivotFollowerStatorCurrent,
-            pivotFollowerPosition,
-            pivotFollowerVelocity,
-            pivotFollowerTemperature,
-            rollerMotorVoltage,
-            rollerMotorSupplyCurrent,
-            rollerMotorStatorCurrent,
-            rollerMotorVelocity,
-            rollerMotorTemperature,
-            rollerFollowerVoltage,
-            rollerFollowerSupplyCurrent,
-            rollerFollowerStatorCurrent,
-            rollerFollowerVelocity,
-            rollerFollowerTemperature
-        )
+        tryUntilOk(5) { leftPivotLeader.configurator.apply(leftPivotConfig, 0.25) }
+        tryUntilOk(5) { rightPivotFollower.configurator.apply(rightPivotConfig, 0.25) }
+        tryUntilOk(5) { leftRollerLeader.configurator.apply(rollerConfig, 0.25) }
+        tryUntilOk(5) { rightRollerFollower.configurator.apply(rollerConfig, 0.25) }
 
-        ParentDevice.optimizeBusUtilizationForAll(
-            pivotMotor,
-            pivotFollower,
-            rollerFollower,
-            rollerMotor,
-        )
+        rightRollerFollower.setControl(Follower(leftRollerLeader.deviceID, IntakeConstants.RIGHT_ROLLER_FOLLOWER_ALIGNMENT))
+
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *allSignals)
+
+        PhoenixUtil.registerSignals(*allSignals)
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        BaseStatusSignal.refreshAll(
-            pivotMotorVoltage,
-            pivotMotorSupplyCurrent,
-            pivotMotorStatorCurrent,
-            pivotMotorPosition,
-            pivotMotorVelocity,
-            pivotMotorTemperature,
-            pivotFollowerVoltage,
-            pivotFollowerSupplyCurrent,
-            pivotFollowerStatorCurrent,
-            pivotFollowerPosition,
-            pivotFollowerVelocity,
-            pivotFollowerTemperature,
-            rollerMotorVoltage,
-            rollerMotorSupplyCurrent,
-            rollerMotorStatorCurrent,
-            rollerMotorVelocity,
-            rollerMotorTemperature,
-            rollerFollowerVoltage,
-            rollerFollowerSupplyCurrent,
-            rollerFollowerStatorCurrent,
-            rollerFollowerVelocity,
-            rollerFollowerTemperature
-        )
+        BaseStatusSignal.refreshAll(*allSignals)
 
-        inputs.pivotMotorControlMode = pivotMotor.controlMode.name
-        inputs.pivotMotorVoltage = pivotMotorVoltage.value
-        inputs.pivotMotorSupplyCurrent = pivotMotorSupplyCurrent.value
-        inputs.pivotMotorStatorCurrent = pivotMotorStatorCurrent.value
-        inputs.pivotMotorPosition = pivotMotorPosition.value
-        inputs.pivotMotorVelocity = pivotMotorVelocity.value
-        inputs.pivotMotorTemperature = pivotMotorTemperature.value
+        inputs.leftPivotLeaderAppliedVolts = leftPivotLeaderVoltage.value.`in`(Units.Volts)
+        inputs.leftPivotLeaderPositionRad = leftPivotLeaderPosition.value.`in`(Units.Radians)
+        inputs.leftPivotLeaderVelocityRadPerSec = leftPivotLeaderVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.leftPivotLeaderSupplyCurrentAmps = leftPivotLeaderSupplyCurrent.value.`in`(Units.Amps)
+        inputs.leftPivotLeaderStatorCurrentAmps = leftPivotLeaderStatorCurrent.value.`in`(Units.Amps)
+        inputs.leftPivotLeaderTempCelsius = leftPivotLeaderTemp.value.`in`(Units.Celsius)
 
-        inputs.pivotFollowerVoltage = pivotFollowerVoltage.value
-        inputs.pivotFollowerSupplyCurrent = pivotFollowerSupplyCurrent.value
-        inputs.pivotFollowerStatorCurrent = pivotFollowerStatorCurrent.value
-        inputs.pivotFollowerPosition = pivotFollowerPosition.value
-        inputs.pivotFollowerVelocity = pivotFollowerVelocity.value
-        inputs.pivotFollowerTemperature = pivotFollowerTemperature.value
+        inputs.rightPivotFollowerAppliedVolts = rightPivotFollowerVoltage.value.`in`(Units.Volts)
+        inputs.rightPivotFollowerSupplyCurrentAmps = rightPivotFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.rightPivotFollowerStatorCurrentAmps = rightPivotFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.rightPivotFollowerTempCelsius = rightPivotFollowerTemp.value.`in`(Units.Celsius)
 
-        inputs.rollerMotorControlMode = rollerMotor.controlMode.name
-        inputs.rollerMotorVoltage = rollerMotorVoltage.value
-        inputs.rollerMotorSupplyCurrent = rollerMotorSupplyCurrent.value
-        inputs.rollerMotorStatorCurrent = rollerMotorStatorCurrent.value
-        inputs.rollerMotorVelocity = rollerMotorVelocity.value
-        inputs.rollerMotorTemperature = rollerMotorTemperature.value
+        inputs.leftRollerLeaderAppliedVolts = leftRollerLeaderVoltage.value.`in`(Units.Volts)
+        inputs.leftRollerLeaderVelocityRadPerSec = leftRollerLeaderVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.leftRollerLeaderSupplyCurrentAmps = leftRollerLeaderSupplyCurrent.value.`in`(Units.Amps)
+        inputs.leftRollerLeaderStatorCurrentAmps = leftRollerLeaderStatorCurrent.value.`in`(Units.Amps)
+        inputs.leftRollerLeaderTempCelsius = leftRollerLeaderTemp.value.`in`(Units.Celsius)
 
-        inputs.rollerFollowerVoltage = rollerFollowerVoltage.value
-        inputs.rollerFollowerSupplyCurrent = rollerFollowerSupplyCurrent.value
-        inputs.rollerFollowerStatorCurrent = rollerFollowerStatorCurrent.value
-        inputs.rollerFollowerVelocity = rollerFollowerVelocity.value
-        inputs.rollerFollowerTemperature = rollerFollowerTemperature.value
+        inputs.rightRollerFollowerAppliedVolts = rightRollerFollowerVoltage.value.`in`(Units.Volts)
+        inputs.rightRollerFollowerSupplyCurrentAmps = rightRollerFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Units.Celsius)
 
-        pivotMotorDisconnectedAlert.set(!pivotMotor.isAlive)
-        pivotFollowerDisconnectedAlert.set(!pivotFollower.isAlive)
-        rollerFollowerDisconnectedAlert.set(!rollerFollower.isAlive)
-        rollerMotorDisconnectedAlert.set(!rollerMotor.isAlive)
+        leftPivotLeaderDisconnectedAlert.set(!leftPivotMotorConnected)
+        rightPivotFollowerDisconnectedAlert.set(!rightPivotMotorConnected)
+        leftRollerLeaderDisconnectedAlert.set(!leftRollerMotorConnected)
+        rightRollerFollowerDisconnectedAlert.set(!rightRollerMotorConnected)
     }
 
-    override fun setPivotRequest(request: ControlRequest) {
-        pivotMotor.setControl(request)
+    override fun setPivotVoltage(volts: Double) {
+        leftPivotLeader.setControl(pivotVoltageRequest.withOutput(volts))
+        rightPivotFollower.setControl(pivotVoltageRequest.withOutput(volts))
     }
 
-    override fun setRollerRequest(request: ControlRequest) {
-        rollerMotor.setControl(request)
+    override fun setPivotAngle(angle: Angle) {
+        leftPivotLeader.setControl(pivotPositionRequest.withPosition(angle))
+        rightPivotFollower.setControl(pivotPositionRequest.withPosition(angle))
     }
 
-    override fun setPivotPosition(position: Angle) {
-        pivotMotor.setPosition(position)
+    override fun resetPivotAngle(angle: Angle) {
+        leftPivotLeader.setPosition(angle)
+        rightPivotFollower.setPosition(angle)
+    }
+
+    override fun setRollerVelocity(velocity: AngularVelocity) {
+        leftRollerLeader.setControl(rollerVelocityRequest.withVelocity(velocity))
+    }
+
+    override fun setRollerVoltage(volts: Double) {
+        leftRollerLeader.setControl(rollerVoltageRequest.withOutput(volts))
+    }
+
+    companion object {
+        val pivotSlot0Config = Slot0Configs().apply {
+            kP = 100.0
+            kI = 0.0
+            kD = 0.1
+            kS = 0.2
+        }
+
+        val leftPivotConfig =
+            TalonFXConfiguration().apply {
+                CurrentLimits.apply {
+                    SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
+                    StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
+                }
+
+                MotorOutput.apply {
+                    NeutralMode = IntakeConstants.LEFT_PIVOT_NEUTRAL_MODE
+                    Inverted = IntakeConstants.LEFT_PIVOT_INVERSION
+                }
+
+                Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+
+                Slot0 = pivotSlot0Config
+            }
+
+        val rightPivotConfig =
+            TalonFXConfiguration().apply {
+                CurrentLimits.apply {
+                    SupplyCurrentLimit = IntakeConstants.PIVOT_SUPPLY_LIMIT
+                    StatorCurrentLimit = IntakeConstants.PIVOT_STATOR_LIMIT
+                }
+
+                MotorOutput.apply {
+                    NeutralMode = IntakeConstants.RIGHT_PIVOT_NEUTRAL_MODE
+                    Inverted = IntakeConstants.RIGHT_PIVOT_INVERSION
+                }
+
+                Feedback.SensorToMechanismRatio = IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+
+                Slot0 = pivotSlot0Config
+            }
+
+        val rollerConfig =
+            TalonFXConfiguration().apply {
+                CurrentLimits.apply {
+                    SupplyCurrentLimit = IntakeConstants.ROLLER_SUPPLY_LIMIT
+                    StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_LIMIT
+                }
+
+                MotorOutput.apply {
+                    NeutralMode = IntakeConstants.LEFT_ROLLER_NEUTRAL_MODE
+                    Inverted = IntakeConstants.LEFT_ROLLER_INVERSION
+                }
+
+                Feedback.SensorToMechanismRatio = IntakeConstants.ROLLER_GEARING
+
+                Slot0.apply {
+                    kP = 0.0
+                    kV = 0.09
+                }
+            }
     }
 }

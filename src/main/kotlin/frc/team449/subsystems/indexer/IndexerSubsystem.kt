@@ -1,13 +1,6 @@
 package frc.team449.subsystems.indexer
-import edu.wpi.first.units.measure.AngularVelocity
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_BACKWARD_VEL
-import frc.team449.Constants.IndexerConstants.BOTTOM_INDEXER_FORWARD_VEL
-import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_BACKWARD_VEL
-import frc.team449.Constants.IndexerConstants.SIDE_INDEXER_FORWARD_VEL
-import frc.team449.Constants.IndexerConstants.TOP_INDEXER_BACKWARD_VEL
-import frc.team449.Constants.IndexerConstants.TOP_INDEXER_FORWARD_VEL
 import org.littletonrobotics.junction.Logger
 
 /**
@@ -15,56 +8,50 @@ import org.littletonrobotics.junction.Logger
  * @brief This file contains functions for the indexer
  * @details This includes motor control and sensor control/definition functions for the indexer
  * @author Sean Zhang
-*/
+ */
 
 class IndexerSubsystem(
     private val io: IndexerIO
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
+    var floorTargetVolts: Double = 0.0
+    var wedgeTargetVolts: Double = 0.0
+    var topTargetVolts: Double = 0.0
+
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
+
+        Logger.recordOutput("Indexer/FloorTargetVolts", floorTargetVolts)
+        Logger.recordOutput("Indexer/WedgeTargetVolts", wedgeTargetVolts)
+        Logger.recordOutput("Indexer/TopTargetVolts", topTargetVolts)
     }
 
-    fun runIndexerForwards(): Command =
-        runOnce {
-            io.setIndexerVelocity(
-                TOP_INDEXER_FORWARD_VEL,
-                SIDE_INDEXER_FORWARD_VEL,
-                BOTTOM_INDEXER_FORWARD_VEL,
-            )
-        }
-
-    fun runIndexerBackwards(): Command =
-        runOnce {
-            io.setIndexerVelocity(
-                TOP_INDEXER_BACKWARD_VEL,
-                SIDE_INDEXER_BACKWARD_VEL,
-                BOTTOM_INDEXER_BACKWARD_VEL,
-            )
-        }
-
-    fun runIndexerAtVelocity(
-        topVel: AngularVelocity,
-        sideVel: AngularVelocity,
-        bottomVel: AngularVelocity
+    fun index(
+        floorVolts: Double,
+        wedgeVolts: Double,
+        topVolts: Double
     ): Command =
-        runOnce {
-            io.setIndexerVelocity(topVel, sideVel, bottomVel)
-        }
+        this
+            .run {
+                floorTargetVolts = floorVolts
+                wedgeTargetVolts = wedgeVolts
+                topTargetVolts = topVolts
 
-    // stops motor
+//                val voltageSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
+//                val floorSlewedVolts = inputs.floorAppliedVolts.slewTowards(floorTargetVolts, voltageSlewRate)
+//                val topSlewedVolts = inputs.topAppliedVolts.slewTowards(topTargetVolts, voltageSlewRate)
+//
+//                io.setIndexerVoltage(floorSlewedVolts, wedgeTargetVolts, topSlewedVolts)
+                io.setIndexerVoltage(floorTargetVolts, wedgeTargetVolts, topTargetVolts)
+            }
+
     fun stop(): Command =
-        run {
-            io.setVoltage(
-                0.0,
-                0.0,
-                0.0,
-            )
+        this.run {
+            floorTargetVolts = 0.0
+            wedgeTargetVolts = 0.0
+            topTargetVolts = 0.0
+            io.setIndexerVoltage(0.0, 0.0, 0.0)
         }
-
-    override fun simulationPeriodic() {
-        io.simPeriodic()
-    }
 }

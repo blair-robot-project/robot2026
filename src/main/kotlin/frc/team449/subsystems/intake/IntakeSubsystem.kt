@@ -1,14 +1,19 @@
 package frc.team449.subsystems.intake
-import com.ctre.phoenix6.controls.VoltageOut
+
 import edu.wpi.first.math.filter.Debouncer
-import edu.wpi.first.units.Units.RadiansPerSecond
+import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.Seconds
+import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.Voltage
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.IntakeConstants
+import frc.team449.subsystems.power.PowerSubsystem
+import frc.team449.util.MathExtensions.slewTowards
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
@@ -17,76 +22,144 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
-    init {
-        io.setPivotPosition(IntakeConstants.STOW_POSITION)
-    }
+    // boolean over position logging increases speed and is easier to read
+    var pivotIsDeployed: Boolean = false
+    var pivotTargetAngleRads: Double = 0.0
+    var rollerTargetVolts: Double = 0.0
 
-    val currentHomingDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME, IntakeConstants.HOMING_DEBOUNCE_TYPE)
-    val request = VoltageOut(0.0)
-        .withEnableFOC(false)
+    val pivotAngle: Double
+        get() = inputs.leftPivotLeaderPositionRad
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
 
-        // Hacky solution for now, replace if you find a better one.
-        Logger.recordOutput("Intake/Current command", currentCommand?.name ?: "None")
-    }
-
-    override fun simulationPeriodic() {
-        io.simulationPeriodic()
+        Logger.recordOutput("Intake/PivotIsDeployed", pivotIsDeployed)
+        Logger.recordOutput("Intake/RollerTargetVolts", rollerTargetVolts)
+        Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadPerSec > 10.0))
     }
 
     fun intake(): Command =
-        runOnce {
-            io.setRollerRequest(
-                request.withOutput(IntakeConstants.INTAKE_VOLTAGE),
-            )
-        }
+        this
+            .run {
+                rollerTargetVolts = 12.0
 
-    fun stopIntake(): Command =
-        runOnce {
-            io.setRollerRequest(VoltageOut(0.0))
-        }
+//                val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+//                val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)
+//
+//                io.setRollerVoltage(slewedVolts)
+                io.setRollerVoltage(12.0)
+            }
+            .withName("Intake")
+
+    fun intakeSlow(): Command =
+        this
+            .run {
+                rollerTargetVolts = 4.0
+
+                val voltageSlewRate = PowerSubsystem.currentProfile.limits.intakeSlewRate
+                val slewedVolts = inputs.leftRollerLeaderAppliedVolts.slewTowards(rollerTargetVolts, voltageSlewRate)
+
+                io.setRollerVoltage(slewedVolts)
+            }
+            .withName("IntakeSlow")
 
     fun outtake(): Command =
-        runOnce {
-            io.setRollerRequest(
-                request.withOutput(IntakeConstants.OUTTAKE_VOLTAGE),
-            )
+        this
+            .run {
+                rollerTargetVolts = -4.0
+                io.setRollerVoltage(-4.0)
+            }
+            .finallyDo { _ ->
+                rollerTargetVolts = 0.0
+                io.setRollerVoltage(0.0)
+            }
+            .withName("Outtake")
+
+    fun stopRollers(): Command =
+        this
+            .run {
+                rollerTargetVolts = 0.0
+                io.setRollerVoltage(0.0)
+            }
+            .withName("StopRoller")
+
+    fun setPivotAngle(angle: Angle): Command =
+        this
+            .run {
+                pivotTargetAngleRads = angle.`in`(Radians)
+                io.setPivotAngle(angle)
+            }
+
+    fun setPivotVoltage(volts: Double): Command =
+        this.run {
+            io.setPivotVoltage(volts)
         }
 
-    fun currentHome(voltage: Voltage, endPosition: Angle, holdVoltage: Voltage): Command =
-        Commands.sequence(
-            runOnce {
-                currentHomingDebouncer.calculate(false)
-                io.setPivotRequest(request.withOutput(voltage))
-            },
-            WaitUntilCommand {
-                currentHomingDebouncer.calculate(
-                    inputs.pivotMotorStatorCurrent >
-                        IntakeConstants.CURRENT_HOMING_CURRENT_LIMIT,
-                ) &&
-                    abs(inputs.pivotMotorVelocity.`in`(RadiansPerSecond)) <
-                        IntakeConstants.CURRENT_HOMING_VEL_LIMIT.`in`(RadiansPerSecond)
-            }.withTimeout(IntakeConstants.CURRENT_HOMING_TIMEOUT),
-            runOnce {
-                io.setPivotPosition(endPosition)
-                io.setPivotRequest(request.withOutput(holdVoltage))
+    fun resetPivotAngle(angle: Angle) {
+        this
+            .run {
+                io.resetPivotAngle(angle)
             }
-        )
+    }
 
     fun deploy(): Command =
-        currentHome(
-            IntakeConstants.DEPLOY_VOLTAGE,
-            IntakeConstants.DEPLOY_POSITION,
-            IntakeConstants.DEPLOY_HOLD_VOLTAGE
-        ).withName("Deploy")
+        slamHoming(
+            true,
+            IntakeConstants.DEPLOY_VOLTS,
+            IntakeConstants.DEPLOY_HOLD_VOLTS,
+        )
+            .withName("Deploy")
 
     fun stow(): Command =
-        currentHome(
-            IntakeConstants.STOW_VOLTAGE,
-            IntakeConstants.STOW_POSITION,
-            IntakeConstants.STOW_HOLD_VOLTAGE
-        ).withName("Stow")
+        slamHoming(
+            false,
+            IntakeConstants.STOW_VOLTS,
+            IntakeConstants.STOW_HOLD_VOLTS,
+        )
+            .withName("Stow")
+
+    private fun slamHoming(
+        isDeployed: Boolean,
+        moveVolts: Double,
+        holdVolts: Double
+    ): Command =
+        this.defer {
+            pivotIsDeployed = isDeployed
+            val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
+
+            this
+                .run {
+                    io.setPivotVoltage(moveVolts)
+                }.until {
+                    val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+                    val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
+                    hardstopDebouncer.calculate(highCurrent && lowVelocity)
+                }.andThen(
+                    runOnce {
+                        val pivotAngleRads: Double = if (pivotIsDeployed) IntakeConstants.DEPLOY_POS_RADS else IntakeConstants.STOW_POS_RADS
+                        io.resetPivotAngle(Radians.of(pivotAngleRads))
+                        io.setPivotVoltage(holdVolts)
+                    },
+                )
+        }
+
+    val sysIDPivot =
+        SysIdRoutine(
+            SysIdRoutine.Config(
+                null,
+                Volts.of(6.0),
+                Seconds.of(20.0),
+            ) { state: SysIdRoutineLog.State ->
+                Logger.recordOutput(
+                    "SysIdPivot",
+                    state.toString(),
+                )
+            },
+            Mechanism(
+                { voltage: Voltage -> io.setPivotVoltage(voltage.`in`(Volts)) },
+                null,
+                this,
+            ),
+        )
 }
