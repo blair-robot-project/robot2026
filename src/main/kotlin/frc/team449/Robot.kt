@@ -3,25 +3,22 @@ package frc.team449
 import com.ctre.phoenix6.SignalLogger
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
-import edu.wpi.first.math.MathUtil
-import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.team449.util.FieldUtil
-import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
-import org.littletonrobotics.junction.LoggedPowerDistribution
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
+import java.util.function.Supplier
+import mrSchaferSim.*
 
+/** The main class of the robot, constructs all the subsystems
+ * and initializes default commands . */
 class Robot : LoggedRobot() {
-    private val robotContainer = RobotContainer
-
     init {
         println("Initializing Robot!")
 
@@ -46,72 +43,79 @@ class Robot : LoggedRobot() {
             }
         }
 
-        LoggedPowerDistribution.getInstance(49, PowerDistribution.ModuleType.kRev)
-
-        // SignalLogger.enableAutoLogging(true)
-        SignalLogger.setPath("/home/lvuser/logs/")
-        SignalLogger.start()
+        SignalLogger.enableAutoLogging(false)
         Logger.start()
+    }
+    private lateinit var ballSim: FuelPhysicsSim
+    private val robotContainer = RobotContainer
+
+    override fun driverStationConnected() {
+        robotContainer.drive.setOperatorPerspectiveForward()
     }
 
     override fun robotInit() {
-        FieldUtil.initialize()
-
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
     }
 
     override fun robotPeriodic() {
+        Threads.setCurrentThreadPriority(true, 99)
         CommandScheduler.getInstance().run()
-        PhoenixUtil.refreshAll()
+        Threads.setCurrentThreadPriority(false, 10)
 
-        Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
-        Logger.recordOutput("MatchTime", DriverStation.getMatchTime())
+        val speeds = RobotContainer.drive.getRobotRelativeSpeeds()
+        val pose =  robotContainer.drive.pose
+        val robotVel = Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond)
+        val fieldVel = robotVel.rotateBy(pose.rotation)
 
-        logComponentPoses()
+        val shotInputs = ShotCalculator.ShotInputs(
+            pose,
+            fieldVel,
+            robotVel,
+            RobotContainer.hubCenter,
+            RobotContainer.hubForward,
+            0.9,
+            0.0,
+            0.0
+        )
+
+        val shot = RobotContainer.shotCalc.calculate(shotInputs)
+        if (shot.isValid && shot.confidence() > 50) {
+            //is it setHoodVoltage though?
+            RobotContainer.shooter.setHoodVoltage(shot.rpm())
+            RobotContainer.drive.target(shot.driveAngle())
+        }
     }
-
     override fun autonomousInit() {
-        robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.updateKeyPositions()
-        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
-
-        robotContainer.autonomousCommand = robotContainer.autoChooser.get()
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
-    override fun autonomousPeriodic() {
-        robotContainer.bLineRoutines.logBLineAuto()
-    }
+    override fun autonomousPeriodic() {}
 
-    override fun teleopInit() {
-        robotContainer.autonomousCommand.cancel()
-        robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.updateKeyPositions()
+    override fun teleopInit() {}
 
-        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
-    }
+    override fun teleopPeriodic() {}
 
-    override fun teleopPeriodic() {
-        if (!FieldUtil.autoWinnerLogged) FieldUtil.autoWinnerLogged = FieldUtil.updateAutoWinner()
-    }
+    override fun disabledInit() {}
 
-    private fun logComponentPoses() {
-        val pivotAngle = robotContainer.intake.pivotAngle
-        val hoodAngle = robotContainer.shooter.hoodAngle
+    override fun disabledPeriodic() {}
 
-        val hopperTranslationX = MathUtil.inverseInterpolate(
-            Constants.IntakeConstants.STOW_POS_RADS,
-            Constants.IntakeConstants.DEPLOY_POS_RADS,
-            pivotAngle
-        ) * 0.3
+    override fun testInit() {}
 
-        Logger.recordOutput(
-            "FinalComponentPoses",
-            Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, pivotAngle, 0.0)),
-            Pose3d(hopperTranslationX, 0.0, 0.0, Rotation3d()),
-            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0))
+    override fun testPeriodic() {}
+
+    override fun simulationInit() {
+        ballSim = FuelPhysicsSim("Sim/Fuel")
+        ballSim.enable()
+        ballSim.placeFieldBalls()
+        //these parameters need to be changed
+        ballSim.configureRobot(0.6858, 0.6858, 0.127,
+            Supplier { robotContainer.drive.pose },
+            Supplier { robotContainer.drive.chassisSpeeds}
         )
+    }
+
+    override fun simulationPeriodic() {
+        ballSim.tick()
     }
 }

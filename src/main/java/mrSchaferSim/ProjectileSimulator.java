@@ -18,7 +18,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
 
-package frc.team449.mrSchaferSim;
+package mrSchaferSim;
 
 import java.util.ArrayList;
 import java.util.List;
