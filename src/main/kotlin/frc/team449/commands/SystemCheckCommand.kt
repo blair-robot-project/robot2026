@@ -8,11 +8,22 @@ import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE_RAD
 import frc.team449.RobotContainer
+import frc.team449.subsystems.drive.DriveIOInputsAutoLogged
+import kotlin.math.abs
 
 class SystemCheckCommand(
     private val robotContainer: RobotContainer
 ) : SequentialCommandGroup() {
     private val driveRequest = SwerveRequest.RobotCentric()
+    private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
+    private val acceptableError = 0.2
+
+    fun isWithinTolerance(): Boolean {
+        return abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) < acceptableError &&
+                abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) < acceptableError &&
+                abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) < acceptableError &&
+                abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) < acceptableError
+    }
 
     init {
         addRequirements(
@@ -28,25 +39,29 @@ class SystemCheckCommand(
                     driveRequest.withVelocityX(1.0).withVelocityY(0.0),
                 )
             },
-            WaitCommand(0.75),
+            WaitCommand(0.5),
+            Commands.runOnce({ Alert("DRIVE FORWARD DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     driveRequest.withVelocityX(0.0).withVelocityY(1.0),
                 )
             },
-            WaitCommand(0.75),
+            WaitCommand(0.5),
+            Commands.runOnce({ Alert("DRIVE RIGHT DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     driveRequest.withVelocityX(-1.0).withVelocityY(0.0),
                 )
             },
-            WaitCommand(0.75),
+            WaitCommand(0.5),
+            Commands.runOnce({ Alert("DRIVE BACKWARD DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     driveRequest.withVelocityX(0.0).withVelocityY(-1.0),
                 )
             },
-            WaitCommand(0.75),
+            WaitCommand(0.5),
+            Commands.runOnce({ Alert("DRIVE LEFT DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     SwerveRequest.SwerveDriveBrake(),
