@@ -31,6 +31,7 @@ class SwerveRequestCommand(
 
     init {
         addRequirements(drive)
+        this.name = "Swerve"
     }
 
     override fun initialize() {}

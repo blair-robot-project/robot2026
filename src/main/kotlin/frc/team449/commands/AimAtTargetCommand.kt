@@ -3,7 +3,6 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
@@ -26,7 +25,6 @@ class AimAtTargetCommand(
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val maxLinearSpeedMetersPerSecond: Double = DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-    private val maxAngularSpeedRadiansPerSecond: Double = DriveConstants.SLOW_ANGULAR_SPEED_RADS_PER_SEC,
     private val targetSupplier: Supplier<Translation2d>
 ) : Command() {
     private val driveWithHeading =
@@ -34,7 +32,6 @@ class AimAtTargetCommand(
             .FieldCentricFacingAngle()
             .withHeadingPID(AlignConstants.ALIGN_KP, 0.0, AlignConstants.ALIGN_KD)
             .withDeadband(maxLinearSpeedMetersPerSecond * DriveConstants.TRANSLATION_DEADBAND)
-            .withRotationalDeadband(maxAngularSpeedRadiansPerSecond * DriveConstants.ANGULAR_DEADBAND)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
 
     private var throttle: Double = 0.0
@@ -52,7 +49,7 @@ class AimAtTargetCommand(
     override fun execute() {
         val currentPose = drive.pose
         val targetTranslation = targetSupplier.get()
-        val translationToTarget = if (isRed) currentPose.translation.minus(targetTranslation) else targetTranslation.minus(currentPose.translation)
+        val translationToTarget = if (isRed) targetTranslation.minus(currentPose.translation) else currentPose.translation.minus(targetTranslation)
         val targetRotation = translationToTarget.angle
 
         throttle =
@@ -80,9 +77,9 @@ class AimAtTargetCommand(
         Logger.recordOutput("Align/DistanceToHubMeters", FieldUtil.getDistanceToFriendlyHub(drive.pose))
     }
 
-    private fun isStationary(driveSpeeds: ChassisSpeeds): Boolean = abs(driveSpeeds.vxMetersPerSecond) < 0.01 && abs(driveSpeeds.vyMetersPerSecond) < 0.1
+    fun atHeadingSetpoint(): Boolean = driveWithHeading.HeadingController.atSetpoint()
 
-    override fun isFinished(): Boolean = driveWithHeading.HeadingController.atSetpoint() && isStationary(drive.getRobotRelativeSpeeds())
+    override fun isFinished(): Boolean = false
 
     override fun end(interrupted: Boolean) {
         drive.setControl(SwerveRequest.Idle())

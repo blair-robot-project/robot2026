@@ -19,13 +19,35 @@ class Bindings(
     val operator = robotContainer.opController
     val actions = robotContainer.actions
 
-    val joysticksMovedPastDeadbandTrigger: Trigger =
+    val joysticksMovedPastDeadband: Trigger =
         Trigger {
             abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
                 abs(driver.rightX) > 0.25
         }
 
+    val driverIdle: Trigger = Trigger {
+        abs(driver.leftY) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
+            abs(driver.leftX) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
+            abs(driver.rightX) < Constants.DriveConstants.ANGULAR_DEADBAND
+    }.debounce(0.1)
+
     val shooterJamTrigger: Trigger = robotContainer.shooter.shooterJamTrigger
+
+    val autoAimCommand = AimAtTargetCommand(
+        robotContainer.drive,
+        robotContainer.shooter,
+        { -driver.leftY },
+        { -driver.leftX },
+        targetSupplier = { FieldUtil.HUB }
+    )
+
+    val autoPassCommand = AimAtTargetCommand(
+        robotContainer.drive,
+        robotContainer.shooter,
+        { -driver.leftY },
+        { -driver.leftX },
+        targetSupplier = { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose) }
+    )
 
     fun setDefaultCommands() {
         robotContainer.drive.defaultCommand =
@@ -57,19 +79,13 @@ class Bindings(
             .rightBumper()
             .whileTrue(
                 Commands.sequence(
-                    AimAtTargetCommand(
-                        robotContainer.drive,
-                        robotContainer.shooter,
-                        { -driver.leftY },
-                        { -driver.leftX },
-                        targetSupplier = { FieldUtil.HUB }
-                    ),
+                    autoAimCommand.until { autoAimCommand.atHeadingSetpoint() && driverIdle.asBoolean },
                     Commands.parallel(
                         robotContainer.drive.xLock(),
                         actions.checkAndFeed()
                     )
                 )
-                    .withName("AimAtTarget")
+                    .withName("AutoAim")
             )
             .onFalse(
                 actions.stopAll()
@@ -78,14 +94,17 @@ class Bindings(
         driver
             .leftBumper()
             .whileTrue(
-                SwerveRequestCommand(
-                    robotContainer.drive,
-                    { -driver.leftY },
-                    { -driver.leftX },
-                    { -driver.rightX },
-                    Constants.DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-                    Constants.DriveConstants.SLOW_ANGULAR_SPEED_RADS_PER_SEC,
-                ),
+                Commands.parallel(
+                    autoPassCommand,
+                    Commands.sequence(
+                        Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
+                        actions.checkAndFeed()
+                    )
+                )
+                    .withName("AutoPass")
+            )
+            .onFalse(
+                actions.stopAll()
             )
 
         driver
@@ -93,7 +112,7 @@ class Bindings(
             .onTrue(
                 robotContainer.drive
                     .xLock()
-                    .until(joysticksMovedPastDeadbandTrigger),
+                    .until(joysticksMovedPastDeadband),
             )
 
         driver

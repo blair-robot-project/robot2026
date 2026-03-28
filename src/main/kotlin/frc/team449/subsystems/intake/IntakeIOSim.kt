@@ -82,7 +82,7 @@ class IntakeIOSim : IntakeIOHardware() {
 
         pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads) + 90 - IntakeConstants.VIZ_OFFSET_DEG
 
-        if (abs(rollerSim.angularVelocityRadPerSec) > 1.0) {
+        if (abs(rollerSim.angularVelocityRadPerSec) > 200.0) {
             pivotMechanism.color = Color8Bit(Color.kGreen)
         } else {
             pivotMechanism.color = Color8Bit(Color.kRed)
