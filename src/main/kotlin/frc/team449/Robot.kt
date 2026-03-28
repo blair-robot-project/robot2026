@@ -55,9 +55,10 @@ class Robot : LoggedRobot() {
     }
 
     override fun robotInit() {
-        FieldUtil.initialize()
+        FieldUtil.initializeAutoWinnerField()
 
         robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
+
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
     }
@@ -74,7 +75,6 @@ class Robot : LoggedRobot() {
 
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.updateKeyPositions()
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
@@ -88,7 +88,6 @@ class Robot : LoggedRobot() {
     override fun teleopInit() {
         robotContainer.autonomousCommand.cancel()
         robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.updateKeyPositions()
 
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
     }

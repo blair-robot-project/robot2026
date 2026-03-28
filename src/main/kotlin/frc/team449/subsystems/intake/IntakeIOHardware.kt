@@ -16,9 +16,9 @@ import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IntakeIOHardware : IntakeIO {
-    val leftPivot = TalonFX(IntakeConstants.LEFT_PIVOT_MOTOR_ID)
-    val rightPivot = TalonFX(IntakeConstants.RIGHT_PIVOT_FOLLOWER_ID)
-    val leftRollerLeader = TalonFX(IntakeConstants.LEFT_ROLLER_MOTOR_ID)
+    val leftPivot = TalonFX(IntakeConstants.LEFT_PIVOT_ID)
+    val rightPivot = TalonFX(IntakeConstants.RIGHT_PIVOT_ID)
+    val leftRollerLeader = TalonFX(IntakeConstants.LEFT_ROLLER_LEADER_ID)
     val rightRollerFollower = TalonFX(IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID)
 
     private val pivotVoltageRequest = VoltageOut(0.0)
@@ -115,11 +115,11 @@ open class IntakeIOHardware : IntakeIO {
         )
 
     val leftPivotLeaderDisconnectedAlert =
-        Alert("Left Pivot Disconnected (ID ${IntakeConstants.LEFT_PIVOT_MOTOR_ID}).", Alert.AlertType.kError)
+        Alert("Left Pivot Disconnected (ID ${IntakeConstants.LEFT_PIVOT_ID}).", Alert.AlertType.kError)
     val rightPivotFollowerDisconnectedAlert =
-        Alert("Right Pivot Disconnected (ID ${IntakeConstants.RIGHT_PIVOT_FOLLOWER_ID}).", Alert.AlertType.kError)
+        Alert("Right Pivot Disconnected (ID ${IntakeConstants.RIGHT_PIVOT_ID}).", Alert.AlertType.kError)
     val leftRollerLeaderDisconnectedAlert =
-        Alert("Left Roller Disconnected (ID ${IntakeConstants.LEFT_ROLLER_MOTOR_ID}).", Alert.AlertType.kError)
+        Alert("Left Roller Disconnected (ID ${IntakeConstants.LEFT_ROLLER_LEADER_ID}).", Alert.AlertType.kError)
     val rightRollerFollowerDisconnectedAlert =
         Alert("Right Roller Disconnected (ID ${IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID}).", Alert.AlertType.kError)
 

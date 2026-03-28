@@ -5,82 +5,58 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.util.Color
-import frc.team449.Constants
+import frc.team449.Constants.FieldConstants
 import org.littletonrobotics.junction.Logger
-import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 
 object FieldUtil {
-    val BLUE_HUB_TRANSLATION = Translation2d(4.625594, 4.034536)
-    var HUB_TRANSLATION = BLUE_HUB_TRANSLATION
+    val isRed: Boolean get() = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
 
-    val BLUE_TOWER_POSE: Pose2d = Pose2d(1.470, 4.034, Rotation2d(0.0))
-    var TOWER_POSE = BLUE_TOWER_POSE
+    private val BLUE_HUB: Translation2d = Translation2d(4.625594, 4.034536)
+    private val RED_HUB: Translation2d = BLUE_HUB.flipped()
+    val HUB: Translation2d get() = if (isRed) RED_HUB else BLUE_HUB
 
-    val BLUE_TRENCH_POSES: List<Pose2d> =
-        listOf(
-            Pose2d(4.35, 0.45, Rotation2d(1.5)),
-            Pose2d(4.35, 7.60, Rotation2d(-1.5)),
-        )
+    private val BLUE_TRENCHES: Array<Pose2d> = arrayOf(Pose2d(4.35, 0.45, Rotation2d(1.5)), Pose2d(4.35, 7.60, Rotation2d(-1.5)))
+    private val RED_TRENCHES: Array<Pose2d> = Array(BLUE_TRENCHES.size) { i -> BLUE_TRENCHES[i].flipped() }
+    val TRENCHES: Array<Pose2d> get() = if (isRed) RED_TRENCHES else BLUE_TRENCHES
+
+    private val BLUE_PASSES: Array<Translation2d> = arrayOf(Translation2d(1.65, 1.4), Translation2d(1.65, 6.6))
+    private val RED_PASSES: Array<Translation2d> = Array(BLUE_PASSES.size) { i -> BLUE_PASSES[i].flipped() }
+    val PASSES: Array<Translation2d> get() = if (isRed) RED_PASSES else BLUE_PASSES
 
     var autoWinnerLogged = false
 
-    fun initialize() {
-        Logger.recordOutput("Auto Winner", Color.kDimGray.toHexString())
-    }
-
-    fun getDistanceToHub(pose: Pose2d): Double {
-        return pose.translation.getDistance(HUB_TRANSLATION)
-    }
-
-    fun getClosestTrenchPose(robotPose: Pose2d): Pose2d {
-        val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
-
-        val allianceTrenchSpots: List<Pose2d> =
-            if (flipRed) {
-                BLUE_TRENCH_POSES.map { flipPose(it) }
-            } else {
-                BLUE_TRENCH_POSES
-            }
-
-        return allianceTrenchSpots.minBy {
-            it.translation.getDistance(robotPose.translation)
-        }
-    }
+    fun getDistanceToFriendlyHub(robotPose: Pose2d): Double = robotPose.translation.getDistance(HUB)
+    fun getClosestFriendlyTrench(robotPose: Pose2d): Pose2d = TRENCHES.minBy { it.translation.getDistance(robotPose.translation) }
+    fun getClosestFriendlyPass(robotPose: Pose2d): Translation2d = PASSES.minBy { it.getDistance(robotPose.translation) }
 
     // flip (wall-blue zero)
-    fun flipPose(pose: Pose2d): Pose2d =
-        Pose2d(
-            Constants.FieldConstants.FIELD_LENGTH_METERS - pose.x,
-            pose.y,
-            Rotation2d(PI).minus(pose.rotation),
-        )
+    fun Pose2d.flipped(): Pose2d = Pose2d(
+        FieldConstants.FIELD_LENGTH_METERS - x,
+        y,
+        Rotation2d(PI).minus(rotation)
+    )
 
-    fun updateKeyPositions() {
-        val flipRed = DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red
-        if (flipRed) {
-            HUB_TRANSLATION = flipPose(Pose2d(BLUE_HUB_TRANSLATION, Rotation2d())).translation
-            TOWER_POSE = flipPose(BLUE_TOWER_POSE)
-        } else {
-            HUB_TRANSLATION = BLUE_HUB_TRANSLATION
-            TOWER_POSE = BLUE_TOWER_POSE
-        }
+    fun Translation2d.flipped(): Translation2d = Translation2d(
+        FieldConstants.FIELD_LENGTH_METERS - x,
+        y
+    )
+
+    fun initializeAutoWinnerField() {
+        Logger.recordOutput("Auto Winner", Color.kDimGray.toHexString())
     }
 
     fun updateAutoWinner(): Boolean {
         val autoWinner = DriverStation.getGameSpecificMessage()
-
         if (autoWinner.isBlank()) return false
 
-        if (autoWinner == "R") {
-            Logger.recordOutput("Auto Winner", Color.kRed.toHexString())
-            return true
-        }
-        if (autoWinner == "B") {
-            Logger.recordOutput("Auto Winner", Color.kBlue.toHexString())
-            return true
+        val statusColor = when (autoWinner.uppercase()) {
+            "R" -> Color.kRed
+            "B" -> Color.kBlue
+            else -> Color.kDimGray
         }
 
-        return false
+        Logger.recordOutput("Auto Winner", statusColor.toHexString())
+        return autoWinner.isNotBlank()
     }
 }

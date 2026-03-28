@@ -12,8 +12,8 @@ import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IndexerIOHardware : IndexerIO {
-    val floor: TalonFX = TalonFX(IndexerConstants.FLOOR_INDEXER_ID) // x60
-    val top: TalonFX = TalonFX(IndexerConstants.TOP_INDEXER_ID) // x44
+    val floor: TalonFX = TalonFX(IndexerConstants.FLOOR_ID) // x60
+    val top: TalonFX = TalonFX(IndexerConstants.TOP_ID) // x44
 
     val floorVoltageRequest: VoltageOut = VoltageOut(0.0)
     val topVoltageRequest: VoltageOut = VoltageOut(0.0)
@@ -65,9 +65,9 @@ open class IndexerIOHardware : IndexerIO {
         )
 
     private val floorDisconnectedAlert =
-        Alert("Floor Indexer Disconnected (ID ${IndexerConstants.FLOOR_INDEXER_ID}).", Alert.AlertType.kError)
+        Alert("Floor Indexer Disconnected (ID ${IndexerConstants.FLOOR_ID}).", Alert.AlertType.kError)
     private val topDisconnectedAlert =
-        Alert("Top Indexer Disconnected (ID ${IndexerConstants.TOP_INDEXER_ID}).", Alert.AlertType.kError)
+        Alert("Top Indexer Disconnected (ID ${IndexerConstants.TOP_ID}).", Alert.AlertType.kError)
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(floor, top)
@@ -122,14 +122,6 @@ open class IndexerIOHardware : IndexerIO {
                 }
 
                 Feedback.SensorToMechanismRatio = IndexerConstants.FLOOR_GEARING
-
-                Slot0.apply {
-                    kP = IndexerConstants.FLOOR_KP
-                    kI = IndexerConstants.FLOOR_KI
-                    kD = IndexerConstants.FLOOR_KD
-                    kS = IndexerConstants.FLOOR_KS
-                    kV = IndexerConstants.FLOOR_KV
-                }
             }
 
         val topConfig =
@@ -145,14 +137,6 @@ open class IndexerIOHardware : IndexerIO {
                 }
 
                 Feedback.SensorToMechanismRatio = IndexerConstants.TOP_GEARING
-
-                Slot0.apply {
-                    kP = IndexerConstants.TOP_KP
-                    kI = IndexerConstants.TOP_KI
-                    kD = IndexerConstants.TOP_KD
-                    kS = IndexerConstants.TOP_KS
-                    kV = IndexerConstants.TOP_KV
-                }
             }
     }
 }

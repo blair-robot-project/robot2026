@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage
 import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
+import com.ctre.phoenix6.signals.GravityTypeValue
 import edu.wpi.first.units.Units.Amps
 import edu.wpi.first.units.Units.Celsius
 import edu.wpi.first.units.Units.Radians
@@ -21,10 +22,10 @@ import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class ShooterIOHardware : ShooterIO {
-    val leftTopLeader = TalonFX(ShooterConstants.LEFT_FLYWHEEL_LEADER_ID)
-    val leftBottomFollower = TalonFX(ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID)
-    val rightTopFollower = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID)
-    val rightBottomFollower = TalonFX(ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID)
+    val leftTopLeader = TalonFX(ShooterConstants.LEFT_TOP_LEADER_ID)
+    val leftBottomFollower = TalonFX(ShooterConstants.LEFT_BOTTOM_FOLLOWER_ID)
+    val rightTopFollower = TalonFX(ShooterConstants.RIGHT_TOP_FOLLOWER_ID)
+    val rightBottomFollower = TalonFX(ShooterConstants.RIGHT_BOTTOM_FOLLOWER_ID)
     val hood = TalonFX(ShooterConstants.HOOD_MOTOR_ID)
 
     private val flywheelVelocityRequest = VelocityVoltage(0.0)
@@ -135,13 +136,13 @@ open class ShooterIOHardware : ShooterIO {
         )
 
     private val leftTopLeaderDisconnectedAlert =
-        Alert("Left Top Flywheel Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
+        Alert("Left Top Flywheel Disconnected (ID ${ShooterConstants.LEFT_TOP_LEADER_ID}).", Alert.AlertType.kError)
     private val leftBottomFollowerDisconnectedAlert =
-        Alert("Left Bottom Flywheel Disconnected (ID ${ShooterConstants.LEFT_FLYWHEEL_FOLLOWER_ID}).", Alert.AlertType.kError)
+        Alert("Left Bottom Flywheel Disconnected (ID ${ShooterConstants.LEFT_BOTTOM_FOLLOWER_ID}).", Alert.AlertType.kError)
     private val rightTopFollowerDisconnectedAlert =
-        Alert("Right Top Flywheel Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_LEADER_ID}).", Alert.AlertType.kError)
+        Alert("Right Top Flywheel Disconnected (ID ${ShooterConstants.RIGHT_TOP_FOLLOWER_ID}).", Alert.AlertType.kError)
     private val rightBottomFollowerDisconnectedAlert =
-        Alert("Right Bottom Flywheel Disconnected (ID ${ShooterConstants.RIGHT_FLYWHEEL_FOLLOWER_ID}).", Alert.AlertType.kError)
+        Alert("Right Bottom Flywheel Disconnected (ID ${ShooterConstants.RIGHT_BOTTOM_FOLLOWER_ID}).", Alert.AlertType.kError)
     private val hoodDisconnectedAlert =
         Alert("Hood Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
 
@@ -272,6 +273,7 @@ open class ShooterIOHardware : ShooterIO {
                     kS = ShooterConstants.HOOD_KS
                     kV = ShooterConstants.HOOD_KV
                     kG = ShooterConstants.HOOD_KG
+                    GravityType = GravityTypeValue.Arm_Cosine
                 }
             }
     }

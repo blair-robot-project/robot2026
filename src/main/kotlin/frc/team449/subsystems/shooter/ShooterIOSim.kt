@@ -78,40 +78,31 @@ class ShooterIOSim : ShooterIOHardware() {
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
-        val totalCurrent =
-            hoodSim.currentDrawAmps +
-                flywheelSim.currentDrawAmps // * 2 // simulating two flywheels
-        // something something dont use stator current alr stop yapping yall
-
-        hoodSimState.setSupplyVoltage(12.0)
+        // update flywheel sim
         leftTopLeaderSimState.setSupplyVoltage(12.0)
         leftBottomFollowerSimState.setSupplyVoltage(12.0)
         rightTopFollowerSimState.setSupplyVoltage(12.0)
         rightBottomFollowerSimState.setSupplyVoltage(12.0)
-
-        hoodSim.setInput(hoodSimState.motorVoltage)
-        hoodSim.update(Constants.LOOP_TIME)
-
-        val hoodRotorPos =
-            Units.radiansToRotations(hoodSim.angleRads) * ShooterConstants.HOOD_GEARING
-        val hoodRotorVel =
-            Units.radiansToRotations(hoodSim.velocityRadPerSec) * ShooterConstants.HOOD_GEARING
-
-        hoodSimState.setRawRotorPosition(hoodRotorPos)
-        hoodSimState.setRotorVelocity(hoodRotorVel)
-
-        hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
-
         flywheelSim.setInput(leftTopLeaderSimState.motorVoltage)
         flywheelSim.update(Constants.LOOP_TIME)
 
-        val rotorVel =
-            Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * ShooterConstants.FLYWHEEL_GEARING
-
+        val rotorVel = Units.radiansToRotations(flywheelSim.angularVelocityRadPerSec) * ShooterConstants.FLYWHEEL_GEARING
         leftTopLeaderSimState.setRotorVelocity(rotorVel)
         leftBottomFollowerSimState.setRotorVelocity(rotorVel)
         rightTopFollowerSimState.setRotorVelocity(rotorVel)
         rightBottomFollowerSimState.setRotorVelocity(rotorVel)
+
+        // update hood sim
+        hoodSimState.setSupplyVoltage(12.0)
+        hoodSim.setInput(hoodSimState.motorVoltage)
+        hoodSim.update(Constants.LOOP_TIME)
+
+        val hoodRotorPos = Units.radiansToRotations(hoodSim.angleRads) * ShooterConstants.HOOD_GEARING
+        val hoodRotorVel = Units.radiansToRotations(hoodSim.velocityRadPerSec) * ShooterConstants.HOOD_GEARING
+        hoodSimState.setRawRotorPosition(hoodRotorPos)
+        hoodSimState.setRotorVelocity(hoodRotorVel)
+
+        hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
 
         super.updateInputs(inputs)
     }

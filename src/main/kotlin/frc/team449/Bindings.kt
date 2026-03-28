@@ -62,7 +62,7 @@ class Bindings(
                         robotContainer.shooter,
                         { -driver.leftY },
                         { -driver.leftX },
-                        targetSupplier = { FieldUtil.HUB_TRANSLATION }
+                        targetSupplier = { FieldUtil.HUB }
                     ),
                     Commands.parallel(
                         robotContainer.drive.xLock(),

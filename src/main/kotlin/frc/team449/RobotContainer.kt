@@ -76,13 +76,13 @@ object RobotContainer {
                     drive::addVisionMeasurement,
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
-                        { drive.pose.rotation },
+                        drive.pose::getRotation,
                         drive::getAngularVelocity,
                         VisionConstants.ROBOT_TO_CAMERA_RIGHT
                     ),
                     VisionIOLimelight(
                         VisionConstants.CAMERA_LEFT_NAME,
-                        { drive.pose.rotation },
+                        drive.pose::getRotation,
                         drive::getAngularVelocity,
                         VisionConstants.ROBOT_TO_CAMERA_LEFT
                     )
@@ -97,7 +97,7 @@ object RobotContainer {
                 drive::addVisionMeasurement,
                 object : VisionIO {},
                 object : VisionIO {}
-            ).also { vision = it }
+            )
         }
 
     val intake: IntakeSubsystem =

@@ -33,9 +33,7 @@ class SwerveRequestCommand(
         addRequirements(drive)
     }
 
-    override fun initialize() {
-        println("Initializing SwerveRequestCommand!")
-    }
+    override fun initialize() {}
 
     override fun execute() {
         throttle =

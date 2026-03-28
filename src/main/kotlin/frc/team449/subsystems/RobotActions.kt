@@ -6,9 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
-import frc.team449.RobotContainer.indexer
-import frc.team449.RobotContainer.intake
-import frc.team449.RobotContainer.shooter
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
@@ -83,7 +80,7 @@ class RobotActions(
                 Commands.print("AUTO-UNJAM!"),
                 Commands.parallel(
                     indexer.setIndexerVoltage(0.0, 2.0),
-                    shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL)
+                    shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL)
                 ),
                 Commands.waitSeconds(0.25),
                 indexer.stop(),
@@ -96,7 +93,7 @@ class RobotActions(
         Commands.parallel(
             intake.setRollerVoltage(-2.0),
             indexer.setIndexerVoltage(-2.0, -2.0),
-            shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
+            shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
         )
 
     fun stopAll(): Command =
