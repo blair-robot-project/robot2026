@@ -57,9 +57,9 @@ class VisionSubsystem(
                 val rejectPose =
                     observation.tagCount == 0 ||
                         (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
-                        abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS
-                observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
-                    observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS
+                        abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
+                        observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
+                        observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS
 
                 if (rejectPose) {
                     robotPosesRejected.add(observation.pose)
@@ -72,9 +72,9 @@ class VisionSubsystem(
                 var linearStdDev = VisionConstants.LINEAR_STD_DEV_BASELINE_METERS * stdDevFactor
                 var angularStdDev = VisionConstants.ANGULAR_STD_DEV_BASELINE_RADIANS * stdDevFactor
 
-                if (observation.type == VisionIO.PoseObservationType.MEGATAG_2) {
-                    linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
-                    angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
+                if (observation.type == PoseObservationType.MEGATAG_2) {
+                    linearStdDev *= VisionConstants.MT2_LINEAR_STD_DEV_FACTOR
+                    angularStdDev *= VisionConstants.MT2_ANGULAR_STD_DEV_FACTOR
                 }
 
                 if (cameraIndex < VisionConstants.CAMERA_STD_DEV_FACTORS.size) {

@@ -19,35 +19,31 @@ class RobotActions(
     private val indexer: IndexerSubsystem = robotContainer.indexer
     private val shooter: ShooterSubsystem = robotContainer.shooter
 
-    fun deployAndRunIntake(): Command =
-        Commands.either(
+    fun deployAndIntake(): Command =
+        Commands.sequence(
+            intake.deploy().unless { intake.pivotIsDeployed },
             Commands.parallel(
                 intake.setRollerVoltage(12.0),
                 indexer.setIndexerVoltage(0.5, 0.0)
-            ),
-            Commands.sequence(
-                intake.deploy(),
-                Commands.parallel(
-                    intake.setRollerVoltage(12.0),
-                    indexer.setIndexerVoltage(0.5, 0.0)
-                )
             )
-        ) { intake.pivotIsDeployed }
+        )
+            .withName("DeployAndIntake")
 
     fun stopIntakeAndPivot(): Command =
         Commands.sequence(
             intake.stopRollers(),
             intake.setPivotVoltage(0.0)
         )
+            .withName("StopIntakeAndPivot")
 
     fun stopAndStow(): Command =
         Commands.sequence(
             intake.stopRollers(),
-            Commands.race(
-                intake.stow(),
-                indexer.setIndexerVoltage(0.5, 0.0)
-            )
+            indexer.setIndexerVoltage(0.5, 0.0),
+            intake.stow(),
+            indexer.setIndexerVoltage(0.0, 0.0)
         )
+            .withName("StopAndStow")
 
     fun shuffleIntakePivot(): Command =
         Commands.sequence(
@@ -71,6 +67,7 @@ class RobotActions(
             Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
             indexer.setIndexerVoltage(12.0, 12.0)
         )
+            .withName("CheckAndFeed")
 
     fun autoUnjam(): Command =
         Commands.defer({
@@ -102,6 +99,7 @@ class RobotActions(
             indexer.stop(),
             shooter.stopFlywheel()
         )
+            .withName("StopAll")
 
     fun stopAllAndHomeHood(): Command =
         Commands.sequence(

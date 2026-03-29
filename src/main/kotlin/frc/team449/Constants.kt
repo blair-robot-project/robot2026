@@ -53,6 +53,7 @@ object Constants {
         // --- DEADBANDS & TOLERANCE ---
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
+        const val INTERRUPT_DEADBAND = 0.25
         const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
     }
 
@@ -293,12 +294,12 @@ object Constants {
         // --- CAMERA STANDARD DEVIATION MULTIPLIERS ---
         val CAMERA_STD_DEV_FACTORS: DoubleArray =
             doubleArrayOf(
-                1.0, // Camera 0
-                1.0, // Camera 1
+                1.0, // camera 0
+                1.0, // camera 1
             )
 
-        // TODO: can we name this group and apply if (if necessary?)
-        const val linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
-        const val angularStdDevMegatag2Factor: Double = Double.POSITIVE_INFINITY // No rotation data available
+        // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
+        const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
+        const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available
     }
 }

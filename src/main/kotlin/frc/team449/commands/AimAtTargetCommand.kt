@@ -37,19 +37,21 @@ class AimAtTargetCommand(
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
 
-    var isRed: Boolean = FieldUtil.isRed
+    var isRed: Boolean = false
 
     init {
-        addRequirements(drive)
-        driveWithHeading.HeadingController.setTolerance(AlignConstants.POSITION_TOLERANCE_RADS, AlignConstants.VELOCITY_TOLERANCE_RADS_PER_SEC)
+        addRequirements(drive, shooter)
     }
 
-    override fun initialize() {}
+    override fun initialize() {
+        isRed = FieldUtil.isRed
+        driveWithHeading.HeadingController.setTolerance(AlignConstants.POSITION_TOLERANCE_RADS, AlignConstants.VELOCITY_TOLERANCE_RADS_PER_SEC)
+    }
 
     override fun execute() {
         val currentPose = drive.pose
         val targetTranslation = targetSupplier.get()
-        val translationToTarget = if (isRed) targetTranslation.minus(currentPose.translation) else currentPose.translation.minus(targetTranslation)
+        val translationToTarget = if (isRed) currentPose.translation.minus(targetTranslation) else targetTranslation.minus(currentPose.translation)
         val targetRotation = translationToTarget.angle
 
         throttle =

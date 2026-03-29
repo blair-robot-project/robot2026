@@ -3,13 +3,6 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
 
-/**
- * @file Indexer.kt
- * @brief This file contains functions for the indexer
- * @details This includes motor control and sensor control/definition functions for the indexer
- * @author Sean Zhang
- */
-
 class IndexerSubsystem(
     private val io: IndexerIO
 ) : SubsystemBase() {

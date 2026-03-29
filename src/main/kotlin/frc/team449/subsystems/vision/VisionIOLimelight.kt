@@ -4,9 +4,6 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.Timer
-import frc.team449.subsystems.vision.VisionIO.PoseObservation
-import frc.team449.subsystems.vision.VisionIO.PoseObservationType
-import frc.team449.subsystems.vision.VisionIO.TargetObservation
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import limelight.Limelight
 import limelight.networktables.AngularVelocity3d
@@ -32,15 +29,15 @@ class VisionIOLimelight(
     offset: Pose3d
 ) : VisionIO {
     private val limelight = Limelight(name)
-    private var estimationMode = EstimationMode.MEGATAG1 // can change this if wanna run both megatag1 and 2
-    private var poseObservationType = PoseObservationType.MEGATAG_1
+    private var estimationMode = EstimationMode.MEGATAG2
+    private var poseObservationType = PoseObservationType.MEGATAG_2
     private val poseEstimator = limelight.createPoseEstimator(estimationMode)
 
     init {
         limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
             .withCameraOffset(offset)
+        limelight.settings.withImuMode(LimelightSettings.ImuMode.ExternalImu)
             .save()
-        limelight.settings.withImuMode(LimelightSettings.ImuMode.InternalImuExternalAssist)
     }
 
     override fun updateInputs(inputs: VisionIOInputs) {
@@ -68,7 +65,7 @@ class VisionIOLimelight(
                     est.avgTagAmbiguity,
                     est.tagCount,
                     est.avgTagDist,
-                    PoseObservationType.MEGATAG_2
+                    poseObservationType,
                 )
             )
         } else {

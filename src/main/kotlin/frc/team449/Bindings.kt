@@ -16,20 +16,23 @@ class Bindings(
     val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
-    val operator = robotContainer.opController
+    val operator = robotContainer.operatorController
     val actions = robotContainer.actions
 
     val joysticksMovedPastDeadband: Trigger =
         Trigger {
-            abs(driver.leftY) > 0.25 || abs(driver.leftX) > 0.25 ||
-                abs(driver.rightX) > 0.25
+            abs(driver.leftY) > Constants.DriveConstants.INTERRUPT_DEADBAND ||
+                abs(driver.leftX) > Constants.DriveConstants.INTERRUPT_DEADBAND ||
+                abs(driver.rightX) > Constants.DriveConstants.INTERRUPT_DEADBAND
         }
+            .debounce(0.1)
 
     val driverIdle: Trigger = Trigger {
         abs(driver.leftY) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
             abs(driver.leftX) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
             abs(driver.rightX) < Constants.DriveConstants.ANGULAR_DEADBAND
-    }.debounce(0.1)
+    }
+        .debounce(0.1)
 
     val shooterJamTrigger: Trigger = robotContainer.shooter.shooterJamTrigger
 
@@ -63,7 +66,7 @@ class Bindings(
         driver
             .rightTrigger()
             .whileTrue(
-                actions.deployAndRunIntake()
+                actions.deployAndIntake()
             )
             .onFalse(
                 actions.stopIntakeAndPivot()
