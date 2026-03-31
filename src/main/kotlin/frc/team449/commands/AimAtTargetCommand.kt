@@ -2,6 +2,7 @@ package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
@@ -53,6 +54,7 @@ class AimAtTargetCommand(
         val targetTranslation = targetSupplier.get()
         val translationToTarget = if (isRed) currentPose.translation.minus(targetTranslation) else targetTranslation.minus(currentPose.translation)
         val targetRotation = translationToTarget.angle
+        val distance = FieldUtil.getDistanceToPose(currentPose, targetTranslation)
 
         throttle =
             abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *
@@ -69,14 +71,14 @@ class AimAtTargetCommand(
         )
 
         shooter.setFlywheelVelocityInternal(
-            RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(FieldUtil.getDistanceToFriendlyHub(drive.pose)))
+            RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
         )
         shooter.setHoodAngleInternal(
-            Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(FieldUtil.getDistanceToFriendlyHub(drive.pose)))
+            Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance))
         )
 
         Logger.recordOutput("Align/HeadingErrorRads", driveWithHeading.HeadingController.positionError)
-        Logger.recordOutput("Align/DistanceToHubMeters", FieldUtil.getDistanceToFriendlyHub(drive.pose))
+        Logger.recordOutput("Align/DistanceToHubMeters", distance)
     }
 
     fun atHeadingSetpoint(): Boolean = driveWithHeading.HeadingController.atSetpoint()

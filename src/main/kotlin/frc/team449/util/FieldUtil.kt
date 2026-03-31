@@ -28,6 +28,7 @@ object FieldUtil {
 
     fun getDistanceToFriendlyHub(robotPose: Pose2d): Double = robotPose.translation.getDistance(HUB)
     fun getClosestFriendlyTrench(robotPose: Pose2d): Pose2d = TRENCHES.minBy { it.translation.getDistance(robotPose.translation) }
+    fun getDistanceToPose(robotPose: Pose2d, targetTranslation: Translation2d): Double = robotPose.translation.getDistance(targetTranslation)
     fun getClosestFriendlyPass(robotPose: Pose2d): Translation2d = PASSES.minBy { it.getDistance(robotPose.translation) }
 
     // flip (wall-blue zero)
