@@ -12,15 +12,15 @@ import kotlin.math.PI
 object FieldUtil {
     val isRed: Boolean get() = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
 
-    private val BLUE_HUB: Translation2d = Translation2d(4.625594, 4.034536)
+    private val BLUE_HUB: Translation2d = FieldConstants.BLUE_HUB
     private val RED_HUB: Translation2d = BLUE_HUB.flipped()
     val HUB: Translation2d get() = if (isRed) RED_HUB else BLUE_HUB
 
-    private val BLUE_TRENCHES: Array<Pose2d> = arrayOf(Pose2d(4.35, 0.45, Rotation2d(1.5)), Pose2d(4.35, 7.60, Rotation2d(-1.5)))
+    private val BLUE_TRENCHES: Array<Pose2d> = FieldConstants.BLUE_TRENCHES
     private val RED_TRENCHES: Array<Pose2d> = Array(BLUE_TRENCHES.size) { i -> BLUE_TRENCHES[i].flipped() }
     val TRENCHES: Array<Pose2d> get() = if (isRed) RED_TRENCHES else BLUE_TRENCHES
 
-    private val BLUE_PASSES: Array<Translation2d> = arrayOf(Translation2d(1.65, 1.4), Translation2d(1.65, 6.6))
+    private val BLUE_PASSES: Array<Translation2d> = FieldConstants.BLUE_PASSES
     private val RED_PASSES: Array<Translation2d> = Array(BLUE_PASSES.size) { i -> BLUE_PASSES[i].flipped() }
     val PASSES: Array<Translation2d> get() = if (isRed) RED_PASSES else BLUE_PASSES
 

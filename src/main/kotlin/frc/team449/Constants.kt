@@ -58,7 +58,7 @@ object Constants {
     }
 
     object AutoConstants {
-        // auto constants TODO: tune
+        // --- PATH FOLLOWING GAINS ---
         const val TRANSLATION_P = 3.2
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.1
@@ -71,14 +71,29 @@ object Constants {
         const val CTE_I = 0.0
         const val CTE_D = 0.0
 
+        // --- OPERATION TIMING ---
         const val AUTO_SHOOTING_TIME_SEC = 4.5
+
+        // --- SPEED LIMITS ---
         const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
         const val AUTO_ANGULAR_ACCEL_RADS_PER_SEC_PER_SEC = 4 * PI
     }
 
     object FieldConstants {
+        // --- FIELD DIMENSIONS ---
         val FIELD_LENGTH_METERS = VisionConstants.REBUILT_FIELD_LAYOUT.fieldLength
         val FIELD_WIDTH_METERS = VisionConstants.REBUILT_FIELD_LAYOUT.fieldWidth
+
+        // --- BLUE ALLIANCE LANDMARKS ---
+        val BLUE_HUB: Translation2d = Translation2d(4.625594, 4.034536)
+        val BLUE_TRENCHES: Array<Pose2d> = arrayOf(
+            Pose2d(4.35, 0.45, Rotation2d(1.5)),
+            Pose2d(4.35, 7.60, Rotation2d(-1.5))
+        )
+        val BLUE_PASSES: Array<Translation2d> = arrayOf(
+            Translation2d(1.65, 1.4),
+            Translation2d(1.65, 6.6)
+        )
     }
 
     object ShooterConstants {
