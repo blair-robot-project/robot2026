@@ -207,6 +207,23 @@ class BLineRoutines(
         )
     }
 
+    private fun citrusTest(mirror: Boolean): Command {
+        val path1 = Path("test_pt1")
+        val path2 = Path("test_pt2")
+        val path3 = Path("test_pt3")
+
+        eventTriggerCommands()
+
+        return Commands.sequence(
+            drive.alignModules(Rotation2d.kCW_90deg),
+            pathBuilderWithReset(mirror).build(path1),
+            pathBuilderWithReset(mirror).build(path2),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilderWithReset(mirror).build(path3)
+
+        )
+    }
+
     fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
         autoChooser.addDefaultOption("Do Nothing", nothing())
         autoChooser.addOption("Preload Hub", preloadHubShot())
@@ -220,5 +237,6 @@ class BLineRoutines(
         autoChooser.addOption("L Half Loop", halfAndLoop(true))
 
         autoChooser.addOption("Citrus Far Bump", citrusFarBump(true))
+        autoChooser.addOption("Test Part 1", citrusTest(true))
     }
 }
