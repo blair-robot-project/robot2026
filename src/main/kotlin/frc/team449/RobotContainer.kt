@@ -29,6 +29,8 @@ import frc.team449.subsystems.vision.VisionIOLimelight
 import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 import frc.team449.subsystems.vision.VisionSubsystem
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
+import ShootOnTheMove.*
+import edu.wpi.first.units.Units.Degrees
 
 object RobotContainer {
     // driver controller
@@ -130,6 +132,40 @@ object RobotContainer {
     val actions = RobotActions(this)
     val bindings = Bindings(this)
 
+    val shotCalculatorConfig = ShotCalculator.Config().apply {
+        launcherOffsetX = 0.23
+        launcherOffsetY = 0.0
+        phaseDelayMs = 30.0
+        mechLatencyMs = 20.0
+        maxTiltDeg = 5.0
+        headingSpeedScalar = 1.0
+        headingReferenceDistance = 2.5
+    }
+
+    val shotCalcSimParams = ProjectileSimulator.SimParameters(
+        0.215,   // ball mass kg
+        0.1501,  // ball diameter m
+        0.47,    // drag coeff
+        0.2,     // Magnus coeff
+        1.225,   // air density
+        0.43,    // exit height m
+        0.1016,  // flywheel diameter m
+        1.83,    // target height m
+        0.6,     // slip factor
+        45.0,    // launch angle degrees
+        0.001,   // sim timestep
+        1500.0, 5000.0, 25, 5.0  // RPM range, iterations, max sim time
+    )
+    val shotCalcSim = ProjectileSimulator(shotCalcSimParams)
+    val shotCalculator = ShotCalculator(shotCalculatorConfig)
+
+    init {
+        val minAngleDeg = Constants.ShooterConstants.MIN_HOOD_ANGLE.`in`(Degrees)
+        val maxAngleDeg = Constants.ShooterConstants.MAX_HOOD_ANGLE.`in`(Degrees)
+        shotCalculator.loadShotLUT(
+            shotCalcSim.generateVariableAngleShotLUT(minAngleDeg, maxAngleDeg, 0.2)
+        )
+    }
     val bLineRoutines = BLineRoutines(drive, actions)
     val autoChooser = LoggedDashboardChooser<Command>("Auto Routines")
 }

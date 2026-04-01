@@ -13,8 +13,11 @@ object FieldUtil {
     val isRed: Boolean get() = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
 
     private val BLUE_HUB: Translation2d = Translation2d(4.625594, 4.034536)
+    private val BLUE_HUB_FORWARD: Translation2d = Translation2d(1.0, 0.0)
     private val RED_HUB: Translation2d = BLUE_HUB.flipped()
+    private val RED_HUB_FORWARD: Translation2d = BLUE_HUB_FORWARD.flipped()
     val HUB: Translation2d get() = if (isRed) RED_HUB else BLUE_HUB
+    val HUB_FORWARD: Translation2d get() = if (isRed) RED_HUB_FORWARD else BLUE_HUB_FORWARD
 
     private val BLUE_TRENCHES: Array<Pose2d> = arrayOf(Pose2d(4.35, 0.45, Rotation2d(1.5)), Pose2d(4.35, 7.60, Rotation2d(-1.5)))
     private val RED_TRENCHES: Array<Pose2d> = Array(BLUE_TRENCHES.size) { i -> BLUE_TRENCHES[i].flipped() }

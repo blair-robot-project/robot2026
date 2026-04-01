@@ -15,6 +15,7 @@ import frc.team449.util.FieldUtil
 import org.littletonrobotics.junction.Logger
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
+import ShootOnTheMove.*
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sign
@@ -22,6 +23,7 @@ import kotlin.math.sign
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
     private val shooter: ShooterSubsystem,
+    private val shotCalculator: ShotCalculator,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val maxLinearSpeedMetersPerSecond: Double = DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SEC,
@@ -67,6 +69,18 @@ class AimAtTargetCommand(
                 .withVelocityX(throttle)
                 .withVelocityY(strafe)
                 .withTargetDirection(targetRotation)
+        )
+
+        //sotm calcs
+        val shotInputs = ShotCalculator.ShotInputs(
+            currentPose,
+            drive.getFieldRelativeSpeeds(),
+            drive.getRobotRelativeSpeeds(),
+            FieldUtil.HUB,
+            FieldUtil.HUB,
+            0.9,
+            0.0,
+            0.0
         )
 
         shooter.setFlywheelVelocityInternal(
