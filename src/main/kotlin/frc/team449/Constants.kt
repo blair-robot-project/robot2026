@@ -113,7 +113,7 @@ object Constants {
         // --- CURRENT & OPERATIONAL LIMITS ---
         const val FLYWHEEL_SUPPLY_LIM = 30.0
         const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 20.0
+        const val HOOD_SUPPLY_LIM = 15.0
         const val HOOD_STATOR_LIM = 20.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
@@ -123,8 +123,8 @@ object Constants {
         const val FLYWHEEL_KP = 0.55
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.286
-        const val FLYWHEEL_KV = 0.2073
+        const val FLYWHEEL_KS = 0.2237
+        const val FLYWHEEL_KV = 0.2036
         // const val FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
@@ -195,7 +195,7 @@ object Constants {
         val RIGHT_PIVOT_INVERSION = InvertedValue.CounterClockwise_Positive
 
         val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Brake
-        val LEFT_ROLLER_INVERSION = InvertedValue.Clockwise_Positive
+        val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
         // --- PHYSICAL SPECS & GEARING ---

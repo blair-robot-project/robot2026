@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class ShooterSubsystem(
-    private val io: ShooterIO,
+    private val io: ShooterIO
 ) : SubsystemBase() {
     private val inputs: ShooterIOInputsAutoLogged = ShooterIOInputsAutoLogged()
 
