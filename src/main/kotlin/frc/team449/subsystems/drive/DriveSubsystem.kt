@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
+import frc.team449.Constants
 import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
@@ -100,7 +101,7 @@ class DriveSubsystem(
 
                 abs(target.minus(state).degrees) <= MODULE_ALIGN_TOLERANCE
             }
-        }
+        }.withTimeout(0.5)
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
@@ -117,6 +118,15 @@ class DriveSubsystem(
     fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
         io.setSupplyLimits(driveSupplyLimitAmps, steerSupplyLimitAmps)
     }
+
+    fun isWithinTolerance(): Boolean = abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) <
+        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+        abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) <
+        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+        abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) <
+        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+        abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) <
+        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE
 
     private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     val sysIDTranslationRoutine =

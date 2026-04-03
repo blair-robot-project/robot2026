@@ -23,6 +23,8 @@ object FieldUtil {
             Pose2d(4.35, 7.60, Rotation2d(-1.5)),
         )
 
+    var autoWinnerLogged = false
+
     fun initialize() {
         Logger.recordOutput("Auto Winner", Color.kDimGray.toHexString())
     }
@@ -61,12 +63,20 @@ object FieldUtil {
         }
     }
 
-    fun updateAutoWinner() {
+    fun updateAutoWinner(): Boolean {
         val autoWinner = DriverStation.getGameSpecificMessage()
 
-        if (autoWinner.isBlank()) return
+        if (autoWinner.isBlank()) return false
 
-        if (autoWinner == "R") Logger.recordOutput("Auto Winner", Color.kRed.toHexString())
-        if (autoWinner == "B") Logger.recordOutput("Auto Winner", Color.kBlue.toHexString())
+        if (autoWinner == "R") {
+            Logger.recordOutput("Auto Winner", Color.kRed.toHexString())
+            return true
+        }
+        if (autoWinner == "B") {
+            Logger.recordOutput("Auto Winner", Color.kBlue.toHexString())
+            return true
+        }
+
+        return false
     }
 }

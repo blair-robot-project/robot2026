@@ -9,21 +9,13 @@ import frc.team449.Constants.ShooterConstants
 import frc.team449.Constants.ShooterConstants.HOOD_TOLERANCE_RAD
 import frc.team449.RobotContainer
 import frc.team449.subsystems.drive.DriveIOInputsAutoLogged
-import kotlin.math.abs
 
 class SystemCheckCommand(
     private val robotContainer: RobotContainer
 ) : SequentialCommandGroup() {
     private val driveRequest = SwerveRequest.RobotCentric()
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
-    private val acceptableError = 0.2
-
-    fun isWithinTolerance(): Boolean {
-        return abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) < acceptableError &&
-                abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) < acceptableError &&
-                abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) < acceptableError &&
-                abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) < acceptableError
-    }
+    private var subSystemsAtTolerance = ""
 
     init {
         addRequirements(
@@ -40,28 +32,28 @@ class SystemCheckCommand(
                 )
             },
             WaitCommand(0.5),
-            Commands.runOnce({ Alert("DRIVE FORWARD DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
+            Commands.runOnce({ subSystemsAtTolerance += "BAD FORWARD DIRECTION, " }).onlyIf { !robotContainer.drive.isWithinTolerance() },
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     driveRequest.withVelocityX(0.0).withVelocityY(1.0),
                 )
             },
             WaitCommand(0.5),
-            Commands.runOnce({ Alert("DRIVE RIGHT DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
+            Commands.runOnce({ subSystemsAtTolerance += "BAD RIGHT DIRECTION, " }).onlyIf { !robotContainer.drive.isWithinTolerance() },
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     driveRequest.withVelocityX(-1.0).withVelocityY(0.0),
                 )
             },
             WaitCommand(0.5),
-            Commands.runOnce({ Alert("DRIVE BACKWARD DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
+            Commands.runOnce({ subSystemsAtTolerance += "BAD BACKWARD DIRECTION, " }).onlyIf { !robotContainer.drive.isWithinTolerance() },
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     driveRequest.withVelocityX(0.0).withVelocityY(-1.0),
                 )
             },
             WaitCommand(0.5),
-            Commands.runOnce({ Alert("DRIVE LEFT DIRECTION OFF", Alert.AlertType.kError).set(!isWithinTolerance()) }),
+            Commands.runOnce({ subSystemsAtTolerance += "BAD LEFT DIRECTION, " }).onlyIf { !robotContainer.drive.isWithinTolerance() },
             robotContainer.drive.runOnce {
                 robotContainer.drive.setControl(
                     SwerveRequest.SwerveDriveBrake(),
@@ -77,25 +69,25 @@ class SystemCheckCommand(
                         .withTimeout(
                             0.5,
                         ),
-                    Commands.runOnce({ Alert("BAD PIVOT DEPLOY", Alert.AlertType.kError).set(!robotContainer.intake.pivotAtTolerance()) }),
-                    Commands.runOnce({ Alert("BAD ROLLER", Alert.AlertType.kError).set(!robotContainer.intake.rollerAtTolerance()) }),
+                    Commands.runOnce({ subSystemsAtTolerance += "BAD PIVOT DEPLOY" }).onlyIf { !robotContainer.intake.pivotAtTolerance() },
+                    Commands.runOnce({ subSystemsAtTolerance += "BAD ROLLER" }).onlyIf { !robotContainer.intake.rollerAtTolerance() },
                 ).withTimeout(2.0),
             robotContainer.intake.stopRollers().withTimeout(0.1),
             robotContainer.intake.stow(),
             Commands.waitUntil { robotContainer.intake.pivotAtTolerance() }.withTimeout(0.5),
-            Commands.runOnce({ Alert("BAD PIVOT STOW", Alert.AlertType.kError).set(!robotContainer.intake.pivotAtTolerance()) }),
+            Commands.runOnce({ subSystemsAtTolerance += "BAD PIVOT STOW" }).onlyIf { !robotContainer.intake.pivotAtTolerance() },
             // -----------INDEXER-----------
             robotContainer.indexer.index(12.0, 3.0, 12.0).withTimeout(2.0).alongWith(
                 Commands.waitUntil { robotContainer.indexer.indexerAtTolerance() }.withTimeout(0.5),
-                Commands.runOnce({ Alert("BAD INDEXER", Alert.AlertType.kError).set(!robotContainer.indexer.indexerAtTolerance()) }),
+                Commands.runOnce({ subSystemsAtTolerance += "BAD INDEXER" }).onlyIf { !robotContainer.indexer.indexerAtTolerance() },
             ),
             robotContainer.indexer.stop().withTimeout(0.1),
             // -----------SHOOTER---------
             robotContainer.shooter.homeHood(),
             Commands.waitUntil { robotContainer.shooter.hoodAngle == 0.0 }.withTimeout(0.5),
-            Commands.runOnce(
-                { Alert("DID NOT HOME HOOD", Alert.AlertType.kError).set(robotContainer.shooter.hoodAngle >= HOOD_TOLERANCE_RAD) },
-            ),
+            Commands.runOnce({ subSystemsAtTolerance += "DID NOT HOME HOOD" }).onlyIf {
+                robotContainer.shooter.hoodAngle >= HOOD_TOLERANCE_RAD
+            },
             robotContainer.shooter.setHoodAngle(ShooterConstants.TRENCH_HOOD_ANGLE).withTimeout(1.0),
             robotContainer.shooter
                 .setFlywheelVelocity(ShooterConstants.TRENCH_FLYWHEEL_VEL)
@@ -105,12 +97,12 @@ class SystemCheckCommand(
                         .withTimeout(
                             0.75,
                         ),
-                    Commands.runOnce(
-                        { Alert("BAD TRENCH FLYWHEEL", Alert.AlertType.kError).set(!robotContainer.shooter.isFlywheelAtTolerance()) },
-                    ),
-                    Commands.runOnce(
-                        { Alert("BAD TRENCH HOOD ANGLE", Alert.AlertType.kError).set(!robotContainer.shooter.isHoodAtTolerance()) },
-                    ),
+                    Commands.runOnce({ subSystemsAtTolerance += "BAD TRENCH FLYWHEEL" }).onlyIf {
+                        !robotContainer.shooter.isFlywheelAtTolerance()
+                    },
+                    Commands.runOnce({ subSystemsAtTolerance += "BAD TRENCH HOOD ANGLE" }).onlyIf {
+                        !robotContainer.shooter.isHoodAtTolerance()
+                    },
                 ).withTimeout(2.0),
             robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE).withTimeout(0.8),
             robotContainer.shooter
@@ -121,15 +113,16 @@ class SystemCheckCommand(
                         .withTimeout(
                             0.75,
                         ),
-                    Commands.runOnce(
-                        { Alert("BAD MAX HOOD ANGLE", Alert.AlertType.kError).set(!robotContainer.shooter.isHoodAtTolerance()) },
-                    ),
-                    Commands.runOnce(
-                        { Alert("BAD HUB FLYWHEEL", Alert.AlertType.kError).set(!robotContainer.shooter.isFlywheelAtTolerance()) },
-                    ),
+                    Commands.runOnce({ subSystemsAtTolerance += "BAD MAX HOOD ANGLE" }).onlyIf {
+                        !robotContainer.shooter.isHoodAtTolerance()
+                    },
+                    Commands.runOnce({ subSystemsAtTolerance += "BAD HUB FLYWHEEL" }).onlyIf {
+                        !robotContainer.shooter.isFlywheelAtTolerance()
+                    },
                 ).withTimeout(2.0),
             robotContainer.shooter.stopFlywheel().withTimeout(0.2),
             robotContainer.shooter.homeHood().withTimeout(0.5),
+            Commands.run({ Alert(subSystemsAtTolerance, Alert.AlertType.kError) }),
         )
     }
 }

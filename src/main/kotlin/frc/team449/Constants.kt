@@ -55,6 +55,7 @@ object Constants {
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
         const val MODULE_ALIGN_TOLERANCE = 5.0 // degrees
+        const val DRIVE_POSITION_TOLERANCE = 0.2
     }
 
     object AutoConstants {
