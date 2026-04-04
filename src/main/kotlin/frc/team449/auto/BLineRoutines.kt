@@ -109,9 +109,10 @@ class BLineRoutines(
             .withShouldMirror { mirror }
 
     private fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
-        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
-        FollowPath.registerEventTrigger("stop_shooting", actions.stopAllAndHomeHood())
+        FollowPath.registerEventTrigger("start_intake", actions.deployAndIntake())
+        FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot(0.8))
+        FollowPath.registerEventTrigger("second_start_shooting", actions.autoTrenchShot(0.8))
+        FollowPath.registerEventTrigger("stop_shooting", actions.stopAll()) // end of auto
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
 

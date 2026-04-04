@@ -23,7 +23,7 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-    const val TUNING_MODE: Boolean = true
+    const val TUNING_MODE: Boolean = false
 
     // --- SYSTEM TIMING ---
     const val LOOP_TIME = 0.02
@@ -35,7 +35,6 @@ object Constants {
 
     object DriveConstants {
         // --- LOOP TIMING ---
-        const val SIM_LOOP_TIME = 0.01 // 100 Hz
         const val ODOMETRY_LOOP_HZ = 100.0
 
         // --- PHYSICAL SPECS ---
@@ -44,18 +43,18 @@ object Constants {
         const val WHEEL_COF = 1.4
 
         // --- SPEED LIMITS (STANDARD) ---
-        const val MAX_LINEAR_SPEED_METERS_PER_SECOND = 4.7244
-        const val MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 5.804 / 4 * PI
+        const val MAX_LINEAR_SPEED_METERS_PER_SEC = 4.7244
+        const val MAX_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
 
         // --- SPEED LIMITS (SLOW) ---
-        const val SLOW_LINEAR_SPEED_METERS_PER_SECOND = 1.5
-        const val SLOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 0.5804
+        const val SLOW_LINEAR_SPEED_METERS_PER_SEC = 1.5
+        const val SLOW_ANGULAR_SPEED_RADS_PER_SEC = 0.5804
 
         // --- DEADBANDS & TOLERANCE ---
         const val TRANSLATION_DEADBAND = 0.05
         const val ANGULAR_DEADBAND = 0.1
-        const val MODULE_ALIGN_TOLERANCE = 5.0 // degrees
-        const val DRIVE_POSITION_TOLERANCE = 0.2
+        const val INTERRUPT_DEADBAND = 0.25
+        const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
     }
 
     object AutoConstants {
@@ -64,7 +63,7 @@ object Constants {
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.1
 
-        const val ROTATION_P = 2.8
+        const val ROTATION_P = 3.2
         const val ROTATION_I = 0.0
         const val ROTATION_D = 0.0
 
@@ -72,9 +71,9 @@ object Constants {
         const val CTE_I = 0.0
         const val CTE_D = 0.0
 
-        const val AUTO_SHOOTING_TIME_SEC = 4.0
-        const val AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * PI
-        const val AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND = 4 * PI
+        const val AUTO_SHOOTING_TIME_SEC = 4.5
+        const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
+        const val AUTO_ANGULAR_ACCEL_RADS_PER_SEC_PER_SEC = 4 * PI
     }
 
     object FieldConstants {
@@ -84,20 +83,17 @@ object Constants {
 
     object ShooterConstants {
         // --- HARDWARE IDs ---
-        const val LEFT_FLYWHEEL_LEADER_ID = 11
-        const val LEFT_FLYWHEEL_FOLLOWER_ID = 12
-        const val RIGHT_FLYWHEEL_LEADER_ID = 13
-        const val RIGHT_FLYWHEEL_FOLLOWER_ID = 14
+        const val LEFT_TOP_LEADER_ID = 11
+        const val LEFT_BOTTOM_FOLLOWER_ID = 12
+        const val RIGHT_TOP_FOLLOWER_ID = 13
+        const val RIGHT_BOTTOM_FOLLOWER_ID = 14
         const val HOOD_MOTOR_ID = 15
 
         // --- HARDWARE CONFIGURATION ---
-        val LEFT_FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
-        val LEFT_FLYWHEEL_INVERSION = InvertedValue.CounterClockwise_Positive
-        val LEFT_FLYWHEEL_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
-
-        val RIGHT_FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
-        val RIGHT_FLYWHEEL_INVERSION = InvertedValue.Clockwise_Positive
-        val RIGHT_FLYWHEEL_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
+        val FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
+        val LEFT_LEADER_INVERSION = InvertedValue.CounterClockwise_Positive
+        val LEFT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
+        val RIGHT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
         val HOOD_NEUTRAL_MODE = NeutralModeValue.Brake
         val HOOD_INVERSION = InvertedValue.CounterClockwise_Positive
@@ -122,22 +118,14 @@ object Constants {
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
         val MAX_HOOD_ANGLE: Angle = Radians.of(0.5185)
-        val SHOOTER_HEIGHT: Distance = Inches.of(18.0)
 
         // --- FLYWHEEL GAINS ---
-        const val LEFT_FLYWHEEL_KP = 0.55
-        const val LEFT_FLYWHEEL_KI = 0.0
-        const val LEFT_FLYWHEEL_KD = 0.0
-        const val LEFT_FLYWHEEL_KS = 0.286
-        const val LEFT_FLYWHEEL_KV = 0.2073
-        // const val LEFT_FLYWHEEL_KA = ...
-
-        const val RIGHT_FLYWHEEL_KP = 0.55
-        const val RIGHT_FLYWHEEL_KI = 0.0
-        const val RIGHT_FLYWHEEL_KD = 0.0
-        const val RIGHT_FLYWHEEL_KS = 0.271
-        const val RIGHT_FLYWHEEL_KV = 0.2042
-        // const val RIGHT_FLYWHEEL_KA = ...
+        const val FLYWHEEL_KP = 0.55
+        const val FLYWHEEL_KI = 0.0
+        const val FLYWHEEL_KD = 0.0
+        const val FLYWHEEL_KS = 0.286
+        const val FLYWHEEL_KV = 0.2073
+        // const val FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
         const val HOOD_KP = 5000.0
@@ -149,7 +137,7 @@ object Constants {
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 20.0
+        const val HOMING_CURRENT_AMPS = 18.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
         const val HOMING_DEBOUNCE_TIME = 0.4
 
@@ -158,16 +146,7 @@ object Constants {
         const val TOLERANCE_DEBOUNCE_TIME = 0.2
 
         // --- STATIC SETPOINTS ---
-        val HUB_HOOD_ANGLE: Angle = MIN_HOOD_ANGLE
-        val HUB_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(160.5)
-
-        val TRENCH_HOOD_ANGLE: Angle = Radians.of(0.14)
-        val TRENCH_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
-
-        val TOWER_HOOD_ANGLE: Angle = Radians.of(0.09)
-        val TOWER_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(200.5)
-
-        val TEST_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(20.0)
+        val UNJAM_FLYWHEEL_VEL: AngularVelocity = RadiansPerSecond.of(-20.0)
 
         // --- INTERPOLATION MAPS ---
         val SHOT_TIME_MAP =
@@ -203,9 +182,9 @@ object Constants {
 
     object IntakeConstants {
         // --- HARDWARE IDs ---
-        const val LEFT_PIVOT_MOTOR_ID = 40
-        const val RIGHT_PIVOT_FOLLOWER_ID = 41
-        const val LEFT_ROLLER_MOTOR_ID = 42
+        const val LEFT_PIVOT_ID = 40
+        const val RIGHT_PIVOT_ID = 41
+        const val LEFT_ROLLER_LEADER_ID = 42
         const val RIGHT_ROLLER_FOLLOWER_ID = 43
 
         // --- HARDWARE CONFIGURATION ---
@@ -228,9 +207,9 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 10.0
+        const val PIVOT_SUPPLY_LIMIT = 15.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 10.0
+        const val ROLLER_SUPPLY_LIMIT = 30.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -242,34 +221,19 @@ object Constants {
         const val STOW_VOLTS = -4.0
         const val STOW_HOLD_VOLTS = 0.0
 
-        // --- PIVOT TOLERANCE ---
-        const val PIVOT_TOLERANCE_POS_RADS = 0.175
-
-        // --- ROLLER VELOCITY SETPOINTS ---
-        val INTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(80.0)
-        val OUTTAKE_VELOCITY: AngularVelocity = RotationsPerSecond.of(-40.0)
-
-        // -- ROLLER TOLERANCE ---
-        const val ROLLER_TOLERANCE_VELOCITY_RAD_SEC = 20
-
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
-        const val HOMING_VELOCITY_RAD_PER_SEC = 0.5
-        const val HOMING_DEBOUNCE_TIME = 0.2
+        const val HOMING_VELOCITY_RADS_PER_SEC = 0.5
+        const val HOMING_DEBOUNCE_TIME = 0.1
         const val VIZ_OFFSET_DEG = 33.873
     }
 
-    // INDEXER CONSTANTS STILL SLIGHTLY OFF
     object IndexerConstants {
         // --- HARDWARE IDs ---
-        const val WEDGE_INDEXER_ID = 21
-        const val FLOOR_INDEXER_ID = 22
-        const val TOP_INDEXER_ID = 23
+        const val FLOOR_ID = 22
+        const val TOP_ID = 23
 
         // --- HARDWARE CONFIGURATION ---
-        val WEDGE_NEUTRAL_MODE = NeutralModeValue.Coast
-        val WEDGE_INVERSION = InvertedValue.Clockwise_Positive
-
         val FLOOR_NEUTRAL_MODE = NeutralModeValue.Coast
         val FLOOR_INVERSION = InvertedValue.CounterClockwise_Positive
 
@@ -277,59 +241,28 @@ object Constants {
         val TOP_INVERSION = InvertedValue.Clockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val WEDGE_STATOR_LIMIT = 40.0
-        const val WEDGE_SUPPLY_LIMIT = 5.0
-
+        const val FLOOR_SUPPLY_LIMIT = 20.0
         const val FLOOR_STATOR_LIMIT = 60.0
-        const val FLOOR_SUPPLY_LIMIT = 30.0
 
-        const val TOP_STATOR_LIMIT = 60.0
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_SUPPLY_LIMIT = 40.0
+        const val TOP_STATOR_LIMIT = 80.0
 
         // --- PHYSICAL SPECS & GEARING ---
-        const val WEDGE_GEARING = 1.5
-        const val WEDGE_MOI_KG_MM = 0.001
-
         const val FLOOR_GEARING = 27.0 / 14.0
         const val FLOOR_MOI_KG_MM = 0.005
 
         const val TOP_GEARING = 31.0 / 11.0
         const val TOP_MOI_KG_MM = 0.000000008 // TODO: Find
-
-        // --- WEDGE GAINS ---
-        const val WEDGE_KP = 0.5
-        const val WEDGE_KI = 0.0
-        const val WEDGE_KD = 0.0
-        const val WEDGE_KS = 0.05
-        const val WEDGE_KV = 0.15
-
-        // --- FLOOR GAINS ---
-        const val FLOOR_KP = 1.75
-        const val FLOOR_KI = 0.0
-        const val FLOOR_KD = 0.0
-        const val FLOOR_KS = 0.05
-        const val FLOOR_KV = 0.2
-
-        // --- TOP GAINS ---
-        const val TOP_KP = 0.25
-        const val TOP_KI = 0.0
-        const val TOP_KD = 0.0
-        const val TOP_KS = 0.05
-        const val TOP_KV = 0.34
-
-        // --- SETPOINTS ---
-        val SHOOTING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(240.0)
-        val INTAKING_INDEXER_SPEED: AngularVelocity = RadiansPerSecond.of(30.0)
     }
 
-    object AimbotConstants {
-        // --- AIMBOT GAINS ---
-        const val AIMBOT_KP = 10.0
-        const val AIMBOT_KI = 0.0
-        const val AIMBOT_KD = 0.1
+    object AlignConstants {
+        // --- ALIGN GAINS ---
+        const val ALIGN_KP = 10.0
+        const val ALIGN_KD = 0.05
 
         // --- AIMBOT CONFIGURATION ---
-        const val AIMBOT_HEADING_TOLERANCE_RADIANS = 0.035
+        const val POSITION_TOLERANCE_RADS = 0.035
+        const val VELOCITY_TOLERANCE_RADS_PER_SEC = 0.25
     }
 
     object LEDConstants {
@@ -361,12 +294,12 @@ object Constants {
         // --- CAMERA STANDARD DEVIATION MULTIPLIERS ---
         val CAMERA_STD_DEV_FACTORS: DoubleArray =
             doubleArrayOf(
-                1.0, // Camera 0
-                1.0, // Camera 1
+                1.0, // camera 0
+                1.0, // camera 1
             )
 
-        // TODO: can we name this group and apply if (if necessary?)
-        const val linearStdDevMegatag2Factor: Double = 0.5 // More stable than full 3D solve
-        const val angularStdDevMegatag2Factor: Double = Double.POSITIVE_INFINITY // No rotation data available
+        // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
+        const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
+        const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available
     }
 }

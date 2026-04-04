@@ -20,21 +20,20 @@ import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
 import frc.team449.subsystems.intake.IntakeSubsystem
-import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
+import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
 import frc.team449.subsystems.vision.VisionSubsystem
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 
 object RobotContainer {
-    // driver/op controllers
+    // driver controller
     val driveController: CommandXboxController = CommandXboxController(0)
-    val opController: CommandXboxController = CommandXboxController(1)
-
+    val operatorController: CommandXboxController = CommandXboxController(1)
     var autonomousCommand: Command = PrintCommand("If you see this, you probably didn't run an auto.")
 
     val drive: DriveSubsystem =
@@ -77,28 +76,28 @@ object RobotContainer {
                     drive::addVisionMeasurement,
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
-                        { drive.pose.rotation },
+                        drive.pose::getRotation,
                         drive::getAngularVelocity,
                         VisionConstants.ROBOT_TO_CAMERA_RIGHT
                     ),
                     VisionIOLimelight(
                         VisionConstants.CAMERA_LEFT_NAME,
-                        { drive.pose.rotation },
+                        drive.pose::getRotation,
                         drive::getAngularVelocity,
                         VisionConstants.ROBOT_TO_CAMERA_LEFT
                     )
                 )
-//            Mode.SIM ->
-//                VisionSubsystem(
-//                    drive::addVisionMeasurement,
-//                    VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT, { drive.pose }),
-//                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT, { drive.pose }),
-//                )
+            Mode.SIM ->
+                VisionSubsystem(
+                    drive::addVisionMeasurement,
+                    VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
+                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
+                )
             else -> VisionSubsystem(
                 drive::addVisionMeasurement,
                 object : VisionIO {},
                 object : VisionIO {}
-            ).also { vision = it }
+            )
         }
 
     val intake: IntakeSubsystem =
@@ -128,16 +127,7 @@ object RobotContainer {
             },
         )
 
-    val power: PowerSubsystem =
-        PowerSubsystem(
-            this.drive,
-            this.intake,
-            this.indexer,
-            this.shooter
-        )
-
     val actions = RobotActions(this)
-
     val bindings = Bindings(this)
 
     val bLineRoutines = BLineRoutines(drive, actions)

@@ -20,127 +20,85 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
-    // boolean over position logging increases speed and is easier to read
     var pivotIsDeployed: Boolean = false
+        private set
     var pivotTargetAngleRads: Double = 0.0
+        private set
     var rollerTargetVolts: Double = 0.0
+        private set
 
     val pivotAngle: Double
-        get() = inputs.leftPivotLeaderPositionRad
+        get() = inputs.leftPivotPositionRads
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
 
+        pivotIsDeployed = determinePivotDeployedState()
         Logger.recordOutput("Intake/PivotIsDeployed", pivotIsDeployed)
         Logger.recordOutput("Intake/RollerTargetVolts", rollerTargetVolts)
-        Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadPerSec > 10.0))
+        Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadsPerSec > 10.0))
+        Logger.recordOutput("Intake/ActiveCommand", currentCommand?.name ?: "None")
     }
 
-    fun intake(): Command =
-        this
-            .run {
-                rollerTargetVolts = 11.0
-                io.setRollerVoltage(11.0)
-            }.withName("Intake")
-
-    fun intakeSlow(): Command =
-        this
-            .run {
-                rollerTargetVolts = 4.0
-                io.setRollerVoltage(4.0)
-            }.withName("IntakeSlow")
-
-    fun outtake(): Command =
-        this
-            .run {
-                rollerTargetVolts = -4.0
-                io.setRollerVoltage(-4.0)
-            }.withName("Outtake")
+    fun setRollerVoltage(rollerVolts: Double): Command =
+        runOnce {
+            rollerTargetVolts = rollerVolts
+            io.setRollerVoltage(rollerTargetVolts)
+        }
+            .withName("ROLLER-VOLTS")
 
     fun stopRollers(): Command =
-        this
-            .run {
-                rollerTargetVolts = 0.0
-                io.setRollerVoltage(0.0)
-            }.withName("StopRoller")
+        runOnce {
+            rollerTargetVolts = 0.0
+            io.setRollerVoltage(0.0)
+        }
+            .withName("ROLLER-STOP")
 
-    fun setPivotAngle(angle: Angle): Command =
-        this
-            .run {
-                pivotTargetAngleRads = angle.`in`(Radians)
-                io.setPivotAngle(angle)
-            }
+    fun setPivotAngle(pivotAngle: Angle): Command =
+        runOnce {
+            pivotTargetAngleRads = pivotAngle.`in`(Radians)
+            io.setPivotAngle(pivotAngle)
+        }
+            .withName("PIVOT-ANGLE")
 
-    fun resetPivotAngle(angle: Angle) {
-        this
-            .run {
-                io.resetPivotAngle(angle)
-            }
-    }
+    fun setPivotVoltage(pivotVolts: Double): Command =
+        runOnce {
+            io.setPivotVoltage(pivotVolts)
+        }
+            .withName("PIVOT-VOLTS")
 
-    fun deploy(): Command =
-        slamHoming(
-            true,
-            IntakeConstants.DEPLOY_VOLTS,
-            IntakeConstants.DEPLOY_HOLD_VOLTS,
-        ).withName("Deploy")
-
-    fun stow(): Command =
-        slamHoming(
-            false,
-            IntakeConstants.STOW_VOLTS,
-            IntakeConstants.STOW_HOLD_VOLTS,
-        ).withName("Stow")
-
-    fun setSupplyLimits(
-        pivotSupplyLimitAmps: Double,
-        rollerSupplyLimitAmps: Double
-    ) {
-        io.setSupplyLimits(pivotSupplyLimitAmps, rollerSupplyLimitAmps)
-    }
+    fun deploy(): Command = slamHoming(targetIsDeployed = true).withName("PIVOT-DEPLOY")
+    fun stow(): Command = slamHoming(targetIsDeployed = false).withName("PIVOT-STOW")
 
     private fun slamHoming(
-        isDeployed: Boolean,
-        moveVolts: Double,
-        holdVolts: Double
+        targetIsDeployed: Boolean
     ): Command =
-        this.defer {
-            pivotIsDeployed = isDeployed
+        defer {
             val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
+            val moveVolts = if (targetIsDeployed) IntakeConstants.DEPLOY_VOLTS else IntakeConstants.STOW_VOLTS
+            val holdVolts = if (targetIsDeployed) IntakeConstants.DEPLOY_HOLD_VOLTS else IntakeConstants.STOW_HOLD_VOLTS
+            val pivotAngleRads: Double = if (targetIsDeployed) IntakeConstants.DEPLOY_POS_RADS else IntakeConstants.STOW_POS_RADS
 
-            this
-                .run {
-                    io.setPivotVoltage(moveVolts)
-                }.until {
-                    val highCurrent = abs(inputs.leftPivotLeaderStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
-                    val lowVelocity = abs(inputs.leftPivotLeaderVelocityRadPerSec) < IntakeConstants.HOMING_VELOCITY_RAD_PER_SEC
+            run {
+                io.setPivotVoltage(moveVolts)
+            }
+                .until {
+                    val highCurrent = abs(inputs.leftPivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+                    val lowVelocity = abs(inputs.leftPivotVelocityRadsPerSec) < IntakeConstants.HOMING_VELOCITY_RADS_PER_SEC
                     hardstopDebouncer.calculate(highCurrent && lowVelocity)
-                }.andThen(
+                }
+                .andThen(
                     runOnce {
-                        val pivotAngleRads: Double = if (pivotIsDeployed) IntakeConstants.DEPLOY_POS_RADS else IntakeConstants.STOW_POS_RADS
                         io.resetPivotAngle(Radians.of(pivotAngleRads))
                         io.setPivotVoltage(holdVolts)
-                    },
+                    }
                 )
         }
 
-    // Checks Left Pivot Leader to see if it's in a tolerable range
-    fun pivotAtTolerance(): Boolean {
-        val target: Double =
-            if (pivotIsDeployed) {
-                IntakeConstants.DEPLOY_POS_RADS
-            } else {
-                IntakeConstants.STOW_POS_RADS
-            }
-        return abs(pivotAngle - target) <=
-            IntakeConstants.PIVOT_TOLERANCE_POS_RADS
+    private fun determinePivotDeployedState(): Boolean {
+        return abs(inputs.leftPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1 && abs(inputs.rightPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1
     }
-
-    // Checks the rollerVelocity is in a tolerable range
-    fun rollerAtTolerance(): Boolean =
-        abs(inputs.leftRollerLeaderAppliedVolts - rollerTargetVolts) <= 1.0 &&
-            abs(inputs.rightRollerFollowerAppliedVolts - rollerTargetVolts) <= 1.0
 
     val sysIDPivot =
         SysIdRoutine(

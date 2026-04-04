@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants
-import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
+import frc.team449.Constants.DriveConstants
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
@@ -38,6 +38,10 @@ class DriveSubsystem(
 
     val modulePositions: Array<SwerveModulePosition>
         get() = inputs.ModulePositions
+
+    private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
+    private val brakeRequest = SwerveRequest.SwerveDriveBrake()
+    private val alignModulesRequest = SwerveRequest.PointWheelsAt()
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -89,19 +93,25 @@ class DriveSubsystem(
             DegreesPerSecond.of(inputs.yawVelocityDegreesPerSecond)
         )
 
-    fun xLock(): Command = run { io.setControl(SwerveRequest.SwerveDriveBrake()) }
+    fun xLock(): Command =
+        run {
+            io.setControl(brakeRequest)
+        }
+            .withName("X-LOCK")
 
     fun alignModules(direction: Rotation2d): Command =
         run {
-            io.setControl(SwerveRequest.PointWheelsAt().withModuleDirection(direction))
+            io.setControl(alignModulesRequest.withModuleDirection(direction))
         }.until {
             (0..3).all { i ->
                 val target = inputs.ModuleTargets[i].angle
                 val state = inputs.ModuleStates[i].angle
 
-                abs(target.minus(state).degrees) <= MODULE_ALIGN_TOLERANCE
+                abs(target.minus(state).degrees) <= DriveConstants.MODULE_ALIGN_TOLERANCE_DEG
             }
-        }.withTimeout(0.5)
+        }
+            .withName("ALIGN")
+            .withTimeout(0.5)
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
@@ -114,21 +124,14 @@ class DriveSubsystem(
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
-
-    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
-        io.setSupplyLimits(driveSupplyLimitAmps, steerSupplyLimitAmps)
-    }
-
     fun isWithinTolerance(): Boolean = abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) <
-        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
-        abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) <
-        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
-        abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) <
-        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
-        abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) <
-        Constants.DriveConstants.DRIVE_POSITION_TOLERANCE
-
-    private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
+            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) <
+            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) <
+            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) <
+            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE
     val sysIDTranslationRoutine =
         SysIdRoutine(
             SysIdRoutine.Config(
