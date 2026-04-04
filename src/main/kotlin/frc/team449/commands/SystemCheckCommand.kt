@@ -91,7 +91,7 @@ class SystemCheckCommand(
             // -----------SHOOTER---------
             testSubSystem(
                 robotContainer.shooter.setFlywheelVelocity(
-                    RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(1.3)), // FIX IT
+                    RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(1.3)),
                 ),
                 robotContainer.shooter.isFlywheelAtTolerance(),
                 0.5,

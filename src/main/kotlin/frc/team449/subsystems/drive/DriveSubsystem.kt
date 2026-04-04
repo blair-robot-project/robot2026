@@ -124,14 +124,16 @@ class DriveSubsystem(
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
-    fun isWithinTolerance(): Boolean = abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) <
-            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+
+    fun isWithinTolerance(): Boolean =
+        abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) <
+            DriveConstants.DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) <
-            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            DriveConstants.DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) <
-            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            DriveConstants.DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) <
-            Constants.DriveConstants.DRIVE_POSITION_TOLERANCE
+            DriveConstants.DRIVE_POSITION_TOLERANCE
     val sysIDTranslationRoutine =
         SysIdRoutine(
             SysIdRoutine.Config(
