@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 import frc.team449.subsystems.drive.DriveIOInputsAutoLogged
@@ -15,18 +16,6 @@ class SystemCheckCommand(
     private val driveRequest = SwerveRequest.RobotCentric()
     private val inputs: DriveIOInputsAutoLogged = DriveIOInputsAutoLogged()
     private var errors = mutableListOf<String>()
-    val hoodToleranceCondition: Boolean
-        get() = robotContainer.shooter.isHoodAtTolerance()
-    val flywheelToleranceCondition: Boolean
-        get() = robotContainer.shooter.isFlywheelAtTolerance()
-    val swerveToleranceCondition: Boolean
-        get() = robotContainer.drive.isWithinTolerance()
-    val indexerToleranceCondition: Boolean
-        get() = robotContainer.indexer.indexerAtTolerance()
-    val pivotToleranceCondition: Boolean
-        get() = robotContainer.intake.pivotAtTolerance()
-    val rollerToleranceCondition: Boolean
-        get() = robotContainer.intake.rollerAtTolerance()
 
     init {
         addRequirements(
@@ -43,7 +32,7 @@ class SystemCheckCommand(
                         driveRequest.withVelocityX(1.0).withVelocityY(0.0),
                     )
                 },
-                swerveToleranceCondition,
+                robotContainer.drive.isWithinTolerance(),
                 0.5,
                 "BAD FORWARD DIRECTION",
             ),
@@ -53,7 +42,7 @@ class SystemCheckCommand(
                         driveRequest.withVelocityX(0.0).withVelocityY(1.0),
                     )
                 },
-                swerveToleranceCondition,
+                robotContainer.drive.isWithinTolerance(),
                 0.5,
                 "BAD RIGHT DIRECTION",
             ),
@@ -63,7 +52,7 @@ class SystemCheckCommand(
                         driveRequest.withVelocityX(-1.0).withVelocityY(0.0),
                     )
                 },
-                swerveToleranceCondition,
+                robotContainer.drive.isWithinTolerance(),
                 0.5,
                 "BAD BACKWARD DIRECTION",
             ),
@@ -73,7 +62,7 @@ class SystemCheckCommand(
                         driveRequest.withVelocityX(0.0).withVelocityY(-1.0),
                     )
                 },
-                swerveToleranceCondition,
+                robotContainer.drive.isWithinTolerance(),
                 0.5,
                 "BAD LEFT DIRECTION",
             ),
@@ -83,28 +72,28 @@ class SystemCheckCommand(
                 )
             },
             // -----------INTAKE-----------
-            testSubSystem(robotContainer.intake.intake(), rollerToleranceCondition, 1.0, "BAD ROLLER"),
-            testSubSystem(robotContainer.intake.deploy(), pivotToleranceCondition, 1.0, "BAD PIVOT DEPLOY"),
+            testSubSystem(robotContainer.intake.intake(), robotContainer.intake.rollerAtTolerance(), 1.0, "BAD ROLLER"),
+            testSubSystem(robotContainer.intake.deploy(), robotContainer.intake.pivotAtTolerance(), 1.0, "BAD PIVOT DEPLOY"),
             robotContainer.intake.stopRollers(),
-            testSubSystem(robotContainer.intake.stow(), pivotToleranceCondition, 1.0, "BAD PIVOT STOW"),
+            testSubSystem(robotContainer.intake.stow(), robotContainer.intake.pivotAtTolerance(), 1.0, "BAD PIVOT STOW"),
             // -----------INDEXER-----------
-            testSubSystem(robotContainer.indexer.index(12.0, 3.0, 12.0), indexerToleranceCondition, 1.0, "BAD INDEXER"),
+            testSubSystem(robotContainer.indexer.index(12.0, 3.0, 12.0), robotContainer.indexer.indexerAtTolerance(), 1.0, "BAD INDEXER"),
             robotContainer.indexer.stop().withTimeout(0.1),
             // -----------SHOOTER---------
             testSubSystem(
                 robotContainer.shooter.setFlywheelVelocity(
                     ShooterConstants.TRENCH_FLYWHEEL_VEL,
                 ),
-                flywheelToleranceCondition,
+                robotContainer.shooter.isFlywheelAtTolerance(),
                 0.5,
                 "BAD FLYWHEEL VELOCITY",
             ),
-            testSubSystem(robotContainer.shooter.homeHood(), hoodToleranceCondition, 0.5, "BAD HOME HOOD ANGLE"),
+            testSubSystem(robotContainer.shooter.homeHood(), robotContainer.shooter.isHoodAtTolerance(), 0.5, "BAD HOME HOOD ANGLE"),
             testSubSystem(
                 robotContainer.shooter.setHoodAngle(
                     ShooterConstants.TOWER_HOOD_ANGLE,
                 ),
-                hoodToleranceCondition,
+                robotContainer.shooter.isHoodAtTolerance(),
                 0.75,
                 "BAD TOWER HOOD ANGLE",
             ),
@@ -112,13 +101,13 @@ class SystemCheckCommand(
                 robotContainer.shooter.setHoodAngle(
                     ShooterConstants.TRENCH_HOOD_ANGLE,
                 ),
-                hoodToleranceCondition,
+                robotContainer.shooter.isHoodAtTolerance(),
                 0.75,
                 "BAD TRENCH HOOD ANGLE",
             ),
             testSubSystem(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
-                hoodToleranceCondition,
+                robotContainer.shooter.isHoodAtTolerance(),
                 0.75,
                 "BAD MAX HOOD ANGLE",
             ),
@@ -134,11 +123,9 @@ class SystemCheckCommand(
         timeOut: Double,
         errorMessage: String,
     ): Command =
-        Commands.runOnce(
-            {
-                run { action }
-                Commands.waitUntil { condition }.withTimeout(timeOut)
-                Commands.runOnce({ errors.add(errorMessage) }).onlyIf { !condition }
-            },
+        SequentialCommandGroup(
+            action,
+            Commands.waitUntil { condition }.withTimeout(timeOut),
+            Commands.runOnce({ errors.add(errorMessage) }).onlyIf { !condition },
         )
 }
