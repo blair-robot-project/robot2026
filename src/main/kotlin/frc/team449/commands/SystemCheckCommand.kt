@@ -1,11 +1,12 @@
 package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveRequest
+import edu.wpi.first.units.Units.Radians
+import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 import frc.team449.subsystems.drive.DriveIOInputsAutoLogged
@@ -72,17 +73,25 @@ class SystemCheckCommand(
                 )
             },
             // -----------INTAKE-----------
-            testSubSystem(robotContainer.intake.intake(), robotContainer.intake.rollerAtTolerance(), 1.0, "BAD ROLLER"),
+            testSubSystem(robotContainer.intake.setRollerVoltage(12.0), robotContainer.intake.rollerAtTolerance(), 1.0, "BAD ROLLER"),
             testSubSystem(robotContainer.intake.deploy(), robotContainer.intake.pivotAtTolerance(), 1.0, "BAD PIVOT DEPLOY"),
             robotContainer.intake.stopRollers(),
             testSubSystem(robotContainer.intake.stow(), robotContainer.intake.pivotAtTolerance(), 1.0, "BAD PIVOT STOW"),
             // -----------INDEXER-----------
-            testSubSystem(robotContainer.indexer.index(12.0, 3.0, 12.0), robotContainer.indexer.indexerAtTolerance(), 1.0, "BAD INDEXER"),
+            testSubSystem(
+                robotContainer.indexer.setIndexerVoltage(
+                    0.5,
+                    0.0,
+                ),
+                robotContainer.indexer.indexerAtTolerance(),
+                1.0,
+                "BAD INDEXER",
+            ),
             robotContainer.indexer.stop().withTimeout(0.1),
             // -----------SHOOTER---------
             testSubSystem(
                 robotContainer.shooter.setFlywheelVelocity(
-                    ShooterConstants.TRENCH_FLYWHEEL_VEL,
+                    RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(1.3)), // FIX IT
                 ),
                 robotContainer.shooter.isFlywheelAtTolerance(),
                 0.5,
@@ -90,20 +99,10 @@ class SystemCheckCommand(
             ),
             testSubSystem(robotContainer.shooter.homeHood(), robotContainer.shooter.isHoodAtTolerance(), 0.5, "BAD HOME HOOD ANGLE"),
             testSubSystem(
-                robotContainer.shooter.setHoodAngle(
-                    ShooterConstants.TOWER_HOOD_ANGLE,
-                ),
+                robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
                 robotContainer.shooter.isHoodAtTolerance(),
                 0.75,
-                "BAD TOWER HOOD ANGLE",
-            ),
-            testSubSystem(
-                robotContainer.shooter.setHoodAngle(
-                    ShooterConstants.TRENCH_HOOD_ANGLE,
-                ),
-                robotContainer.shooter.isHoodAtTolerance(),
-                0.75,
-                "BAD TRENCH HOOD ANGLE",
+                "BAD MIN HOOD ANGLE",
             ),
             testSubSystem(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),

@@ -100,6 +100,23 @@ class IntakeSubsystem(
         return abs(inputs.leftPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1 && abs(inputs.rightPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1
     }
 
+    // Checks Left Pivot Leader to see if it's in a tolerable range
+    fun pivotAtTolerance(): Boolean {
+        val target: Double =
+            if (pivotIsDeployed) {
+                IntakeConstants.DEPLOY_POS_RADS
+            } else {
+                IntakeConstants.STOW_POS_RADS
+            }
+        return abs(pivotAngle - target) <=
+            IntakeConstants.PIVOT_TOLERANCE_POS_RADS
+    }
+
+    // Checks the rollerVelocity is in a tolerable range
+    fun rollerAtTolerance(): Boolean =
+        abs(inputs.leftRollerLeaderAppliedVolts - rollerTargetVolts) <= 1.0 &&
+            abs(inputs.rightRollerFollowerAppliedVolts - rollerTargetVolts) <= 1.0
+
     val sysIDPivot =
         SysIdRoutine(
             SysIdRoutine.Config(
