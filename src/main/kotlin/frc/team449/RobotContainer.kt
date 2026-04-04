@@ -76,13 +76,13 @@ object RobotContainer {
                     drive::addVisionMeasurement,
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
-                        drive.pose::getRotation,
+                        { drive.pose },
                         drive::getAngularVelocity,
                         VisionConstants.ROBOT_TO_CAMERA_RIGHT
                     ),
                     VisionIOLimelight(
                         VisionConstants.CAMERA_LEFT_NAME,
-                        drive.pose::getRotation,
+                        { drive.pose },
                         drive::getAngularVelocity,
                         VisionConstants.ROBOT_TO_CAMERA_LEFT
                     )
