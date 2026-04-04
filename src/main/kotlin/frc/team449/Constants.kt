@@ -278,9 +278,15 @@ object Constants {
         const val CAMERA_LEFT_NAME: String = "limelight-left"
 
         // --- ROBOT TO CAMERA TRANSFORMS ---
-        var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, -0.523599))
-        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.2514092 - 0.079375 + 0.0516, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.013, 0.270, 0.539243, Rotation3d(0.0, 0.438377245469, -0.583128849696))
+        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.013, -0.270, 0.539243, Rotation3d(0.0, 0.438377245469, 0.583128849696))
         // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
+
+        // x: -0.270 m
+        // y: 0.013 m
+        // z: -0.539243 m
+        // pitch is up/down - up is positive, down is negative
+        // yaw is left/right - left is positive, right is negative
 
         // --- FILTERING THRESHOLDS --
         const val MAX_AMBIGUITY: Double = 0.15
@@ -301,5 +307,6 @@ object Constants {
         // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
         const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
         const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available
+//const val MT2_ANGULAR_STD_DEV_FACTOR: Double = 0.5 // no rotation data available
     }
 }
