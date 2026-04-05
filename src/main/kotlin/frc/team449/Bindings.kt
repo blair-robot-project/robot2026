@@ -141,7 +141,14 @@ class Bindings(
                         robotContainer.drive
                             .xLock()
                             .alongWith(actions.checkAndFeed())
-                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot())),
+                            .alongWith(
+                                Commands.sequence(
+                                    robotContainer.intake.setRollerVoltage(6.0),
+                                    WaitCommand(1.5),
+                                    robotContainer.intake.stopRollers(),
+                                    robotContainer.intake.stowSlow()
+                                )
+                            ),
                     ),
             ).onFalse(
                 actions.stopAll(),

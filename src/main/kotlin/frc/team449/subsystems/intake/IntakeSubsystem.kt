@@ -68,16 +68,17 @@ class IntakeSubsystem(
         }
             .withName("PIVOT-VOLTS")
 
-    fun deploy(): Command = slamHoming(targetIsDeployed = true).withName("PIVOT-DEPLOY")
-    fun stow(): Command = slamHoming(targetIsDeployed = false).withName("PIVOT-STOW")
+    fun deploy(): Command = slamHoming(IntakeConstants.DEPLOY_VOLTS, IntakeConstants.DEPLOY_HOLD_VOLTS, targetIsDeployed = true).withName("PIVOT-DEPLOY")
+    fun stow(): Command = slamHoming(IntakeConstants.STOW_VOLTS, IntakeConstants.STOW_HOLD_VOLTS, targetIsDeployed = false).withName("PIVOT-STOW")
+    fun stowSlow(): Command = slamHoming(-1.5, 0.0, targetIsDeployed = false).withName("PIVOT-STOW-SLOW")
 
     private fun slamHoming(
+        moveVolts: Double,
+        holdVolts: Double,
         targetIsDeployed: Boolean
     ): Command =
         defer {
             val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
-            val moveVolts = if (targetIsDeployed) IntakeConstants.DEPLOY_VOLTS else IntakeConstants.STOW_VOLTS
-            val holdVolts = if (targetIsDeployed) IntakeConstants.DEPLOY_HOLD_VOLTS else IntakeConstants.STOW_HOLD_VOLTS
             val pivotAngleRads: Double = if (targetIsDeployed) IntakeConstants.DEPLOY_POS_RADS else IntakeConstants.STOW_POS_RADS
 
             run {

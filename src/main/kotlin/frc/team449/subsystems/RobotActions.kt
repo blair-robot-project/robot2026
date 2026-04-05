@@ -32,6 +32,7 @@ class RobotActions(
     fun stopIntakeAndPivot(): Command =
         Commands.sequence(
             intake.stopRollers(),
+            indexer.setIndexerVoltage(0.0, 0.0),
             intake.setPivotVoltage(0.0)
         )
             .withName("StopIntakeAndPivot")

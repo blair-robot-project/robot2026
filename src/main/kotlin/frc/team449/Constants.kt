@@ -106,7 +106,7 @@ object Constants {
 
         // --- HARDWARE CONFIGURATION ---
         val FLYWHEEL_NEUTRAL_MODE = NeutralModeValue.Coast
-        val LEFT_LEADER_INVERSION = InvertedValue.CounterClockwise_Positive
+        val LEFT_LEADER_INVERSION = InvertedValue.Clockwise_Positive
         val LEFT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Aligned
         val RIGHT_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
@@ -138,8 +138,8 @@ object Constants {
         const val FLYWHEEL_KP = 0.55
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.2237
-        const val FLYWHEEL_KV = 0.2036
+        const val FLYWHEEL_KS = 0.331
+        const val FLYWHEEL_KV = 0.208
         // const val FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
@@ -250,14 +250,14 @@ object Constants {
 
         // --- HARDWARE CONFIGURATION ---
         val FLOOR_NEUTRAL_MODE = NeutralModeValue.Coast
-        val FLOOR_INVERSION = InvertedValue.CounterClockwise_Positive
+        val FLOOR_INVERSION = InvertedValue.Clockwise_Positive
 
         val TOP_NEUTRAL_MODE = NeutralModeValue.Coast
-        val TOP_INVERSION = InvertedValue.Clockwise_Positive
+        val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val FLOOR_SUPPLY_LIMIT = 20.0
-        const val FLOOR_STATOR_LIMIT = 60.0
+        const val FLOOR_SUPPLY_LIMIT = 40.0
+        const val FLOOR_STATOR_LIMIT = 80.0
 
         const val TOP_SUPPLY_LIMIT = 40.0
         const val TOP_STATOR_LIMIT = 80.0
@@ -322,6 +322,6 @@ object Constants {
         // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
         const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
         const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available
-//const val MT2_ANGULAR_STD_DEV_FACTOR: Double = 0.5 // no rotation data available
+// const val MT2_ANGULAR_STD_DEV_FACTOR: Double = 0.5 // no rotation data available
     }
 }
