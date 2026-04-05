@@ -128,7 +128,7 @@ object Constants {
         // --- CURRENT & OPERATIONAL LIMITS ---
         const val FLYWHEEL_SUPPLY_LIM = 30.0
         const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 20.0
+        const val HOOD_SUPPLY_LIM = 15.0
         const val HOOD_STATOR_LIM = 20.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
@@ -138,8 +138,8 @@ object Constants {
         const val FLYWHEEL_KP = 0.55
         const val FLYWHEEL_KI = 0.0
         const val FLYWHEEL_KD = 0.0
-        const val FLYWHEEL_KS = 0.286
-        const val FLYWHEEL_KV = 0.2073
+        const val FLYWHEEL_KS = 0.2237
+        const val FLYWHEEL_KV = 0.2036
         // const val FLYWHEEL_KA = ...
 
         // --- HOOD GAINS ---
@@ -210,7 +210,7 @@ object Constants {
         val RIGHT_PIVOT_INVERSION = InvertedValue.CounterClockwise_Positive
 
         val LEFT_ROLLER_NEUTRAL_MODE = NeutralModeValue.Brake
-        val LEFT_ROLLER_INVERSION = InvertedValue.Clockwise_Positive
+        val LEFT_ROLLER_INVERSION = InvertedValue.CounterClockwise_Positive
         val RIGHT_ROLLER_FOLLOWER_ALIGNMENT = MotorAlignmentValue.Opposed
 
         // --- PHYSICAL SPECS & GEARING ---
@@ -293,9 +293,15 @@ object Constants {
         const val CAMERA_LEFT_NAME: String = "limelight-left"
 
         // --- ROBOT TO CAMERA TRANSFORMS ---
-        var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.2514092 - 0.079375 + 0.0516, 0.3030474, 0.53594, Rotation3d(0.0, 0.523599, -0.523599))
-        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.2514092 - 0.079375 + 0.0516, -0.3030474, 0.53594, Rotation3d(0.0, 0.523599, 0.523599))
+        var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.013, 0.270, 0.539243, Rotation3d(0.0, 0.438377245469, -0.583128849696))
+        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.013, -0.270, 0.539243, Rotation3d(0.0, 0.438377245469, 0.583128849696))
         // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
+
+        // x: -0.270 m
+        // y: 0.013 m
+        // z: -0.539243 m
+        // pitch is up/down - up is positive, down is negative
+        // yaw is left/right - left is positive, right is negative
 
         // --- FILTERING THRESHOLDS --
         const val MAX_AMBIGUITY: Double = 0.15
@@ -316,5 +322,6 @@ object Constants {
         // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
         const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
         const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available
+//const val MT2_ANGULAR_STD_DEV_FACTOR: Double = 0.5 // no rotation data available
     }
 }

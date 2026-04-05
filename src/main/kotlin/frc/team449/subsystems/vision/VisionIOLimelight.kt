@@ -1,9 +1,12 @@
 package frc.team449.subsystems.vision
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.wpilibj.Timer
+import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import limelight.Limelight
 import limelight.networktables.AngularVelocity3d
@@ -24,7 +27,7 @@ import java.util.function.Supplier
  */
 class VisionIOLimelight(
     name: String,
-    private val rotationSupplier: Supplier<Rotation2d>,
+    private val poseSupplier: () -> Pose2d,
     private val angularVelocitySupplier: Supplier<AngularVelocity3d>,
     offset: Pose3d
 ) : VisionIO {
@@ -44,8 +47,13 @@ class VisionIOLimelight(
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d(rotationSupplier.get()),
+                    Rotation3d (poseSupplier().rotation),
                     angularVelocitySupplier.get(),
+//                    AngularVelocity3d(
+//                        DegreesPerSecond.of(0.0),
+//                        DegreesPerSecond.of(0.0),
+//                        DegreesPerSecond.of(0.0)
+//                    )
                 )
             )
             .save()
