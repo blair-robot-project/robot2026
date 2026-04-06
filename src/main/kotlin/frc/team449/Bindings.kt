@@ -1,5 +1,6 @@
 package frc.team449
 
+import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.InstantCommand
@@ -14,7 +15,7 @@ import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer
+    val robotContainer: RobotContainer,
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.operatorController
@@ -144,10 +145,12 @@ class Bindings(
                             .alongWith(
                                 Commands.sequence(
                                     robotContainer.intake.setRollerVoltage(6.0),
-                                    WaitCommand(1.5),
+                                    WaitCommand(1.0),
+                                    robotContainer.intake.setPivotAngle(Radians.of(1.1)),
+                                    WaitCommand(1.0),
                                     robotContainer.intake.stopRollers(),
-                                    robotContainer.intake.stowSlow()
-                                )
+                                    robotContainer.intake.stowSlow(),
+                                ),
                             ),
                     ),
             ).onFalse(
@@ -199,11 +202,5 @@ class Bindings(
                     actions.checkAndFeed(),
                 ),
             )
-
-        operator.povUp().onTrue(robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kForward))
-        operator.povDown().onTrue(robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kReverse))
-
-        operator.povLeft().onTrue(robotContainer.shooter.sysIDFlywheel.quasistatic(SysIdRoutine.Direction.kForward))
-        operator.povRight().onTrue(robotContainer.shooter.sysIDFlywheel.quasistatic(SysIdRoutine.Direction.kReverse))
     }
 }

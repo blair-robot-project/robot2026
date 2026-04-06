@@ -12,7 +12,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    robotContainer: RobotContainer
+    robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -20,31 +20,31 @@ class RobotActions(
     private val shooter: ShooterSubsystem = robotContainer.shooter
 
     fun deployAndIntake(): Command =
-        Commands.sequence(
-            intake.deploy().unless { intake.pivotIsDeployed },
-            Commands.parallel(
-                intake.setRollerVoltage(12.0),
-                indexer.setIndexerVoltage(0.5, 0.0)
-            )
-        )
-            .withName("DeployAndIntake")
+        Commands
+            .sequence(
+                intake.deploy().unless { intake.pivotIsDeployed },
+                Commands.parallel(
+                    intake.setRollerVoltage(12.0),
+                    indexer.setIndexerVoltage(0.5, 0.0),
+                ),
+            ).withName("DeployAndIntake")
 
     fun stopIntakeAndPivot(): Command =
-        Commands.sequence(
-            intake.stopRollers(),
-            indexer.setIndexerVoltage(0.0, 0.0),
-            intake.setPivotVoltage(0.0)
-        )
-            .withName("StopIntakeAndPivot")
+        Commands
+            .sequence(
+                intake.stopRollers(),
+                indexer.setIndexerVoltage(0.0, 0.0),
+                intake.setPivotVoltage(0.0),
+            ).withName("StopIntakeAndPivot")
 
     fun stopAndStow(): Command =
-        Commands.sequence(
-            intake.stopRollers(),
-            indexer.setIndexerVoltage(0.5, 0.0),
-            intake.stow(),
-            indexer.setIndexerVoltage(0.0, 0.0)
-        )
-            .withName("StopAndStow")
+        Commands
+            .sequence(
+                intake.stopRollers(),
+                indexer.setIndexerVoltage(0.5, 0.0),
+                intake.stow(),
+                indexer.setIndexerVoltage(0.0, 0.0),
+            ).withName("StopAndStow")
 
     fun shuffleIntakePivot(): Command =
         Commands.sequence(
@@ -53,8 +53,8 @@ class RobotActions(
                 intake.setPivotAngle(Radians.of(1.6)),
                 Commands.waitSeconds(0.15),
                 intake.setPivotAngle(Radians.of(0.85)),
-                Commands.waitSeconds(0.15)
-            )
+                Commands.waitSeconds(0.15),
+            ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
@@ -64,11 +64,11 @@ class RobotActions(
         )
 
     fun checkAndFeed(): Command =
-        Commands.sequence(
-            Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
-            indexer.setIndexerVoltage(12.0, 12.0)
-        )
-            .withName("CheckAndFeed")
+        Commands
+            .sequence(
+                Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
+                indexer.setIndexerVoltage(8.0, 12.0),
+            ).withName("CheckAndFeed")
 
     fun autoUnjam(): Command =
         Commands.defer({
@@ -78,7 +78,7 @@ class RobotActions(
                 Commands.print("AUTO-UNJAM!"),
                 Commands.parallel(
                     indexer.setIndexerVoltage(0.0, 2.0),
-                    shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL)
+                    shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
                 ),
                 Commands.waitSeconds(0.25),
                 indexer.stop(),
@@ -95,12 +95,12 @@ class RobotActions(
         )
 
     fun stopAll(): Command =
-        Commands.sequence(
-            intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel()
-        )
-            .withName("StopAll")
+        Commands
+            .sequence(
+                intake.stopRollers(),
+                indexer.stop(),
+                shooter.stopFlywheel(),
+            ).withName("StopAll")
 
     fun stopAllAndHomeHood(): Command =
         Commands.sequence(

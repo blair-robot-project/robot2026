@@ -33,7 +33,7 @@ open class IndexerIOHardware : IndexerIO {
     private val lowPrioSignals =
         arrayOf(
             floorTemp,
-            topTemp
+            topTemp,
         )
 
     private val highPrioSignals =
@@ -49,20 +49,22 @@ open class IndexerIOHardware : IndexerIO {
         )
 
     private val floorConnected: Boolean
-        get() = BaseStatusSignal.isAllGood(
-            floorVoltage,
-            floorVelocity,
-            floorStatorCurrent,
-            floorSupplyCurrent,
-        )
+        get() =
+            BaseStatusSignal.isAllGood(
+                floorVoltage,
+                floorVelocity,
+                floorStatorCurrent,
+                floorSupplyCurrent,
+            )
 
     private val topConnected: Boolean
-        get() = BaseStatusSignal.isAllGood(
-            topVoltage,
-            topVelocity,
-            topStatorCurrent,
-            topSupplyCurrent,
-        )
+        get() =
+            BaseStatusSignal.isAllGood(
+                topVoltage,
+                topVelocity,
+                topStatorCurrent,
+                topSupplyCurrent,
+            )
 
     private val floorDisconnectedAlert =
         Alert("Floor Indexer Disconnected (ID ${IndexerConstants.FLOOR_ID}).", Alert.AlertType.kError)
@@ -102,7 +104,7 @@ open class IndexerIOHardware : IndexerIO {
 
     override fun setIndexerVoltage(
         floorVolts: Double,
-        topVolts: Double
+        topVolts: Double,
     ) {
         floor.setControl(floorVoltageRequest.withOutput(floorVolts))
         top.setControl(topVoltageRequest.withOutput(topVolts))
