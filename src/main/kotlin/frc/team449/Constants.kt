@@ -55,7 +55,9 @@ object Constants {
         const val ANGULAR_DEADBAND = 0.1
         const val INTERRUPT_DEADBAND = 0.25
         const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
-        const val DRIVE_POSITION_TOLERANCE = 0.2
+
+        // --- SYSTEM CHECK ---
+        const val SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE = 0.2
     }
 
     object AutoConstants {
@@ -228,8 +230,8 @@ object Constants {
         const val HOMING_DEBOUNCE_TIME = 0.1
         const val VIZ_OFFSET_DEG = 33.873
 
-        // --- PIVOT TOLERANCE ---
-        const val PIVOT_TOLERANCE_POS_RADS = 0.175
+        // --- SYSTEM CHECK ---
+        const val SYSTEM_CHECK_PIVOT_TOLERANCE_POS_RADS = 0.175
     }
 
     object IndexerConstants {
@@ -305,5 +307,13 @@ object Constants {
         // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
         const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
         const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available
+    }
+
+    object SystemCheckConstants {
+        // --- INTAKE ---
+        const val PIVOT_TOLERANCE_POS_RADS = 0.175
+
+        // --- SWERVE ---
+        const val DRIVE_POSITION_TOLERANCE = 0.2
     }
 }

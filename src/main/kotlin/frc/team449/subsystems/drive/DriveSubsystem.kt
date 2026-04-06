@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
-import frc.team449.Constants
 import frc.team449.Constants.DriveConstants
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
@@ -125,15 +124,15 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    fun isWithinTolerance(): Boolean =
+    fun moduleAngleWithinTolerance(): Boolean =
         abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) <
-            DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) <
-            DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) <
-            DriveConstants.DRIVE_POSITION_TOLERANCE &&
+            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) <
-            DriveConstants.DRIVE_POSITION_TOLERANCE
+            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE
     val sysIDTranslationRoutine =
         SysIdRoutine(
             SysIdRoutine.Config(

@@ -109,7 +109,7 @@ class IntakeSubsystem(
                 IntakeConstants.STOW_POS_RADS
             }
         return abs(pivotAngle - target) <=
-            IntakeConstants.PIVOT_TOLERANCE_POS_RADS
+                IntakeConstants.SYSTEM_CHECK_PIVOT_TOLERANCE_POS_RADS
     }
 
     // Checks the rollerVelocity is in a tolerable range

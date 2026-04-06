@@ -27,43 +27,48 @@ class SystemCheckCommand(
         )
 
         addCommands(
+            // -----------SWERVE-----------
+            // TESTS FORWARD DIRECTION
             testSubSystem(
                 robotContainer.drive.runOnce {
                     robotContainer.drive.setControl(
                         driveRequest.withVelocityX(1.0).withVelocityY(0.0),
                     )
                 },
-                robotContainer.drive.isWithinTolerance(),
+                robotContainer.drive.moduleAngleWithinTolerance(),
                 0.5,
                 "BAD FORWARD DIRECTION",
             ),
+            // TESTS RIGHT DIRECTION
             testSubSystem(
                 robotContainer.drive.runOnce {
                     robotContainer.drive.setControl(
                         driveRequest.withVelocityX(0.0).withVelocityY(1.0),
                     )
                 },
-                robotContainer.drive.isWithinTolerance(),
+                robotContainer.drive.moduleAngleWithinTolerance(),
                 0.5,
                 "BAD RIGHT DIRECTION",
             ),
+            // TESTS BACKWARD DIRECTION
             testSubSystem(
                 robotContainer.drive.runOnce {
                     robotContainer.drive.setControl(
                         driveRequest.withVelocityX(-1.0).withVelocityY(0.0),
                     )
                 },
-                robotContainer.drive.isWithinTolerance(),
+                robotContainer.drive.moduleAngleWithinTolerance(),
                 0.5,
                 "BAD BACKWARD DIRECTION",
             ),
+            // TESTS LEFT DIRECTION
             testSubSystem(
                 robotContainer.drive.runOnce {
                     robotContainer.drive.setControl(
                         driveRequest.withVelocityX(0.0).withVelocityY(-1.0),
                     )
                 },
-                robotContainer.drive.isWithinTolerance(),
+                robotContainer.drive.moduleAngleWithinTolerance(),
                 0.5,
                 "BAD LEFT DIRECTION",
             ),
@@ -73,10 +78,28 @@ class SystemCheckCommand(
                 )
             },
             // -----------INTAKE-----------
-            testSubSystem(robotContainer.intake.setRollerVoltage(12.0), robotContainer.intake.rollerAtTolerance(), 1.0, "BAD ROLLER"),
-            testSubSystem(robotContainer.intake.deploy(), robotContainer.intake.pivotAtTolerance(), 1.0, "BAD PIVOT DEPLOY"),
+            // TESTS THE ROLLERS
+            testSubSystem(
+                robotContainer.intake.setRollerVoltage(12.0),
+                robotContainer.intake.rollerAtTolerance(),
+                1.0,
+                "BAD ROLLER",
+            ),
+            // TESTS THE PIVOT DEPLOYED
+            testSubSystem(
+                robotContainer.intake.deploy(),
+                robotContainer.intake.pivotAtTolerance(),
+                1.0,
+                "BAD PIVOT DEPLOY",
+            ),
             robotContainer.intake.stopRollers(),
-            testSubSystem(robotContainer.intake.stow(), robotContainer.intake.pivotAtTolerance(), 1.0, "BAD PIVOT STOW"),
+            // TESTS THE PIVOT STOW
+            testSubSystem(
+                robotContainer.intake.stow(),
+                robotContainer.intake.pivotAtTolerance(),
+                1.0,
+                "BAD PIVOT STOW",
+            ),
             // -----------INDEXER-----------
             testSubSystem(
                 robotContainer.indexer.setIndexerVoltage(
@@ -89,6 +112,7 @@ class SystemCheckCommand(
             ),
             robotContainer.indexer.stop().withTimeout(0.1),
             // -----------SHOOTER---------
+            // TESTS THE FLYWHEEL VELOCITY
             testSubSystem(
                 robotContainer.shooter.setFlywheelVelocity(
                     RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(1.3)),
@@ -97,13 +121,21 @@ class SystemCheckCommand(
                 0.5,
                 "BAD FLYWHEEL VELOCITY",
             ),
-            testSubSystem(robotContainer.shooter.homeHood(), robotContainer.shooter.isHoodAtTolerance(), 0.5, "BAD HOME HOOD ANGLE"),
+            // TESTS THE HOME HOOD ANGLE
+            testSubSystem(
+                robotContainer.shooter.homeHood(),
+                robotContainer.shooter.isHoodAtTolerance(),
+                0.5,
+                "BAD HOME HOOD ANGLE",
+            ),
+            // TESTS THE MINIMUM HOOD ANGLE
             testSubSystem(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MIN_HOOD_ANGLE),
                 robotContainer.shooter.isHoodAtTolerance(),
                 0.75,
                 "BAD MIN HOOD ANGLE",
             ),
+            // TESTS THE MAXIMUM HOOD ANGLE
             testSubSystem(
                 robotContainer.shooter.setHoodAngle(ShooterConstants.MAX_HOOD_ANGLE),
                 robotContainer.shooter.isHoodAtTolerance(),
@@ -116,6 +148,7 @@ class SystemCheckCommand(
         )
     }
 
+    // Takes in a subsystem action and if the condition is false, the errorMessage is added to errors
     private fun testSubSystem(
         action: Command,
         condition: Boolean,
