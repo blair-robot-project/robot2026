@@ -128,11 +128,11 @@ class DriveSubsystem(
         abs(inputs.ModuleTargets[0].angle.radians - inputs.ModuleStates[0].angle.radians) <
             DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[1].angle.radians - inputs.ModuleStates[1].angle.radians) <
-            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
+                DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[2].angle.radians - inputs.ModuleStates[2].angle.radians) <
-            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
+                DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE &&
             abs(inputs.ModuleTargets[3].angle.radians - inputs.ModuleStates[3].angle.radians) <
-            DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE
+                DriveConstants.SYSTEM_CHECK_DRIVE_POSITION_TOLERANCE
     val sysIDTranslationRoutine =
         SysIdRoutine(
             SysIdRoutine.Config(

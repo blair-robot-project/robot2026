@@ -1,7 +1,6 @@
 package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveRequest
-import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj2.command.Command
@@ -153,7 +152,7 @@ class SystemCheckCommand(
         action: Command,
         condition: Boolean,
         timeOut: Double,
-        errorMessage: String,
+        errorMessage: String
     ): Command =
         SequentialCommandGroup(
             action,
