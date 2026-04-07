@@ -1,10 +1,10 @@
 package frc.team449
 
-import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.team449.Constants.Mode
+import frc.team449.Constants.VisionConstants
 import frc.team449.auto.BLineRoutines
 import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.RobotActions
@@ -20,7 +20,6 @@ import frc.team449.subsystems.intake.IntakeIO
 import frc.team449.subsystems.intake.IntakeIOHardware
 import frc.team449.subsystems.intake.IntakeIOSim
 import frc.team449.subsystems.intake.IntakeSubsystem
-import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
@@ -32,10 +31,9 @@ import frc.team449.subsystems.vision.VisionSubsystem
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
 
 object RobotContainer {
-    // driver/op controllers
+    // driver controller
     val driveController: CommandXboxController = CommandXboxController(0)
-    val opController: CommandXboxController = CommandXboxController(1)
-
+    val operatorController: CommandXboxController = CommandXboxController(1)
     var autonomousCommand: Command = PrintCommand("If you see this, you probably didn't run an auto.")
 
     val drive: DriveSubsystem =
@@ -76,21 +74,30 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                    VisionIOLimelight(Constants.VisionConstants.CAMERA_RIGHT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT.rotation)),
-                    VisionIOLimelight(Constants.VisionConstants.CAMERA_LEFT_NAME, { drive.pose.rotation }, Pose3d(Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.translation, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT.rotation))
+                    VisionIOLimelight(
+                        VisionConstants.CAMERA_RIGHT_NAME,
+                        { drive.pose },
+                        drive::getAngularVelocity,
+                        VisionConstants.ROBOT_TO_CAMERA_RIGHT
+                    ),
+                    VisionIOLimelight(
+                        VisionConstants.CAMERA_LEFT_NAME,
+                        { drive.pose },
+                        drive::getAngularVelocity,
+                        VisionConstants.ROBOT_TO_CAMERA_LEFT
+                    )
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-//                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_RIGHT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_RIGHT) { drive.pose },
-                    VisionIOPhotonVisionSim(Constants.VisionConstants.CAMERA_LEFT_NAME, Constants.VisionConstants.PV_ROBOT_TO_CAMERA_LEFT) { drive.pose },
+                    VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
+                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
-            Mode.REPLAY ->
-                VisionSubsystem(
-                    drive::addVisionMeasurement,
-                    object : VisionIO {},
-//                    object : VisionIO {},
-                )
+            else -> VisionSubsystem(
+                drive::addVisionMeasurement,
+                object : VisionIO {},
+                object : VisionIO {}
+            )
         }
 
     val intake: IntakeSubsystem =
@@ -120,16 +127,7 @@ object RobotContainer {
             },
         )
 
-    val power: PowerSubsystem =
-        PowerSubsystem(
-            this.drive,
-            this.intake,
-            this.indexer,
-            this.shooter
-        )
-
     val actions = RobotActions(this)
-
     val bindings = Bindings(this)
 
     val bLineRoutines = BLineRoutines(drive, actions)

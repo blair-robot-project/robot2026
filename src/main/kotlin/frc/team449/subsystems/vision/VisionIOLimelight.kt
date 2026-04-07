@@ -1,14 +1,12 @@
 package frc.team449.subsystems.vision
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.wpilibj.Timer
-import frc.team449.subsystems.vision.VisionIO.PoseObservation
-import frc.team449.subsystems.vision.VisionIO.PoseObservationType
-import frc.team449.subsystems.vision.VisionIO.TargetObservation
+import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import limelight.Limelight
 import limelight.networktables.AngularVelocity3d
@@ -29,36 +27,36 @@ import java.util.function.Supplier
  */
 class VisionIOLimelight(
     name: String,
-    private val rotationSupplier: Supplier<Rotation2d>,
+    private val poseSupplier: () -> Pose2d,
+    private val angularVelocitySupplier: Supplier<AngularVelocity3d>,
     offset: Pose3d
 ) : VisionIO {
     private val limelight = Limelight(name)
-    private var estimationMode = EstimationMode.MEGATAG1 // can change this if wanna run both megatag1 and 2
-    private var poseObservationType = PoseObservationType.MEGATAG_1
+    private var estimationMode = EstimationMode.MEGATAG2
+    private var poseObservationType = PoseObservationType.MEGATAG_2
     private val poseEstimator = limelight.createPoseEstimator(estimationMode)
 
     init {
         limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
             .withCameraOffset(offset)
+        limelight.settings.withImuMode(LimelightSettings.ImuMode.ExternalImu)
             .save()
-        limelight.settings.withImuMode(LimelightSettings.ImuMode.InternalImuExternalAssist)
     }
 
     override fun updateInputs(inputs: VisionIOInputs) {
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d(rotationSupplier.get()),
-                    AngularVelocity3d(
-                        DegreesPerSecond.of(0.0),
-                        DegreesPerSecond.of(0.0),
-                        DegreesPerSecond.of(0.0),
-                    )
+                    Rotation3d (poseSupplier().rotation),
+                    angularVelocitySupplier.get(),
+//                    AngularVelocity3d(
+//                        DegreesPerSecond.of(0.0),
+//                        DegreesPerSecond.of(0.0),
+//                        DegreesPerSecond.of(0.0)
+//                    )
                 )
             )
             .save()
-
-        NetworkTableInstance.getDefault().flush()
 
         val visionEstimateOpt: Optional<PoseEstimate> = poseEstimator.poseEstimate
         val resultsOpt: Optional<LimelightResults> = limelight.data.results
@@ -75,7 +73,7 @@ class VisionIOLimelight(
                     est.avgTagAmbiguity,
                     est.tagCount,
                     est.avgTagDist,
-                    PoseObservationType.MEGATAG_2
+                    poseObservationType,
                 )
             )
         } else {

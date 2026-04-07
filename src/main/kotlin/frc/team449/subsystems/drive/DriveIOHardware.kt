@@ -19,9 +19,8 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.units.measure.LinearAcceleration
 import frc.team449.Constants
 import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.Logger
@@ -50,19 +49,11 @@ open class DriveIOHardware(
     val angularPitchVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityYWorld
     val angularRollVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityXWorld
     val angularYawVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityZWorld
-    val roll: StatusSignal<Angle> = pigeon2.roll
-    val pitch: StatusSignal<Angle> = pigeon2.pitch
-    val accelX: StatusSignal<LinearAcceleration> = pigeon2.accelerationX
-    val accelY: StatusSignal<LinearAcceleration> = pigeon2.accelerationY
 
     val gyroSignals = arrayOf(
         angularPitchVelocity,
         angularRollVelocity,
         angularYawVelocity,
-        roll,
-        pitch,
-        accelX,
-        accelY
     )
 
     init {
@@ -77,18 +68,23 @@ open class DriveIOHardware(
     }
 
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
+        BaseStatusSignal.refreshAll(*gyroSignals)
+
         if (telemetryCache.get() == null) return
         inputs.fromSwerveDriveState(telemetryCache.get())
 
         inputs.gyroAngle = inputs.Pose.rotation.degrees
+        inputs.rollVelocityDegreesPerSecond = angularRollVelocity.value.`in`(DegreesPerSecond)
+        inputs.pitchVelocityDegreesPerSecond = angularPitchVelocity.value.`in`(DegreesPerSecond)
+        inputs.yawVelocityDegreesPerSecond = angularYawVelocity.value.`in`(DegreesPerSecond)
     }
 
     override fun setControl(request: SwerveRequest) {
         super<SwerveDrivetrain>.setControl(request)
     }
 
-    override fun seedFieldCentric(yaw: Rotation2d) {
-        super<SwerveDrivetrain>.seedFieldCentric(yaw)
+    override fun seedFieldCentric() {
+        super<SwerveDrivetrain>.seedFieldCentric()
     }
 
     override fun resetOdometry(pose: Pose2d) {

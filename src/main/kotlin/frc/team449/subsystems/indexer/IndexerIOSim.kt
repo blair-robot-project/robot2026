@@ -4,33 +4,17 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.simulation.FlywheelSim
 import frc.team449.Constants
-import frc.team449.Constants.IndexerConstants.FLOOR_GEARING
-import frc.team449.Constants.IndexerConstants.FLOOR_MOI_KG_MM
-import frc.team449.Constants.IndexerConstants.TOP_GEARING
-import frc.team449.Constants.IndexerConstants.TOP_MOI_KG_MM
-import frc.team449.Constants.IndexerConstants.WEDGE_GEARING
-import frc.team449.Constants.IndexerConstants.WEDGE_MOI_KG_MM
+import frc.team449.Constants.IndexerConstants
 
 class IndexerIOSim : IndexerIOHardware() {
-    var wedgeSim =
-        FlywheelSim(
-            LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX60(1),
-                WEDGE_MOI_KG_MM,
-                WEDGE_GEARING,
-            ),
-            DCMotor.getKrakenX60(1),
-        )
-
     var floorSim =
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(1),
-                FLOOR_MOI_KG_MM,
-                FLOOR_GEARING,
+                IndexerConstants.FLOOR_MOI_KG_MM,
+                IndexerConstants.FLOOR_GEARING,
             ),
             DCMotor.getKrakenX60(1),
         )
@@ -39,31 +23,27 @@ class IndexerIOSim : IndexerIOHardware() {
         FlywheelSim(
             LinearSystemId.createFlywheelSystem(
                 DCMotor.getKrakenX60(1),
-                TOP_MOI_KG_MM,
-                TOP_GEARING,
+                IndexerConstants.TOP_MOI_KG_MM,
+                IndexerConstants.TOP_GEARING,
             ),
             DCMotor.getKrakenX60(1),
         )
 
-    private val wedgeMotorSim = wedgeIndexer.simState
-    private val floorMotorSim = floorIndexer.simState
-    private val topMotorSim = topIndexer.simState
+    private val floorMotorSim = floor.simState
+    private val topMotorSim = top.simState
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        wedgeMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
-        wedgeSim.setInput(wedgeMotorSim.motorVoltage)
-        wedgeSim.update(Constants.LOOP_TIME)
-        wedgeMotorSim.setRotorVelocity(Units.radiansToRotations(wedgeSim.angularVelocity.`in`(RadiansPerSecond)) * WEDGE_GEARING)
-
-        floorMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        // update floor indexer sim
+        floorMotorSim.setSupplyVoltage(12.0)
         floorSim.setInput(floorMotorSim.motorVoltage)
         floorSim.update(Constants.LOOP_TIME)
-        floorMotorSim.setRotorVelocity(Units.radiansToRotations(floorSim.angularVelocity.`in`(RadiansPerSecond)) * FLOOR_GEARING)
+        floorMotorSim.setRotorVelocity(Units.radiansToRotations(floorSim.angularVelocity.`in`(RadiansPerSecond)) * IndexerConstants.FLOOR_GEARING)
 
-        topMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage())
+        // update top indexer sim
+        topMotorSim.setSupplyVoltage(12.0)
         topSim.setInput(topMotorSim.motorVoltage)
         topSim.update(Constants.LOOP_TIME)
-        topMotorSim.setRotorVelocity(Units.radiansToRotations(topSim.angularVelocity.`in`(RadiansPerSecond)) * TOP_GEARING)
+        topMotorSim.setRotorVelocity(Units.radiansToRotations(topSim.angularVelocity.`in`(RadiansPerSecond)) * IndexerConstants.TOP_GEARING)
 
         super.updateInputs(inputs)
     }

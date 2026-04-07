@@ -3,14 +3,15 @@ package frc.team449.subsystems.vision
 import com.ctre.phoenix6.Utils
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
-import edu.wpi.first.math.geometry.*
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.Alert.AlertType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.Constants.FieldConstants
-import frc.team449.Constants.FieldConstants.FIELD_LENGTH_METERS
+import frc.team449.Constants
 import frc.team449.Constants.VisionConstants
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
@@ -44,20 +45,21 @@ class VisionSubsystem(
         for (cameraIndex in io.indices) {
             io[cameraIndex].updateInputs(inputs[cameraIndex])
             Logger.processInputs("Vision/Camera$cameraIndex", inputs[cameraIndex])
-
             disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected)
 
             val robotPosesAccepted = mutableListOf<Pose3d>()
             val robotPosesRejected = mutableListOf<Pose3d>()
-            var observationID = 0
+
+            val linearStdDevs = mutableListOf<Double>()
+            val angularStdDevs = mutableListOf<Double>()
 
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
                     observation.tagCount == 0 ||
                         (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
                         abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
-                        observation.pose.x < 0.0 || observation.pose.x > FieldConstants.FIELD_LENGTH_METERS ||
-                        observation.pose.y < 0.0 || observation.pose.y > FieldConstants.FIELD_WIDTH_METERS
+                        observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
+                        observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS
 
                 if (rejectPose) {
                     robotPosesRejected.add(observation.pose)
@@ -70,13 +72,14 @@ class VisionSubsystem(
                 var linearStdDev = VisionConstants.LINEAR_STD_DEV_BASELINE_METERS * stdDevFactor
                 var angularStdDev = VisionConstants.ANGULAR_STD_DEV_BASELINE_RADIANS * stdDevFactor
 
-                if (observation.type == VisionIO.PoseObservationType.MEGATAG_2) {
-                    linearStdDev *= VisionConstants.linearStdDevMegatag2Factor
-                    angularStdDev *= VisionConstants.angularStdDevMegatag2Factor
+                if (observation.type == PoseObservationType.MEGATAG_2) {
+                    linearStdDev *= VisionConstants.MT2_LINEAR_STD_DEV_FACTOR
+                    angularStdDev *= VisionConstants.MT2_ANGULAR_STD_DEV_FACTOR
                 }
-                if (cameraIndex < VisionConstants.cameraStdDevFactors.size) {
-                    linearStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
-                    angularStdDev *= VisionConstants.cameraStdDevFactors[cameraIndex]
+
+                if (cameraIndex < VisionConstants.CAMERA_STD_DEV_FACTORS.size) {
+                    linearStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
+                    angularStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                 }
 
                 consumeVisionMeasurement(
@@ -85,11 +88,12 @@ class VisionSubsystem(
                     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                 )
 
-                Logger.recordOutput("Vision/Camera$cameraIndex/Observation$observationID/LinearStandardDeviation", linearStdDev)
-                Logger.recordOutput("Vision/Camera$cameraIndex/Observation$observationID/AngularStandardDeviation", angularStdDev)
-
-                observationID++
+                linearStdDevs.add(linearStdDev)
+                angularStdDevs.add(angularStdDev)
             }
+
+            Logger.recordOutput("Vision/Camera$cameraIndex/LinearStdDevs", linearStdDevs.toDoubleArray())
+            Logger.recordOutput("Vision/Camera$cameraIndex/AngularStdDevs", angularStdDevs.toDoubleArray())
 
             Logger.recordOutput("Vision/Camera$cameraIndex/Yaw", inputs[cameraIndex].latestTargetObservation.tx)
             Logger.recordOutput("Vision/Camera$cameraIndex/RobotPosesAccepted", *robotPosesAccepted.toTypedArray())

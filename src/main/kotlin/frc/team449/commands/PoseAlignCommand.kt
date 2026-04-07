@@ -28,8 +28,8 @@ class PoseAlignCommand(
         0.0,
         0.0,
         TrapezoidProfile.Constraints(
-            Constants.AutoConstants.AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND,
-            Constants.AutoConstants.AUTO_ANGULAR_ACCEL_RADIANS_PER_SECOND_PER_SECOND
+            Constants.AutoConstants.AUTO_ANGULAR_SPEED_RADS_PER_SEC,
+            Constants.AutoConstants.AUTO_ANGULAR_ACCEL_RADS_PER_SEC_PER_SEC
         )
     )
 

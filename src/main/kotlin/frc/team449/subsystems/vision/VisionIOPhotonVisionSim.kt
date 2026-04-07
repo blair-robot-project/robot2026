@@ -7,8 +7,8 @@
 package frc.team449.subsystems.vision
 
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.geometry.Transform3d
 import frc.team449.Constants.VisionConstants
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import org.photonvision.simulation.PhotonCameraSim
@@ -25,9 +25,9 @@ import java.util.function.Supplier
  */
 class VisionIOPhotonVisionSim(
     name: String,
-    robotToCamera: Transform3d,
+    robotToCamera: Pose3d,
     private val poseSupplier: Supplier<Pose2d>
-) : VisionIOPhotonVision(name, robotToCamera) {
+) : VisionIOPhotonVision(name, robotToCamera.minus(Pose3d())) {
     private val cameraSim: PhotonCameraSim
     private val visionSim: VisionSystemSim = VisionSystemSim("main")
 
@@ -44,7 +44,7 @@ class VisionIOPhotonVisionSim(
 
         // add sim camera
         cameraSim = PhotonCameraSim(camera, cameraProperties, VisionConstants.REBUILT_FIELD_LAYOUT)
-        visionSim.addCamera(cameraSim, robotToCamera)
+        visionSim.addCamera(cameraSim, robotToCamera.minus(Pose3d()))
     }
 
     override fun updateInputs(inputs: VisionIOInputs) {

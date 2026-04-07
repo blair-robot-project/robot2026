@@ -3,140 +3,120 @@ package frc.team449.subsystems
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.ConditionalCommand
-import edu.wpi.first.wpilibj2.command.DeferredCommand
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup
-import edu.wpi.first.wpilibj2.command.PrintCommand
-import edu.wpi.first.wpilibj2.command.RepeatCommand
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
-import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
-import frc.team449.Constants.IndexerConstants
+import edu.wpi.first.wpilibj2.command.Commands
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
-import frc.team449.commands.SystemCheckCommand
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.intake.IntakeSubsystem
-import frc.team449.subsystems.power.PowerProfile
-import frc.team449.subsystems.power.PowerSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
-import kotlin.text.get
 
 class RobotActions(
-    private val robotContainer: RobotContainer,
+    robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
     private val indexer: IndexerSubsystem = robotContainer.indexer
     private val shooter: ShooterSubsystem = robotContainer.shooter
-    private val power: PowerSubsystem = robotContainer.power
 
-    fun deployAndRunIntake(): Command =
-        SequentialCommandGroup(
-            power.requestProfile(PowerProfile.INTAKING),
-            intake.deploy(),
-            ParallelCommandGroup(
-                intake.intake(),
-                indexer.index(
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    RadiansPerSecond.of(0.0),
+    fun deployAndIntake(): Command =
+        Commands
+            .sequence(
+                intake.deploy().unless { intake.pivotIsDeployed },
+                Commands.parallel(
+                    intake.setRollerVoltage(12.0),
+                    indexer.setIndexerVoltage(0.5, 0.0),
                 ),
-            ),
-        ).finallyDo { _ -> power.requestProfile(PowerProfile.DRIVING) }
+            ).withName("DeployAndIntake")
+
+    fun stopIntakeAndPivot(): Command =
+        Commands
+            .sequence(
+                intake.stopRollers(),
+                indexer.setIndexerVoltage(0.0, 0.0),
+                intake.setPivotVoltage(0.0),
+            ).withName("StopIntakeAndPivot")
 
     fun stopAndStow(): Command =
-        SequentialCommandGroup(
-            power.requestProfile(PowerProfile.DRIVING),
-            intake.stopRollers(),
-            ParallelRaceGroup(
-                indexer.index(
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    IndexerConstants.INTAKING_INDEXER_SPEED,
-                    RadiansPerSecond.of(0.0),
-                ),
+        Commands
+            .sequence(
+                intake.stopRollers(),
+                indexer.setIndexerVoltage(0.5, 0.0),
                 intake.stow(),
-            ),
-        )
+                indexer.setIndexerVoltage(0.0, 0.0),
+            ).withName("StopAndStow")
 
     fun shuffleIntakePivot(): Command =
-        RepeatCommand(
-            SequentialCommandGroup(
-                intake.stow(),
-                intake.deploy(),
+        Commands.sequence(
+            intake.setRollerVoltage(3.0),
+            Commands.repeatingSequence(
+                intake.setPivotAngle(Radians.of(1.6)),
+                Commands.waitSeconds(0.15),
+                intake.setPivotAngle(Radians.of(0.85)),
+                Commands.waitSeconds(0.15),
             ),
         )
 
     fun prepShotFromAnywhere(distance: Double): Command =
-        SequentialCommandGroup(
-            power.requestProfile(PowerProfile.SHOOTING),
-            shooter.setAimCommand(
-                Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance)),
-                RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance)),
-            ),
+        Commands.sequence(
+            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))),
+            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance))),
         )
 
     fun checkAndFeed(): Command =
-        RepeatCommand(
-            ConditionalCommand(
-                indexer.index(IndexerConstants.SHOOTING_INDEXER_SPEED),
-                indexer.stop(),
-            ) { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
-        )
+        Commands
+            .sequence(
+                Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
+                indexer.setIndexerVoltage(8.0, 12.0),
+            ).withName("CheckAndFeed")
 
     fun autoUnjam(): Command =
-        DeferredCommand(
-            {
-                val currentSetpoint = shooter.flywheelTargetVelocityRadPerSec
+        Commands.defer({
+            val originalFlywheelSetpointRadsPerSec = shooter.flywheelTargetVelocityRadsPerSec
 
-                SequentialCommandGroup(
-                    PrintCommand("AUTO UNJAM!"),
-                    ParallelCommandGroup(
-                        indexer.index(IndexerConstants.INTAKING_INDEXER_SPEED),
-                        shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
-                    ).withTimeout(0.25),
-                    indexer.stop(),
-                    shooter.setFlywheelVelocity(RadiansPerSecond.of(currentSetpoint)),
-                )
-            },
-            setOf(indexer, shooter),
-        )
+            Commands.sequence(
+                Commands.print("AUTO-UNJAM!"),
+                Commands.parallel(
+                    indexer.setIndexerVoltage(0.0, 2.0),
+                    shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
+                ),
+                Commands.waitSeconds(0.25),
+                indexer.stop(),
+                Commands.print("POST-UNJAM SETPOINT: $originalFlywheelSetpointRadsPerSec"),
+                shooter.setFlywheelVelocity(RadiansPerSecond.of(originalFlywheelSetpointRadsPerSec)),
+            )
+        }, setOf(indexer, shooter))
 
     fun reverseAll(): Command =
-        ParallelCommandGroup(
-            intake.outtake(),
-            indexer.index(RadiansPerSecond.of(-30.0)),
-            shooter.setFlywheelVelocity(-ShooterConstants.TEST_FLYWHEEL_VEL),
-        )
-
-    fun stopAllAndHomeHood(): Command =
-        SequentialCommandGroup(
-            intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel(),
-            shooter.homeHood(),
+        Commands.parallel(
+            intake.setRollerVoltage(-2.0),
+            indexer.setIndexerVoltage(-2.0, -2.0),
+            shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
         )
 
     fun stopAll(): Command =
-        ParallelCommandGroup(
-            intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel(),
+        Commands
+            .sequence(
+                intake.stopRollers(),
+                indexer.stop(),
+                shooter.stopFlywheel(),
+            ).withName("StopAll")
+
+    fun stopAllAndHomeHood(): Command =
+        Commands.sequence(
+            stopAll(),
+            shooter.homeHood(),
         )
 
-    fun autoTrenchShot(): Command =
-        SequentialCommandGroup(
-            prepShotFromAnywhere(TRENCH_TO_HUB_DISTANCE_METERS),
+    fun autoTrenchShot(time: Double): Command =
+        Commands.sequence(
+            prepShotFromAnywhere(3.43),
             checkAndFeed(),
         )
 
     fun autoHubShot(): Command =
-        SequentialCommandGroup(
-            prepShotFromAnywhere(HUB_DISTANCE_METERS),
+        Commands.sequence(
+            prepShotFromAnywhere(1.3),
             checkAndFeed(),
         )
-
-    fun systemCheckCommand(): Command = SystemCheckCommand(robotContainer)
 }
