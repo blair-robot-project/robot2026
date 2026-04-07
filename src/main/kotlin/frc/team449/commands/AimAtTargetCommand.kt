@@ -53,7 +53,7 @@ class AimAtTargetCommand(
         val targetTranslation = targetSupplier.get()
         val translationToTarget = if (isRed) currentPose.translation.minus(targetTranslation) else targetTranslation.minus(currentPose.translation)
         val targetRotation = translationToTarget.angle
-        val distance = FieldUtil.getDistanceToPose(currentPose, targetTranslation)
+        val distance = FieldUtil.getDistanceToTranslation(currentPose.translation, targetTranslation)
 
         throttle =
             abs(throttleSupplier.asDouble).pow(2) * sign(throttleSupplier.asDouble) *

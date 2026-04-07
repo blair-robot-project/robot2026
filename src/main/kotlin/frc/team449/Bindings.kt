@@ -51,7 +51,7 @@ class Bindings(
             robotContainer.shooter,
             { -driver.leftY },
             { -driver.leftX },
-            targetSupplier = { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose) },
+            targetSupplier = { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose.translation) },
         )
 
     fun setDefaultCommands() {

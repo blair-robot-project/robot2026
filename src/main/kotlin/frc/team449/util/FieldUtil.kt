@@ -26,10 +26,10 @@ object FieldUtil {
 
     var autoWinnerLogged = false
 
-    fun getDistanceToFriendlyHub(robotPose: Pose2d): Double = robotPose.translation.getDistance(HUB)
-    fun getClosestFriendlyTrench(robotPose: Pose2d): Pose2d = TRENCHES.minBy { it.translation.getDistance(robotPose.translation) }
-    fun getDistanceToPose(robotPose: Pose2d, targetTranslation: Translation2d): Double = robotPose.translation.getDistance(targetTranslation)
-    fun getClosestFriendlyPass(robotPose: Pose2d): Translation2d = PASSES.minBy { it.getDistance(robotPose.translation) }
+    fun getDistanceToFriendlyHub(robotTranslation: Translation2d): Double = robotTranslation.getDistance(HUB)
+    fun getClosestFriendlyTrench(robotTranslation: Translation2d): Pose2d = TRENCHES.minBy { it.translation.getDistance(robotTranslation) }
+    fun getDistanceToTranslation(robotTranslation: Translation2d, targetTranslation: Translation2d): Double = robotTranslation.getDistance(targetTranslation)
+    fun getClosestFriendlyPass(robotTranslation: Translation2d): Translation2d = PASSES.minBy { it.getDistance(robotTranslation) }
 
     // flip (wall-blue zero)
     fun Pose2d.flipped(): Pose2d = Pose2d(
