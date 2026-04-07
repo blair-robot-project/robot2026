@@ -174,13 +174,13 @@ object Constants {
 
         val FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 165.0)
-                put(1.671, 180.0)
-                put(2.08, 210.0)
-                put(2.57, 210.0)
-                put(3.43, 210.0)
-                put(4.92, 220.0)
-                put(5.90, 280.5)
+                put(1.294, 160.0)
+                put(1.671, 175.0)
+                put(2.08, 205.0)
+                put(2.57, 205.0)
+                put(3.43, 205.0)
+                put(4.92, 215.0)
+                put(5.90, 275.5)
             }
 
         val HOOD_ANGLE_MAP =

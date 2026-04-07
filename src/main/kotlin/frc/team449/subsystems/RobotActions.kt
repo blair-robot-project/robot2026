@@ -4,6 +4,7 @@ import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 import frc.team449.subsystems.drive.DriveSubsystem
@@ -12,7 +13,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    robotContainer: RobotContainer,
+    robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -108,21 +109,29 @@ class RobotActions(
             shooter.homeHood(),
         )
 
+    fun movePivotWhileShooting(): Command =
+        Commands.sequence(
+            intake.setRollerVoltage(6.0),
+            WaitCommand(1.5),
+            intake.stopRollers(),
+            intake.stowSlow(),
+        )
+
     fun autoTrenchShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(3.43),
-            checkAndFeed(),
+            checkAndFeed().alongWith(movePivotWhileShooting()),
         )
 
     fun autoLemonShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(2.22),
-            checkAndFeed(),
+            checkAndFeed().alongWith(movePivotWhileShooting()),
         )
 
     fun autoHubShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(1.3),
-            checkAndFeed(),
+            checkAndFeed().alongWith(movePivotWhileShooting()),
         )
 }
