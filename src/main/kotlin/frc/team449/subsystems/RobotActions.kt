@@ -67,7 +67,7 @@ class RobotActions(
         Commands
             .sequence(
                 Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
-                indexer.setIndexerVoltage(8.0, 12.0),
+                indexer.setIndexerVoltage(12.0, 12.0),
             ).withName("CheckAndFeed")
 
     fun autoUnjam(): Command =

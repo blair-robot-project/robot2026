@@ -14,7 +14,7 @@ import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer
+    val robotContainer: RobotContainer,
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.operatorController
@@ -126,7 +126,14 @@ class Bindings(
                         robotContainer.drive
                             .xLock()
                             .alongWith(actions.checkAndFeed())
-                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot())),
+                            .alongWith(
+                                Commands.sequence(
+                                    robotContainer.intake.setRollerVoltage(6.0),
+                                    WaitCommand(1.5),
+                                    robotContainer.intake.stopRollers(),
+                                    robotContainer.intake.stowSlow(),
+                                ),
+                            ),
                     ),
             ).onFalse(
                 actions.stopAll(),
@@ -144,9 +151,7 @@ class Bindings(
                             .alongWith(
                                 Commands.sequence(
                                     robotContainer.intake.setRollerVoltage(6.0),
-                                    WaitCommand(1.0),
-                                    robotContainer.intake.setPivotAngle(Radians.of(1.1)),
-                                    WaitCommand(1.0),
+                                    WaitCommand(1.5),
                                     robotContainer.intake.stopRollers(),
                                     robotContainer.intake.stowSlow(),
                                 ),
