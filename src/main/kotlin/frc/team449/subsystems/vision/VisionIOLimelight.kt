@@ -4,9 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.units.Units.DegreesPerSecond
 import edu.wpi.first.wpilibj.Timer
-import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import limelight.Limelight
 import limelight.networktables.AngularVelocity3d
@@ -18,13 +16,6 @@ import limelight.networktables.PoseEstimate
 import java.util.Optional
 import java.util.function.Supplier
 
-/** IO implementation for real Limelight hardware.  */
-/**
- * Creates a new VisionIOLimelight.
- *
- * @param name The configured name of the Limelight.
- * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
- */
 class VisionIOLimelight(
     name: String,
     private val poseSupplier: () -> Pose2d,
@@ -47,7 +38,7 @@ class VisionIOLimelight(
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d (poseSupplier().rotation),
+                    Rotation3d(poseSupplier().rotation),
                     angularVelocitySupplier.get(),
 //                    AngularVelocity3d(
 //                        DegreesPerSecond.of(0.0),

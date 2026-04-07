@@ -104,7 +104,7 @@ open class IndexerIOHardware : IndexerIO {
 
     override fun setIndexerVoltage(
         floorVolts: Double,
-        topVolts: Double,
+        topVolts: Double
     ) {
         floor.setControl(floorVoltageRequest.withOutput(floorVolts))
         top.setControl(topVoltageRequest.withOutput(topVolts))

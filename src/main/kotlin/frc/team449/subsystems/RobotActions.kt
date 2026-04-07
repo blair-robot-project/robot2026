@@ -12,7 +12,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    robotContainer: RobotContainer,
+    robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -57,10 +57,10 @@ class RobotActions(
             ),
         )
 
-    fun prepShotFromAnywhere(distance: Double): Command =
+    fun prepShotFromDistanceMeters(distanceMeters: Double): Command =
         Commands.sequence(
-            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))),
-            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance))),
+            shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceMeters))),
+            shooter.setHoodAngle(Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceMeters))),
         )
 
     fun checkAndFeed(): Command =
@@ -110,13 +110,13 @@ class RobotActions(
 
     fun autoTrenchShot(time: Double): Command =
         Commands.sequence(
-            prepShotFromAnywhere(3.43),
+            prepShotFromDistanceMeters(3.43),
             checkAndFeed(),
         )
 
     fun autoHubShot(): Command =
         Commands.sequence(
-            prepShotFromAnywhere(1.3),
+            prepShotFromDistanceMeters(1.3),
             checkAndFeed(),
         )
 }

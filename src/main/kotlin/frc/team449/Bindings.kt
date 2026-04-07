@@ -8,14 +8,13 @@ import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.operatorController
@@ -122,7 +121,7 @@ class Bindings(
             .x()
             .whileTrue(
                 actions
-                    .prepShotFromAnywhere(3.43)
+                    .prepShotFromDistanceMeters(3.43)
                     .andThen(
                         robotContainer.drive
                             .xLock()
@@ -137,7 +136,7 @@ class Bindings(
             .y()
             .whileTrue(
                 actions
-                    .prepShotFromAnywhere(1.3)
+                    .prepShotFromDistanceMeters(1.3)
                     .andThen(
                         robotContainer.drive
                             .xLock()
@@ -161,7 +160,7 @@ class Bindings(
             .b()
             .whileTrue(
                 actions
-                    .prepShotFromAnywhere(2.92)
+                    .prepShotFromDistanceMeters(2.92)
                     .andThen(
                         robotContainer.drive
                             .xLock()

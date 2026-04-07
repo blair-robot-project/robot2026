@@ -16,13 +16,6 @@ import org.photonvision.simulation.SimCameraProperties
 import org.photonvision.simulation.VisionSystemSim
 import java.util.function.Supplier
 
-/** IO implementation for physics sim using PhotonVision simulator.  */
-/**
- * Creates a new VisionIOPhotonVisionSim.
- *
- * @param name The name of the camera.
- * @param poseSupplier Supplier for the robot pose to use in simulation.
- */
 class VisionIOPhotonVisionSim(
     name: String,
     robotToCamera: Pose3d,
