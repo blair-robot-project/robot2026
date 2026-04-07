@@ -114,8 +114,8 @@ class RobotActions(
             intake.setRollerVoltage(6.0),
             WaitCommand(1.5),
             intake.stopRollers(),
-            intake.stowSlow(),
-        )
+            intake.stowSlow()
+        ).withName("MovePivot")
 
     fun autoTrenchShot(): Command =
         Commands.sequence(

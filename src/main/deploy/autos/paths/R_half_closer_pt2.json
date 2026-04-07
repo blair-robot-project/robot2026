@@ -14,19 +14,19 @@
     },
     {
       "type": "translation",
-      "x_meters": 6.313711660679601,
-      "y_meters": 1.2337584431945103,
+      "x_meters": 6.176052293953507,
+      "y_meters": 1.4746623349651786,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "translation",
-      "x_meters": 5.236859947628949,
-      "y_meters": 0.5213861636948813,
+      "x_meters": 5.236859947628948,
+      "y_meters": 0.5672726192702431,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.9000000000000008,
+      "t_ratio": 0.9000000000000007,
       "lib_key": "second_start_shooting"
     },
     {
