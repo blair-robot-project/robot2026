@@ -12,7 +12,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    robotContainer: RobotContainer
+    robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -67,7 +67,7 @@ class RobotActions(
         Commands
             .sequence(
                 Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
-                indexer.setIndexerVoltage(8.0, 12.0),
+                indexer.setIndexerVoltage(12.0, 12.0),
             ).withName("CheckAndFeed")
 
     fun autoUnjam(): Command =

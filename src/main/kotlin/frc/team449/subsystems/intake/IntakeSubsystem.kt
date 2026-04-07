@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO
+    private val io: IntakeIO,
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -45,37 +45,37 @@ class IntakeSubsystem(
         runOnce {
             rollerTargetVolts = rollerVolts
             io.setRollerVoltage(rollerTargetVolts)
-        }
-            .withName("ROLLER-VOLTS")
+        }.withName("ROLLER-VOLTS")
 
     fun stopRollers(): Command =
         runOnce {
             rollerTargetVolts = 0.0
             io.setRollerVoltage(0.0)
-        }
-            .withName("ROLLER-STOP")
+        }.withName("ROLLER-STOP")
 
     fun setPivotAngle(pivotAngle: Angle): Command =
         runOnce {
             pivotTargetAngleRads = pivotAngle.`in`(Radians)
             io.setPivotAngle(pivotAngle)
-        }
-            .withName("PIVOT-ANGLE")
+        }.withName("PIVOT-ANGLE")
 
     fun setPivotVoltage(pivotVolts: Double): Command =
         runOnce {
             io.setPivotVoltage(pivotVolts)
-        }
-            .withName("PIVOT-VOLTS")
+        }.withName("PIVOT-VOLTS")
 
-    fun deploy(): Command = slamHoming(IntakeConstants.DEPLOY_VOLTS, IntakeConstants.DEPLOY_HOLD_VOLTS, targetIsDeployed = true).withName("PIVOT-DEPLOY")
-    fun stow(): Command = slamHoming(IntakeConstants.STOW_VOLTS, IntakeConstants.STOW_HOLD_VOLTS, targetIsDeployed = false).withName("PIVOT-STOW")
-    fun stowSlow(): Command = slamHoming(-1.5, 0.0, targetIsDeployed = false).withName("PIVOT-STOW-SLOW")
+    fun deploy(): Command =
+        slamHoming(IntakeConstants.DEPLOY_VOLTS, IntakeConstants.DEPLOY_HOLD_VOLTS, targetIsDeployed = true).withName("PIVOT-DEPLOY")
+
+    fun stow(): Command =
+        slamHoming(IntakeConstants.STOW_VOLTS, IntakeConstants.STOW_HOLD_VOLTS, targetIsDeployed = false).withName("PIVOT-STOW")
+
+    fun stowSlow(): Command = slamHoming(-1.323, 0.0, targetIsDeployed = false).withName("PIVOT-STOW-SLOW")
 
     private fun slamHoming(
         moveVolts: Double,
         holdVolts: Double,
-        targetIsDeployed: Boolean
+        targetIsDeployed: Boolean,
     ): Command =
         defer {
             val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)
@@ -83,23 +83,21 @@ class IntakeSubsystem(
 
             run {
                 io.setPivotVoltage(moveVolts)
-            }
-                .until {
-                    val highCurrent = abs(inputs.leftPivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
-                    val lowVelocity = abs(inputs.leftPivotVelocityRadsPerSec) < IntakeConstants.HOMING_VELOCITY_RADS_PER_SEC
-                    hardstopDebouncer.calculate(highCurrent && lowVelocity)
-                }
-                .andThen(
-                    runOnce {
-                        io.resetPivotAngle(Radians.of(pivotAngleRads))
-                        io.setPivotVoltage(holdVolts)
-                    }
-                )
+            }.until {
+                val highCurrent = abs(inputs.leftPivotStatorCurrentAmps) > IntakeConstants.HOMING_CURRENT_AMPS
+                val lowVelocity = abs(inputs.leftPivotVelocityRadsPerSec) < IntakeConstants.HOMING_VELOCITY_RADS_PER_SEC
+                hardstopDebouncer.calculate(highCurrent && lowVelocity)
+            }.andThen(
+                runOnce {
+                    io.resetPivotAngle(Radians.of(pivotAngleRads))
+                    io.setPivotVoltage(holdVolts)
+                },
+            )
         }
 
-    private fun determinePivotDeployedState(): Boolean {
-        return abs(inputs.leftPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1 && abs(inputs.rightPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1
-    }
+    private fun determinePivotDeployedState(): Boolean =
+        abs(inputs.leftPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1 &&
+            abs(inputs.rightPivotPositionRads - IntakeConstants.DEPLOY_POS_RADS) < 0.1
 
     val sysIDPivot =
         SysIdRoutine(
