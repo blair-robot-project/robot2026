@@ -108,9 +108,15 @@ class RobotActions(
             shooter.homeHood(),
         )
 
-    fun autoTrenchShot(time: Double): Command =
+    fun autoTrenchShot(): Command =
         Commands.sequence(
             prepShotFromAnywhere(3.43),
+            checkAndFeed(),
+        )
+
+    fun autoLemonShot(): Command =
+        Commands.sequence(
+            prepShotFromAnywhere(2.22),
             checkAndFeed(),
         )
 

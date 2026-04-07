@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.lib.BLine.FollowPath
 import frc.robot.lib.BLine.Path
-import frc.team449.Constants.AimbotConstants.HUB_DISTANCE_METERS
-import frc.team449.Constants.AimbotConstants.TRENCH_TO_HUB_DISTANCE_METERS
 import frc.team449.Constants.AutoConstants.AUTO_SHOOTING_TIME_SEC
 import frc.team449.Constants.AutoConstants.CTE_D
 import frc.team449.Constants.AutoConstants.CTE_I
@@ -111,8 +109,9 @@ class BLineRoutines(
             .withShouldMirror { mirror }
 
     private fun eventTriggerCommands() {
-        FollowPath.registerEventTrigger("start_intake", actions.deployAndRunIntake())
+        FollowPath.registerEventTrigger("start_intake", actions.deployAndIntake())
         FollowPath.registerEventTrigger("start_shooting", actions.autoTrenchShot())
+        FollowPath.registerEventTrigger("lemon_shoot", actions.autoLemonShot())
         FollowPath.registerEventTrigger("stop_shooting", actions.stopAll())
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
@@ -174,53 +173,35 @@ class BLineRoutines(
         )
     }
 
-    private fun halfAndLoop(mirror: Boolean): Command {
-        val path1 = Path("R_half_reg_pt1")
-        val path2 = Path("R_half_reg_pt2")
-        val path3 = Path("R_loop_reg")
-        val path4 = Path("r_end")
+    private fun lemonAuto(mirror: Boolean): Command {
+        val path1 = Path("lemon_pt1")
+        val path2 = Path("lemon_pt2")
+        val path3 = Path("lemon_end")
 
         eventTriggerCommands()
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset(mirror).build(path1),
+            WaitCommand(3.0),
             pathBuilder(mirror).build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            WaitCommand(3.0),
             pathBuilder(mirror).build(path3),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilder(!mirror).build(path4),
         )
     }
 
-    private fun citrusFarBump(mirror: Boolean): Command {
-        val path1 = Path("citrus_pt1")
-        val path2 = Path("citrus_pt2")
+    private fun bumpAuto(mirror: Boolean): Command {
+        val path1 = Path("bump")
+        val path2 = Path("lemon_end")
 
         eventTriggerCommands()
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
+            WaitCommand(3.0),
             pathBuilderWithReset(mirror).build(path1),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            WaitCommand(4.5),
             pathBuilder(mirror).build(path2),
-        )
-    }
-
-    private fun citrusTest(mirror: Boolean): Command {
-        val path1 = Path("test_pt1")
-        val path2 = Path("test_pt2")
-        val path3 = Path("test_pt3")
-
-        eventTriggerCommands()
-
-        return Commands.sequence(
-            drive.alignModules(Rotation2d.kCW_90deg),
-            pathBuilderWithReset(mirror).build(path1),
-            pathBuilderWithReset(mirror).build(path2),
-            WaitCommand(AUTO_SHOOTING_TIME_SEC),
-            pathBuilderWithReset(mirror).build(path3)
-
         )
     }
 
@@ -230,13 +211,14 @@ class BLineRoutines(
 
         autoChooser.addOption("R Half Close", halfClose(false))
         autoChooser.addOption("R Half Far", halfFar(false))
-        autoChooser.addOption("R Half Loop", halfAndLoop(false))
 
         autoChooser.addOption("L Half Close", halfClose(true))
         autoChooser.addOption("L Half Far", halfFar(true))
-        autoChooser.addOption("L Half Loop", halfAndLoop(true))
 
-        autoChooser.addOption("Citrus Far Bump", citrusFarBump(true))
-        autoChooser.addOption("Test Part 1", citrusTest(true))
+        autoChooser.addOption("R Lemon", lemonAuto(false))
+        autoChooser.addOption("L Lemon", lemonAuto(true))
+
+        autoChooser.addOption("R Bump", bumpAuto(false))
+        autoChooser.addOption("L Bump", bumpAuto(true))
     }
 }

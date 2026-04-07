@@ -3,7 +3,6 @@ package frc.team449.subsystems.drive
 import com.ctre.phoenix6.BaseStatusSignal
 import com.ctre.phoenix6.StatusSignal
 import com.ctre.phoenix6.configs.CANcoderConfiguration
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.configs.TalonFXSConfiguration
 import com.ctre.phoenix6.hardware.CANcoder
@@ -29,15 +28,15 @@ import java.util.function.Consumer
 
 open class DriveIOHardware(
     driveConstants: SwerveDrivetrainConstants,
-    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>
+    moduleConstants: Array<SwerveModuleConstants<TalonFXConfiguration, TalonFXSConfiguration, CANcoderConfiguration>>,
 ) : SwerveDrivetrain<TalonFX, TalonFXS, CANcoder>(
-    ::TalonFX,
-    ::TalonFXS,
-    ::CANcoder,
-    driveConstants,
-    Constants.DriveConstants.ODOMETRY_LOOP_HZ,
-    *moduleConstants,
-),
+        ::TalonFX,
+        ::TalonFXS,
+        ::CANcoder,
+        driveConstants,
+        Constants.DriveConstants.ODOMETRY_LOOP_HZ,
+        *moduleConstants,
+    ),
     DriveIO {
     var telemetryCache: AtomicReference<SwerveDriveState> = AtomicReference()
 
@@ -50,11 +49,12 @@ open class DriveIOHardware(
     val angularRollVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityXWorld
     val angularYawVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityZWorld
 
-    val gyroSignals = arrayOf(
-        angularPitchVelocity,
-        angularRollVelocity,
-        angularYawVelocity,
-    )
+    val gyroSignals =
+        arrayOf(
+            angularPitchVelocity,
+            angularRollVelocity,
+            angularYawVelocity,
+        )
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
@@ -98,7 +98,7 @@ open class DriveIOHardware(
     override fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
         timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>
+        visionMeasurementStdDevs: Matrix<N3, N1>,
     ) {
         super<SwerveDrivetrain>.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs)
     }
@@ -107,25 +107,20 @@ open class DriveIOHardware(
         super<SwerveDrivetrain>.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    override fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {
-        val driveCurrentLimitConfig = CurrentLimitsConfigs()
-        val steerCurrentLimitConfig = CurrentLimitsConfigs()
-
-        for (i in 0 until modules.count()) {
-            driveCurrentLimitConfig.SupplyCurrentLimit = driveSupplyLimitAmps
-            steerCurrentLimitConfig.SupplyCurrentLimit = steerSupplyLimitAmps
-
-            modules[i].driveMotor.configurator.apply(driveCurrentLimitConfig, 0.0)
-            modules[i].steerMotor.configurator.apply(steerCurrentLimitConfig, 0.0)
-        }
-    }
-
     override fun logModules(driveState: SwerveDriveState) {
         val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
         if (driveState.ModuleStates == null) return
         for (i in 0 until modules.count()) {
-            Logger.recordOutput(moduleNames[i] + "/DriveSupplyCurrentAmps", this.modules[i].driveMotor.supplyCurrent.valueAsDouble)
-            Logger.recordOutput(moduleNames[i] + "/DriveStatorCurrentAmps", this.modules[i].driveMotor.statorCurrent.valueAsDouble)
+            Logger.recordOutput(
+                moduleNames[i] + "/DriveSupplyCurrentAmps",
+                this.modules[i]
+                    .driveMotor.supplyCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/DriveStatorCurrentAmps",
+                this.modules[i]
+                    .driveMotor.statorCurrent.valueAsDouble,
+            )
         }
     }
 }
