@@ -12,7 +12,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    robotContainer: RobotContainer
+    robotContainer: RobotContainer,
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -116,7 +116,7 @@ class RobotActions(
 
     fun autoLemonShot(): Command =
         Commands.sequence(
-            prepShotFromAnywhere(2.22),
+            prepShotFromDistanceMeters(2.22),
             checkAndFeed(),
         )
 
