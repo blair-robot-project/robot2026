@@ -30,7 +30,7 @@ import java.util.function.Consumer
 
 class BLineRoutines(
     private val drive: DriveSubsystem,
-    private val actions: RobotActions,
+    private val actions: RobotActions
 ) {
     private val translationP = LoggedNetworkNumber("Auto/Translation/P", TRANSLATION_P)
     private val translationI = LoggedNetworkNumber("Auto/Translation/I", TRANSLATION_I)

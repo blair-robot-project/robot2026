@@ -47,17 +47,6 @@ class RobotActions(
                 indexer.setIndexerVoltage(0.0, 0.0),
             ).withName("StopAndStow")
 
-    fun shuffleIntakePivot(): Command =
-        Commands.sequence(
-            intake.setRollerVoltage(3.0),
-            Commands.repeatingSequence(
-                intake.setPivotAngle(Radians.of(1.6)),
-                Commands.waitSeconds(0.15),
-                intake.setPivotAngle(Radians.of(0.85)),
-                Commands.waitSeconds(0.15),
-            ),
-        )
-
     fun prepShotFromDistanceMeters(distanceMeters: Double): Command =
         Commands.sequence(
             shooter.setFlywheelVelocity(RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceMeters))),
@@ -70,23 +59,6 @@ class RobotActions(
                 Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
                 indexer.setIndexerVoltage(12.0, 12.0),
             ).withName("CheckAndFeed")
-
-    fun autoUnjam(): Command =
-        Commands.defer({
-            val originalFlywheelSetpointRadsPerSec = shooter.flywheelTargetVelocityRadsPerSec
-
-            Commands.sequence(
-                Commands.print("AUTO-UNJAM!"),
-                Commands.parallel(
-                    indexer.setIndexerVoltage(0.0, 2.0),
-                    shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
-                ),
-                Commands.waitSeconds(0.25),
-                indexer.stop(),
-                Commands.print("POST-UNJAM SETPOINT: $originalFlywheelSetpointRadsPerSec"),
-                shooter.setFlywheelVelocity(RadiansPerSecond.of(originalFlywheelSetpointRadsPerSec)),
-            )
-        }, setOf(indexer, shooter))
 
     fun reverseAll(): Command =
         Commands.parallel(
@@ -109,29 +81,29 @@ class RobotActions(
             shooter.homeHood(),
         )
 
-    fun movePivotWhileShooting(): Command =
+    fun tuckAndClear(): Command =
         Commands.sequence(
             intake.setRollerVoltage(6.0),
             WaitCommand(1.5),
             intake.stopRollers(),
             intake.stowSlow()
-        ).withName("MovePivot")
+        ).withName("TuckAndClear")
 
     fun autoTrenchShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(3.43),
-            checkAndFeed().alongWith(movePivotWhileShooting()),
+            checkAndFeed().andThen(tuckAndClear()),
         )
 
     fun autoLemonShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(2.22),
-            checkAndFeed().alongWith(movePivotWhileShooting()),
+            checkAndFeed().andThen(tuckAndClear()),
         )
 
     fun autoHubShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(1.3),
-            checkAndFeed().alongWith(movePivotWhileShooting()),
+            checkAndFeed().andThen(tuckAndClear()),
         )
 }

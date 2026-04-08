@@ -1,20 +1,15 @@
 package frc.team449
 
-import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import edu.wpi.first.wpilibj2.command.PrintCommand
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.operatorController
@@ -33,8 +28,6 @@ class Bindings(
                 abs(driver.leftX) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
                 abs(driver.rightX) < Constants.DriveConstants.ANGULAR_DEADBAND
         }.debounce(0.1)
-
-    val shooterJamTrigger: Trigger = robotContainer.shooter.shooterJamTrigger
 
     val autoAimCommand =
         AimAtTargetCommand(
@@ -87,7 +80,7 @@ class Bindings(
                         autoAimCommand.until { autoAimCommand.atHeadingSetpoint() && driverIdle.asBoolean },
                         Commands.parallel(
                             robotContainer.drive.xLock(),
-                            actions.checkAndFeed(),
+                            actions.checkAndFeed().andThen(actions.tuckAndClear())
                         ),
                     ).withName("AutoAim"),
             ).onFalse(
@@ -125,15 +118,7 @@ class Bindings(
                     .andThen(
                         robotContainer.drive
                             .xLock()
-                            .alongWith(actions.checkAndFeed())
-                            .alongWith(
-                                Commands.sequence(
-                                    robotContainer.intake.setRollerVoltage(6.0),
-                                    WaitCommand(1.5),
-                                    robotContainer.intake.stopRollers(),
-                                    robotContainer.intake.stowSlow(),
-                                ),
-                            ),
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
                     ),
             ).onFalse(
                 actions.stopAll(),
@@ -147,15 +132,7 @@ class Bindings(
                     .andThen(
                         robotContainer.drive
                             .xLock()
-                            .alongWith(actions.checkAndFeed())
-                            .alongWith(
-                                Commands.sequence(
-                                    robotContainer.intake.setRollerVoltage(6.0),
-                                    WaitCommand(1.5),
-                                    robotContainer.intake.stopRollers(),
-                                    robotContainer.intake.stowSlow(),
-                                ),
-                            ),
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
                     ),
             ).onFalse(
                 actions.stopAll(),
@@ -169,8 +146,7 @@ class Bindings(
                     .andThen(
                         robotContainer.drive
                             .xLock()
-                            .alongWith(actions.checkAndFeed())
-                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot())),
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
                     ),
             ).onFalse(
                 actions.stopAll(),
@@ -191,20 +167,36 @@ class Bindings(
             )
 
         driver
+            .povUp()
+            .whileTrue(
+                actions.checkAndFeed()
+            )
+            .onFalse(
+                actions.stopAllAndHomeHood(),
+            )
+
+        driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
             )
 
-        shooterJamTrigger
-            .onTrue(
-                SequentialCommandGroup(
-                    InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
-                    actions.autoUnjam(),
-                    InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }),
-                    PrintCommand("RUMBLE COMPLETE."),
-                    actions.checkAndFeed(),
-                ),
+        operator
+            .y()
+            .whileTrue(
+                robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kForward)
+            )
+
+        operator
+            .a()
+            .whileTrue(
+                robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kReverse)
+            )
+
+        operator
+            .b()
+            .whileTrue(
+                robotContainer.shooter.sysIDHood.dynamic(SysIdRoutine.Direction.kForward)
             )
     }
 }

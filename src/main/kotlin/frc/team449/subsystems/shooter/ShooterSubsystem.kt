@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import edu.wpi.first.wpilibj2.command.button.Trigger
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.ShooterConstants
@@ -30,16 +29,12 @@ class ShooterSubsystem(
     var hoodTargetAngleRad: Double = 0.0
         private set
 
-    private val tunableFlywheelVelocity = LoggedTunableNumber("Shooter/Tuning/FlywheelTargetRadsPerSec", 0.0)
-    private val tunableHoodAngle = LoggedTunableNumber("Shooter/Tuning/HoodTargetRads", 0.0)
-    private val tuningModeActive = LoggedTunableNumber("Shooter/Tuning/ModeActive", 0.0) // 1.0 = active
+    private val tunableFlywheelVelocity = LoggedTunableNumber("Shooter/FlywheelTargetRadsPerSec", 0.0)
+    private val tunableHoodAngle = LoggedTunableNumber("Shooter/HoodTargetRads", 0.0)
+    private val tuningModeActive = LoggedTunableNumber("Shooter/ModeActive", 0.0) // 1.0 = active
 
     val hoodAngle: Double
         get() = inputs.hoodAngleRad
-
-    val shooterJamTrigger: Trigger =
-        Trigger { abs(inputs.leftTopLeaderStatorCurrentAmps) > (ShooterConstants.FLYWHEEL_STATOR_LIM - 10.0) }
-            .debounce(0.25)
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -50,8 +45,8 @@ class ShooterSubsystem(
                 flywheelTargetVelocityRadsPerSec = tunableFlywheelVelocity.get()
                 hoodTargetAngleRad = tunableHoodAngle.get()
 
-                io.setFlywheelVelocity(RadiansPerSecond.of(flywheelTargetVelocityRadsPerSec))
-                io.setHoodAngle(Radians.of(hoodTargetAngleRad))
+                setFlywheelVelocityInternal(RadiansPerSecond.of(flywheelTargetVelocityRadsPerSec))
+                setHoodAngleInternal(Radians.of(hoodTargetAngleRad))
             }
         }
 
