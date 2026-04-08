@@ -26,7 +26,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.9,
+      "t_ratio": 0.8232449894770815,
       "lib_key": "start_intake"
     },
     {
@@ -38,7 +38,7 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 8.457076124129724,
+        "x_meters": 8.242190978647335,
         "y_meters": 2.270027184177094,
         "intermediate_handoff_radius_meters": 0.35
       },
@@ -50,8 +50,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 8.695494315268984,
-        "y_meters": 3.3869378277040845,
+        "x_meters": 8.614912385713088,
+        "y_meters": 3.3869378277040854,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -62,8 +62,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 8.666366668814836,
-        "y_meters": 4.713139015916182,
+        "x_meters": 8.58578473925894,
+        "y_meters": 4.73999965910148,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -74,8 +74,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.638862846965063,
-        "y_meters": 5.368789041549128,
+        "x_meters": 7.450838344667972,
+        "y_meters": 5.395649684734427,
         "intermediate_handoff_radius_meters": 0.35
       },
       "rotation_target": {
@@ -86,8 +86,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.550130652726104,
-        "y_meters": 4.0730647546676995,
+        "x_meters": 7.281524220873118,
+        "y_meters": 4.234228613779493,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -98,8 +98,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.415345792772016,
-        "y_meters": 3.0604620697641316,
+        "x_meters": 7.254181933660223,
+        "y_meters": 3.1679046425053263,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -133,7 +133,7 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.0,
+      "t_ratio": -0.0,
       "lib_key": "lemon_shoot"
     },
     {

@@ -72,7 +72,7 @@ object Constants {
         const val CTE_D = 0.0
 
         // --- OPERATION TIMING ---
-        const val AUTO_SHOOTING_TIME_SEC = 4.5
+        const val AUTO_SHOOTING_TIME_SEC = 4.0
 
         // --- SPEED LIMITS ---
         const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
@@ -86,14 +86,16 @@ object Constants {
 
         // --- BLUE ALLIANCE LANDMARKS ---
         val BLUE_HUB: Translation2d = Translation2d(4.625594, 4.034536)
-        val BLUE_TRENCHES: Array<Pose2d> = arrayOf(
-            Pose2d(4.35, 0.45, Rotation2d(1.5)),
-            Pose2d(4.35, 7.60, Rotation2d(-1.5))
-        )
-        val BLUE_PASSES: Array<Translation2d> = arrayOf(
-            Translation2d(1.65, 1.4),
-            Translation2d(1.65, 6.6)
-        )
+        val BLUE_TRENCHES: Array<Pose2d> =
+            arrayOf(
+                Pose2d(4.35, 0.45, Rotation2d(1.5)),
+                Pose2d(4.35, 7.60, Rotation2d(-1.5)),
+            )
+        val BLUE_PASSES: Array<Translation2d> =
+            arrayOf(
+                Translation2d(1.65, 1.4),
+                Translation2d(1.65, 6.6),
+            )
     }
 
     object ShooterConstants {

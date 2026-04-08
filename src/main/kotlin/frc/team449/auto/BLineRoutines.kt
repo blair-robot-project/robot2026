@@ -116,6 +116,8 @@ class BLineRoutines(
         FollowPath.registerEventTrigger("start_shooting_hub", actions.autoHubShot())
     }
 
+    private fun nothing(): Command = Commands.none()
+
     private fun preloadHubShot(): Command {
         val path1 = Path("hub_start")
         val path2 = Path("hub_end")
@@ -128,8 +130,6 @@ class BLineRoutines(
             pathBuilder(false).build(path2),
         )
     }
-
-    private fun nothing(): Command = Commands.none()
 
     private fun halfClose(mirror: Boolean): Command {
         val path1 = Path("R_half_reg_pt1")
@@ -152,11 +152,48 @@ class BLineRoutines(
         )
     }
 
+    private fun regAndCleanUp(mirror: Boolean): Command {
+        val path1 = Path("R_half_reg_pt1")
+        val path2 = Path("R_half_reg_pt2")
+        val path3 = Path("close_cleanup")
+        val path4 = Path("r_end")
+
+        eventTriggerCommands()
+
+        return Commands.sequence(
+            drive.alignModules(Rotation2d.kCW_90deg),
+            pathBuilderWithReset(mirror).build(path1),
+            pathBuilder(mirror).build(path2),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilder(mirror).build(path3),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilder(mirror).build(path4),
+        )
+    }
+
+    private fun doubleCleanUp(mirror: Boolean): Command {
+        val path1 = Path("far_cleanup")
+        val path2 = Path("close_cleanup")
+        val path3 = Path("r_end")
+
+        eventTriggerCommands()
+
+        return Commands.sequence(
+            drive.alignModules(Rotation2d.kCW_90deg),
+            pathBuilderWithReset(mirror).build(path1),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilder(mirror).build(path2),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilder(mirror).build(path3),
+        )
+    }
+
     private fun halfFar(mirror: Boolean): Command {
-        val path1 = Path("R_half_close_pt1")
-        val path2 = Path("R_half_close_pt2")
-        val path3 = Path("R_half_far_pt1")
-        val path4 = Path("R_half_far_pt2")
+        val path1 = Path("R_half_far_pt1")
+        val path2 = Path("R_half_far_pt2")
+        val path3 = Path("R_half_close_pt1")
+        val path4 = Path("R_half_close_pt2")
+
         val path5 = Path("r_end")
 
         eventTriggerCommands()
@@ -173,6 +210,7 @@ class BLineRoutines(
         )
     }
 
+    /**------------bump autos------------**/
     private fun lemonAuto(mirror: Boolean): Command {
         val path1 = Path("lemon_pt1")
         val path2 = Path("lemon_pt2")
@@ -183,25 +221,25 @@ class BLineRoutines(
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
             pathBuilderWithReset(mirror).build(path1),
-            WaitCommand(3.0),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilder(mirror).build(path2),
-            WaitCommand(3.0),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
             pathBuilder(mirror).build(path3),
         )
     }
 
     private fun bumpAuto(mirror: Boolean): Command {
-        val path1 = Path("bump")
-        val path2 = Path("lemon_end")
+        val path1 = Path("bump_pt1")
+        val path2 = Path("bump_pt2")
 
         eventTriggerCommands()
 
         return Commands.sequence(
             drive.alignModules(Rotation2d.kCW_90deg),
-            WaitCommand(3.0),
+            WaitCommand(2.0), // wait until partners get out of NZ
             pathBuilderWithReset(mirror).build(path1),
-            WaitCommand(4.5),
-            pathBuilder(mirror).build(path2),
+            WaitCommand(AUTO_SHOOTING_TIME_SEC),
+            pathBuilderWithReset(mirror).build(path2),
         )
     }
 
@@ -210,15 +248,18 @@ class BLineRoutines(
         autoChooser.addOption("Preload Hub", preloadHubShot())
 
         autoChooser.addOption("R Half Close", halfClose(false))
-        autoChooser.addOption("R Half Far", halfFar(false))
+        autoChooser.addOption("R Regular & Clean Up", regAndCleanUp(false))
+        autoChooser.addOption("R Trench Double Clean Up", doubleCleanUp(false))
+        autoChooser.addOption("R Bump Double Clean Up", lemonAuto(false))
 
         autoChooser.addOption("L Half Close", halfClose(true))
-        autoChooser.addOption("L Half Far", halfFar(true))
+        autoChooser.addOption("L regular & Clean Up", regAndCleanUp(true))
+        autoChooser.addOption("L Trench Double Clean Up", doubleCleanUp(true))
+        autoChooser.addOption("L Bump Double Clean Up", lemonAuto(true))
 
-        autoChooser.addOption("R Lemon", lemonAuto(false))
-        autoChooser.addOption("L Lemon", lemonAuto(true))
-
-        autoChooser.addOption("R Bump", bumpAuto(false))
-        autoChooser.addOption("L Bump", bumpAuto(true))
+        // autoChooser.addOption("R Bump", bumpAuto(false))
+        // autoChooser.addOption("L Bump", bumpAuto(true))
+        // autoChooser.addOption("R Half Far", halfFar(false))
+        // autoChooser.addOption("L Half Far", halfFar(true))
     }
 }
