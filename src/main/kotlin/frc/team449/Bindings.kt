@@ -29,7 +29,7 @@ class Bindings(
                 abs(driver.rightX) < Constants.DriveConstants.ANGULAR_DEADBAND
         }.debounce(0.1)
 
-    val autoAimCommand =
+    private fun createAutoAimCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
             robotContainer.shooter,
@@ -38,7 +38,7 @@ class Bindings(
             targetSupplier = { FieldUtil.HUB },
         )
 
-    val autoPassCommand =
+    private fun createAutoPassCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
             robotContainer.shooter,
@@ -75,14 +75,16 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                Commands
-                    .sequence(
+                Commands.defer({
+                    val autoAimCommand = createAutoAimCommand()
+                    Commands.sequence(
                         autoAimCommand.until { autoAimCommand.atHeadingSetpoint() && driverIdle.asBoolean },
                         Commands.parallel(
                             robotContainer.drive.xLock(),
                             actions.checkAndFeed().andThen(actions.tuckAndClear())
-                        ),
-                    ).withName("AutoAim"),
+                        )
+                    ).withName("AutoAim")
+                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
             ).onFalse(
                 actions.stopAll(),
             )
@@ -90,14 +92,16 @@ class Bindings(
         driver
             .leftBumper()
             .whileTrue(
-                Commands
-                    .parallel(
+                Commands.defer({
+                    val autoPassCommand = createAutoPassCommand()
+                    Commands.parallel(
                         autoPassCommand,
                         Commands.sequence(
                             Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
                             actions.checkAndFeed(),
-                        ),
-                    ).withName("AutoPass"),
+                        )
+                    ).withName("AutoPass")
+                }, setOf(robotContainer.drive))
             ).onFalse(
                 actions.stopAll(),
             )
@@ -170,9 +174,6 @@ class Bindings(
             .povUp()
             .whileTrue(
                 actions.checkAndFeed()
-            )
-            .onFalse(
-                actions.stopAllAndHomeHood(),
             )
 
         driver

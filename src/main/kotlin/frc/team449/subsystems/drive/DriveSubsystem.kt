@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.DriveConstants
+import frc.team449.util.FieldUtil
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
@@ -48,10 +49,8 @@ class DriveSubsystem(
         field.robotPose = pose
 
         Logger.processInputs("Drive", inputs)
-        Logger.recordOutput(
-            "Drive/ActiveCommand",
-            currentCommand?.name ?: "None",
-        )
+        Logger.recordOutput("Drive/ActiveCommand", currentCommand?.name ?: "None")
+        Logger.recordOutput("Drive/DistanceToHub", FieldUtil.getDistanceToFriendlyHub(pose.translation))
     }
 
     fun setControl(request: SwerveRequest) {

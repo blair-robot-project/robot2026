@@ -130,8 +130,8 @@ object Constants {
         // --- CURRENT & OPERATIONAL LIMITS ---
         const val FLYWHEEL_SUPPLY_LIM = 30.0
         const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 15.0
-        const val HOOD_STATOR_LIM = 20.0
+        const val HOOD_SUPPLY_LIM = 20.0
+        const val HOOD_STATOR_LIM = 30.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
         val MAX_HOOD_ANGLE: Angle = Radians.of(0.5185)
@@ -148,8 +148,8 @@ object Constants {
         const val HOOD_KP = 5000.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
-        const val HOOD_KS = 0.2102
-        const val HOOD_KG = 0.14
+        const val HOOD_KS = 0.595
+        const val HOOD_KG = 0.595
         const val HOOD_KV = 3.4683
 
         // --- HOMING & TOLERANCE ---
@@ -176,22 +176,22 @@ object Constants {
 
         val FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 160.0)
-                put(1.671, 175.0)
-                put(2.08, 205.0)
-                put(2.57, 205.0)
-                put(3.43, 205.0)
-                put(4.92, 215.0)
-                put(5.90, 275.5)
+                put(1.294, 150.0)
+                put(1.671, 160.0)
+                put(2.08, 180.0)
+                put(2.57, 180.0)
+                put(3.43, 180.0)
+                put(4.92, 200.0)
+                put(5.90, 250.5)
             }
 
         val HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 0.0)
-                put(1.671, 0.0)
-                put(2.08, .01)
-                put(2.57, .07)
-                put(3.43, 0.15)
+                put(1.294, 0.01678)
+                put(1.671, 0.02)
+                put(2.08, .03)
+                put(2.57, .1)
+                put(3.43, 0.1678)
                 put(4.92, 0.27)
                 put(5.90, 0.27)
             }
@@ -236,6 +236,7 @@ object Constants {
         const val DEPLOY_VOLTS = 4.0
         const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
+        const val SLOW_STOW_VOLTS = -1.323
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- HOMING & VISUALIZATION ---
@@ -269,7 +270,7 @@ object Constants {
         const val FLOOR_MOI_KG_MM = 0.005
 
         const val TOP_GEARING = 31.0 / 11.0
-        const val TOP_MOI_KG_MM = 0.000000008
+        const val TOP_MOI_KG_MM = 0.005
     }
 
     object AlignConstants {
@@ -277,7 +278,7 @@ object Constants {
         const val ALIGN_KP = 10.0
         const val ALIGN_KD = 0.05
 
-        // --- AIMBOT CONFIGURATION ---
+        // --- ALIGN CONFIGURATION ---
         const val POSITION_TOLERANCE_RADS = 0.035
         const val VELOCITY_TOLERANCE_RADS_PER_SEC = 0.25
     }

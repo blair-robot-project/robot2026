@@ -76,13 +76,6 @@ class DriveIOSim(
         }
 
     init {
-        SimulatedArena.overrideInstance(
-            object : SimulatedArena(object : FieldMap() {}) {
-                override fun placeGamePiecesOnField() {
-                }
-            },
-        )
-
         initializeSimulation()
 
         registerTelemetry(simTelemetryConsumer)

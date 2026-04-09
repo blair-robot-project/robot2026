@@ -35,7 +35,6 @@ class VisionIOLimelight(
     }
 
     override fun updateInputs(inputs: VisionIOInputs) {
-        println(poseSupplier.get().rotation)
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
