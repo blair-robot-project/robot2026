@@ -83,8 +83,9 @@ class Bindings(
                             robotContainer.drive.xLock(),
                             actions.checkAndFeed().andThen(actions.tuckAndClear())
                         )
-                    ).withName("AutoAim")
+                    )
                 }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
+                    .withName("AutoAim")
             ).onFalse(
                 actions.stopAll(),
             )
@@ -94,16 +95,17 @@ class Bindings(
             .whileTrue(
                 Commands.defer({
                     val autoPassCommand = createAutoPassCommand()
-                    Commands.parallel(
-                        autoPassCommand,
-                        Commands.sequence(
-                            Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
-                            actions.checkAndFeed(),
+                    Commands.sequence(
+                        autoPassCommand.until { autoPassCommand.atHeadingSetpoint() && driverIdle.asBoolean },
+                        Commands.parallel(
+                            robotContainer.drive.xLock(),
+                            actions.checkAndFeed().alongWith(actions.tuckAndClear()),
                         )
-                    ).withName("AutoPass")
-                }, setOf(robotContainer.drive))
+                    )
+                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
+                    .withName("AutoPass")
             ).onFalse(
-                actions.stopAll(),
+                actions.stopAllAndHomeHood(),
             )
 
         driver

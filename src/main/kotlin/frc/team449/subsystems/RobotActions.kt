@@ -75,16 +75,20 @@ class RobotActions(
                 shooter.stopFlywheel(),
             ).withName("StopAll")
 
+    fun stopFeed(): Command = indexer.stop()
+
     fun stopAllAndHomeHood(): Command =
         Commands.sequence(
-            stopAll(),
-            shooter.homeHood(),
-        )
+            intake.stopRollers(),
+            indexer.stop(),
+            shooter.stopFlywheel(),
+            shooter.homeHoodNoDeferred(),
+        ).withName("StopAllAndHomeHood")
 
     fun tuckAndClear(): Command =
         Commands.sequence(
             intake.setRollerVoltage(6.0),
-            WaitCommand(1.5),
+            WaitCommand(1.6),
             intake.stopRollers(),
             intake.stowSlow()
         ).withName("TuckAndClear")
@@ -95,7 +99,7 @@ class RobotActions(
             checkAndFeed().andThen(tuckAndClear()),
         )
 
-    fun autoLemonShot(): Command =
+    fun autoBumpShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(2.22),
             checkAndFeed().andThen(tuckAndClear()),
@@ -103,7 +107,7 @@ class RobotActions(
 
     fun autoHubShot(): Command =
         Commands.sequence(
-            prepShotFromDistanceMeters(1.3),
+            prepShotFromDistanceMeters(2.5),
             checkAndFeed().andThen(tuckAndClear()),
         )
 }

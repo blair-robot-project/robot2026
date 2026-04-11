@@ -51,7 +51,7 @@ object Constants {
         const val SLOW_ANGULAR_SPEED_RADS_PER_SEC = 0.5804
 
         // --- DEADBANDS & TOLERANCE ---
-        const val TRANSLATION_DEADBAND = 0.05
+        const val TRANSLATION_DEADBAND = 0.1
         const val ANGULAR_DEADBAND = 0.1
         const val INTERRUPT_DEADBAND = 0.25
         const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
@@ -176,13 +176,15 @@ object Constants {
 
         val FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 150.0)
+                put(1.294, 145.0)
                 put(1.671, 160.0)
-                put(2.08, 180.0)
+                put(2.08, 170.0)
                 put(2.57, 180.0)
                 put(3.43, 180.0)
-                put(4.92, 200.0)
+                put(4.92, 220.0)
                 put(5.90, 250.5)
+                put(7.00, 220.5)
+                put(12.00, 250.5)
             }
 
         val HOOD_ANGLE_MAP =
@@ -194,6 +196,8 @@ object Constants {
                 put(3.43, 0.1678)
                 put(4.92, 0.27)
                 put(5.90, 0.27)
+                put(7.00, 0.5)
+                put(12.00, 0.5)
             }
     }
 

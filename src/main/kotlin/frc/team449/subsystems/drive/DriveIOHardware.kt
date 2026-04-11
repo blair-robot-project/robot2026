@@ -113,13 +113,19 @@ open class DriveIOHardware(
         for (i in 0 until modules.count()) {
             Logger.recordOutput(
                 moduleNames[i] + "/DriveSupplyCurrentAmps",
-                this.modules[i]
-                    .driveMotor.supplyCurrent.valueAsDouble,
+                this.modules[i].driveMotor.supplyCurrent.valueAsDouble,
             )
             Logger.recordOutput(
                 moduleNames[i] + "/DriveStatorCurrentAmps",
-                this.modules[i]
-                    .driveMotor.statorCurrent.valueAsDouble,
+                this.modules[i].driveMotor.statorCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/SteerSupplyCurrentAmps",
+                this.modules[i].steerMotor.supplyCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/SteerStatorCurrentAmps",
+                this.modules[i].steerMotor.statorCurrent.valueAsDouble,
             )
         }
     }

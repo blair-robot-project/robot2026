@@ -77,7 +77,8 @@ class AimAtTargetCommand(
         )
 
         Logger.recordOutput("Align/HeadingErrorRads", driveWithHeading.HeadingController.positionError)
-        Logger.recordOutput("Align/DistanceToHubMeters", distance)
+        Logger.recordOutput("Align/HeadingAtTarget", driveWithHeading.HeadingController.atSetpoint())
+        Logger.recordOutput("Align/DistanceToTargetMeters", distance)
     }
 
     fun atHeadingSetpoint(): Boolean = driveWithHeading.HeadingController.atSetpoint()
