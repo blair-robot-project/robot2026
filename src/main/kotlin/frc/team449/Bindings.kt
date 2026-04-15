@@ -2,7 +2,6 @@ package frc.team449
 
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
@@ -77,10 +76,10 @@ class Bindings(
             .whileTrue(
                 Commands.defer({
                     val autoAimCommand = createAutoAimCommand()
-                    Commands.sequence(
-                        autoAimCommand.until { autoAimCommand.atHeadingSetpoint() && driverIdle.asBoolean },
-                        Commands.parallel(
-                            robotContainer.drive.xLock(),
+                    Commands.parallel(
+                        autoAimCommand,
+                        Commands.sequence(
+                            Commands.waitUntil { autoAimCommand.atHeadingSetpoint() },
                             actions.checkAndFeed().andThen(actions.tuckAndClear())
                         )
                     )
@@ -95,17 +94,17 @@ class Bindings(
             .whileTrue(
                 Commands.defer({
                     val autoPassCommand = createAutoPassCommand()
-                    Commands.sequence(
-                        autoPassCommand.until { autoPassCommand.atHeadingSetpoint() && driverIdle.asBoolean },
-                        Commands.parallel(
-                            robotContainer.drive.xLock(),
-                            actions.checkAndFeed().alongWith(actions.tuckAndClear()),
+                    Commands.parallel(
+                        autoPassCommand,
+                        Commands.sequence(
+                            Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
+                            actions.checkAndFeed().andThen(actions.tuckAndClear())
                         )
                     )
                 }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
                     .withName("AutoPass")
             ).onFalse(
-                actions.stopAllAndHomeHood(),
+                actions.stopAllAndZeroHood(),
             )
 
         driver
@@ -125,7 +124,8 @@ class Bindings(
                         robotContainer.drive
                             .xLock()
                             .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
-                    ),
+                    )
+                    .withName("TrenchShot"),
             ).onFalse(
                 actions.stopAll(),
             )
@@ -134,12 +134,13 @@ class Bindings(
             .y()
             .whileTrue(
                 actions
-                    .prepShotFromDistanceMeters(1.3)
+                    .prepShotFromDistanceMeters(1.4)
                     .andThen(
                         robotContainer.drive
                             .xLock()
                             .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
-                    ),
+                    )
+                    .withName("HubShot"),
             ).onFalse(
                 actions.stopAll(),
             )
@@ -153,7 +154,8 @@ class Bindings(
                         robotContainer.drive
                             .xLock()
                             .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
-                    ),
+                    )
+                    .withName("TowerShot"),
             ).onFalse(
                 actions.stopAll(),
             )
@@ -182,24 +184,6 @@ class Bindings(
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
-            )
-
-        operator
-            .y()
-            .whileTrue(
-                robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kForward)
-            )
-
-        operator
-            .a()
-            .whileTrue(
-                robotContainer.shooter.sysIDHood.quasistatic(SysIdRoutine.Direction.kReverse)
-            )
-
-        operator
-            .b()
-            .whileTrue(
-                robotContainer.shooter.sysIDHood.dynamic(SysIdRoutine.Direction.kForward)
             )
     }
 }

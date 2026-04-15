@@ -33,6 +33,9 @@ class AimAtTargetCommand(
             .withHeadingPID(AlignConstants.ALIGN_KP, 0.0, AlignConstants.ALIGN_KD)
             .withDeadband(maxLinearSpeedMetersPerSecond * DriveConstants.TRANSLATION_DEADBAND)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity)
+    private val brakeRequest =
+        SwerveRequest
+            .SwerveDriveBrake()
 
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
@@ -62,12 +65,16 @@ class AimAtTargetCommand(
             abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
             maxLinearSpeedMetersPerSecond
 
-        drive.setControl(
-            driveWithHeading
-                .withVelocityX(throttle)
-                .withVelocityY(strafe)
-                .withTargetDirection(targetRotation)
-        )
+        if (!atHeadingSetpoint()) {
+            drive.setControl(
+                driveWithHeading
+                    .withVelocityX(throttle)
+                    .withVelocityY(strafe)
+                    .withTargetDirection(targetRotation)
+            )
+        } else {
+            drive.setControl(brakeRequest)
+        }
 
         shooter.setFlywheelVelocityInternal(
             RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
@@ -84,8 +91,4 @@ class AimAtTargetCommand(
     fun atHeadingSetpoint(): Boolean = driveWithHeading.HeadingController.atSetpoint()
 
     override fun isFinished(): Boolean = false
-
-    override fun end(interrupted: Boolean) {
-        drive.setControl(SwerveRequest.Idle())
-    }
 }

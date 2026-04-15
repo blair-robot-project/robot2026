@@ -27,8 +27,9 @@ class RobotActions(
                 Commands.parallel(
                     intake.setRollerVoltage(12.0),
                     indexer.setIndexerVoltage(0.5, 0.0),
+                    shooter.stopFlywheel()
                 ),
-            ).withName("DeployAndIntake")
+            ).withName("DeployIntake")
 
     fun stopIntakeAndPivot(): Command =
         Commands
@@ -36,7 +37,9 @@ class RobotActions(
                 intake.stopRollers(),
                 indexer.setIndexerVoltage(0.0, 0.0),
                 intake.setPivotVoltage(0.0),
-            ).withName("StopIntakeAndPivot")
+            ).withName("StopIntakePivot")
+
+    fun stopIntake(): Command = intake.stopRollers().withName("StopIntake")
 
     fun stopAndStow(): Command =
         Commands
@@ -45,7 +48,7 @@ class RobotActions(
                 indexer.setIndexerVoltage(0.5, 0.0),
                 intake.stow(),
                 indexer.setIndexerVoltage(0.0, 0.0),
-            ).withName("StopAndStow")
+            ).withName("StopStow")
 
     fun prepShotFromDistanceMeters(distanceMeters: Double): Command =
         Commands.sequence(
@@ -58,7 +61,7 @@ class RobotActions(
             .sequence(
                 Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
                 indexer.setIndexerVoltage(12.0, 12.0),
-            ).withName("CheckAndFeed")
+            ).withName("CHECK-FEED")
 
     fun reverseAll(): Command =
         Commands.parallel(
@@ -66,32 +69,47 @@ class RobotActions(
             indexer.setIndexerVoltage(-2.0, -2.0),
             shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
         )
+            .withName("ReverseAll")
 
     fun stopAll(): Command =
-        Commands
-            .sequence(
-                intake.stopRollers(),
-                indexer.stop(),
-                shooter.stopFlywheel(),
-            ).withName("StopAll")
+        Commands.parallel(
+            shooter.stopFlywheel(),
+            intake.stopRollers(),
+            indexer.stop()
+        )
+            .withName("StopAll")
 
     fun stopFeed(): Command = indexer.stop()
 
     fun stopAllAndHomeHood(): Command =
-        Commands.sequence(
+        Commands.parallel(
+            Commands.sequence(
+                shooter.stopFlywheel(),
+                shooter.homeHoodNoDeferred()
+            ),
             intake.stopRollers(),
-            indexer.stop(),
-            shooter.stopFlywheel(),
-            shooter.homeHoodNoDeferred(),
-        ).withName("StopAllAndHomeHood")
+            indexer.stop()
+        )
+            .withName("StopAllHomeHood")
+
+    fun stopAllAndZeroHood(): Command =
+        Commands.parallel(
+            Commands.sequence(
+                shooter.stopFlywheel(),
+                shooter.setHoodAngle(Radians.of(0.0))
+            ),
+            intake.stopRollers(),
+            indexer.stop()
+        )
+            .withName("StopAllZeroHood")
 
     fun tuckAndClear(): Command =
         Commands.sequence(
-            intake.setRollerVoltage(6.0),
+            intake.setRollerVoltage(3.0),
             WaitCommand(1.6),
             intake.stopRollers(),
             intake.stowSlow()
-        ).withName("TuckAndClear")
+        ).withName("TuckClear")
 
     fun autoTrenchShot(): Command =
         Commands.sequence(

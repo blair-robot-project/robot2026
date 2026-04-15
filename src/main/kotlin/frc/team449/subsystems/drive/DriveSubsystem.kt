@@ -36,6 +36,15 @@ class DriveSubsystem(
     val pose: Pose2d
         get() = inputs.Pose
 
+    val robotRelativeSpeeds: ChassisSpeeds
+        get() = inputs.Speeds
+
+    val fieldRelativeSpeeds: ChassisSpeeds
+        get() = ChassisSpeeds.fromRobotRelativeSpeeds(
+            inputs.Speeds,
+            inputs.Pose.rotation,
+        )
+
     val modulePositions: Array<SwerveModulePosition>
         get() = inputs.ModulePositions
 
@@ -75,14 +84,6 @@ class DriveSubsystem(
 
         io.setOperatorPerspectiveForward(forward)
     }
-
-    fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
-
-    fun getFieldRelativeSpeeds(): ChassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            inputs.Speeds,
-            inputs.Pose.rotation,
-        )
 
     fun getAngularVelocity(): AngularVelocity3d =
         AngularVelocity3d(

@@ -23,7 +23,7 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-    const val TUNING_MODE: Boolean = true
+    const val TUNING_MODE: Boolean = false
 
     // --- SYSTEM TIMING ---
     const val LOOP_TIME = 0.02
@@ -72,7 +72,7 @@ object Constants {
         const val CTE_D = 0.0
 
         // --- OPERATION TIMING ---
-        const val AUTO_SHOOTING_TIME_SEC = 4.0
+        const val AUTO_SHOOTING_TIME_SEC = 3.2
 
         // --- SPEED LIMITS ---
         const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
@@ -128,9 +128,9 @@ object Constants {
         const val EFFICIENCY = 0.97
 
         // --- CURRENT & OPERATIONAL LIMITS ---
-        const val FLYWHEEL_SUPPLY_LIM = 30.0
-        const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 20.0
+        const val FLYWHEEL_SUPPLY_LIM = 20.0
+        const val FLYWHEEL_STATOR_LIM = 100.0
+        const val HOOD_SUPPLY_LIM = 10.0
         const val HOOD_STATOR_LIM = 30.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
@@ -154,7 +154,7 @@ object Constants {
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 18.0
+        const val HOMING_CURRENT_AMPS = 25.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
         const val HOMING_DEBOUNCE_TIME = 0.4
 
@@ -178,13 +178,14 @@ object Constants {
             InterpolatingDoubleTreeMap().apply {
                 put(1.294, 145.0)
                 put(1.671, 160.0)
-                put(2.08, 170.0)
-                put(2.57, 180.0)
-                put(3.43, 180.0)
-                put(4.92, 220.0)
+                put(2.08, 165.0)
+                put(2.57, 175.0)
+                put(3.43, 185.0)
+                put(4.5, 215.0)
+                put(4.92, 225.0)
                 put(5.90, 250.5)
-                put(7.00, 220.5)
-                put(12.00, 250.5)
+                put(7.00, 180.5)
+                put(12.00, 200.5)
             }
 
         val HOOD_ANGLE_MAP =
@@ -196,8 +197,8 @@ object Constants {
                 put(3.43, 0.1678)
                 put(4.92, 0.27)
                 put(5.90, 0.27)
-                put(7.00, 0.5)
-                put(12.00, 0.5)
+                put(7.00, 0.4)
+                put(12.00, 0.4)
             }
     }
 
@@ -228,9 +229,9 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 15.0
+        const val PIVOT_SUPPLY_LIMIT = 10.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 30.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -263,10 +264,10 @@ object Constants {
         val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val FLOOR_SUPPLY_LIMIT = 40.0
+        const val FLOOR_SUPPLY_LIMIT = 20.0
         const val FLOOR_STATOR_LIMIT = 80.0
 
-        const val TOP_SUPPLY_LIMIT = 40.0
+        const val TOP_SUPPLY_LIMIT = 30.0
         const val TOP_STATOR_LIMIT = 80.0
 
         // --- PHYSICAL SPECS & GEARING ---

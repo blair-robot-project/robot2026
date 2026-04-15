@@ -27,7 +27,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.9000000000000007,
-      "lib_key": "second_start_shooting"
+      "lib_key": "trench_shot"
     },
     {
       "type": "waypoint",

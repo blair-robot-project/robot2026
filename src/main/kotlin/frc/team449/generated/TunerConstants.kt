@@ -78,6 +78,7 @@ object TunerConstants {
             .withCurrentLimits(
                 CurrentLimitsConfigs()
                     .withSupplyCurrentLimit(40.0)
+                    .withStatorCurrentLimit(80.0)
             )
 
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
@@ -99,7 +100,7 @@ object TunerConstants {
 
     private const val kDriveGearRatio: Double = 50.0 / 14 * 17 / 27 * 45 / 15
     private const val kSteerGearRatio: Double = 21.428571428571427
-    private val kWheelRadius: Distance = Units.Inches.of(1.908419751181103)
+    private val kWheelRadius: Distance = Units.Inches.of(2.04)
 
     private const val kInvertLeftSide: Boolean = true
     private const val kInvertRightSide: Boolean = false
