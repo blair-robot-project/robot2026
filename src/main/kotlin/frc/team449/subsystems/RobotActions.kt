@@ -4,6 +4,7 @@ import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.Constants.ShooterConstants
 import frc.team449.RobotContainer
 import frc.team449.subsystems.drive.DriveSubsystem
@@ -12,7 +13,7 @@ import frc.team449.subsystems.intake.IntakeSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 
 class RobotActions(
-    robotContainer: RobotContainer,
+    robotContainer: RobotContainer
 ) {
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
@@ -26,8 +27,9 @@ class RobotActions(
                 Commands.parallel(
                     intake.setRollerVoltage(12.0),
                     indexer.setIndexerVoltage(0.5, 0.0),
+                    shooter.stopFlywheel()
                 ),
-            ).withName("DeployAndIntake")
+            ).withName("DeployIntake")
 
     fun stopIntakeAndPivot(): Command =
         Commands
@@ -35,7 +37,9 @@ class RobotActions(
                 intake.stopRollers(),
                 indexer.setIndexerVoltage(0.0, 0.0),
                 intake.setPivotVoltage(0.0),
-            ).withName("StopIntakeAndPivot")
+            ).withName("StopIntakePivot")
+
+    fun stopIntake(): Command = intake.stopRollers().withName("StopIntake")
 
     fun stopAndStow(): Command =
         Commands
@@ -44,18 +48,7 @@ class RobotActions(
                 indexer.setIndexerVoltage(0.5, 0.0),
                 intake.stow(),
                 indexer.setIndexerVoltage(0.0, 0.0),
-            ).withName("StopAndStow")
-
-    fun shuffleIntakePivot(): Command =
-        Commands.sequence(
-            intake.setRollerVoltage(3.0),
-            Commands.repeatingSequence(
-                intake.setPivotAngle(Radians.of(1.6)),
-                Commands.waitSeconds(0.15),
-                intake.setPivotAngle(Radians.of(0.85)),
-                Commands.waitSeconds(0.15),
-            ),
-        )
+            ).withName("StopStow")
 
     fun prepShotFromDistanceMeters(distanceMeters: Double): Command =
         Commands.sequence(
@@ -68,24 +61,7 @@ class RobotActions(
             .sequence(
                 Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() },
                 indexer.setIndexerVoltage(12.0, 12.0),
-            ).withName("CheckAndFeed")
-
-    fun autoUnjam(): Command =
-        Commands.defer({
-            val originalFlywheelSetpointRadsPerSec = shooter.flywheelTargetVelocityRadsPerSec
-
-            Commands.sequence(
-                Commands.print("AUTO-UNJAM!"),
-                Commands.parallel(
-                    indexer.setIndexerVoltage(0.0, 2.0),
-                    shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
-                ),
-                Commands.waitSeconds(0.25),
-                indexer.stop(),
-                Commands.print("POST-UNJAM SETPOINT: $originalFlywheelSetpointRadsPerSec"),
-                shooter.setFlywheelVelocity(RadiansPerSecond.of(originalFlywheelSetpointRadsPerSec)),
-            )
-        }, setOf(indexer, shooter))
+            ).withName("CHECK-FEED")
 
     fun reverseAll(): Command =
         Commands.parallel(
@@ -93,30 +69,63 @@ class RobotActions(
             indexer.setIndexerVoltage(-2.0, -2.0),
             shooter.setFlywheelVelocity(ShooterConstants.UNJAM_FLYWHEEL_VEL),
         )
+            .withName("ReverseAll")
 
     fun stopAll(): Command =
-        Commands
-            .sequence(
-                intake.stopRollers(),
-                indexer.stop(),
-                shooter.stopFlywheel(),
-            ).withName("StopAll")
+        Commands.parallel(
+            shooter.stopFlywheel(),
+            intake.stopRollers(),
+            indexer.stop()
+        )
+            .withName("StopAll")
+
+    fun stopFeed(): Command = indexer.stop()
 
     fun stopAllAndHomeHood(): Command =
-        Commands.sequence(
-            stopAll(),
-            shooter.homeHood(),
+        Commands.parallel(
+            Commands.sequence(
+                shooter.stopFlywheel(),
+                shooter.homeHoodNoDeferred()
+            ),
+            intake.stopRollers(),
+            indexer.stop()
         )
+            .withName("StopAllHomeHood")
 
-    fun autoTrenchShot(time: Double): Command =
+    fun stopAllAndZeroHood(): Command =
+        Commands.parallel(
+            Commands.sequence(
+                shooter.stopFlywheel(),
+                shooter.setHoodAngle(Radians.of(0.0))
+            ),
+            intake.stopRollers(),
+            indexer.stop()
+        )
+            .withName("StopAllZeroHood")
+
+    fun tuckAndClear(): Command =
+        Commands.sequence(
+            intake.setRollerVoltage(3.0),
+            WaitCommand(1.6),
+            intake.stopRollers(),
+            intake.stowSlow()
+        ).withName("TuckClear")
+
+    fun autoTrenchShot(): Command =
         Commands.sequence(
             prepShotFromDistanceMeters(3.43),
-            checkAndFeed(),
+            checkAndFeed().andThen(tuckAndClear()),
+        )
+
+    fun autoBumpShot(): Command =
+        Commands.sequence(
+            prepShotFromDistanceMeters(2.22),
+            checkAndFeed().andThen(tuckAndClear()),
         )
 
     fun autoHubShot(): Command =
         Commands.sequence(
-            prepShotFromDistanceMeters(1.3),
-            checkAndFeed(),
+            prepShotFromDistanceMeters(2.5),
+            checkAndFeed().andThen(tuckAndClear()),
         )
 }

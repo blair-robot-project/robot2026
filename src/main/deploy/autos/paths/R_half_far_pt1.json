@@ -14,13 +14,13 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.3,
+      "t_ratio": 0.29999999999999966,
       "lib_key": "start_intake"
     },
     {
       "type": "translation",
-      "x_meters": 6.198220187383005,
-      "y_meters": 0.4,
+      "x_meters": 6.227283981914904,
+      "y_meters": 0.5162551781275884,
       "intermediate_handoff_radius_meters": 0.2
     },
     {
@@ -31,7 +31,7 @@
         "intermediate_handoff_radius_meters": 0.3
       },
       "rotation_target": {
-        "rotation_radians": 1.5429380819796414,
+        "rotation_radians": 1.7453292519943295,
         "profiled_rotation": true
       }
     },
@@ -43,7 +43,7 @@
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
-        "rotation_radians": 1.5961608682628468,
+        "rotation_radians": 1.7453292519943295,
         "profiled_rotation": true
       }
     }

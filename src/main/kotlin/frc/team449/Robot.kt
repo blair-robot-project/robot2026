@@ -46,11 +46,10 @@ class Robot : LoggedRobot() {
             }
         }
 
+        // TODO: correct PDH CAN ID
         LoggedPowerDistribution.getInstance(49, PowerDistribution.ModuleType.kRev)
 
-        // SignalLogger.enableAutoLogging(true)
-        SignalLogger.setPath("/home/lvuser/logs/")
-        SignalLogger.start()
+        SignalLogger.enableAutoLogging(false)
         Logger.start()
     }
 
@@ -81,9 +80,7 @@ class Robot : LoggedRobot() {
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
-    override fun autonomousPeriodic() {
-        robotContainer.bLineRoutines.logBLineAuto()
-    }
+    override fun autonomousPeriodic() {}
 
     override fun teleopInit() {
         robotContainer.autonomousCommand.cancel()

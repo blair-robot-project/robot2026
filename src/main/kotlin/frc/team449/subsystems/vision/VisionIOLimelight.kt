@@ -18,7 +18,7 @@ import java.util.function.Supplier
 
 class VisionIOLimelight(
     name: String,
-    private val poseSupplier: () -> Pose2d,
+    private val poseSupplier: Supplier<Pose2d>,
     private val angularVelocitySupplier: Supplier<AngularVelocity3d>,
     offset: Pose3d
 ) : VisionIO {
@@ -38,13 +38,8 @@ class VisionIOLimelight(
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d(poseSupplier().rotation),
+                    Rotation3d(poseSupplier.get().rotation),
                     angularVelocitySupplier.get(),
-//                    AngularVelocity3d(
-//                        DegreesPerSecond.of(0.0),
-//                        DegreesPerSecond.of(0.0),
-//                        DegreesPerSecond.of(0.0)
-//                    )
                 )
             )
             .save()

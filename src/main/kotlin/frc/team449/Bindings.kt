@@ -1,12 +1,6 @@
 package frc.team449
 
-import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import edu.wpi.first.wpilibj2.command.PrintCommand
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
@@ -14,7 +8,7 @@ import frc.team449.util.FieldUtil
 import kotlin.math.abs
 
 class Bindings(
-    val robotContainer: RobotContainer,
+    val robotContainer: RobotContainer
 ) {
     val driver = robotContainer.driveController
     val operator = robotContainer.operatorController
@@ -34,9 +28,7 @@ class Bindings(
                 abs(driver.rightX) < Constants.DriveConstants.ANGULAR_DEADBAND
         }.debounce(0.1)
 
-    val shooterJamTrigger: Trigger = robotContainer.shooter.shooterJamTrigger
-
-    val autoAimCommand =
+    private fun createAutoAimCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
             robotContainer.shooter,
@@ -45,7 +37,7 @@ class Bindings(
             targetSupplier = { FieldUtil.HUB },
         )
 
-    val autoPassCommand =
+    private fun createAutoPassCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
             robotContainer.shooter,
@@ -82,14 +74,17 @@ class Bindings(
         driver
             .rightBumper()
             .whileTrue(
-                Commands
-                    .sequence(
-                        autoAimCommand.until { autoAimCommand.atHeadingSetpoint() && driverIdle.asBoolean },
-                        Commands.parallel(
-                            robotContainer.drive.xLock(),
-                            actions.checkAndFeed(),
-                        ),
-                    ).withName("AutoAim"),
+                Commands.defer({
+                    val autoAimCommand = createAutoAimCommand()
+                    Commands.parallel(
+                        autoAimCommand,
+                        Commands.sequence(
+                            Commands.waitUntil { autoAimCommand.atHeadingSetpoint() },
+                            actions.checkAndFeed().andThen(actions.tuckAndClear())
+                        )
+                    )
+                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
+                    .withName("AutoAim")
             ).onFalse(
                 actions.stopAll(),
             )
@@ -97,16 +92,19 @@ class Bindings(
         driver
             .leftBumper()
             .whileTrue(
-                Commands
-                    .parallel(
+                Commands.defer({
+                    val autoPassCommand = createAutoPassCommand()
+                    Commands.parallel(
                         autoPassCommand,
                         Commands.sequence(
                             Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
-                            actions.checkAndFeed(),
-                        ),
-                    ).withName("AutoPass"),
+                            actions.checkAndFeed().andThen(actions.tuckAndClear())
+                        )
+                    )
+                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
+                    .withName("AutoPass")
             ).onFalse(
-                actions.stopAll(),
+                actions.stopAllAndZeroHood(),
             )
 
         driver
@@ -125,16 +123,9 @@ class Bindings(
                     .andThen(
                         robotContainer.drive
                             .xLock()
-                            .alongWith(actions.checkAndFeed())
-                            .alongWith(
-                                Commands.sequence(
-                                    robotContainer.intake.setRollerVoltage(6.0),
-                                    WaitCommand(1.5),
-                                    robotContainer.intake.stopRollers(),
-                                    robotContainer.intake.stowSlow(),
-                                ),
-                            ),
-                    ),
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
+                    )
+                    .withName("TrenchShot"),
             ).onFalse(
                 actions.stopAll(),
             )
@@ -143,20 +134,13 @@ class Bindings(
             .y()
             .whileTrue(
                 actions
-                    .prepShotFromDistanceMeters(1.3)
+                    .prepShotFromDistanceMeters(1.4)
                     .andThen(
                         robotContainer.drive
                             .xLock()
-                            .alongWith(actions.checkAndFeed())
-                            .alongWith(
-                                Commands.sequence(
-                                    robotContainer.intake.setRollerVoltage(6.0),
-                                    WaitCommand(1.5),
-                                    robotContainer.intake.stopRollers(),
-                                    robotContainer.intake.stowSlow(),
-                                ),
-                            ),
-                    ),
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
+                    )
+                    .withName("HubShot"),
             ).onFalse(
                 actions.stopAll(),
             )
@@ -169,9 +153,9 @@ class Bindings(
                     .andThen(
                         robotContainer.drive
                             .xLock()
-                            .alongWith(actions.checkAndFeed())
-                            .alongWith(WaitCommand(1.0).andThen(actions.shuffleIntakePivot())),
-                    ),
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
+                    )
+                    .withName("TowerShot"),
             ).onFalse(
                 actions.stopAll(),
             )
@@ -191,20 +175,15 @@ class Bindings(
             )
 
         driver
+            .povUp()
+            .whileTrue(
+                actions.checkAndFeed()
+            )
+
+        driver
             .start()
             .onTrue(
                 robotContainer.drive.seedFieldCentric(),
-            )
-
-        shooterJamTrigger
-            .onTrue(
-                SequentialCommandGroup(
-                    InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 1.0) }),
-                    actions.autoUnjam(),
-                    InstantCommand({ driver.setRumble(GenericHID.RumbleType.kBothRumble, 0.0) }),
-                    PrintCommand("RUMBLE COMPLETE."),
-                    actions.checkAndFeed(),
-                ),
             )
     }
 }

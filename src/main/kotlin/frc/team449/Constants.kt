@@ -51,7 +51,7 @@ object Constants {
         const val SLOW_ANGULAR_SPEED_RADS_PER_SEC = 0.5804
 
         // --- DEADBANDS & TOLERANCE ---
-        const val TRANSLATION_DEADBAND = 0.05
+        const val TRANSLATION_DEADBAND = 0.1
         const val ANGULAR_DEADBAND = 0.1
         const val INTERRUPT_DEADBAND = 0.25
         const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
@@ -72,7 +72,7 @@ object Constants {
         const val CTE_D = 0.0
 
         // --- OPERATION TIMING ---
-        const val AUTO_SHOOTING_TIME_SEC = 4.5
+        const val AUTO_SHOOTING_TIME_SEC = 3.2
 
         // --- SPEED LIMITS ---
         const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
@@ -86,14 +86,16 @@ object Constants {
 
         // --- BLUE ALLIANCE LANDMARKS ---
         val BLUE_HUB: Translation2d = Translation2d(4.625594, 4.034536)
-        val BLUE_TRENCHES: Array<Pose2d> = arrayOf(
-            Pose2d(4.35, 0.45, Rotation2d(1.5)),
-            Pose2d(4.35, 7.60, Rotation2d(-1.5))
-        )
-        val BLUE_PASSES: Array<Translation2d> = arrayOf(
-            Translation2d(1.65, 1.4),
-            Translation2d(1.65, 6.6)
-        )
+        val BLUE_TRENCHES: Array<Pose2d> =
+            arrayOf(
+                Pose2d(4.35, 0.45, Rotation2d(1.5)),
+                Pose2d(4.35, 7.60, Rotation2d(-1.5)),
+            )
+        val BLUE_PASSES: Array<Translation2d> =
+            arrayOf(
+                Translation2d(1.65, 1.4),
+                Translation2d(1.65, 6.6),
+            )
     }
 
     object ShooterConstants {
@@ -126,10 +128,10 @@ object Constants {
         const val EFFICIENCY = 0.97
 
         // --- CURRENT & OPERATIONAL LIMITS ---
-        const val FLYWHEEL_SUPPLY_LIM = 30.0
-        const val FLYWHEEL_STATOR_LIM = 80.0
-        const val HOOD_SUPPLY_LIM = 15.0
-        const val HOOD_STATOR_LIM = 20.0
+        const val FLYWHEEL_SUPPLY_LIM = 20.0
+        const val FLYWHEEL_STATOR_LIM = 100.0
+        const val HOOD_SUPPLY_LIM = 10.0
+        const val HOOD_STATOR_LIM = 30.0
 
         val MIN_HOOD_ANGLE: Angle = Radians.of(0.0)
         val MAX_HOOD_ANGLE: Angle = Radians.of(0.5185)
@@ -146,13 +148,13 @@ object Constants {
         const val HOOD_KP = 5000.0
         const val HOOD_KI = 0.0
         const val HOOD_KD = 0.0
-        const val HOOD_KS = 0.2102
-        const val HOOD_KG = 0.14
+        const val HOOD_KS = 0.595
+        const val HOOD_KG = 0.595
         const val HOOD_KV = 3.4683
 
         // --- HOMING & TOLERANCE ---
         const val HOMING_VOLTAGE = -2.0
-        const val HOMING_CURRENT_AMPS = 18.0
+        const val HOMING_CURRENT_AMPS = 25.0
         const val HOMING_VELOCITY_RAD_PER_SEC = 0.2
         const val HOMING_DEBOUNCE_TIME = 0.4
 
@@ -174,24 +176,29 @@ object Constants {
 
         val FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 150.0)
-                put(1.671, 165.0)
-                put(2.08, 195.0)
-                put(2.57, 195.0)
-                put(3.43, 195.0)
-                put(4.92, 205.0)
-                put(5.90, 265.5)
+                put(1.294, 145.0)
+                put(1.671, 160.0)
+                put(2.08, 165.0)
+                put(2.57, 175.0)
+                put(3.43, 185.0)
+                put(4.5, 215.0)
+                put(4.92, 225.0)
+                put(5.90, 250.5)
+                put(7.00, 180.5)
+                put(12.00, 200.5)
             }
 
         val HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 0.0)
-                put(1.671, 0.0)
-                put(2.08, .01)
-                put(2.57, .07)
-                put(3.43, 0.132)
+                put(1.294, 0.01678)
+                put(1.671, 0.02)
+                put(2.08, .03)
+                put(2.57, .1)
+                put(3.43, 0.1678)
                 put(4.92, 0.27)
                 put(5.90, 0.27)
+                put(7.00, 0.4)
+                put(12.00, 0.4)
             }
     }
 
@@ -222,9 +229,9 @@ object Constants {
         const val ROLLER_MOI_KG_MM = .0001411489
 
         // --- CURRENT LIMITS ---
-        const val PIVOT_SUPPLY_LIMIT = 15.0
+        const val PIVOT_SUPPLY_LIMIT = 10.0
         const val PIVOT_STATOR_LIMIT = 40.0
-        const val ROLLER_SUPPLY_LIMIT = 30.0
+        const val ROLLER_SUPPLY_LIMIT = 20.0
         const val ROLLER_STATOR_LIMIT = 60.0
 
         // --- PIVOT STATE SETTINGS ---
@@ -234,6 +241,7 @@ object Constants {
         const val DEPLOY_VOLTS = 4.0
         const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
+        const val SLOW_STOW_VOLTS = -1.323
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- HOMING & VISUALIZATION ---
@@ -256,10 +264,10 @@ object Constants {
         val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val FLOOR_SUPPLY_LIMIT = 40.0
+        const val FLOOR_SUPPLY_LIMIT = 20.0
         const val FLOOR_STATOR_LIMIT = 80.0
 
-        const val TOP_SUPPLY_LIMIT = 40.0
+        const val TOP_SUPPLY_LIMIT = 30.0
         const val TOP_STATOR_LIMIT = 80.0
 
         // --- PHYSICAL SPECS & GEARING ---
@@ -267,7 +275,7 @@ object Constants {
         const val FLOOR_MOI_KG_MM = 0.005
 
         const val TOP_GEARING = 31.0 / 11.0
-        const val TOP_MOI_KG_MM = 0.000000008 // TODO: Find
+        const val TOP_MOI_KG_MM = 0.005
     }
 
     object AlignConstants {
@@ -275,7 +283,7 @@ object Constants {
         const val ALIGN_KP = 10.0
         const val ALIGN_KD = 0.05
 
-        // --- AIMBOT CONFIGURATION ---
+        // --- ALIGN CONFIGURATION ---
         const val POSITION_TOLERANCE_RADS = 0.035
         const val VELOCITY_TOLERANCE_RADS_PER_SEC = 0.25
     }

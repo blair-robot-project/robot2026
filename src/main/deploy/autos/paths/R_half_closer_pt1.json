@@ -15,7 +15,7 @@
     {
       "type": "event_trigger",
       "t_ratio": 0.11999999999999998,
-      "lib_key": "stop_shooting"
+      "lib_key": "stop_shot"
     },
     {
       "type": "event_trigger",

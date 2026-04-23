@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 class IntakeSubsystem(
-    private val io: IntakeIO,
+    private val io: IntakeIO
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
@@ -64,18 +64,28 @@ class IntakeSubsystem(
             io.setPivotVoltage(pivotVolts)
         }.withName("PIVOT-VOLTS")
 
-    fun deploy(): Command =
-        slamHoming(IntakeConstants.DEPLOY_VOLTS, IntakeConstants.DEPLOY_HOLD_VOLTS, targetIsDeployed = true).withName("PIVOT-DEPLOY")
+    fun deploy(): Command = slamHoming(
+        IntakeConstants.DEPLOY_VOLTS,
+        IntakeConstants.DEPLOY_HOLD_VOLTS,
+        targetIsDeployed = true
+    ).withName("PIVOT-DEPLOY")
 
-    fun stow(): Command =
-        slamHoming(IntakeConstants.STOW_VOLTS, IntakeConstants.STOW_HOLD_VOLTS, targetIsDeployed = false).withName("PIVOT-STOW")
+    fun stow(): Command = slamHoming(
+        IntakeConstants.STOW_VOLTS,
+        IntakeConstants.STOW_HOLD_VOLTS,
+        targetIsDeployed = false
+    ).withName("PIVOT-STOW")
 
-    fun stowSlow(): Command = slamHoming(-1.323, 0.0, targetIsDeployed = false).withName("PIVOT-STOW-SLOW")
+    fun stowSlow(): Command = slamHoming(
+        IntakeConstants.SLOW_STOW_VOLTS,
+        IntakeConstants.STOW_HOLD_VOLTS,
+        targetIsDeployed = false
+    ).withName("PIVOT-STOW-SLOW")
 
     private fun slamHoming(
         moveVolts: Double,
         holdVolts: Double,
-        targetIsDeployed: Boolean,
+        targetIsDeployed: Boolean
     ): Command =
         defer {
             val hardstopDebouncer = Debouncer(IntakeConstants.HOMING_DEBOUNCE_TIME)

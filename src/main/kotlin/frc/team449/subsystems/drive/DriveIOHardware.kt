@@ -49,11 +49,12 @@ open class DriveIOHardware(
     val angularRollVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityXWorld
     val angularYawVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityZWorld
 
-    val gyroSignals = arrayOf(
-        angularPitchVelocity,
-        angularRollVelocity,
-        angularYawVelocity,
-    )
+    val gyroSignals =
+        arrayOf(
+            angularPitchVelocity,
+            angularRollVelocity,
+            angularYawVelocity,
+        )
 
     init {
         ParentDevice.optimizeBusUtilizationForAll(pigeon2)
@@ -110,8 +111,22 @@ open class DriveIOHardware(
         val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
         if (driveState.ModuleStates == null) return
         for (i in 0 until modules.count()) {
-            Logger.recordOutput(moduleNames[i] + "/DriveSupplyCurrentAmps", this.modules[i].driveMotor.supplyCurrent.valueAsDouble)
-            Logger.recordOutput(moduleNames[i] + "/DriveStatorCurrentAmps", this.modules[i].driveMotor.statorCurrent.valueAsDouble)
+            Logger.recordOutput(
+                moduleNames[i] + "/DriveSupplyCurrentAmps",
+                this.modules[i].driveMotor.supplyCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/DriveStatorCurrentAmps",
+                this.modules[i].driveMotor.statorCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/SteerSupplyCurrentAmps",
+                this.modules[i].steerMotor.supplyCurrent.valueAsDouble,
+            )
+            Logger.recordOutput(
+                moduleNames[i] + "/SteerStatorCurrentAmps",
+                this.modules[i].steerMotor.statorCurrent.valueAsDouble,
+            )
         }
     }
 }

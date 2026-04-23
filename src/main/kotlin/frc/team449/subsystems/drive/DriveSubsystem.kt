@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.DriveConstants
+import frc.team449.util.FieldUtil
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
@@ -35,6 +36,15 @@ class DriveSubsystem(
     val pose: Pose2d
         get() = inputs.Pose
 
+    val robotRelativeSpeeds: ChassisSpeeds
+        get() = inputs.Speeds
+
+    val fieldRelativeSpeeds: ChassisSpeeds
+        get() = ChassisSpeeds.fromRobotRelativeSpeeds(
+            inputs.Speeds,
+            inputs.Pose.rotation,
+        )
+
     val modulePositions: Array<SwerveModulePosition>
         get() = inputs.ModulePositions
 
@@ -48,10 +58,8 @@ class DriveSubsystem(
         field.robotPose = pose
 
         Logger.processInputs("Drive", inputs)
-        Logger.recordOutput(
-            "Drive/ActiveCommand",
-            currentCommand?.name ?: "None",
-        )
+        Logger.recordOutput("Drive/ActiveCommand", currentCommand?.name ?: "None")
+        Logger.recordOutput("Drive/DistanceToHub", FieldUtil.getDistanceToFriendlyHub(pose.translation))
     }
 
     fun setControl(request: SwerveRequest) {
@@ -76,14 +84,6 @@ class DriveSubsystem(
 
         io.setOperatorPerspectiveForward(forward)
     }
-
-    fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
-
-    fun getFieldRelativeSpeeds(): ChassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            inputs.Speeds,
-            inputs.Pose.rotation,
-        )
 
     fun getAngularVelocity(): AngularVelocity3d =
         AngularVelocity3d(

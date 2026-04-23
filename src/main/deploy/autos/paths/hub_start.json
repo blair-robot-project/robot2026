@@ -14,18 +14,8 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.0,
-      "lib_key": "start_intake"
-    },
-    {
-      "type": "event_trigger",
-      "t_ratio": 0.0,
-      "lib_key": "end_intake"
-    },
-    {
-      "type": "event_trigger",
       "t_ratio": 0.5,
-      "lib_key": "start_shooting_hub"
+      "lib_key": "hub_shot"
     },
     {
       "type": "waypoint",
