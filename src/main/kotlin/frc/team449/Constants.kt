@@ -285,8 +285,8 @@ object Constants {
     }
 
     object VisionConstants {
-        // --- CHS ANDYMARK REBUILT FIELD ---
-        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
+        // --- WORLDS WELDED REBUILT FIELD ---
+        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded)
 
         // --- CAMERA IDENTIFIERS ---
         const val CAMERA_RIGHT_NAME: String = "limelight-right"
