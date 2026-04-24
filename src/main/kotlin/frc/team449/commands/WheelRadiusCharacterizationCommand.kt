@@ -2,9 +2,13 @@ package frc.team449.commands
 
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
+import frc.team449.Constants.DriveConstants
+import frc.team449.generated.TunerConstants
 import frc.team449.subsystems.drive.DriveSubsystem
+import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
 /** Measures the robot's wheel radius by spinning in a circle. */
@@ -60,24 +64,19 @@ class WheelRadiusCharacterizationCommand(
     }
 
     override fun isFinished(): Boolean {
-        return gyroDelta >= Math.PI * 10
+        return gyroDelta >= Math.PI * 6
     }
 
     override fun end(interrupted: Boolean) {
-        if (timer.hasElapsed(1.0)) {
-            val averageWheelDistance = accumWheelDistance / 4.0
+        val averageWheelDistance = accumWheelDistance / 4.0
 
-            val drivebaseRadius = 0.3906411413 // meters
-            val currentWheelRadius = 0.0508 // meters
+        val wheelbaseRadius = Units.inchesToMeters(DriveConstants.WHEELBASE_INCHES) / 2 // meters
+        val currentWheelRadius = TunerConstants.FrontLeft.WheelRadius // meters
 
-            val effectiveRadius = currentWheelRadius * (gyroDelta * drivebaseRadius) / averageWheelDistance
+        val effectiveRadius = currentWheelRadius * (gyroDelta * wheelbaseRadius) / averageWheelDistance
 
-            println("********** Wheel Radius Characterization Results **********")
-            println("\tWheel Delta (Meters): $averageWheelDistance")
-            println("\tGyro Delta: $gyroDelta Radians")
-            println("\tCalculated Effective Wheel Radius: $effectiveRadius")
-        } else {
-            println("Characterization interrupted or didn't run long enough to measure!")
-        }
+        Logger.recordOutput("WheelRadius/WheelDeltaMeters", averageWheelDistance)
+        Logger.recordOutput("WheelRadius/GyroDeltaRadians", gyroDelta)
+        Logger.recordOutput("WheelRadius/EffectiveRadius", effectiveRadius)
     }
 }

@@ -4,6 +4,8 @@ import org.littletonrobotics.junction.AutoLog
 interface IndexerIO {
     @AutoLog
     open class IndexerInputs {
+        @JvmField var floorConnected: Boolean = false
+
         @JvmField var floorAppliedVolts: Double = 0.0
 
         @JvmField var floorVelocityRadsPerSec: Double = 0.0
@@ -13,6 +15,8 @@ interface IndexerIO {
         @JvmField var floorStatorCurrentAmps: Double = 0.0
 
         @JvmField var floorTempCelsius: Double = 0.0
+
+        @JvmField var topConnected: Boolean = false
 
         @JvmField var topAppliedVolts: Double = 0.0
 

@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.util.FieldUtil
-import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedPowerDistribution
 import org.littletonrobotics.junction.LoggedRobot
@@ -56,7 +55,7 @@ class Robot : LoggedRobot() {
     override fun robotInit() {
         FieldUtil.initializeAutoWinnerField()
 
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
+        robotContainer.autoRoutines.addOptionsToChooser(robotContainer.autoChooser)
 
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
@@ -64,7 +63,6 @@ class Robot : LoggedRobot() {
 
     override fun robotPeriodic() {
         CommandScheduler.getInstance().run()
-        PhoenixUtil.refreshAll()
 
         Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
         Logger.recordOutput("MatchTime", DriverStation.getMatchTime())

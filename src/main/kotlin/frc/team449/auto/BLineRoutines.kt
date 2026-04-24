@@ -84,7 +84,7 @@ class BLineRoutines(
         ).withName("DoubleBumpSweep")
     }
 
-    fun addAutoOptions(autoChooser: LoggedDashboardChooser<Command>) {
+    fun addOptionsToChooser(autoChooser: LoggedDashboardChooser<Command>) {
         autoChooser.addDefaultOption("Do Nothing", Commands.none())
 
         fun addMirroredOptions(name: String, buildRoutine: (mirror: Boolean) -> Command) {

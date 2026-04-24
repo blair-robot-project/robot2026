@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.AutoLog
 interface IntakeIO {
     @AutoLog
     open class IntakeIOInputs {
+        @JvmField var leftPivotConnected: Boolean = false
+
         @JvmField var leftPivotAppliedVolts: Double = 0.0
 
         @JvmField var leftPivotPositionRads: Double = 0.0
@@ -18,6 +20,8 @@ interface IntakeIO {
         @JvmField var leftPivotStatorCurrentAmps: Double = 0.0
 
         @JvmField var leftPivotTempCelsius: Double = 0.0
+
+        @JvmField var rightPivotConnected: Boolean = false
 
         @JvmField var rightPivotAppliedVolts: Double = 0.0
 
@@ -31,6 +35,8 @@ interface IntakeIO {
 
         @JvmField var rightPivotTempCelsius: Double = 0.0
 
+        @JvmField var leftRollerLeaderConnected: Boolean = false
+
         @JvmField var leftRollerLeaderAppliedVolts: Double = 0.0
 
         @JvmField var leftRollerLeaderVelocityRadsPerSec: Double = 0.0
@@ -40,6 +46,8 @@ interface IntakeIO {
         @JvmField var leftRollerLeaderStatorCurrentAmps: Double = 0.0
 
         @JvmField var leftRollerLeaderTempCelsius: Double = 0.0
+
+        @JvmField var rightRollerFollowerConnected: Boolean = false
 
         @JvmField var rightRollerFollowerAppliedVolts: Double = 0.0
 

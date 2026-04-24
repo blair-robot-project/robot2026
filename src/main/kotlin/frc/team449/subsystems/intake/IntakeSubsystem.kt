@@ -6,12 +6,14 @@ import edu.wpi.first.units.Units.Seconds
 import edu.wpi.first.units.Units.Volts
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.Voltage
+import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
 import frc.team449.Constants.IntakeConstants
+import org.littletonrobotics.junction.AutoLogOutput
 import org.littletonrobotics.junction.Logger
 import kotlin.math.abs
 
@@ -20,23 +22,40 @@ class IntakeSubsystem(
 ) : SubsystemBase() {
     private val inputs: IntakeIOInputsAutoLogged = IntakeIOInputsAutoLogged()
 
+    @AutoLogOutput(key = "Intake/PivotIsDeployed")
     var pivotIsDeployed: Boolean = false
+        get() = determinePivotDeployedState()
         private set
+
+    @AutoLogOutput(key = "Intake/PivotTargetRads")
     var pivotTargetAngleRads: Double = 0.0
         private set
+
+    @AutoLogOutput(key = "Intake/RollerTargetVolts")
     var rollerTargetVolts: Double = 0.0
         private set
 
     val pivotAngle: Double
         get() = inputs.leftPivotPositionRads
 
+    val leftPivotDisconnectedAlert =
+        Alert("Left Pivot Disconnected (ID ${IntakeConstants.LEFT_PIVOT_ID}).", Alert.AlertType.kError)
+    val rightPivotDisconnectedAlert =
+        Alert("Right Pivot Disconnected (ID ${IntakeConstants.RIGHT_PIVOT_ID}).", Alert.AlertType.kError)
+    val leftRollerLeaderDisconnectedAlert =
+        Alert("Left Roller Disconnected (ID ${IntakeConstants.LEFT_ROLLER_LEADER_ID}).", Alert.AlertType.kError)
+    val rightRollerFollowerDisconnectedAlert =
+        Alert("Right Roller Disconnected (ID ${IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID}).", Alert.AlertType.kError)
+
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Intake", inputs)
 
-        pivotIsDeployed = determinePivotDeployedState()
-        Logger.recordOutput("Intake/PivotIsDeployed", pivotIsDeployed)
-        Logger.recordOutput("Intake/RollerTargetVolts", rollerTargetVolts)
+        leftPivotDisconnectedAlert.set(!inputs.leftPivotConnected)
+        rightPivotDisconnectedAlert.set(!inputs.rightPivotConnected)
+        leftRollerLeaderDisconnectedAlert.set(!inputs.leftRollerLeaderConnected)
+        rightRollerFollowerDisconnectedAlert.set(!inputs.rightRollerFollowerConnected)
+
         Logger.recordOutput("Intake/RollersRunning", (inputs.leftRollerLeaderVelocityRadsPerSec > 10.0))
         Logger.recordOutput("Intake/ActiveCommand", currentCommand?.name ?: "None")
     }

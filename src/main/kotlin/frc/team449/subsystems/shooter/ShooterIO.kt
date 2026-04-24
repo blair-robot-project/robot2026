@@ -6,6 +6,8 @@ import org.littletonrobotics.junction.AutoLog
 interface ShooterIO {
     @AutoLog
     open class ShooterIOInputs {
+        @JvmField var leftTopLeaderConnected: Boolean = false
+
         @JvmField var leftTopLeaderAppliedVolts: Double = 0.0
 
         @JvmField var leftTopLeaderVelocityRadsPerSec: Double = 0.0
@@ -15,6 +17,8 @@ interface ShooterIO {
         @JvmField var leftTopLeaderStatorCurrentAmps: Double = 0.0
 
         @JvmField var leftTopLeaderTempCelsius: Double = 0.0
+
+        @JvmField var leftBottomFollowerConnected: Boolean = false
 
         @JvmField var leftBottomFollowerAppliedVolts: Double = 0.0
 
@@ -26,6 +30,8 @@ interface ShooterIO {
 
         @JvmField var leftBottomFollowerTempCelsius: Double = 0.0
 
+        @JvmField var rightTopFollowerConnected: Boolean = false
+
         @JvmField var rightTopFollowerAppliedVolts: Double = 0.0
 
         @JvmField var rightTopFollowerVelocityRadsPerSec: Double = 0.0
@@ -36,6 +42,8 @@ interface ShooterIO {
 
         @JvmField var rightTopFollowerTempCelsius: Double = 0.0
 
+        @JvmField var rightBottomFollowerConnected: Boolean = false
+
         @JvmField var rightBottomFollowerAppliedVolts: Double = 0.0
 
         @JvmField var rightBottomFollowerVelocityRadsPerSec: Double = 0.0
@@ -45,6 +53,8 @@ interface ShooterIO {
         @JvmField var rightBottomFollowerStatorCurrentAmps: Double = 0.0
 
         @JvmField var rightBottomFollowerTempCelsius: Double = 0.0
+
+        @JvmField var hoodConnected: Boolean = false
 
         @JvmField var hoodAppliedVolts: Double = 0.0
 

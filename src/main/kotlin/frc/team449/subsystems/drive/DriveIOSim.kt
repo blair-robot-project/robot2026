@@ -126,13 +126,13 @@ class DriveIOSim(
         )
 
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
+        super.updateInputs(inputs)
+
         if (IntakeIOSim.isDeployed) {
             intakeSimulation.startIntake()
         } else {
             intakeSimulation.stopIntake()
         }
-
-        super.updateInputs(inputs)
     }
 
     override fun resetOdometry(pose: Pose2d) {

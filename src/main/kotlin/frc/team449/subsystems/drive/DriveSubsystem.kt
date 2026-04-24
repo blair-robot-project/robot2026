@@ -23,6 +23,7 @@ import frc.team449.Constants.DriveConstants
 import frc.team449.util.FieldUtil
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
+import kotlin.jvm.optionals.getOrElse
 import kotlin.math.abs
 
 class DriveSubsystem(
@@ -43,6 +44,13 @@ class DriveSubsystem(
         get() = ChassisSpeeds.fromRobotRelativeSpeeds(
             inputs.Speeds,
             inputs.Pose.rotation,
+        )
+
+    val angularVelocity: AngularVelocity3d
+        get() = AngularVelocity3d(
+            DegreesPerSecond.of(inputs.rollVelocityDegreesPerSecond),
+            DegreesPerSecond.of(inputs.pitchVelocityDegreesPerSecond),
+            DegreesPerSecond.of(inputs.yawVelocityDegreesPerSecond)
         )
 
     val modulePositions: Array<SwerveModulePosition>
@@ -76,7 +84,7 @@ class DriveSubsystem(
 
     fun setOperatorPerspectiveForward() {
         val forward: Rotation2d =
-            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            if (DriverStation.getAlliance().getOrElse { DriverStation.Alliance.Blue } == DriverStation.Alliance.Red) {
                 Rotation2d.k180deg
             } else {
                 Rotation2d.kZero
@@ -84,13 +92,6 @@ class DriveSubsystem(
 
         io.setOperatorPerspectiveForward(forward)
     }
-
-    fun getAngularVelocity(): AngularVelocity3d =
-        AngularVelocity3d(
-            DegreesPerSecond.of(inputs.rollVelocityDegreesPerSecond),
-            DegreesPerSecond.of(inputs.pitchVelocityDegreesPerSecond),
-            DegreesPerSecond.of(inputs.yawVelocityDegreesPerSecond)
-        )
 
     fun xLock(): Command =
         run {

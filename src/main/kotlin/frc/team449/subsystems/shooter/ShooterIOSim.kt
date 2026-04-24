@@ -78,6 +78,8 @@ class ShooterIOSim : ShooterIOHardware() {
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
+        super.updateInputs(inputs)
+
         // update flywheel sim
         leftTopLeaderSimState.setSupplyVoltage(12.0)
         leftBottomFollowerSimState.setSupplyVoltage(12.0)
@@ -103,7 +105,5 @@ class ShooterIOSim : ShooterIOHardware() {
         hoodSimState.setRotorVelocity(hoodRotorVel)
 
         hoodMechanism.angle = Units.radiansToDegrees(hoodSim.angleRads)
-
-        super.updateInputs(inputs)
     }
 }

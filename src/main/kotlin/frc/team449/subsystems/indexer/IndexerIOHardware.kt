@@ -6,9 +6,7 @@ import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.Units
-import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IndexerConstants
-import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IndexerIOHardware : IndexerIO {
@@ -30,13 +28,7 @@ open class IndexerIOHardware : IndexerIO {
     private val topStatorCurrent = top.statorCurrent
     private val topTemp = top.deviceTemp
 
-    private val lowPrioSignals =
-        arrayOf(
-            floorTemp,
-            topTemp,
-        )
-
-    private val highPrioSignals =
+    private val indexerSignals =
         arrayOf(
             floorVoltage,
             floorVelocity,
@@ -66,46 +58,34 @@ open class IndexerIOHardware : IndexerIO {
                 topSupplyCurrent,
             )
 
-    private val floorDisconnectedAlert =
-        Alert("Floor Indexer Disconnected (ID ${IndexerConstants.FLOOR_ID}).", Alert.AlertType.kError)
-    private val topDisconnectedAlert =
-        Alert("Top Indexer Disconnected (ID ${IndexerConstants.TOP_ID}).", Alert.AlertType.kError)
-
     init {
-        ParentDevice.optimizeBusUtilizationForAll(floor, top)
-
         tryUntilOk(5) { floor.configurator.apply(floorConfig) }
         tryUntilOk(5) { top.configurator.apply(topConfig) }
 
-        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioSignals)
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *indexerSignals)
 
-        PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
+        ParentDevice.optimizeBusUtilizationForAll(floor, top)
     }
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
-        BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
+        BaseStatusSignal.refreshAll(*indexerSignals)
 
+        inputs.floorConnected = floorConnected
         inputs.floorAppliedVolts = floorVoltage.valueAsDouble
         inputs.floorVelocityRadsPerSec = floorVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.floorSupplyCurrentAmps = floorSupplyCurrent.value.`in`(Units.Amps)
         inputs.floorStatorCurrentAmps = floorStatorCurrent.value.`in`(Units.Amps)
         inputs.floorTempCelsius = floorTemp.value.`in`(Units.Celsius)
 
+        inputs.topConnected = topConnected
         inputs.topAppliedVolts = topVoltage.valueAsDouble
         inputs.topVelocityRadsPerSec = topVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.topSupplyCurrentAmps = topSupplyCurrent.value.`in`(Units.Amps)
         inputs.topStatorCurrentAmps = topStatorCurrent.value.`in`(Units.Amps)
         inputs.topTempCelsius = topTemp.value.`in`(Units.Celsius)
-
-        floorDisconnectedAlert.set(!floorConnected)
-        topDisconnectedAlert.set(!topConnected)
     }
 
-    override fun setIndexerVoltage(
-        floorVolts: Double,
-        topVolts: Double
-    ) {
+    override fun setIndexerVoltage(floorVolts: Double, topVolts: Double) {
         floor.setControl(floorVoltageRequest.withOutput(floorVolts))
         top.setControl(topVoltageRequest.withOutput(topVolts))
     }

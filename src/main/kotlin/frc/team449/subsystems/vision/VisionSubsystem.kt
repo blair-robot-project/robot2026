@@ -5,7 +5,6 @@ import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
@@ -24,18 +23,6 @@ class VisionSubsystem(
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
     private val disconnectedAlerts = Array(io.size) { i ->
         Alert("Vision Camera $i Disconnected.", AlertType.kWarning)
-    }
-
-    fun getLatestTargetX(cameraIndex: Int): Rotation2d {
-        val input = inputs[cameraIndex]
-        if (input.tagIds.isEmpty()) return Rotation2d.kZero
-        return input.latestTargetObservation.tx
-    }
-
-    fun getLatestTargetY(cameraIndex: Int): Rotation2d {
-        val input = inputs[cameraIndex]
-        if (input.tagIds.isEmpty()) return Rotation2d.kZero
-        return input.latestTargetObservation.ty
     }
 
     override fun periodic() {
