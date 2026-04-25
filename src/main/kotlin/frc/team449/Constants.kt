@@ -72,7 +72,8 @@ object Constants {
         const val CTE_D = 0.0
 
         // --- OPERATION TIMING ---
-        const val AUTO_SHOOTING_TIME_SEC = 3.2
+        const val AUTO_SHOOTING_TIME_SEC = 3.0
+        const val AUTO_PRELOAD_SHOOTING_TIME_SEC = 1.0
 
         // --- SPEED LIMITS ---
         const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
