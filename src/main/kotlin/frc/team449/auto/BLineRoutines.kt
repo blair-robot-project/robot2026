@@ -26,18 +26,18 @@ class BLineRoutines(
     private val applyRobotSpeedsRequest = SwerveRequest.ApplyRobotSpeeds()
 
     private val baseBuilder =
-        FollowPath
-            .Builder(
-                drive,
-                drive::pose,
-                drive::robotRelativeSpeeds,
-                { speeds: ChassisSpeeds ->
-                    drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
-                },
-                translationController,
-                rotationController,
-                crossTrackController,
-            ).withDefaultShouldFlip()
+        FollowPath.Builder(
+            drive,
+            drive::pose,
+            drive::robotRelativeSpeeds,
+            { speeds: ChassisSpeeds ->
+                drive.setControl(applyRobotSpeedsRequest.withSpeeds(speeds))
+            },
+            translationController,
+            rotationController,
+            crossTrackController,
+        )
+            .withDefaultShouldFlip()
 
     private fun registerEventTriggers() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndIntake())
@@ -94,15 +94,15 @@ class BLineRoutines(
         val resetBuilder = baseBuilder.withPoseReset(drive::resetOdometry).withShouldMirror { mirror }
         val standardBuilder = baseBuilder.withShouldMirror { mirror }
 
-        return Commands
-            .sequence(
-                drive.alignModules(Rotation2d.kCW_90deg),
-                resetBuilder.build(Path("trench_bump_pt1")),
-                WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
-                standardBuilder.build(Path("trench_bump_pt2")),
-                WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
-                standardBuilder.build(Path("bump_to_nz")),
-            ).withName("DoubleBumpSweep")
+        return Commands.sequence(
+            drive.alignModules(Rotation2d.kCW_90deg),
+            resetBuilder.build(Path("trench_bump_pt1")),
+            WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
+            standardBuilder.build(Path("trench_bump_pt2")),
+            WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
+            standardBuilder.build(Path("bump_to_nz")),
+        )
+            .withName("DoubleBumpSweep")
     }
 
     private fun delayAuto(mirror: Boolean): Command {

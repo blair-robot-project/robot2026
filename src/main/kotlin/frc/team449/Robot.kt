@@ -72,9 +72,10 @@ class Robot : LoggedRobot() {
 
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
-        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
+        robotContainer.drive.configureCoastMode()
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
+            .beforeStarting(robotContainer.actions.stopAllAndHomeHood())
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
@@ -83,6 +84,7 @@ class Robot : LoggedRobot() {
     override fun teleopInit() {
         robotContainer.autonomousCommand.cancel()
         robotContainer.drive.setOperatorPerspectiveForward()
+        robotContainer.drive.configureBrakeMode()
 
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
     }

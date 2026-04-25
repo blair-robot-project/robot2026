@@ -1,5 +1,6 @@
 package frc.team449.subsystems.drive
 
+import com.ctre.phoenix6.signals.NeutralModeValue
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.Pose2d
@@ -91,6 +92,13 @@ class DriveSubsystem(
             }
 
         io.setOperatorPerspectiveForward(forward)
+    }
+
+    fun configureCoastMode() = configureNeutralMode(NeutralModeValue.Coast)
+    fun configureBrakeMode() = configureNeutralMode(NeutralModeValue.Brake)
+
+    fun configureNeutralMode(neutralModeValue: NeutralModeValue) {
+        io.configureNeutralMode(neutralModeValue)
     }
 
     fun xLock(): Command =
