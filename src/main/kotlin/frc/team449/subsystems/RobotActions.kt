@@ -1,6 +1,7 @@
 package frc.team449.subsystems
 
 import edu.wpi.first.units.Units
+import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
@@ -22,18 +23,13 @@ class RobotActions(
     fun deployAndIntake(): Command =
         Commands.sequence(
             intake.deploy().unless { intake.pivotIsDeployed },
-            Commands.parallel(
-                intake.setRollerVoltage(12.0),
-                indexer.setIndexerVoltage(0.5, 0.0),
-                shooter.stopFlywheel()
-            ),
+            intake.setRollerVoltage(12.0)
         )
             .withName("DeployIntake")
 
     fun stopIntakeAndPivot(): Command =
         Commands.sequence(
             intake.stopRollers(),
-            indexer.setIndexerVoltage(0.0, 0.0),
             intake.setPivotVoltage(0.0),
         )
             .withName("StopIntakePivot")
@@ -43,23 +39,22 @@ class RobotActions(
             .withName("StopIntake")
 
     fun stopAndStow(): Command =
-        Commands
-            .sequence(
-                intake.stopRollers(),
-                indexer.setIndexerVoltage(0.5, 0.0),
-                intake.stow(),
-                indexer.setIndexerVoltage(0.0, 0.0),
-            ).withName("StopStow")
+        Commands.sequence(
+            intake.stopRollers(),
+            intake.stow(),
+        )
+            .withName("StopStow")
 
     fun prepShotFromDistanceMeters(distanceMeters: Double): Command =
         Commands.sequence(
-            shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distanceMeters))),
-            shooter.setHoodAngle(Units.Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distanceMeters))),
+            shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(ShooterConstants.SCORING_FLYWHEEL_VELOCITY_MAP.get(distanceMeters))),
+            shooter.setHoodAngle(Units.Radians.of(ShooterConstants.SCORING_HOOD_ANGLE_MAP.get(distanceMeters))),
         )
 
     fun checkAndFeed(): Command =
         Commands.sequence(
-            Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() }.withTimeout(2.0),
+            Commands.waitUntil { shooter.isFlywheelAtTolerance() && shooter.isHoodAtTolerance() }
+                .withTimeout(2.0),
             indexer.setIndexerVoltage(12.0, 12.0),
         )
             .withName("CheckFeed")
@@ -105,9 +100,13 @@ class RobotActions(
     fun tuckAndClear(): Command =
         Commands.sequence(
             intake.setRollerVoltage(3.0),
-            WaitCommand(1.6),
+
+            WaitCommand(0.4),
+            intake.setPivotAngle(Radians.of(1.8)),
+            WaitCommand(0.8),
             intake.stopRollers(),
-            intake.stowSlow()
+            intake.stowSlow(),
+
         )
             .withName("TuckClear")
 

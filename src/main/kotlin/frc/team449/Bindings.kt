@@ -1,7 +1,9 @@
 package frc.team449
 
+import edu.wpi.first.units.Units
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.Trigger
+import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.AimAtTargetCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
@@ -35,6 +37,8 @@ class Bindings(
             { -driver.leftY },
             { -driver.leftX },
             targetSupplier = { FieldUtil.HUB },
+            flywheelVelocityMap = ShooterConstants.SCORING_FLYWHEEL_VELOCITY_MAP,
+            hoodAngleMap = ShooterConstants.SCORING_HOOD_ANGLE_MAP,
         )
 
     private fun createAutoPassCommand(): AimAtTargetCommand =
@@ -44,6 +48,8 @@ class Bindings(
             { -driver.leftY },
             { -driver.leftX },
             targetSupplier = { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose.translation) },
+            flywheelVelocityMap = ShooterConstants.PASSING_FLYWHEEL_VELOCITY_MAP,
+            hoodAngleMap = ShooterConstants.PASSING_HOOD_ANGLE_MAP,
         )
 
     fun setDefaultCommands() {
@@ -98,10 +104,10 @@ class Bindings(
                         autoPassCommand,
                         Commands.sequence(
                             Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
-                            actions.checkAndFeed().andThen(actions.tuckAndClear())
+                            actions.checkAndFeed()
                         )
                     )
-                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
+                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
                     .withName("AutoPass")
             ).onFalse(
                 actions.stopAllAndZeroHood(),
@@ -177,7 +183,19 @@ class Bindings(
         driver
             .povUp()
             .whileTrue(
-                actions.checkAndFeed()
+                robotContainer.indexer.setIndexerVoltage(12.0, 12.0)
+            )
+            .onFalse(
+                robotContainer.indexer.stop()
+            )
+
+        driver
+            .povRight()
+            .whileTrue(
+                robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(100.0))
+            )
+            .onFalse(
+                robotContainer.shooter.stopFlywheel()
             )
 
         driver

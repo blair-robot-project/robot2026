@@ -23,7 +23,7 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-    const val TUNING_MODE: Boolean = false
+    const val TUNING_MODE: Boolean = true
 
     // --- SYSTEM TIMING ---
     const val LOOP_TIME = 0.02
@@ -174,31 +174,53 @@ object Constants {
                 put(5.0, 1.35)
             }
 
-        val FLYWHEEL_VELOCITY_MAP =
+        val SCORING_FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 145.0)
-                put(1.671, 160.0)
-                put(2.08, 165.0)
-                put(2.57, 175.0)
-                put(3.43, 185.0)
-                put(4.5, 215.0)
-                put(4.92, 225.0)
-                put(5.90, 250.5)
-                put(7.00, 180.5)
-                put(12.00, 200.5)
+                put(1.294, 130.0)
+                put(1.671, 140.0)
+                put(2.08, 140.0)
+                put(2.57, 150.0)
+                put(3.43, 170.0)
+                put(4.5, 185.0)
+                put(4.92, 195.0)
+                put(5.90, 215.5)
             }
 
-        val HOOD_ANGLE_MAP =
+        val SCORING_HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 0.01678)
-                put(1.671, 0.02)
-                put(2.08, .03)
-                put(2.57, .1)
-                put(3.43, 0.1678)
-                put(4.92, 0.27)
-                put(5.90, 0.27)
-                put(7.00, 0.4)
-                put(12.00, 0.4)
+                put(1.294, 0.06)
+                put(1.671, 0.1013)
+                put(2.08, .13)
+                put(2.57, .16)
+                put(2.8, .20)
+                put(3.43, 0.24)
+                put(4.5, 0.36)
+                put(4.92, 0.4)
+                put(5.90, 0.45)
+            }
+
+        val PASSING_FLYWHEEL_VELOCITY_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(4.0, 100.0)
+                put(5.0, 120.0)
+                put(6.0, 120.0)
+                put(7.0, 140.0)
+                put(8.0, 140.0)
+                put(9.0, 160.0)
+                put(10.0, 180.0)
+                put(11.0, 200.0)
+            }
+
+        val PASSING_HOOD_ANGLE_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(4.0, 0.5)
+                put(5.0, 0.5)
+                put(6.0, 0.45)
+                put(7.0, 0.45)
+                put(8.0, 0.4)
+                put(9.0, 0.4)
+                put(10.0, 0.35)
+                put(11.0, 0.35)
             }
     }
 
@@ -241,7 +263,7 @@ object Constants {
         const val DEPLOY_VOLTS = 4.0
         const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
-        const val SLOW_STOW_VOLTS = -1.323
+        const val SLOW_STOW_VOLTS = -1.690
         const val STOW_HOLD_VOLTS = 0.0
 
         // --- HOMING & VISUALIZATION ---
@@ -281,7 +303,7 @@ object Constants {
     object AlignConstants {
         // --- ALIGN GAINS ---
         const val ALIGN_KP = 10.0
-        const val ALIGN_KD = 0.05
+        const val ALIGN_KD = 0.1
 
         // --- ALIGN CONFIGURATION ---
         const val POSITION_TOLERANCE_RADS = 0.035

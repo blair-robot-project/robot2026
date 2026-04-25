@@ -3,12 +3,12 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
 import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.units.Units.RadiansPerSecond
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants.AlignConstants
 import frc.team449.Constants.DriveConstants
-import frc.team449.Constants.ShooterConstants
 import frc.team449.subsystems.drive.DriveSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import frc.team449.util.FieldUtil
@@ -25,7 +25,9 @@ class AimAtTargetCommand(
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val maxLinearSpeedMetersPerSecond: Double = DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SEC,
-    private val targetSupplier: Supplier<Translation2d>
+    private val targetSupplier: Supplier<Translation2d>,
+    private val flywheelVelocityMap: InterpolatingDoubleTreeMap,
+    private val hoodAngleMap: InterpolatingDoubleTreeMap
 ) : Command() {
     private val driveWithHeading =
         SwerveRequest
@@ -65,22 +67,18 @@ class AimAtTargetCommand(
             abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
             maxLinearSpeedMetersPerSecond
 
-        if (!atHeadingSetpoint()) {
-            drive.setControl(
-                driveWithHeading
-                    .withVelocityX(throttle)
-                    .withVelocityY(strafe)
-                    .withTargetDirection(targetRotation)
-            )
-        } else {
-            drive.setControl(brakeRequest)
-        }
+        drive.setControl(
+            driveWithHeading
+                .withVelocityX(throttle)
+                .withVelocityY(strafe)
+                .withTargetDirection(targetRotation)
+        )
 
         shooter.setFlywheelVelocityInternal(
-            RadiansPerSecond.of(ShooterConstants.FLYWHEEL_VELOCITY_MAP.get(distance))
+            RadiansPerSecond.of(flywheelVelocityMap.get(distance))
         )
         shooter.setHoodAngleInternal(
-            Radians.of(ShooterConstants.HOOD_ANGLE_MAP.get(distance))
+            Radians.of(hoodAngleMap.get(distance))
         )
 
         Logger.recordOutput("Align/HeadingErrorRads", driveWithHeading.HeadingController.positionError)
