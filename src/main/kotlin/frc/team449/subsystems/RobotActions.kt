@@ -1,7 +1,6 @@
 package frc.team449.subsystems
 
 import edu.wpi.first.units.Units
-import edu.wpi.first.units.Units.Radians
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.WaitCommand
@@ -23,14 +22,15 @@ class RobotActions(
     fun deployAndIntake(): Command =
         Commands.sequence(
             intake.deploy().unless { intake.pivotIsDeployed },
+            intake.setPivotVoltage(1.0),
             intake.setRollerVoltage(12.0)
         )
             .withName("DeployIntake")
 
     fun stopIntakeAndPivot(): Command =
         Commands.sequence(
-            intake.stopRollers(),
             intake.setPivotVoltage(0.0),
+            intake.stopRollers()
         )
             .withName("StopIntakePivot")
 
@@ -75,6 +75,12 @@ class RobotActions(
         )
             .withName("StopAll")
 
+    fun stopShooterIndexer(): Command =
+        Commands.parallel(
+            shooter.stopFlywheel(),
+            indexer.stop()
+        )
+
     fun stopAllAndHomeHood(): Command =
         Commands.parallel(
             Commands.sequence(
@@ -86,45 +92,22 @@ class RobotActions(
         )
             .withName("StopAllHomeHood")
 
-    fun stopAllAndZeroHood(): Command =
-        Commands.parallel(
-            Commands.sequence(
-                shooter.stopFlywheel(),
-                shooter.setHoodAngle(Units.Radians.of(0.0))
-            ),
-            intake.stopRollers(),
-            indexer.stop()
-        )
-            .withName("StopAllZeroHood")
-
     fun tuckAndClear(): Command =
         Commands.sequence(
             intake.setRollerVoltage(3.0),
 
-            WaitCommand(0.4),
-            intake.setPivotAngle(Radians.of(1.8)),
             WaitCommand(0.8),
+            intake.setPivotAngle(Units.Radians.of(1.8)),
+            WaitCommand(0.4),
             intake.stopRollers(),
             intake.stowSlow(),
 
         )
             .withName("TuckClear")
 
-    fun autoTrenchShot(): Command =
+    fun autoShot(distanceMeters: Double): Command =
         Commands.sequence(
-            prepShotFromDistanceMeters(3.43),
-            checkAndFeed().andThen(tuckAndClear()),
-        )
-
-    fun autoBumpShot(): Command =
-        Commands.sequence(
-            prepShotFromDistanceMeters(2.22),
-            checkAndFeed().andThen(tuckAndClear()),
-        )
-
-    fun autoHubShot(): Command =
-        Commands.sequence(
-            prepShotFromDistanceMeters(2.5),
+            prepShotFromDistanceMeters(distanceMeters),
             checkAndFeed().andThen(tuckAndClear()),
         )
 }

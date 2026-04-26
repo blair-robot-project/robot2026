@@ -34,12 +34,16 @@ class IndexerSubsystem(
         Logger.recordOutput("Indexer/ActiveCommand", currentCommand?.name ?: "None")
     }
 
+    fun setIndexerVoltageInternal(floorVolts: Double, topVolts: Double) {
+        floorTargetVolts = floorVolts
+        topTargetVolts = topVolts
+
+        io.setIndexerVoltage(floorTargetVolts, topTargetVolts)
+    }
+
     fun setIndexerVoltage(floorVolts: Double, topVolts: Double): Command =
         runOnce {
-            floorTargetVolts = floorVolts
-            topTargetVolts = topVolts
-
-            io.setIndexerVoltage(floorTargetVolts, topTargetVolts)
+            setIndexerVoltageInternal(floorVolts, topVolts)
         }
 
     fun stop(): Command =

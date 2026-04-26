@@ -34,10 +34,12 @@ open class IndexerIOHardware : IndexerIO {
             floorVelocity,
             floorSupplyCurrent,
             floorStatorCurrent,
+            floorTemp,
             topVoltage,
             topVelocity,
             topSupplyCurrent,
             topStatorCurrent,
+            topTemp,
         )
 
     private val floorConnected: Boolean

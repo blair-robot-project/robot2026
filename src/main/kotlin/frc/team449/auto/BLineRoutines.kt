@@ -42,9 +42,10 @@ class BLineRoutines(
     private fun registerEventTriggers() {
         FollowPath.registerEventTrigger("start_intake", actions.deployAndIntake())
         FollowPath.registerEventTrigger("stop_intake", actions.stopIntake())
-        FollowPath.registerEventTrigger("trench_shot", actions.autoTrenchShot())
-        FollowPath.registerEventTrigger("hub_shot", actions.autoHubShot())
-        FollowPath.registerEventTrigger("bump_shot", actions.autoBumpShot())
+        FollowPath.registerEventTrigger("trench_shot", actions.autoShot(3.43))
+        FollowPath.registerEventTrigger("hub_shot", actions.autoShot(1.3))
+        FollowPath.registerEventTrigger("bump_shot", actions.autoShot(2.22))
+        FollowPath.registerEventTrigger("depot_shot", actions.autoShot(3.7))
         FollowPath.registerEventTrigger("stop_shot", actions.stopAll())
     }
 
@@ -87,7 +88,8 @@ class BLineRoutines(
                 standardBuilder.build(Path("trench_pt4")),
                 WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
                 standardBuilder.build(Path("trench_to_nz")),
-            ).withName("DoubleTrench")
+            )
+            .withName("DoubleTrench")
     }
 
     private fun doubleBumpSweep(mirror: Boolean): Command {
@@ -109,25 +111,37 @@ class BLineRoutines(
         val resetBuilder = baseBuilder.withPoseReset(drive::resetOdometry).withShouldMirror { mirror }
         val standardBuilder = baseBuilder.withShouldMirror { mirror }
 
-        return Commands
-            .sequence(
-                drive.alignModules(Rotation2d.kCW_90deg),
-                resetBuilder.build(Path("to_trench")),
-                WaitCommand(AutoConstants.AUTO_PRELOAD_SHOOTING_TIME_SEC),
-                standardBuilder.build(Path("delay_trench_bump")),
-                WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
-                WaitCommand(2.0), // check with alliance partners
-                standardBuilder.build(Path("trench_to_nz")),
-            ).withName("DoubleTrench")
+        return Commands.sequence(
+            drive.alignModules(Rotation2d.kCW_90deg),
+            resetBuilder.build(Path("to_trench")),
+            WaitCommand(AutoConstants.AUTO_PRELOAD_SHOOTING_TIME_SEC),
+            standardBuilder.build(Path("delay_trench_bump")),
+            WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
+            WaitCommand(2.0), // check with alliance partners
+            standardBuilder.build(Path("trench_to_nz")),
+        )
+            .withName("DoubleTrench")
+    }
+
+    private fun hubDepot(mirror: Boolean): Command {
+        val resetBuilder = baseBuilder.withPoseReset(drive::resetOdometry).withShouldMirror { mirror }
+        val standardBuilder = baseBuilder.withShouldMirror { mirror }
+
+        return Commands.sequence(
+            resetBuilder.build(Path("hub_start")),
+            WaitCommand(AutoConstants.AUTO_PRELOAD_SHOOTING_TIME_SEC),
+            standardBuilder.build(Path("hub_end")),
+            standardBuilder.build(Path("hub_depot")),
+            WaitCommand(AutoConstants.AUTO_SHOOTING_TIME_SEC),
+            standardBuilder.build(Path("depot_to_nz"))
+        )
+            .withName("HubDepot")
     }
 
     fun addOptionsToChooser(autoChooser: LoggedDashboardChooser<Command>) {
         autoChooser.addDefaultOption("Do Nothing", Commands.none())
 
-        fun addMirroredOptions(
-            name: String,
-            buildRoutine: (mirror: Boolean) -> Command
-        ) {
+        fun addMirroredOptions(name: String, buildRoutine: (mirror: Boolean) -> Command) {
             autoChooser.addOption("R $name", buildRoutine(false))
             autoChooser.addOption("L $name", buildRoutine(true))
         }
@@ -135,5 +149,8 @@ class BLineRoutines(
         addMirroredOptions("Double Bump Sweep", ::doubleBumpSweep)
         addMirroredOptions("Double Trench", ::doubleTrench)
         addMirroredOptions("Delayed Auto", ::delayAuto)
+
+        // one-side autos
+        autoChooser.addOption("Hub Depot NZ", hubDepot(false))
     }
 }

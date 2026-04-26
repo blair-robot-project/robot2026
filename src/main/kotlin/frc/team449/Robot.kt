@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.util.FieldUtil
 import org.littletonrobotics.junction.LogFileUtil
@@ -46,13 +47,15 @@ class Robot : LoggedRobot() {
         }
 
         // TODO: correct PDH CAN ID
-        LoggedPowerDistribution.getInstance(49, PowerDistribution.ModuleType.kRev)
+        LoggedPowerDistribution.getInstance(0, PowerDistribution.ModuleType.kRev)
 
         SignalLogger.enableAutoLogging(false)
         Logger.start()
     }
 
     override fun robotInit() {
+        RobotController.setBrownoutVoltage(6.3)
+
         FieldUtil.initializeAutoWinnerField()
 
         robotContainer.autoRoutines.addOptionsToChooser(robotContainer.autoChooser)
@@ -72,10 +75,9 @@ class Robot : LoggedRobot() {
 
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
-        robotContainer.drive.configureCoastMode()
+        CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
-            .beforeStarting(robotContainer.actions.stopAllAndHomeHood())
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
@@ -84,7 +86,6 @@ class Robot : LoggedRobot() {
     override fun teleopInit() {
         robotContainer.autonomousCommand.cancel()
         robotContainer.drive.setOperatorPerspectiveForward()
-        robotContainer.drive.configureBrakeMode()
 
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
     }

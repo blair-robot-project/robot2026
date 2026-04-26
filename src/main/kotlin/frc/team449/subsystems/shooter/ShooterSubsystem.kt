@@ -77,34 +77,31 @@ class ShooterSubsystem(
         Logger.recordOutput("Shooter/ActiveCommand", currentCommand?.name ?: "None")
     }
 
-    fun setFlywheelVelocity(flywheelVelocity: AngularVelocity): Command =
-        runOnce {
-            setFlywheelVelocityInternal(flywheelVelocity)
-        }
-            .withName("FLYWHEEL-VEL")
-
     fun setFlywheelVelocityInternal(flywheelVelocity: AngularVelocity) {
         flywheelTargetVelocityRadsPerSec = flywheelVelocity.`in`(RadiansPerSecond)
         io.setFlywheelVelocity(flywheelVelocity)
     }
+
+    fun setFlywheelVelocity(flywheelVelocity: AngularVelocity): Command =
+        runOnce {
+            setFlywheelVelocityInternal(flywheelVelocity)
+        }
 
     fun stopFlywheel(): Command =
         runOnce {
             flywheelTargetVelocityRadsPerSec = 0.0
             io.setFlywheelVoltage(0.0)
         }
-            .withName("FLYWHEEL-STOP")
-
-    fun setHoodAngle(hoodAngle: Angle): Command =
-        runOnce {
-            setHoodAngleInternal(hoodAngle)
-        }
-            .withName("HOOD-ANGLE")
 
     fun setHoodAngleInternal(hoodAngle: Angle) {
         hoodTargetAngleRad = hoodAngle.`in`(Radians)
         io.setHoodAngle(hoodAngle)
     }
+
+    fun setHoodAngle(hoodAngle: Angle): Command =
+        runOnce {
+            setHoodAngleInternal(hoodAngle)
+        }
 
     @AutoLogOutput(key = "Shooter/FlywheelAtTolerance")
     fun isFlywheelAtTolerance(): Boolean {
@@ -140,7 +137,7 @@ class ShooterSubsystem(
                         io.resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
                     },
                 )
-            }.withName("HOOD-HOME")
+            }
 
     fun homeHoodNoDeferred(): Command =
         Commands.sequence(

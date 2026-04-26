@@ -177,14 +177,14 @@ object Constants {
 
         val SCORING_FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 130.0)
-                put(1.671, 140.0)
-                put(2.08, 140.0)
-                put(2.57, 150.0)
-                put(3.43, 170.0)
-                put(4.5, 185.0)
-                put(4.92, 195.0)
-                put(5.90, 215.5)
+                put(1.294, 140.0)
+                put(1.671, 150.0)
+                put(2.08, 150.0)
+                put(2.57, 160.0)
+                put(3.43, 180.0)
+                put(4.5, 195.0)
+                put(4.92, 205.0)
+                put(5.90, 225.5)
             }
 
         val SCORING_HOOD_ANGLE_MAP =
@@ -203,13 +203,13 @@ object Constants {
         val PASSING_FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
                 put(4.0, 100.0)
-                put(5.0, 120.0)
-                put(6.0, 120.0)
-                put(7.0, 140.0)
-                put(8.0, 140.0)
-                put(9.0, 160.0)
-                put(10.0, 180.0)
-                put(11.0, 200.0)
+                put(5.0, 130.0)
+                put(6.0, 130.0)
+                put(7.0, 160.0)
+                put(8.0, 160.0)
+                put(9.0, 190.0)
+                put(10.0, 200.0)
+                put(11.0, 220.0)
             }
 
         val PASSING_HOOD_ANGLE_MAP =
@@ -262,10 +262,9 @@ object Constants {
         const val DEPLOY_POS_RADS = 2.269
 
         const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
         const val SLOW_STOW_VOLTS = -1.690
-        const val STOW_HOLD_VOLTS = 0.0
+        const val PAUSE_TIME_SEC = 0.25
 
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
@@ -287,10 +286,10 @@ object Constants {
         val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val FLOOR_SUPPLY_LIMIT = 20.0
+        const val FLOOR_SUPPLY_LIMIT = 40.0
         const val FLOOR_STATOR_LIMIT = 80.0
 
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_SUPPLY_LIMIT = 50.0
         const val TOP_STATOR_LIMIT = 80.0
 
         // --- PHYSICAL SPECS & GEARING ---

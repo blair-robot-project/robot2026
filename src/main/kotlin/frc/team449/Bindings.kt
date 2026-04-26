@@ -1,10 +1,12 @@
 package frc.team449
 
 import edu.wpi.first.units.Units
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.AimAtTargetCommand
+import frc.team449.commands.StatorStowCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
@@ -33,21 +35,22 @@ class Bindings(
     private fun createAutoAimCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
+            robotContainer.indexer,
             robotContainer.shooter,
             { -driver.leftY },
             { -driver.leftX },
-            targetSupplier = { FieldUtil.HUB },
-            flywheelVelocityMap = ShooterConstants.SCORING_FLYWHEEL_VELOCITY_MAP,
-            hoodAngleMap = ShooterConstants.SCORING_HOOD_ANGLE_MAP,
+            { FieldUtil.HUB },
         )
 
     private fun createAutoPassCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
+            robotContainer.indexer,
             robotContainer.shooter,
             { -driver.leftY },
             { -driver.leftX },
-            targetSupplier = { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose.translation) },
+            { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose.translation) },
+            isScoring = false,
             flywheelVelocityMap = ShooterConstants.PASSING_FLYWHEEL_VELOCITY_MAP,
             hoodAngleMap = ShooterConstants.PASSING_HOOD_ANGLE_MAP,
         )
@@ -82,17 +85,16 @@ class Bindings(
             .whileTrue(
                 Commands.defer({
                     val autoAimCommand = createAutoAimCommand()
+                    val statorStowCommand = StatorStowCommand(robotContainer.intake) { autoAimCommand.readyToShoot() }
                     Commands.parallel(
                         autoAimCommand,
-                        Commands.sequence(
-                            Commands.waitUntil { autoAimCommand.atHeadingSetpoint() },
-                            actions.checkAndFeed().andThen(actions.tuckAndClear())
-                        )
+                        statorStowCommand,
                     )
                 }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
                     .withName("AutoAim")
+                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
             ).onFalse(
-                actions.stopAll(),
+                actions.stopShooterIndexer(),
             )
 
         driver
@@ -100,17 +102,15 @@ class Bindings(
             .whileTrue(
                 Commands.defer({
                     val autoPassCommand = createAutoPassCommand()
-                    Commands.parallel(
-                        autoPassCommand,
-                        Commands.sequence(
-                            Commands.waitUntil { autoPassCommand.atHeadingSetpoint() },
-                            actions.checkAndFeed()
-                        )
-                    )
+                    autoPassCommand
                 }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
                     .withName("AutoPass")
+                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
             ).onFalse(
-                actions.stopAllAndZeroHood(),
+                Commands.sequence(
+                    actions.stopShooterIndexer(),
+                    robotContainer.shooter.setHoodAngle(Units.Radians.of(0.0))
+                )
             )
 
         driver

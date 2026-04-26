@@ -38,6 +38,12 @@ class IntakeSubsystem(
     val pivotAngle: Double
         get() = inputs.leftPivotPositionRads
 
+    val leftPivotStatorCurrentAmps: Double
+        get() = inputs.leftPivotStatorCurrentAmps
+
+    val rightPivotStatorCurrentAmps: Double
+        get() = inputs.rightPivotStatorCurrentAmps
+
     val leftPivotDisconnectedAlert =
         Alert("Left Pivot Disconnected (ID ${IntakeConstants.LEFT_PIVOT_ID}).", Alert.AlertType.kError)
     val rightPivotDisconnectedAlert =
@@ -60,50 +66,57 @@ class IntakeSubsystem(
         Logger.recordOutput("Intake/ActiveCommand", currentCommand?.name ?: "None")
     }
 
+    fun setRollerVoltageInternal(rollerVolts: Double) {
+        rollerTargetVolts = rollerVolts
+        io.setRollerVoltage(rollerTargetVolts)
+    }
+
     fun setRollerVoltage(rollerVolts: Double): Command =
         runOnce {
-            rollerTargetVolts = rollerVolts
-            io.setRollerVoltage(rollerTargetVolts)
-        }.withName("ROLLER-VOLTS")
+            setRollerVoltageInternal(rollerVolts)
+        }
 
     fun stopRollers(): Command =
         runOnce {
             rollerTargetVolts = 0.0
             io.setRollerVoltage(0.0)
-        }.withName("ROLLER-STOP")
+        }
+
+    fun setPivotAngleInternal(pivotAngle: Angle) {
+        pivotTargetAngleRads = pivotAngle.`in`(Radians)
+        io.setPivotAngle(pivotAngle)
+    }
 
     fun setPivotAngle(pivotAngle: Angle): Command =
         runOnce {
-            pivotTargetAngleRads = pivotAngle.`in`(Radians)
-            io.setPivotAngle(pivotAngle)
-        }.withName("PIVOT-ANGLE")
+            setPivotAngleInternal(pivotAngle)
+        }
+
+    fun setPivotVoltageInternal(pivotVolts: Double) =
+        io.setPivotVoltage(pivotVolts)
 
     fun setPivotVoltage(pivotVolts: Double): Command =
         runOnce {
-            io.setPivotVoltage(pivotVolts)
-        }.withName("PIVOT-VOLTS")
+            setPivotVoltageInternal(pivotVolts)
+        }
 
     fun deploy(): Command = slamHoming(
         IntakeConstants.DEPLOY_VOLTS,
-        IntakeConstants.DEPLOY_HOLD_VOLTS,
         targetIsDeployed = true
-    ).withName("PIVOT-DEPLOY")
+    )
 
     fun stow(): Command = slamHoming(
         IntakeConstants.STOW_VOLTS,
-        IntakeConstants.STOW_HOLD_VOLTS,
         targetIsDeployed = false
-    ).withName("PIVOT-STOW")
+    )
 
     fun stowSlow(): Command = slamHoming(
         IntakeConstants.SLOW_STOW_VOLTS,
-        IntakeConstants.STOW_HOLD_VOLTS,
         targetIsDeployed = false
-    ).withName("PIVOT-STOW-SLOW")
+    )
 
     private fun slamHoming(
         moveVolts: Double,
-        holdVolts: Double,
         targetIsDeployed: Boolean
     ): Command =
         defer {
@@ -119,7 +132,6 @@ class IntakeSubsystem(
             }.andThen(
                 runOnce {
                     io.resetPivotAngle(Radians.of(pivotAngleRads))
-                    io.setPivotVoltage(holdVolts)
                 },
             )
         }

@@ -1,6 +1,5 @@
 package frc.team449.subsystems.drive
 
-import com.ctre.phoenix6.signals.NeutralModeValue
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.Matrix
@@ -56,8 +55,6 @@ interface DriveIO {
     fun seedFieldCentric() {}
 
     fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
-
-    fun configureNeutralMode(neutralModeValue: NeutralModeValue) {}
 
     fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {}
 

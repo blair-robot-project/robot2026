@@ -72,13 +72,17 @@ object TunerConstants {
                 CurrentLimitsConfigs()
                     .withSupplyCurrentLimit(40.0)
             )
+            .withOpenLoopRamps(
+                OpenLoopRampsConfigs()
+                    .withVoltageOpenLoopRampPeriod(0.1)
+            )
 
     private val steerInitialConfigs: TalonFXSConfiguration =
         TalonFXSConfiguration()
             .withCurrentLimits(
                 CurrentLimitsConfigs()
-                    .withSupplyCurrentLimit(40.0)
-                    .withStatorCurrentLimit(80.0)
+                    .withSupplyCurrentLimit(30.0)
+                    .withStatorCurrentLimit(100.0)
             )
 
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs

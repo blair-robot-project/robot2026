@@ -9,7 +9,6 @@ import com.ctre.phoenix6.hardware.CANcoder
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.hardware.TalonFXS
-import com.ctre.phoenix6.signals.NeutralModeValue
 import com.ctre.phoenix6.swerve.SwerveDrivetrain
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants
 import com.ctre.phoenix6.swerve.SwerveModuleConstants
@@ -137,10 +136,6 @@ open class DriveIOHardware(
 
     override fun setOperatorPerspectiveForward(yaw: Rotation2d) {
         super<SwerveDrivetrain>.setOperatorPerspectiveForward(yaw)
-    }
-
-    override fun configureNeutralMode(neutralModeValue: NeutralModeValue) {
-        super<SwerveDrivetrain>.configNeutralMode(neutralModeValue, 0.0)
     }
 
     override fun addVisionMeasurement(
