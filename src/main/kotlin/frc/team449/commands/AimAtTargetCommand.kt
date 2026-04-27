@@ -90,8 +90,6 @@ class AimAtTargetCommand(
 
         if (readyToShoot()) {
             indexer.setIndexerVoltageInternal(12.0, 12.0)
-        } else {
-            indexer.setIndexerVoltageInternal(0.0, 0.0)
         }
 
         Logger.recordOutput("Align/HeadingErrorRads", driveWithHeading.HeadingController.positionError)

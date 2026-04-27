@@ -88,7 +88,7 @@ class Bindings(
                     val statorStowCommand = StatorStowCommand(robotContainer.intake) { autoAimCommand.readyToShoot() }
                     Commands.parallel(
                         autoAimCommand,
-                        statorStowCommand,
+                        actions.tuckAndClear(),
                     )
                 }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
                     .withName("AutoAim")

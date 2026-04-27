@@ -263,7 +263,7 @@ object Constants {
 
         const val DEPLOY_VOLTS = 4.0
         const val STOW_VOLTS = -4.0
-        const val SLOW_STOW_VOLTS = -1.690
+        const val SLOW_STOW_VOLTS = -0.75
         const val PAUSE_TIME_SEC = 0.25
 
         // --- HOMING & VISUALIZATION ---
