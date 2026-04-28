@@ -181,8 +181,8 @@ object Constants {
                 put(1.671, 150.0)
                 put(2.08, 150.0)
                 put(2.57, 160.0)
-                put(3.43, 180.0)
-                put(4.5, 195.0)
+                put(3.43, 175.0)
+                put(4.5, 190.0)
                 put(4.92, 205.0)
                 put(5.90, 225.5)
             }
@@ -263,7 +263,7 @@ object Constants {
 
         const val DEPLOY_VOLTS = 4.0
         const val STOW_VOLTS = -4.0
-        const val SLOW_STOW_VOLTS = -0.75
+        const val SLOW_STOW_VOLTS = -2.0
         const val PAUSE_TIME_SEC = 0.25
 
         // --- HOMING & VISUALIZATION ---

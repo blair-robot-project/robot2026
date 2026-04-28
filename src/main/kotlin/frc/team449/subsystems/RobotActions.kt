@@ -95,7 +95,7 @@ class RobotActions(
     fun tuckAndClear(): Command =
         Commands.sequence(
             intake.setRollerVoltage(2.0),
-            WaitCommand(0.4),
+            WaitCommand(2.0),
             intake.stowSlow(),
         )
             .withName("TuckClear")
