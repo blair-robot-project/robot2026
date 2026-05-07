@@ -5,7 +5,6 @@ import com.revrobotics.spark.SparkBase
 import java.util.function.Consumer
 import java.util.function.DoubleConsumer
 import java.util.function.DoubleSupplier
-import java.util.function.Function
 import java.util.function.Supplier
 
 object SparkUtil {
@@ -52,24 +51,6 @@ object SparkUtil {
             sparkStickyFault = true
             return defaultValue
         }
-    }
-
-/** Return a processed set of values from a Spark (or the default if one of the values is invalid). */
-    fun ifOkOrDefault(
-        spark: SparkBase,
-        suppliers: Array<DoubleSupplier>,
-        transformer: Function<Array<Double>, Double>,
-        defaultValue: Double
-    ): Double {
-        val values = arrayOf<Double>()
-        for (i in suppliers.indices) {
-            values[i] = suppliers[i].asDouble
-            if (spark.lastError != REVLibError.kOk) {
-                sparkStickyFault = true
-                return defaultValue
-            }
-        }
-        return transformer.apply(values)
     }
 
 /** Attempts to run the command until no error is produced. */

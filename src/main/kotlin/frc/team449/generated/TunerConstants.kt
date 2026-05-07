@@ -62,7 +62,7 @@ object TunerConstants {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private val kSlipCurrent: Current = Units.Amps.of(80.0)
+    private val kSlipCurrent: Current = Units.Amps.of(100.0)
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -70,17 +70,14 @@ object TunerConstants {
         TalonFXConfiguration()
             .withCurrentLimits(
                 CurrentLimitsConfigs()
-                    .withSupplyCurrentLimit(25.0)
+                    .withSupplyCurrentLimit(40.0)
             )
 
     private val steerInitialConfigs: TalonFXSConfiguration =
         TalonFXSConfiguration()
             .withCurrentLimits(
                 CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Units.Amps.of(40.0))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Units.Amps.of(20.0))
-                    .withSupplyCurrentLimitEnable(true),
+                    .withSupplyCurrentLimit(40.0)
             )
 
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
@@ -102,7 +99,7 @@ object TunerConstants {
 
     private const val kDriveGearRatio: Double = 50.0 / 14 * 17 / 27 * 45 / 15
     private const val kSteerGearRatio: Double = 21.428571428571427
-    private val kWheelRadius: Distance = Units.Inches.of(1.908419751181103)
+    private val kWheelRadius: Distance = Units.Inches.of(2.04)
 
     private const val kInvertLeftSide: Boolean = true
     private const val kInvertRightSide: Boolean = false

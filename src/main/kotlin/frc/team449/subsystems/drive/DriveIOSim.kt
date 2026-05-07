@@ -11,7 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.wpilibj.Notifier
 import frc.team449.Constants
-import frc.team449.Constants.DriveConstants.SIM_LOOP_TIME
+import frc.team449.Constants.DriveConstants
 import frc.team449.subsystems.intake.IntakeIOSim
 import org.ironmaple.simulation.IntakeSimulation
 import org.ironmaple.simulation.SimulatedArena
@@ -43,8 +43,8 @@ class DriveIOSim(
             .withBumperSize(Inches.of(Constants.ROBOT_LENGTH_INCHES), Inches.of(Constants.ROBOT_WIDTH_INCHES))
             .withGyro(COTS.ofPigeon2())
             .withTrackLengthTrackWidth(
-                Inches.of(Constants.DriveConstants.TRACKWIDTH_INCHES),
-                Inches.of(Constants.DriveConstants.WHEELBASE_INCHES),
+                Inches.of(DriveConstants.TRACKWIDTH_INCHES),
+                Inches.of(DriveConstants.WHEELBASE_INCHES),
             ).withSwerveModule(
                 SwerveModuleSimulationConfig(
                     DCMotor.getKrakenX60(1),
@@ -55,7 +55,7 @@ class DriveIOSim(
                     Volts.of(moduleConstants[0].SteerFrictionVoltage),
                     Meters.of(moduleConstants[0].WheelRadius),
                     KilogramSquareMeters.of(moduleConstants[0].SteerInertia),
-                    Constants.DriveConstants.WHEEL_COF,
+                    DriveConstants.WHEEL_COF,
                 ),
             )
 
@@ -79,11 +79,11 @@ class DriveIOSim(
         initializeSimulation()
 
         registerTelemetry(simTelemetryConsumer)
-        simNotifier.startPeriodic(SIM_LOOP_TIME)
+        simNotifier.startPeriodic(1 / DriveConstants.ODOMETRY_LOOP_HZ)
     }
 
     private fun initializeSimulation() {
-        SimulatedArena.overrideSimulationTimings(Seconds.of(SIM_LOOP_TIME), 1)
+        SimulatedArena.overrideSimulationTimings(Seconds.of(1 / DriveConstants.ODOMETRY_LOOP_HZ), 1)
         SimulatedArena.getInstance().addDriveTrainSimulation(mapleSimDrive)
 
         for (i in 0 until 4) {
@@ -126,13 +126,13 @@ class DriveIOSim(
         )
 
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
+        super.updateInputs(inputs)
+
         if (IntakeIOSim.isDeployed) {
             intakeSimulation.startIntake()
         } else {
             intakeSimulation.stopIntake()
         }
-
-        super.updateInputs(inputs)
     }
 
     override fun resetOdometry(pose: Pose2d) {

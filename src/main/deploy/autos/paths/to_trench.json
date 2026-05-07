@@ -3,19 +3,19 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 4.246,
-        "y_meters": 0.534,
+        "x_meters": 3.5004721030042854,
+        "y_meters": 0.5753261802575054,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
-        "rotation_radians": 1.4835298641951802,
+        "rotation_radians": 1.5707963267948966,
         "profiled_rotation": true
       }
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.5,
-      "lib_key": "stop_shooting"
+      "t_ratio": 0.7576465863809074,
+      "lib_key": "trench_shot"
     },
     {
       "type": "waypoint",

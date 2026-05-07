@@ -1,13 +1,10 @@
 package frc.team449.subsystems.vision
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
-import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.Timer
-import frc.team449.subsystems.vision.VisionIO.PoseObservation
-import frc.team449.subsystems.vision.VisionIO.PoseObservationType
-import frc.team449.subsystems.vision.VisionIO.TargetObservation
 import frc.team449.subsystems.vision.VisionIO.VisionIOInputs
 import limelight.Limelight
 import limelight.networktables.AngularVelocity3d
@@ -19,42 +16,33 @@ import limelight.networktables.PoseEstimate
 import java.util.Optional
 import java.util.function.Supplier
 
-/** IO implementation for real Limelight hardware.  */
-/**
- * Creates a new VisionIOLimelight.
- *
- * @param name The configured name of the Limelight.
- * @param rotationSupplier Supplier for the current estimated rotation, used for MegaTag 2.
- */
 class VisionIOLimelight(
     name: String,
-    private val rotationSupplier: Supplier<Rotation2d>,
+    private val poseSupplier: Supplier<Pose2d>,
     private val angularVelocitySupplier: Supplier<AngularVelocity3d>,
     offset: Pose3d
 ) : VisionIO {
     private val limelight = Limelight(name)
-    private var estimationMode = EstimationMode.MEGATAG1 // can change this if wanna run both megatag1 and 2
-    private var poseObservationType = PoseObservationType.MEGATAG_1
+    private var estimationMode = EstimationMode.MEGATAG2
+    private var poseObservationType = PoseObservationType.MEGATAG_2
     private val poseEstimator = limelight.createPoseEstimator(estimationMode)
 
     init {
         limelight.settings.withLimelightLEDMode(LimelightSettings.LEDMode.PipelineControl)
             .withCameraOffset(offset)
+        limelight.settings.withImuMode(LimelightSettings.ImuMode.ExternalImu)
             .save()
-        limelight.settings.withImuMode(LimelightSettings.ImuMode.InternalImuExternalAssist)
     }
 
     override fun updateInputs(inputs: VisionIOInputs) {
         limelight.settings
             .withRobotOrientation(
                 Orientation3d(
-                    Rotation3d(rotationSupplier.get()),
+                    Rotation3d(poseSupplier.get().rotation),
                     angularVelocitySupplier.get(),
                 )
             )
             .save()
-
-        NetworkTableInstance.getDefault().flush()
 
         val visionEstimateOpt: Optional<PoseEstimate> = poseEstimator.poseEstimate
         val resultsOpt: Optional<LimelightResults> = limelight.data.results
@@ -71,7 +59,7 @@ class VisionIOLimelight(
                     est.avgTagAmbiguity,
                     est.tagCount,
                     est.avgTagDist,
-                    PoseObservationType.MEGATAG_2
+                    poseObservationType,
                 )
             )
         } else {

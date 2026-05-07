@@ -6,47 +6,61 @@ import org.littletonrobotics.junction.AutoLog
 interface ShooterIO {
     @AutoLog
     open class ShooterIOInputs {
-        @JvmField var leftLeaderVelocityRadPerSec: Double = 0.0
+        @JvmField var leftTopLeaderConnected: Boolean = false
 
-        @JvmField var leftLeaderAppliedVolts: Double = 0.0
+        @JvmField var leftTopLeaderAppliedVolts: Double = 0.0
 
-        @JvmField var leftLeaderSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftTopLeaderVelocityRadsPerSec: Double = 0.0
 
-        @JvmField var leftLeaderStatorCurrentAmps: Double = 0.0
+        @JvmField var leftTopLeaderSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var leftLeaderTempCelsius: Double = 0.0
+        @JvmField var leftTopLeaderStatorCurrentAmps: Double = 0.0
 
-        @JvmField var leftFollowerAppliedVolts: Double = 0.0
+        @JvmField var leftTopLeaderTempCelsius: Double = 0.0
 
-        @JvmField var leftFollowerSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftBottomFollowerConnected: Boolean = false
 
-        @JvmField var leftFollowerStatorCurrentAmps: Double = 0.0
+        @JvmField var leftBottomFollowerAppliedVolts: Double = 0.0
 
-        @JvmField var leftFollowerTempCelsius: Double = 0.0
+        @JvmField var leftBottomFollowerVelocityRadsPerSec: Double = 0.0
 
-        @JvmField var rightLeaderVelocityRadPerSec: Double = 0.0
+        @JvmField var leftBottomFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var rightLeaderAppliedVolts: Double = 0.0
+        @JvmField var leftBottomFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField var rightLeaderSupplyCurrentAmps: Double = 0.0
+        @JvmField var leftBottomFollowerTempCelsius: Double = 0.0
 
-        @JvmField var rightLeaderStatorCurrentAmps: Double = 0.0
+        @JvmField var rightTopFollowerConnected: Boolean = false
 
-        @JvmField var rightLeaderTempCelsius: Double = 0.0
+        @JvmField var rightTopFollowerAppliedVolts: Double = 0.0
 
-        @JvmField var rightFollowerAppliedVolts: Double = 0.0
+        @JvmField var rightTopFollowerVelocityRadsPerSec: Double = 0.0
 
-        @JvmField var rightFollowerSupplyCurrentAmps: Double = 0.0
+        @JvmField var rightTopFollowerSupplyCurrentAmps: Double = 0.0
 
-        @JvmField var rightFollowerStatorCurrentAmps: Double = 0.0
+        @JvmField var rightTopFollowerStatorCurrentAmps: Double = 0.0
 
-        @JvmField var rightFollowerTempCelsius: Double = 0.0
+        @JvmField var rightTopFollowerTempCelsius: Double = 0.0
+
+        @JvmField var rightBottomFollowerConnected: Boolean = false
+
+        @JvmField var rightBottomFollowerAppliedVolts: Double = 0.0
+
+        @JvmField var rightBottomFollowerVelocityRadsPerSec: Double = 0.0
+
+        @JvmField var rightBottomFollowerSupplyCurrentAmps: Double = 0.0
+
+        @JvmField var rightBottomFollowerStatorCurrentAmps: Double = 0.0
+
+        @JvmField var rightBottomFollowerTempCelsius: Double = 0.0
+
+        @JvmField var hoodConnected: Boolean = false
+
+        @JvmField var hoodAppliedVolts: Double = 0.0
 
         @JvmField var hoodAngleRad: Double = 0.0
 
         @JvmField var hoodVelocityRadPerSec: Double = 0.0
-
-        @JvmField var hoodAppliedVolts: Double = 0.0
 
         @JvmField var hoodSupplyCurrentAmps: Double = 0.0
 
@@ -57,13 +71,13 @@ interface ShooterIO {
 
     fun updateInputs(inputs: ShooterIOInputs) {}
 
-    fun setFlywheelVoltage(volts: Double) {}
+    fun setFlywheelVoltage(flywheelVolts: Double) {}
 
-    fun setFlywheelVelocity(velocity: AngularVelocity) {}
+    fun setFlywheelVelocity(flywheelVelocity: AngularVelocity) {}
 
-    fun setHoodVoltage(volts: Double) {}
+    fun setHoodVoltage(hoodVolts: Double) {}
 
-    fun setHoodAngle(angle: Angle) {}
+    fun setHoodAngle(hoodAngle: Angle) {}
 
-    fun resetHoodAngle(angle: Angle) {}
+    fun resetHoodAngle(hoodAngle: Angle) {}
 }

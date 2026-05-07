@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism
-import frc.team449.Constants.DriveConstants.MODULE_ALIGN_TOLERANCE
+import frc.team449.Constants.DriveConstants
+import frc.team449.util.FieldUtil
 import limelight.networktables.AngularVelocity3d
 import org.littletonrobotics.junction.Logger
+import kotlin.jvm.optionals.getOrElse
 import kotlin.math.abs
 
 class DriveSubsystem(
@@ -35,8 +37,28 @@ class DriveSubsystem(
     val pose: Pose2d
         get() = inputs.Pose
 
+    val robotRelativeSpeeds: ChassisSpeeds
+        get() = inputs.Speeds
+
+    val fieldRelativeSpeeds: ChassisSpeeds
+        get() = ChassisSpeeds.fromRobotRelativeSpeeds(
+            inputs.Speeds,
+            inputs.Pose.rotation,
+        )
+
+    val angularVelocity: AngularVelocity3d
+        get() = AngularVelocity3d(
+            DegreesPerSecond.of(inputs.rollVelocityDegreesPerSecond),
+            DegreesPerSecond.of(inputs.pitchVelocityDegreesPerSecond),
+            DegreesPerSecond.of(inputs.yawVelocityDegreesPerSecond)
+        )
+
     val modulePositions: Array<SwerveModulePosition>
         get() = inputs.ModulePositions
+
+    private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
+    private val brakeRequest = SwerveRequest.SwerveDriveBrake()
+    private val alignModulesRequest = SwerveRequest.PointWheelsAt()
 
     override fun periodic() {
         io.updateInputs(inputs)
@@ -44,10 +66,8 @@ class DriveSubsystem(
         field.robotPose = pose
 
         Logger.processInputs("Drive", inputs)
-        Logger.recordOutput(
-            "Drive/ActiveCommand",
-            currentCommand?.name ?: "None",
-        )
+        Logger.recordOutput("Drive/ActiveCommand", currentCommand?.name ?: "None")
+        Logger.recordOutput("Drive/DistanceToHub", FieldUtil.getDistanceToFriendlyHub(pose.translation))
     }
 
     fun setControl(request: SwerveRequest) {
@@ -64,7 +84,7 @@ class DriveSubsystem(
 
     fun setOperatorPerspectiveForward() {
         val forward: Rotation2d =
-            if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            if (DriverStation.getAlliance().getOrElse { DriverStation.Alliance.Blue } == DriverStation.Alliance.Red) {
                 Rotation2d.k180deg
             } else {
                 Rotation2d.kZero
@@ -73,34 +93,25 @@ class DriveSubsystem(
         io.setOperatorPerspectiveForward(forward)
     }
 
-    fun getRobotRelativeSpeeds(): ChassisSpeeds = inputs.Speeds
-
-    fun getFieldRelativeSpeeds(): ChassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            inputs.Speeds,
-            inputs.Pose.rotation,
-        )
-
-    fun getAngularVelocity(): AngularVelocity3d =
-        AngularVelocity3d(
-            DegreesPerSecond.of(inputs.rollVelocityDegreesPerSecond),
-            DegreesPerSecond.of(inputs.pitchVelocityDegreesPerSecond),
-            DegreesPerSecond.of(inputs.yawVelocityDegreesPerSecond)
-        )
-
-    fun xLock(): Command = run { io.setControl(SwerveRequest.SwerveDriveBrake()) }
+    fun xLock(): Command =
+        run {
+            io.setControl(brakeRequest)
+        }
+            .withName("X-LOCK")
 
     fun alignModules(direction: Rotation2d): Command =
         run {
-            io.setControl(SwerveRequest.PointWheelsAt().withModuleDirection(direction))
+            io.setControl(alignModulesRequest.withModuleDirection(direction))
         }.until {
             (0..3).all { i ->
                 val target = inputs.ModuleTargets[i].angle
                 val state = inputs.ModuleStates[i].angle
 
-                abs(target.minus(state).degrees) <= MODULE_ALIGN_TOLERANCE
+                abs(target.minus(state).degrees) <= DriveConstants.MODULE_ALIGN_TOLERANCE_DEG
             }
-        }.withTimeout(0.5)
+        }
+            .withName("ALIGN")
+            .withTimeout(0.1)
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,
@@ -114,7 +125,6 @@ class DriveSubsystem(
         io.setStateStdDevs(visionMeasurementStdDevs)
     }
 
-    private val translationCharacterizationRequest = SwerveRequest.SysIdSwerveTranslation()
     val sysIDTranslationRoutine =
         SysIdRoutine(
             SysIdRoutine.Config(

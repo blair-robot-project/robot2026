@@ -1,57 +1,55 @@
 package frc.team449.subsystems.indexer
+import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.team449.Constants.IndexerConstants
+import org.littletonrobotics.junction.AutoLogOutput
 import org.littletonrobotics.junction.Logger
-
-/**
- * @file Indexer.kt
- * @brief This file contains functions for the indexer
- * @details This includes motor control and sensor control/definition functions for the indexer
- * @author Sean Zhang
- */
 
 class IndexerSubsystem(
     private val io: IndexerIO
 ) : SubsystemBase() {
     private val inputs: IndexerInputsAutoLogged = IndexerInputsAutoLogged()
 
+    @AutoLogOutput(key = "Indexer/FloorTargetVolts")
     var floorTargetVolts: Double = 0.0
-    var wedgeTargetVolts: Double = 0.0
+        private set
+
+    @AutoLogOutput(key = "Indexer/TopTargetVolts")
     var topTargetVolts: Double = 0.0
+        private set
+
+    private val floorDisconnectedAlert =
+        Alert("Floor Indexer Disconnected (ID ${IndexerConstants.FLOOR_ID}).", Alert.AlertType.kError)
+    private val topDisconnectedAlert =
+        Alert("Top Indexer Disconnected (ID ${IndexerConstants.TOP_ID}).", Alert.AlertType.kError)
 
     override fun periodic() {
         io.updateInputs(inputs)
         Logger.processInputs("Indexer", inputs)
 
-        Logger.recordOutput("Indexer/FloorTargetVolts", floorTargetVolts)
-        Logger.recordOutput("Indexer/WedgeTargetVolts", wedgeTargetVolts)
-        Logger.recordOutput("Indexer/TopTargetVolts", topTargetVolts)
+        floorDisconnectedAlert.set(!inputs.floorConnected)
+        topDisconnectedAlert.set(!inputs.topConnected)
+
+        Logger.recordOutput("Indexer/ActiveCommand", currentCommand?.name ?: "None")
     }
 
-    fun index(
-        floorVolts: Double,
-        wedgeVolts: Double,
-        topVolts: Double
-    ): Command =
-        this
-            .run {
-                floorTargetVolts = floorVolts
-                wedgeTargetVolts = wedgeVolts
-                topTargetVolts = topVolts
+    fun setIndexerVoltageInternal(floorVolts: Double, topVolts: Double) {
+        floorTargetVolts = floorVolts
+        topTargetVolts = topVolts
 
-//                val voltageSlewRate = PowerSubsystem.currentProfile.limits.hopperSlewRate
-//                val floorSlewedVolts = inputs.floorAppliedVolts.slewTowards(floorTargetVolts, voltageSlewRate)
-//                val topSlewedVolts = inputs.topAppliedVolts.slewTowards(topTargetVolts, voltageSlewRate)
-//
-//                io.setIndexerVoltage(floorSlewedVolts, wedgeTargetVolts, topSlewedVolts)
-                io.setIndexerVoltage(floorTargetVolts, wedgeTargetVolts, topTargetVolts)
-            }
+        io.setIndexerVoltage(floorTargetVolts, topTargetVolts)
+    }
+
+    fun setIndexerVoltage(floorVolts: Double, topVolts: Double): Command =
+        runOnce {
+            setIndexerVoltageInternal(floorVolts, topVolts)
+        }
 
     fun stop(): Command =
-        this.run {
+        runOnce {
             floorTargetVolts = 0.0
-            wedgeTargetVolts = 0.0
             topTargetVolts = 0.0
-            io.setIndexerVoltage(0.0, 0.0, 0.0)
+            io.setIndexerVoltage(0.0, 0.0)
         }
 }

@@ -14,13 +14,6 @@ import frc.team449.subsystems.vision.VisionIO.*
 import org.photonvision.PhotonCamera
 import java.util.*
 
-/** IO implementation for real PhotonVision hardware.  */
-/**
- * Creates a new VisionIOPhotonVision.
- *
- * @param name The configured name of the camera.
- * @param robotToCamera The 3D position of the camera relative to the robot.
- */
 open class VisionIOPhotonVision(
     name: String,
     private val robotToCamera: Transform3d

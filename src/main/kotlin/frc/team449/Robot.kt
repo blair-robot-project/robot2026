@@ -8,9 +8,9 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.util.FieldUtil
-import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedPowerDistribution
 import org.littletonrobotics.junction.LoggedRobot
@@ -46,25 +46,26 @@ class Robot : LoggedRobot() {
             }
         }
 
-        LoggedPowerDistribution.getInstance(49, PowerDistribution.ModuleType.kRev)
+        // TODO: correct PDH CAN ID
+        LoggedPowerDistribution.getInstance(0, PowerDistribution.ModuleType.kRev)
 
-        // SignalLogger.enableAutoLogging(true)
-        SignalLogger.setPath("/home/lvuser/logs/")
-        SignalLogger.start()
+        SignalLogger.enableAutoLogging(false)
         Logger.start()
     }
 
     override fun robotInit() {
-        FieldUtil.initialize()
+        RobotController.setBrownoutVoltage(6.3)
 
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
+        FieldUtil.initializeAutoWinnerField()
+
+        robotContainer.autoRoutines.addOptionsToChooser(robotContainer.autoChooser)
+
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
     }
 
     override fun robotPeriodic() {
         CommandScheduler.getInstance().run()
-        PhoenixUtil.refreshAll()
 
         Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
         Logger.recordOutput("MatchTime", DriverStation.getMatchTime())
@@ -74,21 +75,17 @@ class Robot : LoggedRobot() {
 
     override fun autonomousInit() {
         robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.updateKeyPositions()
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
 
         robotContainer.autonomousCommand = robotContainer.autoChooser.get()
         CommandScheduler.getInstance().schedule(robotContainer.autonomousCommand)
     }
 
-    override fun autonomousPeriodic() {
-        robotContainer.bLineRoutines.logBLineAuto()
-    }
+    override fun autonomousPeriodic() {}
 
     override fun teleopInit() {
         robotContainer.autonomousCommand.cancel()
         robotContainer.drive.setOperatorPerspectiveForward()
-        FieldUtil.updateKeyPositions()
 
         CommandScheduler.getInstance().schedule(robotContainer.actions.stopAllAndHomeHood())
     }

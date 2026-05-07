@@ -1,6 +1,5 @@
 package frc.team449.subsystems.intake
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs
 import com.ctre.phoenix6.configs.MotorOutputConfigs
 import com.ctre.phoenix6.signals.InvertedValue
 import edu.wpi.first.math.system.plant.DCMotor
@@ -55,64 +54,52 @@ class IntakeIOSim : IntakeIOHardware() {
             ),
         )
 
-    private val pivotLeaderSim = leftPivotLeader.simState
-    private val pivotFollowerSim = rightPivotFollower.simState
+    private val leftPivotSim = leftPivot.simState
+    private val rightPivotSim = rightPivot.simState
     private val rollerLeaderSim = leftRollerLeader.simState
     private val rollerFollowerSim = rightRollerFollower.simState
 
     init {
-        leftPivotLeader.configurator.apply(
+        leftPivot.configurator.apply(
             MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
-        )
-        leftPivotLeader.configurator.apply(
-            CurrentLimitsConfigs().withSupplyCurrentLimit(20.0).withStatorCurrentLimit(40.0)
         )
 
         SmartDashboard.putData("Intake", mech)
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        pivotLeaderSim.setSupplyVoltage(12.0)
-        pivotFollowerSim.setSupplyVoltage(12.0)
-        rollerLeaderSim.setSupplyVoltage(12.0)
-        rollerFollowerSim.setSupplyVoltage(12.0)
+        super.updateInputs(inputs)
 
-        pivotSim.setInput(pivotLeaderSim.motorVoltage)
+        leftPivotSim.setSupplyVoltage(12.0)
+        rightPivotSim.setSupplyVoltage(12.0)
+        pivotSim.setInput(leftPivotSim.motorVoltage)
         pivotSim.update(Constants.LOOP_TIME)
 
         val pivotRotorPos = Units.radiansToRotations(pivotSim.angleRads) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
         val pivotRotorVel = Units.radiansToRotations(pivotSim.velocityRadPerSec) * IntakeConstants.PIVOT_GEARING_SENSOR_TO_MECH
+        leftPivotSim.setRawRotorPosition(pivotRotorPos)
+        leftPivotSim.setRotorVelocity(pivotRotorVel)
+        rightPivotSim.setRawRotorPosition(pivotRotorPos)
+        rightPivotSim.setRotorVelocity(pivotRotorVel)
 
-        pivotLeaderSim.setRawRotorPosition(pivotRotorPos)
-        pivotLeaderSim.setRotorVelocity(pivotRotorVel)
-        pivotFollowerSim.setRawRotorPosition(pivotRotorPos)
-        pivotFollowerSim.setRotorVelocity(pivotRotorVel)
-
-        rollerSim.setInput(rollerLeaderSim.motorVoltage)
-        rollerSim.update(0.020)
-
-        val rollerRotorVel = Units.radiansToRotations(rollerSim.angularVelocityRadPerSec) * IntakeConstants.ROLLER_GEARING
-
-        rollerLeaderSim.setRotorVelocity(rollerRotorVel)
-        rollerFollowerSim.setRotorVelocity(rollerRotorVel)
-
-        // update viz
         pivotMechanism.angle = Units.radiansToDegrees(pivotSim.angleRads) + 90 - IntakeConstants.VIZ_OFFSET_DEG
 
-        if (abs(rollerSim.angularVelocityRadPerSec) > 1.0) {
+        if (abs(rollerSim.angularVelocityRadPerSec) > 200.0) {
             pivotMechanism.color = Color8Bit(Color.kGreen)
         } else {
             pivotMechanism.color = Color8Bit(Color.kRed)
         }
 
-        isDeployed =
-            if (inputs.leftPivotLeaderPositionRad >= 1.13) {
-                true
-            } else {
-                false
-            }
+        isDeployed = inputs.leftPivotPositionRads >= 1.13
 
-        super.updateInputs(inputs)
+        rollerLeaderSim.setSupplyVoltage(12.0)
+        rollerFollowerSim.setSupplyVoltage(12.0)
+        rollerSim.setInput(rollerLeaderSim.motorVoltage)
+        rollerSim.update(Constants.LOOP_TIME)
+
+        val rollerRotorVel = Units.radiansToRotations(rollerSim.angularVelocityRadPerSec) * IntakeConstants.ROLLER_GEARING
+        rollerLeaderSim.setRotorVelocity(rollerRotorVel)
+        rollerFollowerSim.setRotorVelocity(rollerRotorVel)
     }
 
     companion object {

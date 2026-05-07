@@ -18,13 +18,9 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.units.Units.DegreesPerSecond
-import edu.wpi.first.units.measure.Angle
+import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.units.measure.LinearAcceleration
 import frc.team449.Constants
-import frc.team449.util.PhoenixUtil
-import org.littletonrobotics.junction.Logger
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 
@@ -40,50 +36,97 @@ open class DriveIOHardware(
     *moduleConstants,
 ),
     DriveIO {
-    var telemetryCache: AtomicReference<SwerveDriveState> = AtomicReference()
+    private var telemetryCache: AtomicReference<SwerveDriveState> = AtomicReference()
 
     var telemetryConsumer: Consumer<SwerveDriveState> =
         Consumer { swerveDriveState: SwerveDriveState ->
             telemetryCache.set(swerveDriveState.clone())
         }
 
-    val angularPitchVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityYWorld
-    val angularRollVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityXWorld
-    val angularYawVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityZWorld
-    val roll: StatusSignal<Angle> = pigeon2.roll
-    val pitch: StatusSignal<Angle> = pigeon2.pitch
-    val accelX: StatusSignal<LinearAcceleration> = pigeon2.accelerationX
-    val accelY: StatusSignal<LinearAcceleration> = pigeon2.accelerationY
+    private val angularPitchVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityYWorld
+    private val angularRollVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityXWorld
+    private val angularYawVelocity: StatusSignal<AngularVelocity> = pigeon2.angularVelocityZWorld
 
-    val gyroSignals = arrayOf(
-        angularPitchVelocity,
-        angularRollVelocity,
-        angularYawVelocity,
-        roll,
-        pitch,
-        accelX,
-        accelY
-    )
+    private val gyroSignals =
+        arrayOf(
+            angularPitchVelocity,
+            angularRollVelocity,
+            angularYawVelocity,
+        )
+
+    private val frontLeftSignals = getModuleSignals(0)
+    private val frontRightSignals = getModuleSignals(1)
+    private val backLeftSignals = getModuleSignals(2)
+    private val backRightSignals = getModuleSignals(3)
+
+    private val moduleSignals =
+        arrayOf(
+            frontLeftSignals,
+            frontRightSignals,
+            backLeftSignals,
+            backRightSignals,
+        )
+            .flatten()
+            .toTypedArray()
 
     init {
-        ParentDevice.optimizeBusUtilizationForAll(pigeon2)
-        BaseStatusSignal.setUpdateFrequencyForAll(100.0, angularYawVelocity)
-
-        PhoenixUtil.registerSignals(*gyroSignals)
-
         this.odometryThread.setThreadPriority(99)
-
         registerTelemetry(telemetryConsumer)
+
+        BaseStatusSignal.setUpdateFrequencyForAll(100.0, *gyroSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *moduleSignals)
+
+        ParentDevice.optimizeBusUtilizationForAll(pigeon2, *modules.flatMap { listOf(it.driveMotor, it.steerMotor) }.toTypedArray())
     }
 
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
-        if (telemetryCache.get() == null) return
-        inputs.fromSwerveDriveState(telemetryCache.get())
+        BaseStatusSignal.refreshAll(
+            *gyroSignals,
+            *moduleSignals,
+        )
 
-        inputs.gyroAngle = inputs.Pose.rotation.degrees
-        inputs.rollVelocityDegreesPerSecond = angularRollVelocity.value.`in`(DegreesPerSecond)
-        inputs.pitchVelocityDegreesPerSecond = angularPitchVelocity.value.`in`(DegreesPerSecond)
-        inputs.yawVelocityDegreesPerSecond = angularYawVelocity.value.`in`(DegreesPerSecond)
+        val cachedTelemetry = telemetryCache.get()
+        if (cachedTelemetry != null) {
+            inputs.fromSwerveDriveState(cachedTelemetry)
+            inputs.gyroAngle = inputs.Pose.rotation.degrees
+        }
+
+        inputs.rollVelocityDegreesPerSecond = angularRollVelocity.value.`in`(Units.DegreesPerSecond)
+        inputs.pitchVelocityDegreesPerSecond = angularPitchVelocity.value.`in`(Units.DegreesPerSecond)
+        inputs.yawVelocityDegreesPerSecond = angularYawVelocity.value.`in`(Units.DegreesPerSecond)
+
+        inputs.frontLeftData = ModuleData(
+            frontLeftSignals[0].valueAsDouble,
+            frontLeftSignals[1].valueAsDouble,
+            frontLeftSignals[2].valueAsDouble,
+            frontLeftSignals[3].valueAsDouble,
+            frontLeftSignals[4].valueAsDouble,
+            frontLeftSignals[5].valueAsDouble,
+        )
+        inputs.frontRightData = ModuleData(
+            frontRightSignals[0].valueAsDouble,
+            frontRightSignals[1].valueAsDouble,
+            frontRightSignals[2].valueAsDouble,
+            frontRightSignals[3].valueAsDouble,
+            frontRightSignals[4].valueAsDouble,
+            frontRightSignals[5].valueAsDouble,
+        )
+        inputs.backLeftData = ModuleData(
+            backLeftSignals[0].valueAsDouble,
+            backLeftSignals[1].valueAsDouble,
+            backLeftSignals[2].valueAsDouble,
+            backLeftSignals[3].valueAsDouble,
+            backLeftSignals[4].valueAsDouble,
+            backLeftSignals[5].valueAsDouble,
+        )
+        inputs.backRightData = ModuleData(
+            backRightSignals[0].valueAsDouble,
+            backRightSignals[1].valueAsDouble,
+            backRightSignals[2].valueAsDouble,
+            backRightSignals[3].valueAsDouble,
+            backRightSignals[4].valueAsDouble,
+            backRightSignals[5].valueAsDouble,
+        )
     }
 
     override fun setControl(request: SwerveRequest) {
@@ -115,11 +158,18 @@ open class DriveIOHardware(
     }
 
     override fun logModules(driveState: SwerveDriveState) {
-        val moduleNames = arrayOf("Drive/FL", "Drive/FR", "Drive/BL", "Drive/BR")
         if (driveState.ModuleStates == null) return
-        for (i in 0 until modules.count()) {
-            Logger.recordOutput(moduleNames[i] + "/DriveSupplyCurrentAmps", this.modules[i].driveMotor.supplyCurrent.valueAsDouble)
-            Logger.recordOutput(moduleNames[i] + "/DriveStatorCurrentAmps", this.modules[i].driveMotor.statorCurrent.valueAsDouble)
-        }
+
+        // add specific logging here
     }
+
+    private fun getModuleSignals(moduleIndex: Int): Array<BaseStatusSignal> =
+        arrayOf(
+            modules[moduleIndex].driveMotor.motorVoltage,
+            modules[moduleIndex].driveMotor.supplyCurrent,
+            modules[moduleIndex].driveMotor.statorCurrent,
+            modules[moduleIndex].steerMotor.motorVoltage,
+            modules[moduleIndex].steerMotor.supplyCurrent,
+            modules[moduleIndex].steerMotor.statorCurrent,
+        )
 }

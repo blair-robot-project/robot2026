@@ -12,6 +12,10 @@ import org.littletonrobotics.junction.AutoLog
 interface DriveIO {
     @AutoLog
     open class DriveIOInputs : SwerveDriveState() {
+        init {
+            this.Pose = Pose2d()
+        }
+
         @JvmField var gyroAngle: Double = 0.0
 
         @JvmField var rollVelocityDegreesPerSecond: Double = 0.0
@@ -20,9 +24,13 @@ interface DriveIO {
 
         @JvmField var yawVelocityDegreesPerSecond: Double = 0.0
 
-        init {
-            this.Pose = Pose2d()
-        }
+        @JvmField var frontLeftData: ModuleData = ModuleData()
+
+        @JvmField var frontRightData: ModuleData = ModuleData()
+
+        @JvmField var backLeftData: ModuleData = ModuleData()
+
+        @JvmField var backRightData: ModuleData = ModuleData()
 
         fun fromSwerveDriveState(stateIn: SwerveDriveState) {
             this.Pose = stateIn.Pose
@@ -38,6 +46,8 @@ interface DriveIO {
 
     fun updateInputs(inputs: DriveIOInputs) {}
 
+    fun logModules(driveState: SwerveDriveState) {}
+
     fun resetOdometry(pose: Pose2d) {}
 
     fun setControl(request: SwerveRequest) {}
@@ -46,15 +56,7 @@ interface DriveIO {
 
     fun setOperatorPerspectiveForward(yaw: Rotation2d) {}
 
-    fun addVisionMeasurement(
-        visionRobotPoseMeters: Pose2d,
-        timestampSeconds: Double,
-        visionMeasurementStdDevs: Matrix<N3, N1>
-    ) {}
+    fun addVisionMeasurement(visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) {}
 
     fun setStateStdDevs(visionMeasurementStdDevs: Matrix<N3, N1>) {}
-
-    fun setSupplyLimits(driveSupplyLimitAmps: Double, steerSupplyLimitAmps: Double) {}
-
-    fun logModules(driveState: SwerveDriveState) {}
 }
