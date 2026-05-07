@@ -111,7 +111,7 @@ class DriveSubsystem(
             }
         }
             .withName("ALIGN")
-            .withTimeout(0.5)
+            .withTimeout(0.1)
 
     fun addVisionMeasurement(
         visionRobotPoseMeters: Pose2d,

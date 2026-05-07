@@ -23,7 +23,7 @@ object Constants {
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
-    const val TUNING_MODE: Boolean = true
+    const val TUNING_MODE: Boolean = false
 
     // --- SYSTEM TIMING ---
     const val LOOP_TIME = 0.02
@@ -63,9 +63,9 @@ object Constants {
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.1
 
-        const val ROTATION_P = 3.2
+        const val ROTATION_P = 4.0
         const val ROTATION_I = 0.0
-        const val ROTATION_D = 0.0
+        const val ROTATION_D = 0.1
 
         const val CTE_P = 1.0
         const val CTE_I = 0.0
@@ -177,24 +177,25 @@ object Constants {
 
         val SCORING_FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 140.0)
-                put(1.671, 150.0)
-                put(2.08, 150.0)
-                put(2.57, 160.0)
-                put(3.43, 175.0)
-                put(4.5, 190.0)
-                put(4.92, 205.0)
-                put(5.90, 225.5)
+                put(1.3, 143.0)
+                put(1.67, 143.0)
+                put(2.1, 148.0)
+                put(2.5, 155.0)
+                put(2.8, 160.0)
+                put(3.43, 170.0)
+                put(4.5, 185.0)
+                put(4.92, 200.0)
+                put(5.90, 220.5)
             }
 
         val SCORING_HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 0.06)
-                put(1.671, 0.1013)
-                put(2.08, .13)
-                put(2.57, .16)
+                put(1.3, 0.06)
+                put(1.67, 0.1013)
+                put(2.1, .13)
+                put(2.5, .16)
                 put(2.8, .20)
-                put(3.43, 0.24)
+                put(3.43, 0.28)
                 put(4.5, 0.36)
                 put(4.92, 0.4)
                 put(5.90, 0.45)

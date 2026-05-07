@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.Constants.ShooterConstants
 import frc.team449.commands.AimAtTargetCommand
-import frc.team449.commands.StatorStowCommand
 import frc.team449.commands.SwerveRequestCommand
 import frc.team449.util.FieldUtil
 import kotlin.math.abs
@@ -23,19 +22,12 @@ class Bindings(
             abs(driver.leftY) > Constants.DriveConstants.INTERRUPT_DEADBAND ||
                 abs(driver.leftX) > Constants.DriveConstants.INTERRUPT_DEADBAND ||
                 abs(driver.rightX) > Constants.DriveConstants.INTERRUPT_DEADBAND
-        }.debounce(0.1)
-
-    val driverIdle: Trigger =
-        Trigger {
-            abs(driver.leftY) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
-                abs(driver.leftX) < Constants.DriveConstants.TRANSLATION_DEADBAND &&
-                abs(driver.rightX) < Constants.DriveConstants.ANGULAR_DEADBAND
-        }.debounce(0.1)
+        }
+            .debounce(0.1)
 
     private fun createAutoAimCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
-            robotContainer.indexer,
             robotContainer.shooter,
             { -driver.leftY },
             { -driver.leftX },
@@ -45,11 +37,11 @@ class Bindings(
     private fun createAutoPassCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
             robotContainer.drive,
-            robotContainer.indexer,
             robotContainer.shooter,
             { -driver.leftY },
             { -driver.leftX },
             { FieldUtil.getClosestFriendlyPass(robotContainer.drive.pose.translation) },
+            toleranceRadians = 0.15,
             isScoring = false,
             flywheelVelocityMap = ShooterConstants.PASSING_FLYWHEEL_VELOCITY_MAP,
             hoodAngleMap = ShooterConstants.PASSING_HOOD_ANGLE_MAP,
@@ -68,45 +60,49 @@ class Bindings(
     fun bindControls() {
         driver
             .rightTrigger()
-            .whileTrue(
-                actions.deployAndIntake(),
-            ).onFalse(
-                actions.stopIntakeAndPivot(),
-            )
+            .whileTrue(actions.deployAndIntake())
+            .onFalse(actions.stopIntakeAndPivot())
 
         driver
             .leftTrigger()
-            .onTrue(
-                actions.stopAndStow(),
-            )
+            .onTrue(actions.stopAndStow())
 
         driver
             .rightBumper()
             .whileTrue(
                 Commands.defer({
                     val autoAimCommand = createAutoAimCommand()
-                    val statorStowCommand = StatorStowCommand(robotContainer.intake) { autoAimCommand.readyToShoot() }
                     Commands.parallel(
                         autoAimCommand,
-                        actions.tuckAndClear(),
+                        Commands.sequence(
+                            Commands.waitUntil { autoAimCommand.readyToShoot() },
+                            actions.checkAndFeed(),
+                            actions.tuckAndClear().asProxy()
+                        )
                     )
-                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer, robotContainer.intake))
+                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
                     .withName("AutoAim")
                     .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
-            ).onFalse(
-                actions.stopShooterIndexer(),
             )
+            .onFalse(actions.stopShooterIndexer())
 
         driver
             .leftBumper()
             .whileTrue(
                 Commands.defer({
                     val autoPassCommand = createAutoPassCommand()
-                    autoPassCommand
+                    Commands.parallel(
+                        autoPassCommand,
+                        Commands.sequence(
+                            Commands.waitUntil { autoPassCommand.readyToShoot() },
+                            actions.checkAndFeed(),
+                        )
+                    )
                 }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
                     .withName("AutoPass")
                     .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
-            ).onFalse(
+            )
+            .onFalse(
                 Commands.sequence(
                     actions.stopShooterIndexer(),
                     robotContainer.shooter.setHoodAngle(Units.Radians.of(0.0))
@@ -132,9 +128,8 @@ class Bindings(
                             .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
                     )
                     .withName("TrenchShot"),
-            ).onFalse(
-                actions.stopAll(),
             )
+            .onFalse(actions.stopAll())
 
         driver
             .y()
@@ -147,9 +142,8 @@ class Bindings(
                             .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
                     )
                     .withName("HubShot"),
-            ).onFalse(
-                actions.stopAll(),
             )
+            .onFalse(actions.stopAll())
 
         driver
             .b()
@@ -162,46 +156,25 @@ class Bindings(
                             .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
                     )
                     .withName("TowerShot"),
-            ).onFalse(
-                actions.stopAll(),
             )
+            .onFalse(actions.stopAll())
 
         driver
             .povDown()
-            .whileTrue(
-                actions.reverseAll(),
-            ).onFalse(
-                actions.stopAll(),
-            )
+            .whileTrue(actions.reverseAll())
+            .onFalse(actions.stopAll())
 
         driver
             .povLeft()
-            .onTrue(
-                actions.stopAllAndHomeHood(),
-            )
+            .onTrue(actions.stopAllAndHomeHood())
 
         driver
             .povUp()
-            .whileTrue(
-                robotContainer.indexer.setIndexerVoltage(12.0, 12.0)
-            )
-            .onFalse(
-                robotContainer.indexer.stop()
-            )
-
-        driver
-            .povRight()
-            .whileTrue(
-                robotContainer.shooter.setFlywheelVelocity(Units.RadiansPerSecond.of(100.0))
-            )
-            .onFalse(
-                robotContainer.shooter.stopFlywheel()
-            )
+            .whileTrue(robotContainer.indexer.setIndexerVoltage(12.0, 12.0))
+            .onFalse(robotContainer.indexer.stop())
 
         driver
             .start()
-            .onTrue(
-                robotContainer.drive.seedFieldCentric(),
-            )
+            .onTrue(robotContainer.drive.seedFieldCentric())
     }
 }

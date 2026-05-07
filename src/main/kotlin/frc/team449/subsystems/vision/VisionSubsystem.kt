@@ -43,7 +43,7 @@ class VisionSubsystem(
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
                     observation.tagCount == 0 ||
-                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
+                        observation.ambiguity > VisionConstants.MAX_AMBIGUITY ||
                         abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
                         observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
                         observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS

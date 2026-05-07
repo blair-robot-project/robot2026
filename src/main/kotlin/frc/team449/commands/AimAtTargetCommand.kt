@@ -12,7 +12,6 @@ import frc.team449.Constants.AlignConstants
 import frc.team449.Constants.DriveConstants
 import frc.team449.Constants.ShooterConstants
 import frc.team449.subsystems.drive.DriveSubsystem
-import frc.team449.subsystems.indexer.IndexerSubsystem
 import frc.team449.subsystems.shooter.ShooterSubsystem
 import frc.team449.util.FieldUtil
 import org.littletonrobotics.junction.Logger
@@ -24,12 +23,12 @@ import kotlin.math.sign
 
 class AimAtTargetCommand(
     private val drive: DriveSubsystem,
-    private val indexer: IndexerSubsystem,
     private val shooter: ShooterSubsystem,
     private val throttleSupplier: DoubleSupplier,
     private val strafeSupplier: DoubleSupplier,
     private val targetSupplier: Supplier<Translation2d>,
     private val maxLinearSpeedMetersPerSecond: Double = DriveConstants.SLOW_LINEAR_SPEED_METERS_PER_SEC,
+    private val toleranceRadians: Double = AlignConstants.POSITION_TOLERANCE_RADS,
     private val isScoring: Boolean = true,
     private val flywheelVelocityMap: InterpolatingDoubleTreeMap = ShooterConstants.SCORING_FLYWHEEL_VELOCITY_MAP,
     private val hoodAngleMap: InterpolatingDoubleTreeMap = ShooterConstants.SCORING_HOOD_ANGLE_MAP
@@ -50,12 +49,12 @@ class AimAtTargetCommand(
     val angleSetpointDebounce = Debouncer(0.04)
 
     init {
-        addRequirements(drive, shooter, indexer)
+        addRequirements(drive, shooter)
     }
 
     override fun initialize() {
         isRed = FieldUtil.isRed
-        driveWithHeading.HeadingController.setTolerance(AlignConstants.POSITION_TOLERANCE_RADS, AlignConstants.VELOCITY_TOLERANCE_RADS_PER_SEC)
+        driveWithHeading.HeadingController.setTolerance(toleranceRadians, AlignConstants.VELOCITY_TOLERANCE_RADS_PER_SEC)
     }
 
     override fun execute() {
@@ -73,6 +72,7 @@ class AimAtTargetCommand(
             maxLinearSpeedMetersPerSecond
 
         isDriverStationary = abs(throttle) < 0.1 && abs(strafe) < 0.1
+
         val shouldXLock = isScoring && isDriverStationary && atHeadingSetpoint()
         val driveRequest = if (shouldXLock) {
             brakeRequest
@@ -87,10 +87,6 @@ class AimAtTargetCommand(
 
         shooter.setFlywheelVelocityInternal(RadiansPerSecond.of(flywheelVelocityMap.get(distanceToTarget)))
         shooter.setHoodAngleInternal(Radians.of(hoodAngleMap.get(distanceToTarget)))
-
-        if (readyToShoot()) {
-            indexer.setIndexerVoltageInternal(12.0, 12.0)
-        }
 
         Logger.recordOutput("Align/HeadingErrorRads", driveWithHeading.HeadingController.positionError)
         Logger.recordOutput("Align/HeadingAtTarget", atHeadingSetpoint())

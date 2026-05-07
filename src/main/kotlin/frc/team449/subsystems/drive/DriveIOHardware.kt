@@ -20,7 +20,6 @@ import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.units.measure.Current
 import frc.team449.Constants
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
@@ -55,17 +54,17 @@ open class DriveIOHardware(
             angularYawVelocity,
         )
 
-    private val frontLeftCurrentSignals = getModuleCurrentSignals(0)
-    private val frontRightCurrentSignals = getModuleCurrentSignals(1)
-    private val backLeftCurrentSignals = getModuleCurrentSignals(2)
-    private val backRightCurrentSignals = getModuleCurrentSignals(3)
+    private val frontLeftSignals = getModuleSignals(0)
+    private val frontRightSignals = getModuleSignals(1)
+    private val backLeftSignals = getModuleSignals(2)
+    private val backRightSignals = getModuleSignals(3)
 
-    private val driveCurrentSignals =
+    private val moduleSignals =
         arrayOf(
-            frontLeftCurrentSignals,
-            frontRightCurrentSignals,
-            backLeftCurrentSignals,
-            backRightCurrentSignals,
+            frontLeftSignals,
+            frontRightSignals,
+            backLeftSignals,
+            backRightSignals,
         )
             .flatten()
             .toTypedArray()
@@ -75,7 +74,7 @@ open class DriveIOHardware(
         registerTelemetry(telemetryConsumer)
 
         BaseStatusSignal.setUpdateFrequencyForAll(100.0, *gyroSignals)
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *driveCurrentSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *moduleSignals)
 
         ParentDevice.optimizeBusUtilizationForAll(pigeon2, *modules.flatMap { listOf(it.driveMotor, it.steerMotor) }.toTypedArray())
     }
@@ -83,7 +82,7 @@ open class DriveIOHardware(
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
         BaseStatusSignal.refreshAll(
             *gyroSignals,
-            *driveCurrentSignals
+            *moduleSignals,
         )
 
         val cachedTelemetry = telemetryCache.get()
@@ -97,28 +96,36 @@ open class DriveIOHardware(
         inputs.yawVelocityDegreesPerSecond = angularYawVelocity.value.`in`(Units.DegreesPerSecond)
 
         inputs.frontLeftData = ModuleData(
-            frontLeftCurrentSignals[0].value.`in`(Units.Amps),
-            frontLeftCurrentSignals[1].value.`in`(Units.Amps),
-            frontLeftCurrentSignals[2].value.`in`(Units.Amps),
-            frontLeftCurrentSignals[3].value.`in`(Units.Amps)
+            frontLeftSignals[0].valueAsDouble,
+            frontLeftSignals[1].valueAsDouble,
+            frontLeftSignals[2].valueAsDouble,
+            frontLeftSignals[3].valueAsDouble,
+            frontLeftSignals[4].valueAsDouble,
+            frontLeftSignals[5].valueAsDouble,
         )
         inputs.frontRightData = ModuleData(
-            frontRightCurrentSignals[0].value.`in`(Units.Amps),
-            frontRightCurrentSignals[1].value.`in`(Units.Amps),
-            frontRightCurrentSignals[2].value.`in`(Units.Amps),
-            frontRightCurrentSignals[3].value.`in`(Units.Amps)
+            frontRightSignals[0].valueAsDouble,
+            frontRightSignals[1].valueAsDouble,
+            frontRightSignals[2].valueAsDouble,
+            frontRightSignals[3].valueAsDouble,
+            frontRightSignals[4].valueAsDouble,
+            frontRightSignals[5].valueAsDouble,
         )
         inputs.backLeftData = ModuleData(
-            backLeftCurrentSignals[0].value.`in`(Units.Amps),
-            backLeftCurrentSignals[1].value.`in`(Units.Amps),
-            backLeftCurrentSignals[2].value.`in`(Units.Amps),
-            backLeftCurrentSignals[3].value.`in`(Units.Amps)
+            backLeftSignals[0].valueAsDouble,
+            backLeftSignals[1].valueAsDouble,
+            backLeftSignals[2].valueAsDouble,
+            backLeftSignals[3].valueAsDouble,
+            backLeftSignals[4].valueAsDouble,
+            backLeftSignals[5].valueAsDouble,
         )
         inputs.backRightData = ModuleData(
-            backRightCurrentSignals[0].value.`in`(Units.Amps),
-            backRightCurrentSignals[1].value.`in`(Units.Amps),
-            backRightCurrentSignals[2].value.`in`(Units.Amps),
-            backRightCurrentSignals[3].value.`in`(Units.Amps)
+            backRightSignals[0].valueAsDouble,
+            backRightSignals[1].valueAsDouble,
+            backRightSignals[2].valueAsDouble,
+            backRightSignals[3].valueAsDouble,
+            backRightSignals[4].valueAsDouble,
+            backRightSignals[5].valueAsDouble,
         )
     }
 
@@ -156,10 +163,12 @@ open class DriveIOHardware(
         // add specific logging here
     }
 
-    private fun getModuleCurrentSignals(moduleIndex: Int): Array<StatusSignal<Current>> =
+    private fun getModuleSignals(moduleIndex: Int): Array<BaseStatusSignal> =
         arrayOf(
+            modules[moduleIndex].driveMotor.motorVoltage,
             modules[moduleIndex].driveMotor.supplyCurrent,
             modules[moduleIndex].driveMotor.statorCurrent,
+            modules[moduleIndex].steerMotor.motorVoltage,
             modules[moduleIndex].steerMotor.supplyCurrent,
             modules[moduleIndex].steerMotor.statorCurrent,
         )

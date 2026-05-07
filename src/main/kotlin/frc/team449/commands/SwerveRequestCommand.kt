@@ -27,6 +27,7 @@ class SwerveRequestCommand(
 
     private var throttle: Double = 0.0
     private var strafe: Double = 0.0
+    private var rawTurn: Double = 0.0
     private var turn: Double = 0.0
 
     init {
@@ -43,14 +44,14 @@ class SwerveRequestCommand(
         strafe =
             abs(strafeSupplier.asDouble).pow(2) * sign(strafeSupplier.asDouble) *
             maxLinearSpeedMetersPerSecond
-        turn =
-            abs(turnSupplier.asDouble).pow(2) * sign(turnSupplier.asDouble) * maxAngularSpeedRadiansPerSecond
+        rawTurn = turnSupplier.asDouble
+        turn = abs(rawTurn).pow(2) * sign(rawTurn) * maxAngularSpeedRadiansPerSecond
 
         drive.setControl(
             driveNoHeading
                 .withVelocityX(throttle)
                 .withVelocityY(strafe)
-                .withRotationalRate(turn),
+                .withRotationalRate(turn)
         )
     }
 

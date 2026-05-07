@@ -18,11 +18,16 @@
       "lib_key": "stop_shot"
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 0.42292959729052393,
+      "lib_key": "start_intake"
+    },
+    {
       "type": "waypoint",
       "translation_target": {
         "x_meters": 3.0456194327494,
         "y_meters": 0.7018974824846937,
-        "intermediate_handoff_radius_meters": 0.44999999999999996
+        "intermediate_handoff_radius_meters": 0.7000000000000002
       },
       "rotation_target": {
         "rotation_radians": -3.584786498236381e-15,
@@ -45,13 +50,8 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 1.7999999999999998,
+        "value": 2.5000000000000004,
         "start_ordinal": 0,
-        "end_ordinal": 0
-      },
-      {
-        "value": 1.9,
-        "start_ordinal": 1,
         "end_ordinal": 1
       }
     ]
