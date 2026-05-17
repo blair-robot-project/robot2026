@@ -22,8 +22,7 @@ class Bindings(
             abs(driver.leftY) > Constants.DriveConstants.INTERRUPT_DEADBAND ||
                 abs(driver.leftX) > Constants.DriveConstants.INTERRUPT_DEADBAND ||
                 abs(driver.rightX) > Constants.DriveConstants.INTERRUPT_DEADBAND
-        }
-            .debounce(0.1)
+        }.debounce(0.1)
 
     private fun createAutoAimCommand(): AimAtTargetCommand =
         AimAtTargetCommand(
@@ -59,58 +58,64 @@ class Bindings(
 
     fun bindControls() {
         driver
-            .rightTrigger()
+            .leftTrigger()
             .whileTrue(actions.deployAndIntake())
             .onFalse(actions.stopIntakeAndPivot())
 
         driver
-            .leftTrigger()
-            .onTrue(actions.stopAndStow())
+            .leftBumper()
+            .whileTrue(
+                actions
+                    .prepShotFromDistanceMeters(3.43)
+                    .andThen(
+                        robotContainer.drive
+                            .xLock()
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear())),
+                    ).withName("TrenchShot"),
+            ).onFalse(actions.stopAll())
+
+        driver
+            .rightTrigger()
+            .whileTrue(
+                Commands
+                    .defer({
+                        val autoAimCommand = createAutoAimCommand()
+                        Commands.parallel(
+                            autoAimCommand,
+                            Commands.sequence(
+                                Commands.waitUntil { autoAimCommand.readyToShoot() },
+                                actions.checkAndFeed(),
+                                actions.tuckAndClear().asProxy(),
+                            ),
+                        )
+                    }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
+                    .withName("AutoAim")
+                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming),
+            ).onFalse(actions.stopShooterIndexer())
 
         driver
             .rightBumper()
             .whileTrue(
-                Commands.defer({
-                    val autoAimCommand = createAutoAimCommand()
-                    Commands.parallel(
-                        autoAimCommand,
-                        Commands.sequence(
-                            Commands.waitUntil { autoAimCommand.readyToShoot() },
-                            actions.checkAndFeed(),
-                            actions.tuckAndClear().asProxy()
-                        )
-                    )
-                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
-                    .withName("AutoAim")
-                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
-            )
-            .onFalse(actions.stopShooterIndexer())
-
-        driver
-            .leftBumper()
-            .whileTrue(
-                Commands.defer({
-                    val autoPassCommand = createAutoPassCommand()
-                    Commands.parallel(
-                        autoPassCommand,
-                        Commands.sequence(
-                            Commands.waitUntil { autoPassCommand.readyToShoot() },
-                            actions.checkAndFeed(),
-                        )
-                    )
-                }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
-                    .withName("AutoPass")
-                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
-            )
-            .onFalse(
-                Commands.sequence(
-                    actions.stopShooterIndexer(),
-                    robotContainer.shooter.setHoodAngle(Units.Radians.of(0.0))
-                )
-            )
+                actions
+                    .prepShotFromDistanceMeters(1.4)
+                    .andThen(
+                        robotContainer.drive
+                            .xLock()
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear())),
+                    ).withName("HubShot"),
+            ).onFalse(actions.stopAll())
 
         driver
             .a()
+            .whileTrue(actions.reverseAll())
+            .onFalse(actions.stopAll())
+
+        driver
+            .b()
+            .onTrue(actions.stopAndStow())
+
+        driver
+            .x()
             .onTrue(
                 robotContainer.drive
                     .xLock()
@@ -118,63 +123,51 @@ class Bindings(
             )
 
         driver
-            .x()
-            .whileTrue(
-                actions
-                    .prepShotFromDistanceMeters(3.43)
-                    .andThen(
-                        robotContainer.drive
-                            .xLock()
-                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
-                    )
-                    .withName("TrenchShot"),
-            )
-            .onFalse(actions.stopAll())
-
-        driver
             .y()
             .whileTrue(
-                actions
-                    .prepShotFromDistanceMeters(1.4)
-                    .andThen(
-                        robotContainer.drive
-                            .xLock()
-                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
-                    )
-                    .withName("HubShot"),
+                Commands
+                    .defer({
+                        val autoPassCommand = createAutoPassCommand()
+                        Commands.parallel(
+                            autoPassCommand,
+                            Commands.sequence(
+                                Commands.waitUntil { autoPassCommand.readyToShoot() },
+                                actions.checkAndFeed(),
+                            ),
+                        )
+                    }, setOf(robotContainer.drive, robotContainer.shooter, robotContainer.indexer))
+                    .withName("AutoPass")
+                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming),
+            ).onFalse(
+                Commands.sequence(
+                    actions.stopShooterIndexer(),
+                    robotContainer.shooter.setHoodAngle(Units.Radians.of(0.0)),
+                ),
             )
-            .onFalse(actions.stopAll())
 
         driver
-            .b()
-            .whileTrue(
-                actions
-                    .prepShotFromDistanceMeters(2.92)
-                    .andThen(
-                        robotContainer.drive
-                            .xLock()
-                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear()))
-                    )
-                    .withName("TowerShot"),
-            )
-            .onFalse(actions.stopAll())
-
-        driver
-            .povDown()
-            .whileTrue(actions.reverseAll())
-            .onFalse(actions.stopAll())
+            .povUp()
+            .onTrue(robotContainer.drive.seedFieldCentric())
 
         driver
             .povLeft()
             .onTrue(actions.stopAllAndHomeHood())
 
         driver
-            .povUp()
-            .whileTrue(robotContainer.indexer.setIndexerVoltage(12.0, 12.0))
-            .onFalse(robotContainer.indexer.stop())
+            .povRight()
+            .whileTrue(
+                actions
+                    .prepShotFromDistanceMeters(2.92)
+                    .andThen(
+                        robotContainer.drive
+                            .xLock()
+                            .alongWith(actions.checkAndFeed().andThen(actions.tuckAndClear())),
+                    ).withName("TowerShot"),
+            ).onFalse(actions.stopAll())
 
         driver
-            .start()
-            .onTrue(robotContainer.drive.seedFieldCentric())
+            .povDown()
+            .whileTrue(robotContainer.indexer.setIndexerVoltage(12.0, 12.0))
+            .onFalse(robotContainer.indexer.stop())
     }
 }
