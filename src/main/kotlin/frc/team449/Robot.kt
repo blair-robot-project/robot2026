@@ -98,17 +98,18 @@ class Robot : LoggedRobot() {
         val pivotAngle = robotContainer.intake.pivotAngle
         val hoodAngle = robotContainer.shooter.hoodAngle
 
-        val hopperTranslationX = MathUtil.inverseInterpolate(
-            Constants.IntakeConstants.STOW_POS_RADS,
-            Constants.IntakeConstants.DEPLOY_POS_RADS,
-            pivotAngle
-        ) * 0.3
+        val hopperTranslationX =
+            MathUtil.inverseInterpolate(
+                Constants.IntakeConstants.STOW_POS_RADS,
+                Constants.IntakeConstants.DEPLOY_POS_RADS,
+                pivotAngle,
+            ) * 0.3
 
         Logger.recordOutput(
             "FinalComponentPoses",
             Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, pivotAngle, 0.0)),
             Pose3d(hopperTranslationX, 0.0, 0.0, Rotation3d()),
-            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0))
+            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0)),
         )
     }
 }

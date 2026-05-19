@@ -106,12 +106,12 @@ class Bindings(
             ).onFalse(actions.stopAll())
 
         driver
-            .a()
+            .start()
             .whileTrue(actions.reverseAll())
             .onFalse(actions.stopAll())
 
         driver
-            .b()
+            .a()
             .onTrue(actions.stopAndStow())
 
         driver

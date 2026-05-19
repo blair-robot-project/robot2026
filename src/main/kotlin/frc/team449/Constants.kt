@@ -55,6 +55,10 @@ object Constants {
         const val ANGULAR_DEADBAND = 0.1
         const val INTERRUPT_DEADBAND = 0.25
         const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
+
+        const val HEADING_P = 5.0
+        const val HEADING_I = 0.0
+        const val HEADING_D = 0.0
     }
 
     object AutoConstants {
