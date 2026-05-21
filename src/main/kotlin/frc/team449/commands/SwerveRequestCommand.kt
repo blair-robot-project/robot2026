@@ -95,7 +95,7 @@ class SwerveRequestCommand(
                 driveWithHeading
                     .withVelocityX(throttle)
                     .withVelocityY(strafe)
-                    .withTargetDirection(headingSetpoint.get()),
+                    .withTargetDirection(headingSetpoint.get()-Rotation2d(Math.PI)),
             )
             Logger.recordOutput("DriveHeading/Mode", "HeadingLocked")
         }
