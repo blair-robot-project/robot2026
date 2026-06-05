@@ -179,7 +179,7 @@ object TunerConstants {
     private const val kBackRightDriveMotorId: Int = 7
     private const val kBackRightSteerMotorId: Int = 6
     private const val kBackRightEncoderId: Int = 8
-    private val kBackRightEncoderOffset: Angle = Units.Degrees.of(254.49) // -180.0
+    private val kBackRightEncoderOffset: Angle = Units.Degrees.of(254.49) - Units.Radians.of((204.197387-195.593288)) // -180.0
     private const val kBackRightSteerMotorInverted: Boolean = true
     private const val kBackRightEncoderInverted: Boolean = true
 

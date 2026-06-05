@@ -3,6 +3,7 @@ package frc.team449.commands
 import com.ctre.phoenix6.swerve.SwerveModule
 import com.ctre.phoenix6.swerve.SwerveRequest
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.Constants
@@ -91,12 +92,22 @@ class SwerveRequestCommand(
             if (headingSetpoint.isEmpty) {
                 headingSetpoint = Optional.of(drive.pose.rotation)
             }
-            drive.setControl(
-                driveWithHeading
-                    .withVelocityX(throttle)
-                    .withVelocityY(strafe)
-                    .withTargetDirection(headingSetpoint.get()-Rotation2d(Math.PI)),
-            )
+
+            if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)==DriverStation.Alliance.Red) {
+                drive.setControl(
+                    driveWithHeading
+                        .withVelocityX(throttle)
+                        .withVelocityY(strafe)
+                        .withTargetDirection(headingSetpoint.get() - Rotation2d(Math.PI)),
+                )
+            } else {
+                drive.setControl(
+                    driveWithHeading
+                        .withVelocityX(throttle)
+                        .withVelocityY(strafe)
+                        .withTargetDirection(headingSetpoint.get()),
+                )
+            }
             Logger.recordOutput("DriveHeading/Mode", "HeadingLocked")
         }
 
