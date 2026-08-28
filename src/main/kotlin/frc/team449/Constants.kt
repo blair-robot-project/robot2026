@@ -5,8 +5,12 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.Matrix
+import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.*
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
+import edu.wpi.first.math.numbers.N1
+import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -303,6 +307,7 @@ object Constants {
         // --- ROBOT TO CAMERA TRANSFORMS ---
         var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.013, 0.270, 0.539243, Rotation3d(0.0, 0.438377245469, -0.583128849696))
         var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.013, -0.270, 0.539243, Rotation3d(0.0, 0.438377245469, 0.583128849696))
+        var ROBOT_TO_VISIONQUEST: Transform3d = Transform3d(0.3, 0.3, 0.3, Rotation3d.kZero)
         // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
 
         // x: -0.270 m
@@ -319,6 +324,12 @@ object Constants {
         // std dev baselines for 1 tag @ 1 meter dist
         const val LINEAR_STD_DEV_BASELINE_METERS: Double = 0.02
         const val ANGULAR_STD_DEV_BASELINE_RADIANS: Double = 0.06
+
+        var QUESTNAV_STD_DEVS: Matrix<N3, N1> = VecBuilder.fill(
+            0.02, // X position trust (20 mm)
+            0.02, // Y position trust (20 mm)
+            0.0872665
+        ) // Rotation trust (5 degrees)
 
         // --- CAMERA STANDARD DEVIATION MULTIPLIERS ---
         val CAMERA_STD_DEV_FACTORS: DoubleArray =

@@ -24,6 +24,7 @@ import frc.team449.subsystems.shooter.ShooterIO
 import frc.team449.subsystems.shooter.ShooterIOHardware
 import frc.team449.subsystems.shooter.ShooterIOSim
 import frc.team449.subsystems.shooter.ShooterSubsystem
+import frc.team449.subsystems.vision.QuestNav
 import frc.team449.subsystems.vision.VisionIO
 import frc.team449.subsystems.vision.VisionIOLimelight
 import frc.team449.subsystems.vision.VisionIOPhotonVisionSim
@@ -99,6 +100,12 @@ object RobotContainer {
                 object : VisionIO {}
             )
         }
+
+    val questNav: QuestNav =
+        QuestNav(
+            VisionConstants.ROBOT_TO_VISIONQUEST,
+            drive::addVisionMeasurement,
+        )
 
     val intake: IntakeSubsystem =
         IntakeSubsystem(
