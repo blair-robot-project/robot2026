@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants
 import frc.team449.Constants.VisionConstants
 import org.littletonrobotics.junction.Logger
+import java.util.function.Supplier
 import kotlin.math.abs
 import kotlin.math.pow
 
 class VisionSubsystem(
     private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit,
-    private vararg val io: VisionIO
+    private val isQuestNavDisconnected: Supplier<Boolean>,
+    private vararg val io: VisionIO,
 ) : SubsystemBase() {
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
     private val disconnectedAlerts = Array(io.size) { i ->
@@ -81,13 +83,13 @@ class VisionSubsystem(
                     linearStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                     angularStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                 }
-
-                consumeVisionMeasurement(
-                    observation.pose.toPose2d(),
-                    Utils.fpgaToCurrentTime(observation.timestamp),
-                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
-                )
-
+                if (!isQuestNavDisconnected.get()) {
+                    consumeVisionMeasurement(
+                        observation.pose.toPose2d(),
+                        Utils.fpgaToCurrentTime(observation.timestamp),
+                        VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
+                    )
+                }
                 linearStdDevs.add(linearStdDev)
                 angularStdDevs.add(angularStdDev)
             }

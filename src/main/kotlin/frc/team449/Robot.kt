@@ -60,6 +60,11 @@ class Robot : LoggedRobot() {
 
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
+
+        robotContainer.questNav.questNav.setPose(
+            Pose3d(robotContainer.drive.pose)
+                .plus(robotContainer.questNav.offset)
+        )
     }
 
     override fun robotPeriodic() {

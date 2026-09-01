@@ -10,12 +10,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.Constants
 import gg.questnav.questnav.QuestNav
 import org.littletonrobotics.junction.Logger
+import kotlin.math.abs
 
 class QuestNav(
     val offset: Transform3d,
     private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit
 ) : SubsystemBase() {
     val questNav = QuestNav()
+
+    val getIsDisconnected
+        get() = questNav.isConnected
 
     override fun periodic() {
         questNav.commandPeriodic()
@@ -40,11 +44,11 @@ class QuestNav(
                         .transformBy(offset.inverse())
 
                 if (
-                    robotPose.x > Constants.FieldConstants.FIELD_WIDTH_METERS &&
-                    robotPose.x < 0 &&
-                    robotPose.y > Constants.FieldConstants.FIELD_LENGTH_METERS &&
-                    robotPose.y < 0 &&
-                    robotPose.z > Constants.VisionConstants.MAX_Z_ERROR_METERS
+                    robotPose.x > Constants.FieldConstants.FIELD_WIDTH_METERS ||
+                    robotPose.x < 0 ||
+                    robotPose.y > Constants.FieldConstants.FIELD_LENGTH_METERS ||
+                    robotPose.y < 0 ||
+                    abs(robotPose.z) > Constants.VisionConstants.MAX_Z_ERROR_METERS
                 ) {
                     rejectedPoses.add(robotPose)
                     continue

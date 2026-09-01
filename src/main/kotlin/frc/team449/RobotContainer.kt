@@ -75,29 +75,33 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
+                    { questNav.getIsDisconnected },
+
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
                         { drive.pose },
                         { drive.getAngularVelocity() },
                         VisionConstants.ROBOT_TO_CAMERA_RIGHT
                     ),
-                    VisionIOLimelight(
-                        VisionConstants.CAMERA_LEFT_NAME,
-                        { drive.pose },
-                        { drive.getAngularVelocity() },
-                        VisionConstants.ROBOT_TO_CAMERA_LEFT
-                    )
+//                    VisionIOLimelight(
+//                        VisionConstants.CAMERA_LEFT_NAME,
+//                        { drive.pose },
+//                        { drive.getAngularVelocity() },
+//                        VisionConstants.ROBOT_TO_CAMERA_LEFT
+//                    ),
                 )
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
+                    { questNav.getIsDisconnected },
                     VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
-                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
+//                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             else -> VisionSubsystem(
                 drive::addVisionMeasurement,
+                { questNav.getIsDisconnected },
+//                object : VisionIO {},
                 object : VisionIO {},
-                object : VisionIO {}
             )
         }
 
