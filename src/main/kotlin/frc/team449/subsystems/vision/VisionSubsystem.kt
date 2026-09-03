@@ -21,7 +21,7 @@ import kotlin.math.pow
 class VisionSubsystem(
     private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit,
     private val isQuestNavDisconnected: Supplier<Boolean>,
-    private vararg val io: VisionIO,
+    private vararg val io: VisionIO
 ) : SubsystemBase() {
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
     private val disconnectedAlerts = Array(io.size) { i ->
