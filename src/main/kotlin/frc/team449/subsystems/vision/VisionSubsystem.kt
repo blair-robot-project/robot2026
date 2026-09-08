@@ -5,7 +5,6 @@ import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
@@ -20,24 +19,12 @@ import kotlin.math.pow
 
 class VisionSubsystem(
     private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit,
-    private val isQuestNavDisconnected: Supplier<Boolean>,
+    private val isQuestNavConnected: Supplier<Boolean>,
     private vararg val io: VisionIO
 ) : SubsystemBase() {
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
     private val disconnectedAlerts = Array(io.size) { i ->
         Alert("Vision Camera $i Disconnected.", AlertType.kWarning)
-    }
-
-    fun getLatestTargetX(cameraIndex: Int): Rotation2d {
-        val input = inputs[cameraIndex]
-        if (input.tagIds.isEmpty()) return Rotation2d.kZero
-        return input.latestTargetObservation.tx
-    }
-
-    fun getLatestTargetY(cameraIndex: Int): Rotation2d {
-        val input = inputs[cameraIndex]
-        if (input.tagIds.isEmpty()) return Rotation2d.kZero
-        return input.latestTargetObservation.ty
     }
 
     override fun periodic() {
@@ -58,7 +45,7 @@ class VisionSubsystem(
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
                     observation.tagCount == 0 ||
-                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
+                        observation.ambiguity > VisionConstants.MAX_AMBIGUITY ||
                         abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
                         observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
                         observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS
@@ -83,7 +70,7 @@ class VisionSubsystem(
                     linearStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                     angularStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                 }
-                if (!isQuestNavDisconnected.get()) {
+                if (!isQuestNavConnected.get()) {
                     consumeVisionMeasurement(
                         observation.pose.toPose2d(),
                         Utils.fpgaToCurrentTime(observation.timestamp),

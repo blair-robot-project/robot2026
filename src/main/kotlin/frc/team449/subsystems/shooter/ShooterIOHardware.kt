@@ -9,16 +9,10 @@ import com.ctre.phoenix6.controls.VoltageOut
 import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import com.ctre.phoenix6.signals.GravityTypeValue
-import edu.wpi.first.units.Units.Amps
-import edu.wpi.first.units.Units.Celsius
-import edu.wpi.first.units.Units.Radians
-import edu.wpi.first.units.Units.RadiansPerSecond
-import edu.wpi.first.units.Units.Volts
+import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Angle
 import edu.wpi.first.units.measure.AngularVelocity
-import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.ShooterConstants
-import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class ShooterIOHardware : ShooterIO {
@@ -64,10 +58,13 @@ open class ShooterIOHardware : ShooterIO {
     private val hoodStatorCurrent = hood.statorCurrent
     private val hoodTemp = hood.deviceTemp
 
-    private val lowPrioSignals =
+    private val shooterSignals =
         arrayOf(
+            leftTopLeaderVoltage,
+            leftTopLeaderVelocity,
+            leftTopLeaderSupplyCurrent,
+            leftTopLeaderStatorCurrent,
             leftTopLeaderTemp,
-            hoodTemp,
             leftBottomFollowerVoltage,
             leftBottomFollowerVelocity,
             leftBottomFollowerSupplyCurrent,
@@ -83,28 +80,12 @@ open class ShooterIOHardware : ShooterIO {
             rightBottomFollowerSupplyCurrent,
             rightBottomFollowerStatorCurrent,
             rightBottomFollowerTemp,
-        )
-
-    private val highPrioSignals =
-        arrayOf(
-            leftTopLeaderVoltage,
-            leftTopLeaderVelocity,
-            leftTopLeaderSupplyCurrent,
-            leftTopLeaderStatorCurrent,
             hoodVoltage,
             hoodAngle,
             hoodVelocity,
             hoodSupplyCurrent,
             hoodStatorCurrent,
-        )
-
-    private val hoodConnected: Boolean
-        get() = BaseStatusSignal.isAllGood(
-            hoodVoltage,
-            hoodAngle,
-            hoodVelocity,
-            hoodSupplyCurrent,
-            hoodStatorCurrent,
+            hoodTemp,
         )
 
     private val leftTopLeaderConnected: Boolean
@@ -135,16 +116,13 @@ open class ShooterIOHardware : ShooterIO {
             rightBottomFollowerStatorCurrent,
         )
 
-    private val leftTopLeaderDisconnectedAlert =
-        Alert("Left Top Flywheel Disconnected (ID ${ShooterConstants.LEFT_TOP_LEADER_ID}).", Alert.AlertType.kError)
-    private val leftBottomFollowerDisconnectedAlert =
-        Alert("Left Bottom Flywheel Disconnected (ID ${ShooterConstants.LEFT_BOTTOM_FOLLOWER_ID}).", Alert.AlertType.kError)
-    private val rightTopFollowerDisconnectedAlert =
-        Alert("Right Top Flywheel Disconnected (ID ${ShooterConstants.RIGHT_TOP_FOLLOWER_ID}).", Alert.AlertType.kError)
-    private val rightBottomFollowerDisconnectedAlert =
-        Alert("Right Bottom Flywheel Disconnected (ID ${ShooterConstants.RIGHT_BOTTOM_FOLLOWER_ID}).", Alert.AlertType.kError)
-    private val hoodDisconnectedAlert =
-        Alert("Hood Disconnected (ID ${ShooterConstants.HOOD_MOTOR_ID}).", Alert.AlertType.kError)
+    private val hoodConnected: Boolean
+        get() = BaseStatusSignal.isAllGood(
+            hoodVoltage,
+            hoodAngle,
+            hoodSupplyCurrent,
+            hoodStatorCurrent,
+        )
 
     init {
         tryUntilOk(5) { leftTopLeader.configurator.apply(flywheelConfig) }
@@ -157,55 +135,51 @@ open class ShooterIOHardware : ShooterIO {
         rightTopFollower.setControl(Follower(leftTopLeader.deviceID, ShooterConstants.RIGHT_FOLLOWER_ALIGNMENT))
         rightBottomFollower.setControl(Follower(leftTopLeader.deviceID, ShooterConstants.RIGHT_FOLLOWER_ALIGNMENT))
 
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *shooterSignals)
+
         ParentDevice.optimizeBusUtilizationForAll(leftTopLeader, leftBottomFollower, rightTopFollower, rightBottomFollower, hood)
-
-        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioSignals)
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
-
-        PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
 
         resetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE)
     }
 
     override fun updateInputs(inputs: ShooterIO.ShooterIOInputs) {
-        BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
+        BaseStatusSignal.refreshAll(*shooterSignals)
 
-        inputs.leftTopLeaderAppliedVolts = leftTopLeaderVoltage.value.`in`(Volts)
-        inputs.leftTopLeaderVelocityRadsPerSec = leftTopLeaderVelocity.value.`in`(RadiansPerSecond)
-        inputs.leftTopLeaderSupplyCurrentAmps = leftTopLeaderSupplyCurrent.value.`in`(Amps)
-        inputs.leftTopLeaderStatorCurrentAmps = leftTopLeaderStatorCurrent.value.`in`(Amps)
-        inputs.leftTopLeaderTempCelsius = leftTopLeaderTemp.value.`in`(Celsius)
+        inputs.leftTopLeaderConnected = leftTopLeaderConnected
+        inputs.leftTopLeaderAppliedVolts = leftTopLeaderVoltage.value.`in`(Units.Volts)
+        inputs.leftTopLeaderVelocityRadsPerSec = leftTopLeaderVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.leftTopLeaderSupplyCurrentAmps = leftTopLeaderSupplyCurrent.value.`in`(Units.Amps)
+        inputs.leftTopLeaderStatorCurrentAmps = leftTopLeaderStatorCurrent.value.`in`(Units.Amps)
+        inputs.leftTopLeaderTempCelsius = leftTopLeaderTemp.value.`in`(Units.Celsius)
 
-        inputs.leftBottomFollowerAppliedVolts = leftBottomFollowerVoltage.value.`in`(Volts)
-        inputs.leftBottomFollowerVelocityRadsPerSec = leftBottomFollowerVelocity.value.`in`(RadiansPerSecond)
-        inputs.leftBottomFollowerSupplyCurrentAmps = leftBottomFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.leftBottomFollowerStatorCurrentAmps = leftBottomFollowerStatorCurrent.value.`in`(Amps)
-        inputs.leftBottomFollowerTempCelsius = leftBottomFollowerTemp.value.`in`(Celsius)
+        inputs.leftBottomFollowerConnected = leftBottomFollowerConnected
+        inputs.leftBottomFollowerAppliedVolts = leftBottomFollowerVoltage.value.`in`(Units.Volts)
+        inputs.leftBottomFollowerVelocityRadsPerSec = leftBottomFollowerVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.leftBottomFollowerSupplyCurrentAmps = leftBottomFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.leftBottomFollowerStatorCurrentAmps = leftBottomFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.leftBottomFollowerTempCelsius = leftBottomFollowerTemp.value.`in`(Units.Celsius)
 
-        inputs.rightTopFollowerAppliedVolts = rightTopFollowerVoltage.value.`in`(Volts)
-        inputs.rightTopFollowerVelocityRadsPerSec = rightTopFollowerVelocity.value.`in`(RadiansPerSecond)
-        inputs.rightTopFollowerSupplyCurrentAmps = rightTopFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.rightTopFollowerStatorCurrentAmps = rightTopFollowerStatorCurrent.value.`in`(Amps)
-        inputs.rightTopFollowerTempCelsius = rightTopFollowerTemp.value.`in`(Celsius)
+        inputs.rightTopFollowerConnected = rightTopFollowerConnected
+        inputs.rightTopFollowerAppliedVolts = rightTopFollowerVoltage.value.`in`(Units.Volts)
+        inputs.rightTopFollowerVelocityRadsPerSec = rightTopFollowerVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.rightTopFollowerSupplyCurrentAmps = rightTopFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.rightTopFollowerStatorCurrentAmps = rightTopFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.rightTopFollowerTempCelsius = rightTopFollowerTemp.value.`in`(Units.Celsius)
 
-        inputs.rightBottomFollowerAppliedVolts = rightBottomFollowerVoltage.value.`in`(Volts)
-        inputs.rightBottomFollowerVelocityRadsPerSec = rightBottomFollowerVelocity.value.`in`(RadiansPerSecond)
-        inputs.rightBottomFollowerSupplyCurrentAmps = rightBottomFollowerSupplyCurrent.value.`in`(Amps)
-        inputs.rightBottomFollowerStatorCurrentAmps = rightBottomFollowerStatorCurrent.value.`in`(Amps)
-        inputs.rightBottomFollowerTempCelsius = rightBottomFollowerTemp.value.`in`(Celsius)
+        inputs.rightBottomFollowerConnected = rightBottomFollowerConnected
+        inputs.rightBottomFollowerAppliedVolts = rightBottomFollowerVoltage.value.`in`(Units.Volts)
+        inputs.rightBottomFollowerVelocityRadsPerSec = rightBottomFollowerVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.rightBottomFollowerSupplyCurrentAmps = rightBottomFollowerSupplyCurrent.value.`in`(Units.Amps)
+        inputs.rightBottomFollowerStatorCurrentAmps = rightBottomFollowerStatorCurrent.value.`in`(Units.Amps)
+        inputs.rightBottomFollowerTempCelsius = rightBottomFollowerTemp.value.`in`(Units.Celsius)
 
-        inputs.hoodAppliedVolts = hoodVoltage.value.`in`(Volts)
-        inputs.hoodAngleRad = hoodAngle.value.`in`(Radians)
-        inputs.hoodVelocityRadPerSec = hoodVelocity.value.`in`(RadiansPerSecond)
-        inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Amps)
-        inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Amps)
-        inputs.hoodTempCelsius = hoodTemp.value.`in`(Celsius)
-
-        leftTopLeaderDisconnectedAlert.set(!leftTopLeaderConnected)
-        leftBottomFollowerDisconnectedAlert.set(!leftBottomFollowerConnected)
-        rightTopFollowerDisconnectedAlert.set(!rightTopFollowerConnected)
-        rightBottomFollowerDisconnectedAlert.set(!rightBottomFollowerConnected)
-        hoodDisconnectedAlert.set(!hoodConnected)
+        inputs.hoodConnected = hoodConnected
+        inputs.hoodAppliedVolts = hoodVoltage.value.`in`(Units.Volts)
+        inputs.hoodAngleRad = hoodAngle.value.`in`(Units.Radians)
+        inputs.hoodVelocityRadPerSec = hoodVelocity.value.`in`(Units.RadiansPerSecond)
+        inputs.hoodSupplyCurrentAmps = hoodSupplyCurrent.value.`in`(Units.Amps)
+        inputs.hoodStatorCurrentAmps = hoodStatorCurrent.value.`in`(Units.Amps)
+        inputs.hoodTempCelsius = hoodTemp.value.`in`(Units.Celsius)
     }
 
     override fun setFlywheelVoltage(flywheelVolts: Double) {

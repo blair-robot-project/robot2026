@@ -10,9 +10,7 @@ import com.ctre.phoenix6.hardware.ParentDevice
 import com.ctre.phoenix6.hardware.TalonFX
 import edu.wpi.first.units.Units
 import edu.wpi.first.units.measure.Angle
-import edu.wpi.first.wpilibj.Alert
 import frc.team449.Constants.IntakeConstants
-import frc.team449.util.PhoenixUtil
 import frc.team449.util.PhoenixUtil.tryUntilOk
 
 open class IntakeIOHardware : IntakeIO {
@@ -51,34 +49,30 @@ open class IntakeIOHardware : IntakeIO {
     private val rightRollerFollowerStatorCurrent = rightRollerFollower.statorCurrent
     private val rightRollerFollowerTemp = rightRollerFollower.deviceTemp
 
-    private val lowPrioSignals =
-        arrayOf(
-            leftPivotTemp,
-            rightPivotTemp,
-            leftRollerLeaderTemp,
-            rightRollerFollowerVoltage,
-            rightRollerFollowerVelocity,
-            rightRollerFollowerSupplyCurrent,
-            rightRollerFollowerStatorCurrent,
-            rightRollerFollowerTemp,
-        )
-
-    private val highPrioSignals =
+    private val intakeSignals =
         arrayOf(
             leftPivotVoltage,
             leftPivotPosition,
             leftPivotVelocity,
             leftPivotSupplyCurrent,
             leftPivotStatorCurrent,
+            leftPivotTemp,
             rightPivotVoltage,
             rightPivotPosition,
             rightPivotVelocity,
             rightPivotSupplyCurrent,
             rightPivotStatorCurrent,
+            rightPivotTemp,
             leftRollerLeaderVoltage,
             leftRollerLeaderVelocity,
             leftRollerLeaderSupplyCurrent,
             leftRollerLeaderStatorCurrent,
+            leftRollerLeaderTemp,
+            rightRollerFollowerVoltage,
+            rightRollerFollowerVelocity,
+            rightRollerFollowerSupplyCurrent,
+            rightRollerFollowerStatorCurrent,
+            rightRollerFollowerTemp,
         )
 
     private val leftPivotConnected: Boolean
@@ -99,14 +93,14 @@ open class IntakeIOHardware : IntakeIO {
             rightPivotStatorCurrent,
         )
 
-    private val leftRollerConnected: Boolean
+    private val leftRollerLeaderConnected: Boolean
         get() = BaseStatusSignal.isAllGood(
             leftRollerLeaderVoltage,
             leftRollerLeaderSupplyCurrent,
             leftRollerLeaderStatorCurrent,
         )
 
-    private val rightRollerConnected: Boolean
+    private val rightRollerFollowerConnected: Boolean
         get() = BaseStatusSignal.isAllGood(
             rightRollerFollowerVoltage,
             rightRollerFollowerVelocity,
@@ -114,18 +108,7 @@ open class IntakeIOHardware : IntakeIO {
             rightRollerFollowerStatorCurrent,
         )
 
-    val leftPivotLeaderDisconnectedAlert =
-        Alert("Left Pivot Disconnected (ID ${IntakeConstants.LEFT_PIVOT_ID}).", Alert.AlertType.kError)
-    val rightPivotFollowerDisconnectedAlert =
-        Alert("Right Pivot Disconnected (ID ${IntakeConstants.RIGHT_PIVOT_ID}).", Alert.AlertType.kError)
-    val leftRollerLeaderDisconnectedAlert =
-        Alert("Left Roller Disconnected (ID ${IntakeConstants.LEFT_ROLLER_LEADER_ID}).", Alert.AlertType.kError)
-    val rightRollerFollowerDisconnectedAlert =
-        Alert("Right Roller Disconnected (ID ${IntakeConstants.RIGHT_ROLLER_FOLLOWER_ID}).", Alert.AlertType.kError)
-
     init {
-        ParentDevice.optimizeBusUtilizationForAll(leftPivot, rightPivot, leftRollerLeader, rightRollerFollower)
-
         tryUntilOk(5) { leftPivot.configurator.apply(leftPivotConfig, 0.25) }
         tryUntilOk(5) { rightPivot.configurator.apply(rightPivotConfig, 0.25) }
         tryUntilOk(5) { leftRollerLeader.configurator.apply(rollerConfig, 0.25) }
@@ -133,15 +116,15 @@ open class IntakeIOHardware : IntakeIO {
 
         rightRollerFollower.setControl(Follower(leftRollerLeader.deviceID, IntakeConstants.RIGHT_ROLLER_FOLLOWER_ALIGNMENT))
 
-        BaseStatusSignal.setUpdateFrequencyForAll(4.0, *lowPrioSignals)
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *highPrioSignals)
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, *intakeSignals)
 
-        PhoenixUtil.registerSignals(*lowPrioSignals, *highPrioSignals)
+        ParentDevice.optimizeBusUtilizationForAll(leftPivot, rightPivot, leftRollerLeader, rightRollerFollower)
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
-        BaseStatusSignal.refreshAll(*lowPrioSignals, *highPrioSignals)
+        BaseStatusSignal.refreshAll(*intakeSignals)
 
+        inputs.leftPivotConnected = leftPivotConnected
         inputs.leftPivotAppliedVolts = leftPivotVoltage.value.`in`(Units.Volts)
         inputs.leftPivotPositionRads = leftPivotPosition.value.`in`(Units.Radians)
         inputs.leftPivotVelocityRadsPerSec = leftPivotVelocity.value.`in`(Units.RadiansPerSecond)
@@ -149,6 +132,7 @@ open class IntakeIOHardware : IntakeIO {
         inputs.leftPivotStatorCurrentAmps = leftPivotStatorCurrent.value.`in`(Units.Amps)
         inputs.leftPivotTempCelsius = leftPivotTemp.value.`in`(Units.Celsius)
 
+        inputs.rightPivotConnected = rightPivotConnected
         inputs.rightPivotAppliedVolts = rightPivotVoltage.value.`in`(Units.Volts)
         inputs.rightPivotPositionRads = rightPivotPosition.value.`in`(Units.Radians)
         inputs.rightPivotVelocityRadsPerSec = rightPivotVelocity.value.`in`(Units.RadiansPerSecond)
@@ -156,22 +140,19 @@ open class IntakeIOHardware : IntakeIO {
         inputs.rightPivotStatorCurrentAmps = rightPivotStatorCurrent.value.`in`(Units.Amps)
         inputs.rightPivotTempCelsius = rightPivotTemp.value.`in`(Units.Celsius)
 
+        inputs.leftRollerLeaderConnected = leftRollerLeaderConnected
         inputs.leftRollerLeaderAppliedVolts = leftRollerLeaderVoltage.value.`in`(Units.Volts)
         inputs.leftRollerLeaderVelocityRadsPerSec = leftRollerLeaderVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.leftRollerLeaderSupplyCurrentAmps = leftRollerLeaderSupplyCurrent.value.`in`(Units.Amps)
         inputs.leftRollerLeaderStatorCurrentAmps = leftRollerLeaderStatorCurrent.value.`in`(Units.Amps)
         inputs.leftRollerLeaderTempCelsius = leftRollerLeaderTemp.value.`in`(Units.Celsius)
 
+        inputs.rightRollerFollowerConnected = rightRollerFollowerConnected
         inputs.rightRollerFollowerAppliedVolts = rightRollerFollowerVoltage.value.`in`(Units.Volts)
         inputs.rightRollerFollowerVelocityRadsPerSec = rightRollerFollowerVelocity.value.`in`(Units.RadiansPerSecond)
         inputs.rightRollerFollowerSupplyCurrentAmps = rightRollerFollowerSupplyCurrent.value.`in`(Units.Amps)
         inputs.rightRollerFollowerStatorCurrentAmps = rightRollerFollowerStatorCurrent.value.`in`(Units.Amps)
         inputs.rightRollerFollowerTempCelsius = rightRollerFollowerTemp.value.`in`(Units.Celsius)
-
-        leftPivotLeaderDisconnectedAlert.set(!leftPivotConnected)
-        rightPivotFollowerDisconnectedAlert.set(!rightPivotConnected)
-        leftRollerLeaderDisconnectedAlert.set(!leftRollerConnected)
-        rightRollerFollowerDisconnectedAlert.set(!rightRollerConnected)
     }
 
     override fun setPivotVoltage(pivotVolts: Double) {

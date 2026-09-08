@@ -75,12 +75,12 @@ object RobotContainer {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    { questNav.getIsDisconnected },
+                    { questNav.getIsConnected },
 
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
                         { drive.pose },
-                        { drive.getAngularVelocity() },
+                        { drive.angularVelocity },
                         VisionConstants.ROBOT_TO_CAMERA_RIGHT
                     ),
 //                    VisionIOLimelight(
@@ -93,13 +93,13 @@ object RobotContainer {
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    { questNav.getIsDisconnected },
+                    { questNav.getIsConnected },
                     VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
 //                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
             else -> VisionSubsystem(
                 drive::addVisionMeasurement,
-                { questNav.getIsDisconnected },
+                { questNav.getIsConnected },
 //                object : VisionIO {},
                 object : VisionIO {},
             )
@@ -141,6 +141,6 @@ object RobotContainer {
     val actions = RobotActions(this)
     val bindings = Bindings(this)
 
-    val bLineRoutines = BLineRoutines(drive, actions)
+    val autoRoutines = BLineRoutines(drive, actions)
     val autoChooser = LoggedDashboardChooser<Command>("Auto Routines")
 }

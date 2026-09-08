@@ -8,9 +8,9 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.util.FieldUtil
-import frc.team449.util.PhoenixUtil
 import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedPowerDistribution
 import org.littletonrobotics.junction.LoggedRobot
@@ -47,29 +47,25 @@ class Robot : LoggedRobot() {
         }
 
         // TODO: correct PDH CAN ID
-        LoggedPowerDistribution.getInstance(49, PowerDistribution.ModuleType.kRev)
+        LoggedPowerDistribution.getInstance(0, PowerDistribution.ModuleType.kRev)
 
         SignalLogger.enableAutoLogging(false)
         Logger.start()
     }
 
     override fun robotInit() {
+        RobotController.setBrownoutVoltage(6.3)
+
         FieldUtil.initializeAutoWinnerField()
 
-        robotContainer.bLineRoutines.addAutoOptions(robotContainer.autoChooser)
+        robotContainer.autoRoutines.addOptionsToChooser(robotContainer.autoChooser)
 
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
-
-        robotContainer.questNav.questNav.setPose(
-            Pose3d(robotContainer.drive.pose)
-                .plus(robotContainer.questNav.offset)
-        )
     }
 
     override fun robotPeriodic() {
         CommandScheduler.getInstance().run()
-        PhoenixUtil.refreshAll()
 
         Logger.recordOutput("Robot/Mode", Constants.CURRENT_MODE.name)
         Logger.recordOutput("MatchTime", DriverStation.getMatchTime())
@@ -102,17 +98,18 @@ class Robot : LoggedRobot() {
         val pivotAngle = robotContainer.intake.pivotAngle
         val hoodAngle = robotContainer.shooter.hoodAngle
 
-        val hopperTranslationX = MathUtil.inverseInterpolate(
-            Constants.IntakeConstants.STOW_POS_RADS,
-            Constants.IntakeConstants.DEPLOY_POS_RADS,
-            pivotAngle
-        ) * 0.3
+        val hopperTranslationX =
+            MathUtil.inverseInterpolate(
+                Constants.IntakeConstants.STOW_POS_RADS,
+                Constants.IntakeConstants.DEPLOY_POS_RADS,
+                pivotAngle,
+            ) * 0.3
 
         Logger.recordOutput(
             "FinalComponentPoses",
             Pose3d(0.3, 0.0, 0.2, Rotation3d(0.0, pivotAngle, 0.0)),
             Pose3d(hopperTranslationX, 0.0, 0.0, Rotation3d()),
-            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0))
+            Pose3d(-0.1, 0.0, 0.4, Rotation3d(0.0, hoodAngle + 0.2591940418, 0.0)),
         )
     }
 }

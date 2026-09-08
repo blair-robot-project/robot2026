@@ -68,6 +68,8 @@ class IntakeIOSim : IntakeIOHardware() {
     }
 
     override fun updateInputs(inputs: IntakeIO.IntakeIOInputs) {
+        super.updateInputs(inputs)
+
         leftPivotSim.setSupplyVoltage(12.0)
         rightPivotSim.setSupplyVoltage(12.0)
         pivotSim.setInput(leftPivotSim.motorVoltage)
@@ -98,8 +100,6 @@ class IntakeIOSim : IntakeIOHardware() {
         val rollerRotorVel = Units.radiansToRotations(rollerSim.angularVelocityRadPerSec) * IntakeConstants.ROLLER_GEARING
         rollerLeaderSim.setRotorVelocity(rollerRotorVel)
         rollerFollowerSim.setRotorVelocity(rollerRotorVel)
-
-        super.updateInputs(inputs)
     }
 
     companion object {

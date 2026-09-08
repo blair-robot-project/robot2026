@@ -18,7 +18,7 @@ class QuestNav(
 ) : SubsystemBase() {
     val questNav = QuestNav()
 
-    val getIsDisconnected
+    val getIsConnected
         get() = questNav.isConnected
 
     override fun periodic() {
