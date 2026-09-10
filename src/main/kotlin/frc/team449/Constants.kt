@@ -5,12 +5,8 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
-import edu.wpi.first.math.Matrix
-import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.*
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
-import edu.wpi.first.math.numbers.N1
-import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -59,6 +55,10 @@ object Constants {
         const val ANGULAR_DEADBAND = 0.1
         const val INTERRUPT_DEADBAND = 0.25
         const val MODULE_ALIGN_TOLERANCE_DEG = 5.0
+
+        const val HEADING_P = 5.0
+        const val HEADING_I = 0.0
+        const val HEADING_D = 0.0
     }
 
     object AutoConstants {
@@ -67,16 +67,17 @@ object Constants {
         const val TRANSLATION_I = 0.0
         const val TRANSLATION_D = 0.1
 
-        const val ROTATION_P = 3.2
+        const val ROTATION_P = 4.0
         const val ROTATION_I = 0.0
-        const val ROTATION_D = 0.0
+        const val ROTATION_D = 0.1
 
         const val CTE_P = 1.0
         const val CTE_I = 0.0
         const val CTE_D = 0.0
 
         // --- OPERATION TIMING ---
-        const val AUTO_SHOOTING_TIME_SEC = 3.2
+        const val AUTO_SHOOTING_TIME_SEC = 3.0
+        const val AUTO_PRELOAD_SHOOTING_TIME_SEC = 1.0
 
         // --- SPEED LIMITS ---
         const val AUTO_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
@@ -178,31 +179,54 @@ object Constants {
                 put(5.0, 1.35)
             }
 
-        val FLYWHEEL_VELOCITY_MAP =
+        val SCORING_FLYWHEEL_VELOCITY_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 145.0)
-                put(1.671, 160.0)
-                put(2.08, 165.0)
-                put(2.57, 175.0)
-                put(3.43, 185.0)
-                put(4.5, 215.0)
-                put(4.92, 225.0)
-                put(5.90, 250.5)
-                put(7.00, 180.5)
-                put(12.00, 200.5)
+                put(1.3, 143.0)
+                put(1.67, 143.0)
+                put(2.1, 148.0)
+                put(2.5, 155.0)
+                put(2.8, 160.0)
+                put(3.43, 170.0)
+                put(4.5, 185.0)
+                put(4.92, 200.0)
+                put(5.90, 220.5)
             }
 
-        val HOOD_ANGLE_MAP =
+        val SCORING_HOOD_ANGLE_MAP =
             InterpolatingDoubleTreeMap().apply {
-                put(1.294, 0.01678)
-                put(1.671, 0.02)
-                put(2.08, .03)
-                put(2.57, .1)
-                put(3.43, 0.1678)
-                put(4.92, 0.27)
-                put(5.90, 0.27)
-                put(7.00, 0.4)
-                put(12.00, 0.4)
+                put(1.3, 0.06)
+                put(1.67, 0.1013)
+                put(2.1, .13)
+                put(2.5, .16)
+                put(2.8, .20)
+                put(3.43, 0.28)
+                put(4.5, 0.36)
+                put(4.92, 0.4)
+                put(5.90, 0.45)
+            }
+
+        val PASSING_FLYWHEEL_VELOCITY_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(4.0, 100.0)
+                put(5.0, 130.0)
+                put(6.0, 130.0)
+                put(7.0, 160.0)
+                put(8.0, 160.0)
+                put(9.0, 190.0)
+                put(10.0, 200.0)
+                put(11.0, 220.0)
+            }
+
+        val PASSING_HOOD_ANGLE_MAP =
+            InterpolatingDoubleTreeMap().apply {
+                put(4.0, 0.5)
+                put(5.0, 0.5)
+                put(6.0, 0.45)
+                put(7.0, 0.45)
+                put(8.0, 0.4)
+                put(9.0, 0.4)
+                put(10.0, 0.35)
+                put(11.0, 0.35)
             }
     }
 
@@ -243,10 +267,9 @@ object Constants {
         const val DEPLOY_POS_RADS = 2.269
 
         const val DEPLOY_VOLTS = 4.0
-        const val DEPLOY_HOLD_VOLTS = 0.5
         const val STOW_VOLTS = -4.0
-        const val SLOW_STOW_VOLTS = -1.323
-        const val STOW_HOLD_VOLTS = 0.0
+        const val SLOW_STOW_VOLTS = -2.0
+        const val PAUSE_TIME_SEC = 0.25
 
         // --- HOMING & VISUALIZATION ---
         const val HOMING_CURRENT_AMPS = 35.0
@@ -268,10 +291,10 @@ object Constants {
         val TOP_INVERSION = InvertedValue.CounterClockwise_Positive
 
         // --- CURRENT LIMITS ---
-        const val FLOOR_SUPPLY_LIMIT = 20.0
+        const val FLOOR_SUPPLY_LIMIT = 40.0
         const val FLOOR_STATOR_LIMIT = 80.0
 
-        const val TOP_SUPPLY_LIMIT = 30.0
+        const val TOP_SUPPLY_LIMIT = 50.0
         const val TOP_STATOR_LIMIT = 80.0
 
         // --- PHYSICAL SPECS & GEARING ---
@@ -285,7 +308,7 @@ object Constants {
     object AlignConstants {
         // --- ALIGN GAINS ---
         const val ALIGN_KP = 10.0
-        const val ALIGN_KD = 0.05
+        const val ALIGN_KD = 0.1
 
         // --- ALIGN CONFIGURATION ---
         const val POSITION_TOLERANCE_RADS = 0.035
@@ -297,8 +320,8 @@ object Constants {
     }
 
     object VisionConstants {
-        // --- CHS ANDYMARK REBUILT FIELD ---
-        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark)
+        // --- WORLDS WELDED REBUILT FIELD ---
+        val REBUILT_FIELD_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded)
 
         // --- CAMERA IDENTIFIERS ---
         const val CAMERA_RIGHT_NAME: String = "limelight-right"
@@ -307,7 +330,6 @@ object Constants {
         // --- ROBOT TO CAMERA TRANSFORMS ---
         var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.013, 0.270, 0.539243, Rotation3d(0.0, 0.438377245469, -0.583128849696))
         var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.013, -0.270, 0.539243, Rotation3d(0.0, 0.438377245469, 0.583128849696))
-        var ROBOT_TO_VISIONQUEST: Transform3d = Transform3d(0.3, 0.3, 0.3, Rotation3d.kZero)
         // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
 
         // x: -0.270 m
@@ -324,12 +346,6 @@ object Constants {
         // std dev baselines for 1 tag @ 1 meter dist
         const val LINEAR_STD_DEV_BASELINE_METERS: Double = 0.02
         const val ANGULAR_STD_DEV_BASELINE_RADIANS: Double = 0.06
-
-        var QUESTNAV_STD_DEVS: Matrix<N3, N1> = VecBuilder.fill(
-            0.02, // X position trust (20 mm)
-            0.02, // Y position trust (20 mm)
-            0.0872665
-        ) // Rotation trust (5 degrees)
 
         // --- CAMERA STANDARD DEVIATION MULTIPLIERS ---
         val CAMERA_STD_DEV_FACTORS: DoubleArray =

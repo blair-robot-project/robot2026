@@ -88,7 +88,7 @@ object RobotContainer {
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
                         { drive.pose },
-                        { drive.getAngularVelocity() },
+                        { drive.angularVelocity },
                         VisionConstants.ROBOT_TO_CAMERA_RIGHT
                     ),
 //                    VisionIOLimelight(
@@ -147,6 +147,6 @@ object RobotContainer {
     val actions = RobotActions(this)
     val bindings = Bindings(this)
 
-    val bLineRoutines = BLineRoutines(drive, actions)
+    val autoRoutines = BLineRoutines(drive, actions)
     val autoChooser = LoggedDashboardChooser<Command>("Auto Routines")
 }

@@ -5,7 +5,6 @@ import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Alert
@@ -29,20 +28,6 @@ class VisionSubsystem(
         Alert("Vision Camera $i Disconnected.", AlertType.kWarning)
     }
 
-    @Suppress("unused")
-    fun getLatestTargetX(cameraIndex: Int): Rotation2d {
-        val input = inputs[cameraIndex]
-        if (input.tagIds.isEmpty()) return Rotation2d.kZero
-        return input.latestTargetObservation.tx
-    }
-
-    @Suppress("unused")
-    fun getLatestTargetY(cameraIndex: Int): Rotation2d {
-        val input = inputs[cameraIndex]
-        if (input.tagIds.isEmpty()) return Rotation2d.kZero
-        return input.latestTargetObservation.ty
-    }
-
     override fun periodic() {
         val allRobotPosesAccepted = mutableListOf<Pose3d>()
         val allRobotPosesRejected = mutableListOf<Pose3d>()
@@ -61,7 +46,7 @@ class VisionSubsystem(
             for (observation in inputs[cameraIndex].poseObservations) {
                 val rejectPose =
                     observation.tagCount == 0 ||
-                        (observation.tagCount == 1 && observation.ambiguity > VisionConstants.MAX_AMBIGUITY) ||
+                        observation.ambiguity > VisionConstants.MAX_AMBIGUITY ||
                         abs(observation.pose.z) > VisionConstants.MAX_Z_ERROR_METERS ||
                         observation.pose.x < 0.0 || observation.pose.x > Constants.FieldConstants.FIELD_LENGTH_METERS ||
                         observation.pose.y < 0.0 || observation.pose.y > Constants.FieldConstants.FIELD_WIDTH_METERS

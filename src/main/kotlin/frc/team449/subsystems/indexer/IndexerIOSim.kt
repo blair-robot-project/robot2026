@@ -33,6 +33,8 @@ class IndexerIOSim : IndexerIOHardware() {
     private val topMotorSim = top.simState
 
     override fun updateInputs(inputs: IndexerIO.IndexerInputs) {
+        super.updateInputs(inputs)
+
         // update floor indexer sim
         floorMotorSim.setSupplyVoltage(12.0)
         floorSim.setInput(floorMotorSim.motorVoltage)
@@ -44,7 +46,5 @@ class IndexerIOSim : IndexerIOHardware() {
         topSim.setInput(topMotorSim.motorVoltage)
         topSim.update(Constants.LOOP_TIME)
         topMotorSim.setRotorVelocity(Units.radiansToRotations(topSim.angularVelocity.`in`(RadiansPerSecond)) * IndexerConstants.TOP_GEARING)
-
-        super.updateInputs(inputs)
     }
 }
