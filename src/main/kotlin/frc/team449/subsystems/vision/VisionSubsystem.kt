@@ -20,7 +20,6 @@ import kotlin.math.pow
 class VisionSubsystem(
     private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit,
     private val questNavActive: Supplier<Boolean>,
-    private val updateQuestNavPose: (Pose3d) -> Unit,
     private vararg val io: VisionIO
 ) : SubsystemBase() {
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
@@ -28,6 +27,7 @@ class VisionSubsystem(
         Alert("Vision Camera $i Disconnected.", AlertType.kWarning)
     }
 
+    var latestPoseForQuestNav: Pose3d = Pose3d()
     override fun periodic() {
         val allRobotPosesAccepted = mutableListOf<Pose3d>()
         val allRobotPosesRejected = mutableListOf<Pose3d>()
@@ -78,20 +78,18 @@ class VisionSubsystem(
                         Utils.fpgaToCurrentTime(observation.timestamp),
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                     )
-
-                    val confident = observation.tagCount > 2 &&
-                        observation.averageTagDistance < 4.0 &&
-                        linearStdDev > 0.05 &&
-                        observation.ambiguity < VisionConstants.MAX_AMBIGUITY
-
-                    if (confident) {
-                        updateQuestNavPose(observation.pose)
-                    }
                 }
+                val confident = observation.tagCount >= 1 &&
+                    observation.averageTagDistance < 4.0 &&
+                    linearStdDev > 0.05 &&
+                    observation.ambiguity < VisionConstants.MAX_AMBIGUITY
+                if (confident) {
+                    latestPoseForQuestNav = observation.pose.transformBy(VisionConstants.ROBOT_TO_VISIONQUEST)
+                }
+
                 linearStdDevs.add(linearStdDev)
                 angularStdDevs.add(angularStdDev)
             }
-
             Logger.recordOutput("Vision/Camera$cameraIndex/LinearStdDevs", linearStdDevs.toDoubleArray())
             Logger.recordOutput("Vision/Camera$cameraIndex/AngularStdDevs", angularStdDevs.toDoubleArray())
 

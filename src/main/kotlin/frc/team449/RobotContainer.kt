@@ -83,7 +83,6 @@ object RobotContainer {
                 VisionSubsystem(
                     drive::addVisionMeasurement,
                     { questNav.isActive },
-                    questNav.questNav::setPose,
 
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
@@ -103,7 +102,6 @@ object RobotContainer {
                 VisionSubsystem(
                     drive::addVisionMeasurement,
                     { questNav.isActive },
-                    questNav.questNav::setPose,
                     VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
 //                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
@@ -111,7 +109,6 @@ object RobotContainer {
             else -> VisionSubsystem(
                 drive::addVisionMeasurement,
                 { questNav.isActive },
-                questNav.questNav::setPose,
 //                object : VisionIO {},
                 object : VisionIO {},
             )

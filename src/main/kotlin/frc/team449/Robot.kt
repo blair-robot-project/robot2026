@@ -62,6 +62,8 @@ class Robot : LoggedRobot() {
 
         robotContainer.bindings.setDefaultCommands()
         robotContainer.bindings.bindControls()
+
+        robotContainer.questNav.questNav.setPose(robotContainer.vision.latestPoseForQuestNav)
     }
 
     override fun robotPeriodic() {
@@ -71,6 +73,9 @@ class Robot : LoggedRobot() {
         Logger.recordOutput("MatchTime", DriverStation.getMatchTime())
 
         logComponentPoses()
+
+        // robotContainer.vision.periodic()
+        robotContainer.questNav.questNav.onConnected { robotContainer.questNav.questNav.setPose(robotContainer.vision.latestPoseForQuestNav) }
     }
 
     override fun autonomousInit() {
