@@ -70,12 +70,20 @@ object RobotContainer {
             },
         )
 
+    val questNav: QuestNav =
+        QuestNav(
+            VisionConstants.ROBOT_TO_VISIONQUEST,
+            drive::addVisionMeasurement,
+        )
+
+    @Suppress("unused")
     val vision: VisionSubsystem =
         when (Constants.CURRENT_MODE) {
             Mode.REAL ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    { questNav.getIsDisconnected },
+                    { questNav.isActive },
+                    questNav.questNav::setPose,
 
                     VisionIOLimelight(
                         VisionConstants.CAMERA_RIGHT_NAME,
@@ -90,26 +98,24 @@ object RobotContainer {
 //                        VisionConstants.ROBOT_TO_CAMERA_LEFT
 //                    ),
                 )
+
             Mode.SIM ->
                 VisionSubsystem(
                     drive::addVisionMeasurement,
-                    { questNav.getIsDisconnected },
+                    { questNav.isActive },
+                    questNav.questNav::setPose,
                     VisionIOPhotonVisionSim("camera1", VisionConstants.ROBOT_TO_CAMERA_RIGHT) { drive.pose },
 //                    VisionIOPhotonVisionSim("camera2", VisionConstants.ROBOT_TO_CAMERA_LEFT) { drive.pose },
                 )
+
             else -> VisionSubsystem(
                 drive::addVisionMeasurement,
-                { questNav.getIsDisconnected },
+                { questNav.isActive },
+                questNav.questNav::setPose,
 //                object : VisionIO {},
                 object : VisionIO {},
             )
         }
-
-    val questNav: QuestNav =
-        QuestNav(
-            VisionConstants.ROBOT_TO_VISIONQUEST,
-            drive::addVisionMeasurement,
-        )
 
     val intake: IntakeSubsystem =
         IntakeSubsystem(

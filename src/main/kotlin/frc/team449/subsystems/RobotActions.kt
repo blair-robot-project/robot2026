@@ -15,6 +15,7 @@ import frc.team449.subsystems.shooter.ShooterSubsystem
 class RobotActions(
     robotContainer: RobotContainer
 ) {
+    @Suppress("unused")
     private val drive: DriveSubsystem = robotContainer.drive
     private val intake: IntakeSubsystem = robotContainer.intake
     private val indexer: IndexerSubsystem = robotContainer.indexer
@@ -79,6 +80,7 @@ class RobotActions(
         )
             .withName("StopAll")
 
+    @Suppress("unused")
     fun stopFeed(): Command = indexer.stop()
 
     fun stopAllAndHomeHood(): Command =

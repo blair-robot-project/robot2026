@@ -28,6 +28,7 @@ data class TargetObservation(
 ) : StructSerializable {
     companion object {
         @JvmField
+        @Suppress("unused")
         val struct = object : Struct<TargetObservation> {
             override fun getTypeClass(): Class<TargetObservation> = TargetObservation::class.java
 
@@ -61,6 +62,7 @@ data class PoseObservation(
 ) : StructSerializable {
     companion object {
         @JvmField
+        @Suppress("unused")
         val struct: Struct<PoseObservation> = object : Struct<PoseObservation> {
             override fun getTypeClass(): Class<PoseObservation> = PoseObservation::class.java
 
@@ -92,6 +94,7 @@ data class PoseObservation(
     }
 }
 
+@Suppress("SpellCheckingInspection")
 enum class PoseObservationType {
     MEGATAG_1,
     MEGATAG_2,

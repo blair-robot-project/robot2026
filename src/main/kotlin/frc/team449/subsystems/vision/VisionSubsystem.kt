@@ -20,7 +20,8 @@ import kotlin.math.pow
 
 class VisionSubsystem(
     private val consumeVisionMeasurement: (visionRobotPoseMeters: Pose2d, timestampSeconds: Double, visionMeasurementStdDevs: Matrix<N3, N1>) -> Unit,
-    private val isQuestNavDisconnected: Supplier<Boolean>,
+    private val questNavActive: Supplier<Boolean>,
+    private val updateQuestNavPose: (Pose3d) -> Unit,
     private vararg val io: VisionIO
 ) : SubsystemBase() {
     private val inputs = Array(io.size) { VisionIOInputsAutoLogged() }
@@ -28,12 +29,14 @@ class VisionSubsystem(
         Alert("Vision Camera $i Disconnected.", AlertType.kWarning)
     }
 
+    @Suppress("unused")
     fun getLatestTargetX(cameraIndex: Int): Rotation2d {
         val input = inputs[cameraIndex]
         if (input.tagIds.isEmpty()) return Rotation2d.kZero
         return input.latestTargetObservation.tx
     }
 
+    @Suppress("unused")
     fun getLatestTargetY(cameraIndex: Int): Rotation2d {
         val input = inputs[cameraIndex]
         if (input.tagIds.isEmpty()) return Rotation2d.kZero
@@ -83,12 +86,22 @@ class VisionSubsystem(
                     linearStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                     angularStdDev *= VisionConstants.CAMERA_STD_DEV_FACTORS[cameraIndex]
                 }
-                if (!isQuestNavDisconnected.get()) {
+
+                if (!questNavActive.get()) {
                     consumeVisionMeasurement(
                         observation.pose.toPose2d(),
                         Utils.fpgaToCurrentTime(observation.timestamp),
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev)
                     )
+
+                    val confident = observation.tagCount > 2 &&
+                        observation.averageTagDistance < 4.0 &&
+                        linearStdDev > 0.05 &&
+                        observation.ambiguity < VisionConstants.MAX_AMBIGUITY
+
+                    if (confident) {
+                        updateQuestNavPose(observation.pose)
+                    }
                 }
                 linearStdDevs.add(linearStdDev)
                 angularStdDevs.add(angularStdDev)
