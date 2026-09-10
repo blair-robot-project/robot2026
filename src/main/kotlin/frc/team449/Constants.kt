@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package frc.team449
 
 import com.ctre.phoenix6.signals.InvertedValue
@@ -5,8 +7,12 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue
 import com.ctre.phoenix6.signals.NeutralModeValue
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
+import edu.wpi.first.math.Matrix
+import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.geometry.*
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap
+import edu.wpi.first.math.numbers.N1
+import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.units.Units.*
 import edu.wpi.first.units.measure.*
@@ -315,9 +321,9 @@ object Constants {
         const val VELOCITY_TOLERANCE_RADS_PER_SEC = 0.25
     }
 
-    object LEDConstants {
-        // led constants
-    }
+//    object LEDConstants {
+//        // led constants
+//    }
 
     object VisionConstants {
         // --- WORLDS WELDED REBUILT FIELD ---
@@ -325,11 +331,14 @@ object Constants {
 
         // --- CAMERA IDENTIFIERS ---
         const val CAMERA_RIGHT_NAME: String = "limelight-right"
-        const val CAMERA_LEFT_NAME: String = "limelight-left"
+//        const val CAMERA_LEFT_NAME: String = "limelight-left"
 
         // --- ROBOT TO CAMERA TRANSFORMS ---
         var ROBOT_TO_CAMERA_RIGHT: Pose3d = Pose3d(-0.013, 0.270, 0.539243, Rotation3d(0.0, 0.438377245469, -0.583128849696))
-        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.013, -0.270, 0.539243, Rotation3d(0.0, 0.438377245469, 0.583128849696))
+//        var ROBOT_TO_CAMERA_LEFT: Pose3d = Pose3d(-0.013, -0.270, 0.539243, Rotation3d(0.0, 0.438377245469, 0.583128849696))
+
+        @Suppress("SpellCheckingInspection")
+        var ROBOT_TO_VISIONQUEST: Transform3d = Transform3d(0.3, 0.3, 0.3, Rotation3d.kZero)
         // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-coordinate-systems#robot-space
 
         // x: -0.270 m
@@ -354,6 +363,14 @@ object Constants {
                 1.0, // camera 1
             )
 
+        @Suppress("SpellCheckingInspection")
+        var QUESTNAV_STD_DEVS: Matrix<N3, N1> = VecBuilder.fill(
+            0.02, // X position trust (20 mm)
+            0.02, // Y position trust (20 mm)
+            0.0872665
+        ) // Rotation trust (5 degrees)
+
+        @Suppress("SpellCheckingInspection")
         // --- MEGATAG2 STANDARD DEVIATION MULTIPLIERS ---
         const val MT2_LINEAR_STD_DEV_FACTOR: Double = 0.5 // more stable than full 3D solve
         const val MT2_ANGULAR_STD_DEV_FACTOR: Double = Double.POSITIVE_INFINITY // no rotation data available

@@ -76,7 +76,7 @@ open class DriveIOHardware(
         BaseStatusSignal.setUpdateFrequencyForAll(100.0, *gyroSignals)
         BaseStatusSignal.setUpdateFrequencyForAll(50.0, *moduleSignals)
 
-        ParentDevice.optimizeBusUtilizationForAll(pigeon2, *modules.flatMap { listOf(it.driveMotor, it.steerMotor) }.toTypedArray())
+        ParentDevice.optimizeBusUtilizationForAll(pigeon2, *modules.flatMap { listOf(it.driveMotor, it.steerMotor) }.toTypedArray<ParentDevice>())
     }
 
     override fun updateInputs(inputs: DriveIO.DriveIOInputs) {
