@@ -44,7 +44,7 @@ object Constants {
 
         // --- SPEED LIMITS (STANDARD) ---
         const val MAX_LINEAR_SPEED_METERS_PER_SEC = 4.7244
-        const val MAX_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI
+        const val MAX_ANGULAR_SPEED_RADS_PER_SEC = 2 * PI / 0.8
 
         // --- SPEED LIMITS (SLOW) ---
         const val SLOW_LINEAR_SPEED_METERS_PER_SEC = 1.5

@@ -6,6 +6,7 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.wpilibj.DataLogManager
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.RobotController
@@ -30,8 +31,9 @@ class Robot : LoggedRobot() {
 
         when (Constants.CURRENT_MODE) {
             Constants.Mode.REAL -> {
-                Logger.addDataReceiver(WPILOGWriter())
+                Logger.addDataReceiver(WPILOGWriter("/u/logs"))
                 Logger.addDataReceiver(NT4Publisher())
+                DataLogManager.start("/u/logs")
             }
 
             Constants.Mode.SIM -> {
