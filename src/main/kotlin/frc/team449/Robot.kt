@@ -30,7 +30,7 @@ class Robot : LoggedRobot() {
 
         when (Constants.CURRENT_MODE) {
             Constants.Mode.REAL -> {
-                Logger.addDataReceiver(WPILOGWriter())
+                Logger.addDataReceiver(WPILOGWriter("/home/lvuser/logs/cri"))
                 Logger.addDataReceiver(NT4Publisher())
             }
 

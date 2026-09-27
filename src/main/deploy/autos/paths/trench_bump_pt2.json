@@ -55,8 +55,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 5.780338275733461,
-        "y_meters": 2.8771924407463523,
+        "x_meters": 5.7502266877506285,
+        "y_meters": 2.8019134707892714,
         "intermediate_handoff_radius_meters": 0.39999999999999997
       },
       "rotation_target": {
@@ -67,8 +67,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 5.920272050396656,
-        "y_meters": 3.3969068605796044,
+        "x_meters": 5.92,
+        "y_meters": 3.3421673819742495,
         "intermediate_handoff_radius_meters": 0.39999999999999997
       },
       "rotation_target": {
@@ -79,8 +79,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.1222187277497815,
-        "y_meters": 3.5218188495869125,
+        "x_meters": 7.137274521741197,
+        "y_meters": 3.4220000000000006,
         "intermediate_handoff_radius_meters": 0.39999999999999997
       },
       "rotation_target": {
@@ -91,8 +91,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 8.078339950492968,
-        "y_meters": 3.5674971102253723,
+        "x_meters": 8.048228362510132,
+        "y_meters": 3.1207167381974275,
         "intermediate_handoff_radius_meters": 0.39999999999999997
       },
       "rotation_target": {
@@ -103,8 +103,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 8.087838570387262,
-        "y_meters": 2.8307701916380577,
+        "x_meters": 7.982448012447346,
+        "y_meters": 2.8909933676037225,
         "intermediate_handoff_radius_meters": 0.30000000000000004
       },
       "rotation_target": {
@@ -115,8 +115,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 6.539195433841327,
-        "y_meters": 2.4282687576664124,
+        "x_meters": 6.825255519678237,
+        "y_meters": 2.4583803456492452,
         "intermediate_handoff_radius_meters": 0.35
       },
       "rotation_target": {

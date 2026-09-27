@@ -19,7 +19,7 @@ object Constants {
     enum class Mode {
         REAL,
         SIM,
-        REPLAY
+        REPLAY,
     }
 
     val CURRENT_MODE: Mode = if (RobotBase.isReal()) Mode.REAL else Mode.SIM
@@ -76,7 +76,7 @@ object Constants {
         const val CTE_D = 0.0
 
         // --- OPERATION TIMING ---
-        const val AUTO_SHOOTING_TIME_SEC = 3.0
+        const val AUTO_SHOOTING_TIME_SEC = 2.67
         const val AUTO_PRELOAD_SHOOTING_TIME_SEC = 1.0
 
         // --- SPEED LIMITS ---
