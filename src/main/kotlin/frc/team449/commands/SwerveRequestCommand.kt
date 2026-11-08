@@ -93,7 +93,7 @@ class SwerveRequestCommand(
                 headingSetpoint = Optional.of(drive.pose.rotation)
             }
 
-            if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)==DriverStation.Alliance.Red) {
+            if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
                 drive.setControl(
                     driveWithHeading
                         .withVelocityX(throttle)
